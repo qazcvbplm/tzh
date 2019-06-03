@@ -3,6 +3,7 @@ package com.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.exception.YWException;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -28,7 +29,7 @@ public class BaiduUtil {
         	//String r =HttpRequest.sendGet(url,"&output=json&origins=" + origins + "&destinations=" + destinations + "&ak=" + ak);
             JSONObject json = JSON.parseObject(r, JSONObject.class);
             if(json.getInteger("status")!=0) {
-            	throw new RuntimeException(json.getString("message"));
+            	throw new YWException(json.getString("message"));
             }else {
             	return json.getJSONArray("result").getJSONObject(0).getJSONObject("distance").getInteger("value");
             }

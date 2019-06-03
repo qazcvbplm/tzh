@@ -19,7 +19,7 @@ public class ExceptionHandler {
      * @return
      */
     @ResponseBody
-    @org.springframework.web.bind.annotation.ExceptionHandler(RuntimeException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(YWException.class)
     public ResponseObject errorHandler(Exception ex) {
         stringWriter = new StringWriter();
         ex.printStackTrace(new PrintWriter(stringWriter));

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,7 +97,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 		map.put("amount", orders.getTotalPrice());
 		if(wxUserBellMapper.pay(map)==1){
 			if(paySuccess( orders.getId(),"余额支付")==0){
-				throw new RuntimeException("订单状态异常");
+				throw new YWException("订单状态异常");
 			}
 			  WxUserBell userbell= wxUserBellMapper.selectByPrimaryKey(user.getOpenId()+"-"+user.getPhone());
 	       	  WxUser wxGUser=wxUserMapper.findGzh(user.getPhone());
@@ -115,7 +116,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 	       	  }
 			return 1;
 		}else{
-			throw new RuntimeException("余额不足");
+			throw new YWException("余额不足");
 		}
 	}
 
@@ -137,7 +138,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
                 int result=RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(), school.getWxPayId(), school.getCertPath(),
                 		orders.getId(), fee, fee); 
                 if(result!=1){
-                	throw new RuntimeException("退款失败联系管理员");
+                	throw new YWException("退款失败联系管理员");
                 }else{
                 	return 1;
                 }
@@ -150,7 +151,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 				if(wxUserBellMapper.charge(map)==1){
 					return 1;
 				}else{
-					throw new RuntimeException("退款失败联系管理员");
+					throw new YWException("退款失败联系管理员");
 				}
 			}
 		}

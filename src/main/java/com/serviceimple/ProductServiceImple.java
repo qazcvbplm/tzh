@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,7 +80,7 @@ public class ProductServiceImple implements ProductService{
 			map.put("count", counts.get(i));
              if(temp.getStockFlag()==1){
 				if(productMapper.stock(map)!=1){
-					throw new RuntimeException("库存不足");
+					throw new YWException("库存不足");
 				}
 			}
 		}

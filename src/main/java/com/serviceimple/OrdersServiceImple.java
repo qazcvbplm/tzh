@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -222,7 +223,7 @@ public class OrdersServiceImple implements OrdersService {
 		map.put("amount", orders.getPayPrice());
 		if (wxUserBellMapper.pay(map) == 1) {
 			if (paySuccess(orders.getId(), "余额支付") == 0) {
-				throw new RuntimeException("订单状态异常");
+				throw new YWException("订单状态异常");
 			}
 		  WxUser wxUser=wxUserMapper.selectByPrimaryKey(orders.getOpenId());
 		  WxUserBell userbell= wxUserBellMapper.selectByPrimaryKey(wxUser.getOpenId()+"-"+wxUser.getPhone());
@@ -245,7 +246,7 @@ public class OrdersServiceImple implements OrdersService {
        //	stringRedisTemplate.boundListOps("shopDJS"+orders.getShopId()).rightPush(value);
 			return 1;
 		} else {
-			throw new RuntimeException("余额不足");
+			throw new YWException("余额不足");
 		}
 	}
 
@@ -263,7 +264,7 @@ public class OrdersServiceImple implements OrdersService {
 				int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),
 						school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
 				if (result != 1) {
-					throw new RuntimeException("退款失败联系管理员");
+					throw new YWException("退款失败联系管理员");
 				} else {
 					return orders.getShopId();
 				}
@@ -276,7 +277,7 @@ public class OrdersServiceImple implements OrdersService {
 				if (wxUserBellMapper.charge(map) == 1) {
 					return orders.getShopId();
 				} else {
-					throw new RuntimeException("退款失败联系管理员");
+					throw new YWException("退款失败联系管理员");
 				}
 			}
 		}

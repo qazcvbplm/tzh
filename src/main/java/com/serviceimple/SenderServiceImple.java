@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class SenderServiceImple implements SenderService {
 		if (senderMapper.check(sender.getOpenId()) == null) {
 			senderMapper.insert(sender);
 		} else {
-			throw new RuntimeException("请勿重复申请");
+			throw new YWException("请勿重复申请");
 		}
 	}
 
@@ -380,7 +381,7 @@ public class SenderServiceImple implements SenderService {
 		WxUser user = wxUserMapper.findByschoolAndPhone(query);
 		School school = schoolMapper.selectByPrimaryKey(sender.getSchoolId());
 		if (user == null) {
-			throw new RuntimeException("提现失败，请返回" + school.getName() + "绑定该手机号码");
+			throw new YWException("提现失败，请返回" + school.getName() + "绑定该手机号码");
 		}
 		Map<String, Object> map = new HashMap();
 		map.put("phone", senderId + "-" + sender.getPhone());
@@ -404,7 +405,7 @@ public class SenderServiceImple implements SenderService {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return 2;
 		}
-		throw new RuntimeException("余额不足");
+		throw new YWException("余额不足");
 	}
 
 	@Override
@@ -444,7 +445,7 @@ public class SenderServiceImple implements SenderService {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return 2;
 		}
-		throw new RuntimeException("余额不足");
+		throw new YWException("余额不足");
 	}
 
 }

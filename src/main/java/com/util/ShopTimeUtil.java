@@ -1,5 +1,7 @@
 package com.util;
 
+import com.exception.YWException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,7 +18,7 @@ public class ShopTimeUtil {
 		try {
 			return sdf2.parse(newtime).getTime();
 		} catch (ParseException e) {
-		    throw new RuntimeException("时间格式不正确");
+		    throw new YWException("时间格式不正确");
 		}
 		
 	}
@@ -26,7 +28,7 @@ public class ShopTimeUtil {
 		try {
 			return today = sdf.parse(sdf.format(new Date())).getTime();
 		} catch (ParseException e) {
-			throw new RuntimeException("时间格式不正确");
+			throw new YWException("时间格式不正确");
 		}
 	}
 	

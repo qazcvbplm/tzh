@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +66,7 @@ public class WxUserServiceImple implements WxUserService{
 			if(wxUserBellMapper.findByPhone(wxUser.getOpenId()+"-"+wxUser.getPhone())==0){
 				wxUserBellMapper.insert(new WxUserBell(wxUser.getOpenId()+"-"+wxUser.getPhone()));
 			}else{
-				throw new RuntimeException("手机号码已被注册");
+				throw new YWException("手机号码已被注册");
 			}
 		}
 		wxUserMapper.updateByPrimaryKeySelective(wxUser);

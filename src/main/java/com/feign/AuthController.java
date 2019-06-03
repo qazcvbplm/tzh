@@ -1,5 +1,6 @@
 package com.feign;
 
+import com.exception.YWException;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +21,12 @@ public interface AuthController {
 
 		@Override
 		public String verify(String token) {
-			throw new RuntimeException("服务故障");
+			throw new YWException("服务故障");
 		}
 
 		@Override
 		public String getToken(String userId, String loginName, String role) {
-			throw new RuntimeException("服务故障");
+			throw new YWException("服务故障");
 		}
 		
 	}

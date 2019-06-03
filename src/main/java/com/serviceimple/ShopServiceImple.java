@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class ShopServiceImple implements ShopService{
 			shop.setSort(System.currentTimeMillis());	
 			shopMapper.insert(shop);
 		}else{
-			throw new RuntimeException("登录名重复请重新 输入");
+			throw new YWException("登录名重复请重新 输入");
 		}
 	}
 
@@ -68,7 +69,7 @@ public class ShopServiceImple implements ShopService{
 	public int update(Shop shop) {
 		if(shop.getShopLoginName()!=null){
 			if(shopMapper.checkByLoginName(shop.getShopLoginName())!=null){
-				throw new RuntimeException("登录名重复请重新 输入");
+				throw new YWException("登录名重复请重新 输入");
 			}
 		}
 		return shopMapper.updateByPrimaryKeySelective(shop);
@@ -101,10 +102,10 @@ public class ShopServiceImple implements ShopService{
 			if(shop.getShopLoginPassWord().equals(enCode)){
 				return shop;
 			}else{
-				throw new RuntimeException("密码错误");
+				throw new YWException("密码错误");
 			}
 		}else{
-			throw new RuntimeException("用户名不存在");
+			throw new YWException("用户名不存在");
 		}
 	}
 

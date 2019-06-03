@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.exception.YWException;
 import com.thoughtworks.xstream.core.util.Base64Encoder;
 
 
@@ -40,7 +41,7 @@ public class WXUtil {
 			} 
 			else
 			{
-				throw new RuntimeException(RequestOpenidjson.getString("errmsg"));
+				throw new YWException(RequestOpenidjson.getString("errmsg"));
 			}
 	}
 	

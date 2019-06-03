@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,9 +98,9 @@ public class SchoolServiceImple implements SchoolService{
 				LoggerUtil.log(schoolId+","+openId + ":" + amount + e.getMessage());
 		        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			}
-			throw new RuntimeException("提现失败");
+			throw new YWException("提现失败");
 		}else{
-			throw new RuntimeException("余额不足");
+			throw new YWException("余额不足");
 		}
 		
 	}

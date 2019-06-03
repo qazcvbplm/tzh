@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.exception.YWException;
 import org.json.JSONException;
 import org.springframework.validation.BindingResult;
 
@@ -32,7 +33,7 @@ public class Util{
 		try {
 			return sdf3.parse(day).getTime();
 		} catch (ParseException e) {
-			throw new RuntimeException("时间格式有误");
+			throw new YWException("时间格式有误");
 		}
 	}
 	public static boolean containsEmoji(String source) {
@@ -143,7 +144,7 @@ public class Util{
     public static void checkParams(BindingResult result){
     	    if(result.hasErrors())
     	    {
-    	    	throw new RuntimeException(result.getAllErrors().get(0).getDefaultMessage());
+    	    	throw new YWException(result.getAllErrors().get(0).getDefaultMessage());
     	    }
     }
     
@@ -191,7 +192,7 @@ public class Util{
 		  param=params.split(",");
 		  SmsSingleSenderResult result=sender.sendWithParam("86", phoneNumber, templateId, param,sign, "", "");
 		  if(result.result!=0){
-			  throw new RuntimeException(result.errMsg);
+			  throw new YWException(result.errMsg);
 		  }
 	}
 }

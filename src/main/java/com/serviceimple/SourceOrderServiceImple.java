@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,7 @@ public class SourceOrderServiceImple implements SourceOrderService{
 		if(wxUserBellMapper.paySource(map)==1){
 			sourceOrderMapper.insert(sourceOrder);
 		}else{
-			throw new RuntimeException("积分不足");
+			throw new YWException("积分不足");
 		}
 		return sourceOrder.getId();
 	}

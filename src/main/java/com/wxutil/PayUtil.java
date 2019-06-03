@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.exception.YWException;
 import org.apache.commons.codec.digest.DigestUtils;
 
 public class PayUtil {
@@ -98,7 +99,7 @@ public class PayUtil {
         try {
             return content.getBytes(charset);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("MD5签名过程中出现错�??,指定的编码集不对,您目前指定的编码集是:" + charset);
+            throw new YWException("MD5签名过程中出现错�??,指定的编码集不对,您目前指定的编码集是:" + charset);
         }
     }
 
