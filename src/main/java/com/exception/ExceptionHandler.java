@@ -19,16 +19,16 @@ public class ExceptionHandler {
      * @return
      */
     @ResponseBody
-    @org.springframework.web.bind.annotation.ExceptionHandler(YWException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(RuntimeException.class)
     public ResponseObject errorHandler(Exception ex) {
         stringWriter = new StringWriter();
         ex.printStackTrace(new PrintWriter(stringWriter));
         LoggerUtil.log(stringWriter.toString());
-        if (ex.getMessage() == null || ex.getMessage().length() < 2) {
-    		return new ResponseObject(false, "服务器被外星人攻击了！");
+        if (ex instanceof YWException) {
+            return new ResponseObject(false, ex.getMessage());
     	}
     	else{
-    		return new ResponseObject(false, ex.getMessage());
+            return new ResponseObject(false, "服务器被外星人攻击了！");
     	}
     }
     
