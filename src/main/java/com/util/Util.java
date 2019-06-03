@@ -24,7 +24,7 @@ public class Util{
 
 	/**
 	 * 将小时开始的时间转成时间戳
-	 * @param hh
+	 * @param hhmm
 	 * @return
 	 */
 	public static Long TimetoLong(String hhmm){

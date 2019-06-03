@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.util.SpringUtil;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +21,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fastjson.JSON;
 import com.entity.Orders;
 import com.service.OrdersService;
+import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
@@ -45,13 +47,22 @@ public class App {
 	}
 	 @Bean
 	 public String ordersRedisConfig() {
-		 
 		List<Orders> orders= ordersService.findAllDjs();
 		for(Orders temp:orders){
 			stringRedisTemplate.boundHashOps("SHOP_DJS"+temp.getShopId()).put(temp.getId(), JSON.toJSONString(temp));;
 		}
 	        return "ok";
 	 }
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+
+	@Bean
+	public SpringUtil springUtil() {
+		return new SpringUtil();
+	}
 
 	
 }
