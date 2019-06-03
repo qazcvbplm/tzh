@@ -1,6 +1,5 @@
 package com.config;
 
-import com.redis.message.AndroidListener;
 import com.redis.message.PoductListener;
 import com.redis.message.SchoolListener;
 import com.redis.message.WxUserListener;
@@ -48,8 +47,7 @@ public class RedisConfig {
     RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
                                             MessageListenerAdapter listenerAdapter,
                                             MessageListenerAdapter listenerAdapter2,
-                                            MessageListenerAdapter listenerAdapter3,
-                                            MessageListenerAdapter listenerAdapter4) {
+                                            MessageListenerAdapter listenerAdapter3) {
 
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
@@ -57,7 +55,6 @@ public class RedisConfig {
         container.addMessageListener(listenerAdapter, new PatternTopic(SENDERBELL));
         container.addMessageListener(listenerAdapter2, new PatternTopic(SCHOOLBELL));
         container.addMessageListener(listenerAdapter3, new PatternTopic(PRODUCTADD));
-        container.addMessageListener(listenerAdapter4, new PatternTopic(SOCKET));
         //这个container 可以添加多个 messageListener
         return container;
     }
@@ -87,12 +84,6 @@ public class RedisConfig {
         return new MessageListenerAdapter(receiver, "receiveMessage");
     }
 
-    @Bean
-    MessageListenerAdapter listenerAdapter4(AndroidListener receiver) {
-        //这个地方 是给messageListenerAdapter 传入一个消息接受的处理器，利用反射的方法调用“receiveMessage”
-        //也有好几个重载方法，这边默认调用处理器的方法 叫handleMessage 可以自己到源码里面看
-        return new MessageListenerAdapter(receiver, "receiveMessage");
-    }
     
 
 
