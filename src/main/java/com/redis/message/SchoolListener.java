@@ -65,7 +65,7 @@ public class SchoolListener {
 						String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 						try {
 							List<Integer> ids = senderMapper.findSenderIdBySchoolId(ok.getSchoolId());
-							int index=(int)Math.random()*ids.size();
+							int index=new BigDecimal(Math.random()*ids.size()).intValue();
 							TxLog log = new TxLog(ids.get(index), "配送员提现", null, amount, "", school.getId(),
 									school.getAppId());
 							WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
@@ -87,6 +87,7 @@ public class SchoolListener {
 			cache.amountadd(schoolId, total.add(senderPrice));
 		}
 	}
+
 
 
 }

@@ -17,6 +17,6 @@
   </update>
   
   <update id="tx" parameterType="map">
-  update mqtt set total=total-#{amount},tx=0 where id=#{id} and tx=1 and total>#{amount}
+  update mqtt set total=total-#{amount} where id=#{id} and tx=1 and total>#{amount}
   </update>
 </mapper>
