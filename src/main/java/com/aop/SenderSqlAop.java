@@ -33,14 +33,15 @@ public class SenderSqlAop {
         	return null;
         }
         int id=(int) params[0];
-        Object rs=null;
+        String rs=null;
         if(Boolean.parseBoolean(cache.opsForValue().get("cache"))){
-        	if((rs=cache.boundValueOps("SENDER_ID_"+id))==null){
+            rs=cache.boundValueOps("SENDER_ID_"+id).get();
+        	if(rs==null||rs.trim().equals("")){
         		Sender msg=(Sender) thisJoinPoint.proceed();
         		cache.boundValueOps("SENDER_ID_"+id).set(JSON.toJSONString(msg),2,TimeUnit.DAYS);
         		return msg;
         	}else{
-        		return JSON.parseObject(rs.toString(), Sender.class);
+        		return JSON.parseObject(rs, Sender.class);
         	}
         }else{
         	return thisJoinPoint.proceed();
