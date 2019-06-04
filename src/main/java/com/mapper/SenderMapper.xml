@@ -15,7 +15,9 @@
     <result column="shop_ids" jdbcType="VARCHAR" property="shopIds" />
     <result column="floor_ids" jdbcType="VARCHAR" property="floorIds" />
   </resultMap>
-  
+  <select id="findSenderIdBySchoolId" parameterType="int" resultType="Integer">
+      select id from sender where exam='审核通过' and school_id = #{schoolId}
+  </select>
   <select id="finddsh" parameterType="int" resultType="int">
      select count(*) from sender where exam='待审核' and school_id=#{schoolId}
   </select>

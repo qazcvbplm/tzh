@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.entity.Sender;
 
+import java.util.concurrent.TimeUnit;
+
 @Aspect
 @Component
 public class SenderSqlAop {
@@ -33,9 +35,9 @@ public class SenderSqlAop {
         int id=(int) params[0];
         Object rs=null;
         if(Boolean.parseBoolean(cache.opsForValue().get("cache"))){
-        	if((rs=cache.boundHashOps("SENDER").get(id+""))==null){
+        	if((rs=cache.boundValueOps("SENDER_ID_"+id))==null){
         		Sender msg=(Sender) thisJoinPoint.proceed();
-        		cache.boundHashOps("SENDER").put(""+id, JSON.toJSONString(msg));
+        		cache.boundValueOps("SENDER_ID_"+id).set(JSON.toJSONString(msg),2,TimeUnit.DAYS);
         		return msg;
         	}else{
         		return JSON.parseObject(rs.toString(), Sender.class);

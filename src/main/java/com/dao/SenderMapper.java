@@ -23,4 +23,6 @@ public interface SenderMapper {
 	int count(Sender sender);
 
 	int finddsh(int schoolId);
+
+	List<Integer> findSenderIdBySchoolId(Integer schoolId);
 }
