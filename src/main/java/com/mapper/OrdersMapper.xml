@@ -290,7 +290,7 @@
   
   <select id="senderStatistics" parameterType="map"  resultMap="BaseResultMap"> 
      select id,status,sender_id,create_time,count(*) as floor_id,sum(send_price) as send_price from orders  where sender_id = #{senderId}
-     and status='已完成' and create_time between #{beginTime} and #{endTime} group by status
+     and (status='已完成' or status='配送员已接手') and create_time between #{beginTime} and #{endTime} group by status
   </select>
   
   <update id="pl" parameterType="string">
