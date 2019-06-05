@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dao.ProductAttributeMapper;
 import com.entity.Address;
 import com.service.AddressService;
 import com.util.ResponseObject;
@@ -29,9 +28,7 @@ public class AddressController {
 	
 	@Autowired
 	private AddressService addressService;
-	@Autowired
-	private ProductAttributeMapper pam;
-	
+
 
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")

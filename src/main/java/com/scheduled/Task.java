@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.dto.RunOrdersTj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -36,17 +37,18 @@ public class Task {
 	@Autowired
 	private OrdersMapper ordersService;
 	@Autowired
-	private RunOrdersMapper runordersService;
+	private RunOrdersMapper runOrdersMapper;
 	@Autowired
 	private DayLogTakeoutMapper dayLogTakeoutMapper;
 	@Autowired
 	private RedisUtil cache;
 
+
 	//0 0 10,14,16 * * ?   每天上午10点，下午2点，4点 
 	@Scheduled(cron="0 0 2 * * ?")
 	public void task(){
 		ordersService.remove();
-		runordersService.remove();
+		runOrdersMapper.remove();
 	}
 	
 	@Scheduled(cron="0 0 0 * * ?")
@@ -86,6 +88,12 @@ public class Task {
 				DayLogTakeout daylog=new DayLogTakeout()
 			 			.schoollog(schooltemp.getName(), schooltemp.getId(), day, result,"学校商铺日志",schooltemp.getAppId());
 				dayLogTakeoutMapper.insert(daylog);
+			}
+			//////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
+			for(School schooltemp:schools){
+				List<RunOrdersTj> runOrdersTjs=runOrdersMapper.tj(schooltemp.getId());
+				DayLogTakeout runLog= new DayLogTakeout(day,schooltemp,runOrdersTjs);
+				dayLogTakeoutMapper.insert(runLog);
 			}
 			LoggerUtil.log("统计耗时:"+(System.currentTimeMillis()-start));
 		}

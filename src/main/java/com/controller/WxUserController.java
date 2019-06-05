@@ -54,9 +54,7 @@ public class WxUserController {
 	@Autowired
 	private RedisUtil cache;
 	
-  /*public static Map<String,Long> code=new HashMap<>();
-	public static Map<String,String> code2=new HashMap<>();*/
-	
+
 	@ApiOperation(value="微信用户登录",httpMethod="POST")
 	@PostMapping("wx/login")
 	public ResponseObject login(HttpServletRequest request,HttpServletResponse response,String code,Integer schoolId){
@@ -106,9 +104,6 @@ public class WxUserController {
 	@ApiOperation(value="微信用户更新",httpMethod="POST")
 	@PostMapping("wx/update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,@ModelAttribute WxUser wxUser){
-		/*if(Util.containsEmoji(wxUser.getNickName())){
-			wxUser.setNickName(Util.filterEmoji(wxUser.getNickName()));
-        }*/
 		wxUser.setOpenId(request.getAttribute("Id").toString());
 		wxUser.setPhone(null);
 		if(wxUser.getNickName()!=null&&EmojiManager.isEmoji(wxUser.getNickName())){
@@ -155,8 +150,6 @@ public class WxUserController {
 				WxUser wxUser=new WxUser();
 				wxUser.setPhone(phone);
 				wxUser.setOpenId(id);
-				/*code.remove(phone);
-				code2.remove(phone);*/
 				stringRedisTemplate.delete(phone);
 				return new ResponseObject(true, "绑定成功").push("user", wxUserService.update(wxUser));
 			}else{
