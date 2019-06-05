@@ -72,7 +72,7 @@
   ,sum(oc.app_get_total) as app_get_total,sum(oc.shop_get_total) as shop_get_total,
   sum(oc.school_get_shop) as school_get_shop,sum(oc.school_get_sender) as school_get_sender,oc.app_get_school_rate
   from orders o,orders_complete oc 
-  where oc.order_id=o.id and (o.status='已完成' or o.status='商家已接手' or o.status='配送员已接手') and o.shop_id=#{shopId} and end_time like #{day}
+  where oc.order_id=o.id and (o.status='已完成') and o.shop_id=#{shopId} and end_time like #{day}
   </select>
   
   <select id="completeBySchoolId" parameterType="map"  resultMap="BaseResultMap">
@@ -81,7 +81,7 @@
   sum(oc.app_get_total) as app_get_total,sum(oc.shop_get_total) as shop_get_total,
   sum(oc.school_get_shop) as school_get_shop,sum(oc.school_get_sender) as school_get_sender
   from orders o,orders_complete oc 
-  where oc.order_id=o.id and (o.status='已完成' or o.status='商家已接手' or o.status='配送员已接手') and o.school_id=#{schoolId} and end_time like #{day}
+  where oc.order_id=o.id and (o.status='已完成') and o.school_id=#{schoolId} and end_time like #{day}
   </select>
   
   
@@ -289,7 +289,8 @@
   </select>
   
   <select id="senderStatistics" parameterType="map"  resultMap="BaseResultMap"> 
-     select id,status,sender_id,create_time,count(*) as floor_id,sum(send_price) as send_price from orders  where sender_id = #{senderId} and create_time between #{beginTime} and #{endTime} group by status  
+     select id,status,sender_id,create_time,count(*) as floor_id,sum(send_price) as send_price from orders  where sender_id = #{senderId}
+     and status='已完成' and create_time between #{beginTime} and #{endTime} group by status
   </select>
   
   <update id="pl" parameterType="string">
