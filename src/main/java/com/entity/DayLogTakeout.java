@@ -1,9 +1,11 @@
 package com.entity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.dto.RunOrdersTj;
 
 public class DayLogTakeout {
 	@TableId(type=IdType.AUTO)
@@ -36,11 +38,22 @@ public class DayLogTakeout {
     private BigDecimal sendPrice;
     
     private BigDecimal productPrice;
-    
-    
-    
-    
-    
+
+    public DayLogTakeout(String day,School school,List<RunOrdersTj> runOrdersTjs) {
+        this.selfId = school.getId();
+        this.parentId = school.getAppId();
+        this.day = day;
+        this.totalCount = 0;
+        this.totalPrice = new BigDecimal(0);
+        this.selfGet = new BigDecimal(0);
+        this.type="学校跑腿日志";
+        for(RunOrdersTj temp : runOrdersTjs){
+            this.totalCount +=temp.getCounts();
+            this.totalPrice=this.getTotalPrice().add(temp.getTotal());
+            this.selfGet = this.getSelfGet().add(temp.getSenderGet());
+        }
+    }
+
     public BigDecimal getBoxPrice() {
 		return boxPrice;
 	}
@@ -201,4 +214,6 @@ public class DayLogTakeout {
     public void setSelfgetTotalCount(Integer selfgetTotalCount) {
         this.selfgetTotalCount = selfgetTotalCount;
     }
+
+
 }
