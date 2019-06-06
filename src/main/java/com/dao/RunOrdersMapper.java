@@ -53,7 +53,7 @@ public interface RunOrdersMapper {
 
 	int countBySchoolId(int schoolId);
 
-	@Select("select count(id) as counts,sum(ro.total_price * s.rate) as senderGet,sum(ro.total_price) as total,ro.school_id as schoolId,ro.payment as payType " +
+	@Select("select count(ro.id) as counts,sum(ro.total_price * s.rate) as senderGet,sum(ro.total_price) as total,ro.school_id as schoolId,ro.payment as payType " +
 			"from run_orders ro,sender s where ro.school_id=#{schoolId} and ro.sender_id=s.id and ro.status='已完成' and to_days(ro.create_time)=to_days(now()) group by payType")
 	List<RunOrdersTj> tj(@Param("schoolId") Integer schoolId);
 }
