@@ -32,10 +32,10 @@ public class Test {
 	public void test(){
 		List<School> schools=schoolMapper.find(new School());
 		//////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
-		for(School schooltemp:schools){
+		/*for(School schooltemp:schools){
 			List<RunOrdersTj> runOrdersTjs=runOrdersMapper.tj(schooltemp.getId());
 			DayLogTakeout runLog= new DayLogTakeout("2019-06-05",schooltemp,runOrdersTjs);
 			dayLogTakeoutMapper.insert(runLog);
-		}
+		}*/
 	}
 }

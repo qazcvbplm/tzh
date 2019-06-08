@@ -1,7 +1,8 @@
 /*    */ package com.wx.towallet;
 import com.entity.TxLog;
 /*    */ 
-/*    */ import com.util.LoggerUtil;
+/*    */ import com.exception.YWException;
+import com.util.LoggerUtil;
 /*    */ import com.util.XMLUtil;
 /*    */ import java.math.BigDecimal;
 /*    */ import java.util.ArrayList;
@@ -48,9 +49,9 @@ import com.entity.TxLog;
 				log.setResult(resultMap.get("partner_trade_no").toString());
 /* 60 */       return 1;
 /*    */     }
-					log.setResult(resultMap.get("err_code_des")+","+resultMap.get("return_msg"));		
-/* 65 */     return 0;
-/*    */   }
+             log.setResult(resultMap.get("err_code_des")+","+resultMap.get("return_msg"));
+             throw new YWException(resultMap.get("return_msg").toString());
+             /*    */   }
 /*    */ }
 
 

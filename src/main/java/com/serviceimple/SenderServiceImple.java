@@ -413,6 +413,7 @@ public class SenderServiceImple implements SenderService {
 		return senderMapper.finddsh(schoolId);
 	}
 
+	@Transactional
 	@Override
 	public int tx2(String senderId, String userId) {
 		Sender sender = senderMapper.check(senderId);
@@ -441,8 +442,8 @@ public class SenderServiceImple implements SenderService {
 				}
 			} catch (Exception e) {
 				LoggerUtil.log(senderId + ":" + wxUserBell.getMoney() + e.getMessage());
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			}
-			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return 2;
 		}
 		throw new YWException("余额不足");

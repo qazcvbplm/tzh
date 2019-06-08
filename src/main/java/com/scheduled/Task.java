@@ -91,7 +91,7 @@ public class Task {
 			}
 			//////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
 			for(School schooltemp:schools){
-				List<RunOrdersTj> runOrdersTjs=runOrdersMapper.tj(schooltemp.getId());
+				List<RunOrdersTj> runOrdersTjs=runOrdersMapper.tj(schooltemp.getId(),day+"%");
 				DayLogTakeout runLog= new DayLogTakeout(day,schooltemp,runOrdersTjs);
 				dayLogTakeoutMapper.insert(runLog);
 			}
