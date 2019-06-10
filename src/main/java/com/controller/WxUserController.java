@@ -69,7 +69,7 @@ public class WxUserController {
 			   openid=WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
 			   String token=auth.getToken(openid, "wx","wxuser");
 			   user=wxUserService.login(openid,schoolId,school.getAppId(),"微信小程序");
-			   logsMapper.insert(new Logs(request.getRemoteAddr()+","+user.getNickName()));
+			   //logsMapper.insert(new Logs(request.getRemoteAddr()+","+user.getNickName()));
 			   cache.userCountadd(schoolId);
 			   return new ResponseObject(true, "ok").push("token", token).push("user",user);
 		   }else{
