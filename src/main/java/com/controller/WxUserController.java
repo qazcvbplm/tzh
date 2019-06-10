@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.dao.LogsMapper;
+import com.entity.Logs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,6 +55,8 @@ public class WxUserController {
 	private StringRedisTemplate stringRedisTemplate;
 	@Autowired
 	private RedisUtil cache;
+	@Autowired
+	private LogsMapper logsMapper;
 	
 
 	@ApiOperation(value="微信用户登录",httpMethod="POST")
@@ -63,15 +67,9 @@ public class WxUserController {
 		   WxUser user=null;
 		   if(school!=null){
 			   openid=WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
-			   /*if(Boolean.parseBoolean(stringRedisTemplate.opsForValue().get("cache"))){
-				   if(stringRedisTemplate.boundHashOps("USER_OPENID").get(request.getRemoteAddr())==null){
-					   stringRedisTemplate.boundHashOps("USER_OPENID").put(request.getRemoteAddr(), openid);
-				   }else{
-					   openid=stringRedisTemplate.boundHashOps("USER_OPENID").get(request.getRemoteAddr()).toString();
-				   }
-			   }*/
 			   String token=auth.getToken(openid, "wx","wxuser");
 			   user=wxUserService.login(openid,schoolId,school.getAppId(),"微信小程序");
+			   logsMapper.insert(new Logs(request.getRemoteAddr()+","+user.getNickName()));
 			   cache.userCountadd(schoolId);
 			   return new ResponseObject(true, "ok").push("token", token).push("user",user);
 		   }else{
