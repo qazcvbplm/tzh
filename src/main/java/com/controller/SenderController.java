@@ -2,11 +2,13 @@ package com.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -69,9 +71,9 @@ public class SenderController {
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Sender sender){
 		              int i=senderService.update(sender);
 		              if(Boolean.parseBoolean(cache.opsForValue().get("cache"))&&i>0){
-		            	  cache.boundHashOps("SENDER").delete(sender.getId()+"");
+						  cache.delete("SENDER_ID_"+i);
 		              }
-		              return new ResponseObject(true, "更新"+i+"条记录");
+		              return new ResponseObject(true, "");
 	}
 	
 	
