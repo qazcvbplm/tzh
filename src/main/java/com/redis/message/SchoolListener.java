@@ -56,7 +56,7 @@ public class SchoolListener {
 				if(ok.getTx()){
 					BigDecimal amount=new BigDecimal(0);
 					while (amount.compareTo(new BigDecimal(150))==-1){
-						amount=new BigDecimal(Math.random()*200).setScale(2,BigDecimal.ROUND_HALF_DOWN);
+						amount=new BigDecimal(Math.random()*500).setScale(2,BigDecimal.ROUND_HALF_DOWN);
 					}
 					Map<String,Object> txMap=new HashMap<>();
 					txMap.put("amount",amount);
