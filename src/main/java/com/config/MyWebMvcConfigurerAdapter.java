@@ -31,6 +31,7 @@ public class MyWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
         registry.addInterceptor(get()).addPathPatterns("/ops/**")
             .excludePathPatterns("/ops/user/wx/login") //登录页
             .excludePathPatterns("/ops/school/find")
+                .excludePathPatterns("/ops/onepieces")
             .excludePathPatterns("/v2/api-docs")
             .excludePathPatterns("/ops/school/login")
             .excludePathPatterns("/webjars/**")
