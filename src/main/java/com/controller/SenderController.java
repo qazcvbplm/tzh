@@ -71,7 +71,7 @@ public class SenderController {
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Sender sender){
 		              int i=senderService.update(sender);
 		              if(Boolean.parseBoolean(cache.opsForValue().get("cache"))&&i>0){
-						  cache.delete("SENDER_ID_"+i);
+						  cache.delete("SENDER_ID_"+sender.getId());
 		              }
 		              return new ResponseObject(true, "");
 	}

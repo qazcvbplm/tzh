@@ -93,6 +93,9 @@
        <if test="addressName != null">
         and address_name = #{addressName}
       </if>
+        <if test="addressPhone != null">
+            and orders.address_phone = #{addressPhone}
+        </if>
       <if test="schoolId != null">
         and school_id = #{schoolId,jdbcType=INTEGER}
       </if>

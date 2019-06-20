@@ -150,6 +150,9 @@
        <if test="addressName != null">
         and orders.address_name = #{addressName}
       </if>
+        <if test="addressPhone != null">
+            and orders.address_phone = #{addressPhone}
+        </if>
        <if test="shopName != null">
         and orders.shop_name = #{shopName}
       </if>
