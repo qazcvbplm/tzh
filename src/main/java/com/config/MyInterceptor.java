@@ -1,18 +1,17 @@
 package com.config;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.feign.AuthController;
+import com.util.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.feign.AuthController;
-import com.util.ResultUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Component
 public class MyInterceptor implements HandlerInterceptor {
@@ -32,7 +31,7 @@ public class MyInterceptor implements HandlerInterceptor {
 		    	request.setAttribute("role", json.getString("role"));
 		    	return true;
 		    }
-		    new ResultUtil().error(request, response, "1100");;
+		 new ResultUtil().error(request, response, "1100");
 	        return false;
 	    }
 
