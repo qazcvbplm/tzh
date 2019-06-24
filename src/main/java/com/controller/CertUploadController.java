@@ -1,12 +1,11 @@
 package com.controller;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import io.swagger.annotations.Api;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +18,7 @@ public class CertUploadController {
 
     @Value("${cert.path}")
     private String rootPath;
+
 
     @PostMapping("up")
     private String upload(MultipartFile file){

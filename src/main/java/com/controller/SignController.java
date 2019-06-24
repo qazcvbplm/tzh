@@ -1,24 +1,21 @@
 package com.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.dao.SignMapper;
+import com.entity.Sign;
+import com.service.WxUserService;
+import com.util.ResponseObject;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dao.SignMapper;
-import com.entity.Sign;
-import com.service.WxUserService;
-import com.util.ResponseObject;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RestController
 @Api(tags="签到模块")
@@ -29,7 +26,8 @@ public class SignController {
 	private SignMapper signMapper;
 	@Autowired
 	private WxUserService wxUserService;
-	
+
+
 	public static int day;
 	
 	static{

@@ -3,6 +3,7 @@ package com.util;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Map;
 
@@ -51,5 +52,23 @@ public class SpringUtil implements ApplicationContextAware {
      */
     public static <T> Map<String, T> getBeansByType(Class<T> classType) {
         return context.getBeansOfType(classType);
+    }
+
+    /**
+     * 获取redis缓存状态
+     *
+     * @return
+     */
+    public static boolean redisCache() {
+        StringRedisTemplate stringRedisTemplate = getBean(StringRedisTemplate.class);
+        if (stringRedisTemplate == null) {
+            return false;
+        } else {
+            String rs = stringRedisTemplate.opsForValue().get("cache");
+            if (rs == null) {
+                return false;
+            }
+            return Boolean.parseBoolean(rs);
+        }
     }
 }

@@ -1,5 +1,8 @@
 package com.aop;
 
+import com.alibaba.fastjson.JSON;
+import com.entity.Sender;
+import com.util.SpringUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -7,9 +10,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSON;
-import com.entity.Sender;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +34,7 @@ public class SenderSqlAop {
         }
         int id=(int) params[0];
         String rs=null;
-        if(Boolean.parseBoolean(cache.opsForValue().get("cache"))){
+        if (SpringUtil.redisCache()) {
             rs=cache.boundValueOps("SENDER_ID_"+id).get();
         	if(rs==null||rs.trim().equals("")){
         		Sender msg=(Sender) thisJoinPoint.proceed();

@@ -1,27 +1,8 @@
 package com.controller;
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.alibaba.fastjson.JSON;
 import com.dto.SenderTj;
 import com.dto.ShopTj;
 import com.entity.FullCut;
-import com.entity.Orders;
 import com.entity.School;
 import com.entity.Shop;
 import com.entity.ShopOpenTime;
@@ -31,9 +12,18 @@ import com.service.ShopService;
 import com.util.ResponseObject;
 import com.util.Util;
 import com.wxutil.WXUtil;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.File;
+import java.util.List;
 
 @RestController
 @Api(tags="店铺模块")
@@ -46,8 +36,6 @@ public class ShopController {
 	private SchoolService schoolService;
     @Autowired
     private AuthController auth;
-	/* @Value("${barcode.path}")
-	private  String barcodepath;*/
     @Autowired
 	private StringRedisTemplate cache;
     
