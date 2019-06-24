@@ -22,6 +22,7 @@ import java.util.Date;
 @RequestMapping("/ops")
 public class OtherController {
 
+
     @Autowired
     private SchoolMapper schoolMapper;
     @Autowired
