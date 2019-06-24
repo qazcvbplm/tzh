@@ -1,11 +1,11 @@
 package com.controller;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.entity.SourceProduct;
+import com.service.SourceProductService;
+import com.util.ResponseObject;
+import com.util.Util;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,14 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.entity.Address;
-import com.entity.SourceProduct;
-import com.service.SourceProductService;
-import com.util.ResponseObject;
-import com.util.Util;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Api(tags="积分商品模块")
@@ -29,8 +25,9 @@ public class SourceProductController {
 	
 	@Autowired
 	private SourceProductService sourceProductService;
-	
-	@ApiOperation(value="添加",httpMethod="POST")
+
+
+    @ApiOperation(value = "添加", httpMethod = "POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,
 			@ModelAttribute @Valid SourceProduct sourceProduct,BindingResult result){
