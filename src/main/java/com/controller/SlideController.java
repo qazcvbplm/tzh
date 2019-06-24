@@ -1,13 +1,14 @@
 package com.controller;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.alibaba.fastjson.JSON;
+import com.dao.SlideMapper;
+import com.entity.Slide;
+import com.util.ResponseObject;
+import com.util.SpringUtil;
+import com.util.Util;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,14 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-import com.dao.SlideMapper;
-import com.entity.Slide;
-import com.util.ResponseObject;
-import com.util.Util;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Api(tags="轮播图模块")
@@ -38,7 +35,7 @@ public class SlideController {
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,@ModelAttribute @Valid Slide slide,BindingResult result){
 		              Util.checkParams(result);
-		              if(Boolean.parseBoolean(stringRedisTemplate.opsForValue().get("cache"))){
+        if (SpringUtil.redisCache()) {
 		            	  stringRedisTemplate.boundHashOps("SLIDE_LIST").delete(slide.getSchoolId()+"");
 		              }
 		              slideMapper.insert(slide);
@@ -49,7 +46,7 @@ public class SlideController {
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,int schoolId){
 						List<Slide> list=null;
-						if(Boolean.parseBoolean(stringRedisTemplate.opsForValue().get("cache"))){
+        if (SpringUtil.redisCache()) {
 							if(stringRedisTemplate.boundHashOps("SLIDE_LIST").get(schoolId+"")!=null){
 								 list=JSON.parseArray(stringRedisTemplate.boundHashOps("SLIDE_LIST").get(schoolId+"").toString(), Slide.class);
 							}else{
@@ -64,7 +61,7 @@ public class SlideController {
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Slide slide){
 		              int i= slideMapper.updateByPrimaryKeySelective(slide);
-		              if(Boolean.parseBoolean(stringRedisTemplate.opsForValue().get("cache"))){
+        if (SpringUtil.redisCache()) {
 		            	  Slide temp=slideMapper.findById(slide.getId());
 		            	  stringRedisTemplate.boundHashOps("SLIDE_LIST").delete(temp.getSchoolId()+"");
 		              }

@@ -1,33 +1,25 @@
 package com.controller;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import com.alibaba.fastjson.JSON;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.dto.SenderTj;
 import com.entity.Orders;
 import com.entity.RunOrders;
 import com.entity.Sender;
 import com.service.SenderService;
 import com.util.ResponseObject;
+import com.util.SpringUtil;
 import com.util.Util;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @Api(tags="配送员模块")
@@ -70,7 +62,7 @@ public class SenderController {
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Sender sender){
 		              int i=senderService.update(sender);
-		              if(Boolean.parseBoolean(cache.opsForValue().get("cache"))&&i>0){
+        if (SpringUtil.redisCache() && i > 0) {
 						  cache.delete("SENDER_ID_"+sender.getId());
 		              }
 		              return new ResponseObject(true, "");

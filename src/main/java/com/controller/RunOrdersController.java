@@ -1,14 +1,14 @@
 package com.controller;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.entity.RunOrders;
+import com.entity.School;
+import com.service.RunOrdersService;
+import com.service.SchoolService;
+import com.util.ResponseObject;
+import com.util.Util;
+import com.wxutil.WXpayUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,26 +16,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.entity.Orders;
-import com.entity.RunOrders;
-import com.entity.School;
-import com.service.RunOrdersService;
-import com.service.SchoolService;
-import com.util.ResponseObject;
-import com.util.Util;
-import com.wxutil.AmountUtils;
-import com.wxutil.WXpayUtil;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Api(tags="跑腿订单模块")
 @RequestMapping("ops/runorders")
 public class RunOrdersController {
 
-	
-	@Autowired
+
+    @Autowired
 	private RunOrdersService runOrdersService;
 	@Autowired
 	private SchoolService schoolService;

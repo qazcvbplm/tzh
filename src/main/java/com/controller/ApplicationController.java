@@ -1,14 +1,15 @@
 package com.controller;
 
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.config.RedisConfig;
+import com.dao.WxUserBellMapper;
+import com.dto.ReplyTextMsg;
+import com.entity.WxUser;
+import com.service.WxUserService;
+import com.util.ResponseObject;
+import com.wxutil.XMLUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -17,18 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
-import com.alibaba.fastjson.JSON;
-import com.config.RedisConfig;
-import com.dao.WxUserBellMapper;
-import com.dto.ReplyTextMsg;
-import com.entity.WxUser;
-import com.service.WxUserService;
-import com.util.LoggerUtil;
-import com.util.ResponseObject;
-import com.wxutil.XMLUtil;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @RestController
@@ -44,8 +39,9 @@ public class ApplicationController {
 	private WxUserController wxUserController;
 	@Autowired
 	private WxUserBellMapper wxUserBellMapper;
-	
-	@RequestMapping("check")
+
+
+    @RequestMapping("check")
 	public String version(HttpServletRequest request,HttpServletResponse response) throws IOException, SAXException{
 		Map<String, String>  map = XMLUtil.parseXML(request);
 		String ToUserName=map.get("ToUserName");//	开发者微信号

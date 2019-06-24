@@ -1,20 +1,21 @@
 package com.controller;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.alibaba.fastjson.JSON;
+import com.entity.OrderProduct;
+import com.entity.Orders;
+import com.entity.School;
+import com.service.OrdersService;
+import com.service.ProductService;
+import com.service.SchoolService;
+import com.util.ResponseObject;
+import com.util.SpringUtil;
+import com.util.Util;
+import com.vdurmont.emoji.EmojiManager;
+import com.vdurmont.emoji.EmojiParser;
+import com.wxutil.WXpayUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,27 +23,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-import com.dao.LogsMapper;
-import com.entity.Logs;
-import com.entity.OrderProduct;
-import com.entity.Orders;
-import com.entity.School;
-import com.entity.WxUser;
-import com.entity.WxUserBell;
-import com.service.OrdersService;
-import com.service.ProductService;
-import com.service.SchoolService;
-import com.util.ResponseObject;
-import com.util.Util;
-import com.vdurmont.emoji.EmojiManager;
-import com.vdurmont.emoji.EmojiParser;
-import com.vdurmont.emoji.EmojiParser.EmojiTransformer;
-import com.wxutil.WXpayUtil;
-import com.wxutil.WxGUtil;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Api(tags="订单模块")
@@ -57,7 +45,7 @@ public class OrdersController {
 	private ProductService productService;
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-	
+
 	
 	
 	
@@ -158,7 +146,7 @@ public class OrdersController {
 	@PostMapping("android/findDjs")
 	public ResponseObject android_findDjs(HttpServletRequest request,HttpServletResponse response,int shopId){
 			 List<Orders> list;
-			 if(Boolean.parseBoolean(stringRedisTemplate.opsForValue().get("cache"))){
+        if (SpringUtil.redisCache()) {
 				 list=JSON.parseArray(stringRedisTemplate.boundHashOps("SHOP_DJS"+shopId).values().toString(),Orders.class);
 			 }else{
 				list=ordersService.findByShopByDjs(shopId);
@@ -186,7 +174,7 @@ public class OrdersController {
 	public ResponseObject android_findDjs(HttpServletRequest request,HttpServletResponse response,String orderId){
 		     int i=ordersService.shopAcceptOrderById(orderId);
 		     if(i>0){
-		    	 if(Boolean.parseBoolean(stringRedisTemplate.opsForValue().get("cache"))){
+                 if (SpringUtil.redisCache()) {
 		    		 stringRedisTemplate.boundHashOps("SHOP_DJS"+i).delete(orderId);
 		    		 Orders order=ordersService.findById(orderId);
 		    	 }

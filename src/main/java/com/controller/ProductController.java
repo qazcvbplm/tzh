@@ -1,34 +1,28 @@
 package com.controller;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.entity.Product;
 import com.service.ProductService;
 import com.util.ResponseObject;
 import com.util.Util;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @Api(tags="商品模块")
 @RequestMapping("ops/product")
 public class ProductController {
 
-	@Autowired
+
+    @Autowired
 	private ProductService productService;
 
 	@ApiOperation(value="添加",httpMethod="POST")

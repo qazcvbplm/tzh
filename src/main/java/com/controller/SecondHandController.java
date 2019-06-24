@@ -1,11 +1,11 @@
 package com.controller;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.entity.SecondHand;
+import com.service.SecondHandService;
+import com.util.ResponseObject;
+import com.util.Util;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,21 +13,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.entity.Address;
-import com.entity.SecondHand;
-import com.service.SecondHandService;
-import com.util.ResponseObject;
-import com.util.Util;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Api(tags="二手模块")
 @RequestMapping("ops/secondhand")
 public class SecondHandController {
 
-	@Autowired
+
+    @Autowired
 	private SecondHandService secondHandService;
 	
 	@ApiOperation(value="添加",httpMethod="POST")

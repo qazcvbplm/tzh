@@ -1,30 +1,29 @@
 package com.controller;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dao.DayLogTakeoutMapper;
 import com.entity.DayLogTakeout;
 import com.util.ResponseObject;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @Api(tags="店铺日营业额统计")
 @RequestMapping("ops/daylogtakeout")
 public class DayLogController {
 
-	@Autowired
+
+    @Autowired
 	private DayLogTakeoutMapper dayLogTakeoutMapper;
 	
 	@ApiOperation(value="查询",httpMethod="POST")

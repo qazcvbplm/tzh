@@ -1,11 +1,11 @@
 package com.controller;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.entity.ShopCategory;
+import com.service.ShopCategoryService;
+import com.util.ResponseObject;
+import com.util.Util;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,19 +13,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.entity.ShopCategory;
-import com.service.ShopCategoryService;
-import com.util.ResponseObject;
-import com.util.Util;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Api(tags="店铺分类模块")
 @RequestMapping("ops/shopcategory")
 public class ShopCategoryController {
-	@Autowired
+
+    @Autowired
 	private ShopCategoryService shopCategoryService;
 
 	@ApiOperation(value="添加",httpMethod="POST")
