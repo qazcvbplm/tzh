@@ -1,25 +1,6 @@
 package com.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.dao.LogsMapper;
-import com.entity.Logs;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.alibaba.fastjson.JSON;
-import com.dto.SchoolIndexDto;
 import com.entity.School;
 import com.entity.WxUser;
 import com.feign.AuthController;
@@ -27,17 +8,23 @@ import com.github.qcloudsms.httpclient.HTTPException;
 import com.redis.message.RedisUtil;
 import com.service.SchoolService;
 import com.service.WxUserService;
-import com.util.LoggerUtil;
 import com.util.ResponseObject;
 import com.util.Util;
-import com.vdurmont.emoji.EmojiLoader;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 import com.wxutil.WXUtil;
 import com.wxutil.WxGUtil;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Api(tags="微信用户模块")
@@ -76,9 +63,9 @@ public class WxUserController {
 			   return new ResponseObject(false, "请选择学校");
 		   }
     }
-	
-	
-	@ApiOperation(value="获取钱包信息",httpMethod="POST")
+
+
+	@ApiOperation(value = "获取钱包信息", httpMethod = "POST")
 	@GetMapping("wx/get/bell")
 	public ResponseObject getBell(HttpServletRequest request,HttpServletResponse response,String openId){
 		WxUser wxUser= wxUserService.findByid(openId);
