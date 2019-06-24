@@ -35,9 +35,10 @@ public class OrdersNotify {
 
 	public static final String URL="https://www.chuyinkeji.cn/ops/";
 
-	@PostMapping("takeout")
+	@RequestMapping("takeout")
 	@ApiOperation(value="",hidden=true)
 	public void takeout_noti(HttpServletResponse response,HttpServletRequest request) throws IOException, SAXException{
+		System.out.println(request.getRemoteAddr());
 			Map<String, String>  map = XMLUtil.parseXML(request);
 			// 返回状态码
 			String return_code = map.get("return_code");
