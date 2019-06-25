@@ -1,32 +1,21 @@
 package com.scheduled;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.dto.RunOrdersTj;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.controller.SignController;
-import com.dao.DayLogTakeoutMapper;
-import com.dao.OrdersMapper;
-import com.dao.RunOrdersMapper;
-import com.dao.SchoolMapper;
-import com.dao.ShopMapper;
+import com.dao.*;
+import com.dto.RunOrdersTj;
 import com.entity.DayLogTakeout;
 import com.entity.Orders;
 import com.entity.School;
 import com.entity.Shop;
 import com.redis.message.RedisUtil;
 import com.util.LoggerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 public class Task {
@@ -35,7 +24,7 @@ public class Task {
 	@Autowired
 	private ShopMapper shopMapper;
 	@Autowired
-	private OrdersMapper ordersService;
+	private OrdersMapper ordersMapper;
 	@Autowired
 	private RunOrdersMapper runOrdersMapper;
 	@Autowired
@@ -47,7 +36,7 @@ public class Task {
 	//0 0 10,14,16 * * ?   每天上午10点，下午2点，4点 
 	@Scheduled(cron="0 0 2 * * ?")
 	public void task(){
-		ordersService.remove();
+		ordersMapper.remove();
 		runOrdersMapper.remove();
 	}
 	
@@ -78,13 +67,13 @@ public class Task {
 				List<Shop> shops=shopMapper.find(new Shop(schooltemp.getId()));
 				for(Shop shoptemp:shops){
 					map.put("shopId", shoptemp.getId());
-				 	Orders result=ordersService.completeByShopId(map);
+					Orders result = ordersMapper.completeByShopId(map);
 				 	DayLogTakeout daylog=new DayLogTakeout()
 				 			.shoplog(shoptemp.getShopName(), shoptemp.getId(), day, result,"商铺日志",schooltemp.getId());
 				 	dayLogTakeoutMapper.insert(daylog);
 				}
 				map.put("schoolId", schooltemp.getId());
-				Orders result=ordersService.completeBySchoolId(map);
+				List<Orders> result = ordersMapper.completeBySchoolId(map);
 				DayLogTakeout daylog=new DayLogTakeout()
 			 			.schoollog(schooltemp.getName(), schooltemp.getId(), day, result,"学校商铺日志",schooltemp.getAppId());
 				dayLogTakeoutMapper.insert(daylog);

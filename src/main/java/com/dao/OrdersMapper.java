@@ -1,14 +1,11 @@
 package com.dao;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.annotations.Mapper;
-
-import com.dto.SenderTj;
 import com.entity.Orders;
 import com.entity.Sender;
 import com.entity.Shop;
+
+import java.util.List;
+import java.util.Map;
 public interface OrdersMapper {
     int insert(Orders record);
 
@@ -51,7 +48,7 @@ public interface OrdersMapper {
 
 	Orders completeByShopId(Map<String, Object> map);
 
-	Orders completeBySchoolId(Map<String, Object> map);
+    List<Orders> completeBySchoolId(Map<String, Object> map);
 
 	int countBySchoolId(int schoolId);
 
