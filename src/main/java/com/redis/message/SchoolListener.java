@@ -7,7 +7,6 @@ import com.dao.SenderMapper;
 import com.dao.TxLogMapper;
 import com.entity.Mqtt;
 import com.entity.School;
-import com.entity.Sender;
 import com.entity.TxLog;
 import com.util.LoggerUtil;
 import com.wx.towallet.WeChatPayUtil;
@@ -16,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SchoolListener {
@@ -68,6 +70,7 @@ public class SchoolListener {
 							int index=new BigDecimal(Math.random()*ids.size()).intValue();
 							TxLog log = new TxLog(ids.get(index), "配送员提现", null, amount, "", school.getId(),
 									school.getAppId());
+							log.setIshow(1);
 							WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
 									school.getCertPath(), payId, "127.0.0.1", amount, ok.getOpen(), log);
 							txLogMapper.insert(log);
