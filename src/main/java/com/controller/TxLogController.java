@@ -28,6 +28,7 @@ public class TxLogController {
 	@PostMapping("find")
 	public ResponseObject find(String appId,String schoolId,int page,int size){
 		QueryWrapper<TxLog> query=new QueryWrapper<>();
+        query.select("id", "txer_id", "type", "create_time", "amount");
 		if(schoolId!=null)
 		query.eq("school_id", schoolId);
 		if(appId!=null)
@@ -43,7 +44,7 @@ public class TxLogController {
 		QueryWrapper<TxLog> query = new QueryWrapper<>();
 		query.eq("txer_id", id);
 		query.eq("type", "配送员提现");
-		query.eq("show", "0");
+        query.eq("ishow", "0");
 		query.select("id", "txer_id", "type", "create_time", "amount");
 		query.orderByDesc("create_time");
 		IPage<TxLog> rs = txLogMapper.selectPage(new Page<>(page, size), query);
