@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(tags="提现记录模块")
-@RequestMapping("ops/txlog")
+@RequestMapping("/ops/txlog")
 public class TxLogController {
 
 	@Autowired
@@ -25,7 +25,7 @@ public class TxLogController {
 
 
     @ApiOperation(value = "查询", httpMethod = "POST")
-	@PostMapping("find")
+	@PostMapping("/find")
 	public ResponseObject find(String appId,String schoolId,int page,int size){
 		QueryWrapper<TxLog> query=new QueryWrapper<>();
         query.select("id", "txer_id", "type", "create_time", "amount");
@@ -39,7 +39,7 @@ public class TxLogController {
 	}
 
 	@ApiOperation(value = "按照配送员查询", httpMethod = "GET")
-	@GetMapping("find")
+	@GetMapping("/sender/find")
 	public ResponseObject find(Integer id, int page, int size) {
 		QueryWrapper<TxLog> query = new QueryWrapper<>();
 		query.eq("txer_id", id);
