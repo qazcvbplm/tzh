@@ -27,6 +27,9 @@ public class TxLogController {
     @ApiOperation(value = "查询", httpMethod = "POST")
 	@PostMapping("/find")
 	public ResponseObject find(String appId,String schoolId,int page,int size){
+		if (appId == null && schoolId == null) {
+			return new ResponseObject(false, "");
+		}
 		QueryWrapper<TxLog> query=new QueryWrapper<>();
         query.select("id", "txer_id", "type", "create_time", "amount");
 		if(schoolId!=null)
@@ -41,6 +44,9 @@ public class TxLogController {
 	@ApiOperation(value = "按照配送员查询", httpMethod = "GET")
 	@GetMapping("/sender/find")
 	public ResponseObject find(Integer id, int page, int size) {
+		if (id == null || id <= 0) {
+			return new ResponseObject(false, "");
+		}
 		QueryWrapper<TxLog> query = new QueryWrapper<>();
 		query.eq("txer_id", id);
 		query.eq("type", "配送员提现");
