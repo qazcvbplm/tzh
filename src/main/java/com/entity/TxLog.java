@@ -1,10 +1,10 @@
 package com.entity;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 public class TxLog {
 	@TableId(type=IdType.AUTO)
@@ -24,7 +24,16 @@ public class TxLog {
 
     private Integer appId;
 
-    
+    private Integer ishow;
+
+    public Integer getIshow() {
+        return ishow;
+    }
+
+    public void setIshow(Integer ishow) {
+        this.ishow = ishow;
+    }
+
     public TxLog() {
 		super();
 	}
