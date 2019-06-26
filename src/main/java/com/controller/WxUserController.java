@@ -49,17 +49,22 @@ public class WxUserController {
 
 	@ApiOperation(value="微信用户登录",httpMethod="POST")
 	@PostMapping("wx/login")
-	public ResponseObject login(HttpServletRequest request,HttpServletResponse response,String code,Integer schoolId){
-
-		   School school=schoolService.findById(schoolId);
+	public ResponseObject login(HttpServletRequest request, HttpServletResponse response, String code, String schoolId) {
+		Integer sid;
+		try {
+			sid = Integer.parseInt(schoolId);
+		} catch (Exception e) {
+			return null;
+		}
+		School school = schoolService.findById(sid);
 		   String openid=null;
 		   WxUser user=null;
 		   if(school!=null){
 			   openid=WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
 			   String token=auth.getToken(openid, "wx","wxuser");
-			   user=wxUserService.login(openid,schoolId,school.getAppId(),"微信小程序");
+			   user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
 			   logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
-			   cache.userCountadd(schoolId);
+			   cache.userCountadd(sid);
 			   return new ResponseObject(true, "ok").push("token", token).push("user",user);
 		   }else{
 			   return new ResponseObject(false, "请选择学校");

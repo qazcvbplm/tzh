@@ -37,9 +37,9 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
 	
 	@Override
 	public void onMessage(Message key, byte[] arg1) {
-		Orders orders=orderMapper.selectByPrimaryKey(key.toString().split(",")[1]);
 		if(key.toString().startsWith("tsout")){
-			   try {
+			Orders orders = orderMapper.selectByPrimaryKey(key.toString().split(",")[1]);
+			try {
 				senderService.end(key.toString().split(",")[1],true);
 				   stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
 				WxUser wxUser = wxUserMapper.selectByPrimaryKey(orders.getOpenId());
