@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.config.RedisConfig;
 import com.dao.EvaluateMapper;
 import com.dao.OrdersMapper;
 import com.dao.RunOrdersMapper;
@@ -44,11 +45,11 @@ public class EvaluateController {
 		              Util.checkParams(result);
 		              if(ordersMapper.pl(evaluate.getOrderid())==1){
 		            	  evaluateMapper.insert(evaluate);
-						  stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(userId, 3).toJsonString());
+                          stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
 		              }
 		              if(runOrdersMapper.pl(evaluate.getOrderid())==1){
 		            	  evaluateMapper.insert(evaluate);
-						  stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(userId, 3).toJsonString());
+                          stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
 		            	  }
 		              return new ResponseObject(true, "添加成功");
 	}
