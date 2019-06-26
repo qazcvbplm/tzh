@@ -11,7 +11,7 @@ public class SchoolAddMoneyDTO extends RedisMessage {
     private BigDecimal senderGet;
 
     public SchoolAddMoneyDTO(Integer schoolId, BigDecimal selfGet, BigDecimal senderGet) {
-        super("addMoney");
+        super("addmoney");
         this.schoolId = schoolId;
         this.selfGet = selfGet;
         this.senderGet = senderGet;
