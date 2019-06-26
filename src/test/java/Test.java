@@ -1,6 +1,8 @@
 import com.App;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dao.TxLogMapper;
 import com.dao.WxUserMapper;
+import com.entity.TxLog;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +21,8 @@ public class Test {
 
     @org.junit.Test
     public void test(){
-
+        QueryWrapper<TxLog> query = new QueryWrapper<>();
+        query.lambda().eq(TxLog::getSchoolId, 15);
+        System.out.println(txLogMapper.selectCount(query));
     }
 }
