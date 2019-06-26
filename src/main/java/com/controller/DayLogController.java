@@ -34,12 +34,13 @@ public class DayLogController {
 		              if(parentId!=null)
 						  query.lambda().eq(DayLogTakeout::getParentId, parentId);
 		              if(selfId!=null)
-						  query.lambda().eq(DayLogTakeout::getSelfGet, selfId);
+						  query.lambda().eq(DayLogTakeout::getSelfId, selfId);
 		              if(type!=null)
 						  query.lambda().eq(DayLogTakeout::getType, type);
 		              if(day!=null)
 						  query.lambda().eq(DayLogTakeout::getDay, day);
 		query.lambda().orderByDesc(DayLogTakeout::getDay);
+		System.out.println(query.getSqlSelect());
 		              IPage<DayLogTakeout> list=dayLogTakeoutMapper.selectPage(new Page<>(page, size), query);
 		              return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
 	}
