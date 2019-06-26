@@ -33,10 +33,10 @@ public class TxLogController {
 		QueryWrapper<TxLog> query=new QueryWrapper<>();
         query.select("id", "txer_id", "type", "create_time", "amount");
 		if(schoolId!=null)
-		query.eq("school_id", schoolId);
+			query.lambda().eq(TxLog::getSchoolId, schoolId);
 		if(appId!=null)
-		query.eq("app_id", appId);
-		query.orderByDesc("create_time");
+			query.lambda().eq(TxLog::getAppId, appId);
+		query.lambda().orderByDesc(TxLog::getCreateTime);
 		IPage<TxLog> rs=txLogMapper.selectPage(new Page<>(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
 	}
@@ -48,11 +48,11 @@ public class TxLogController {
 			return new ResponseObject(false, "");
 		}
 		QueryWrapper<TxLog> query = new QueryWrapper<>();
-		query.eq("txer_id", id);
-		query.eq("type", "配送员提现");
-        query.eq("ishow", "0");
+		query.lambda().eq(TxLog::getTxerId, id);
+		query.lambda().eq(TxLog::getType, "配送员提现");
+		query.lambda().eq(TxLog::getIshow, "0");
 		query.select("id", "txer_id", "type", "create_time", "amount");
-		query.orderByDesc("create_time");
+		query.lambda().orderByDesc(TxLog::getCreateTime);
 		IPage<TxLog> rs = txLogMapper.selectPage(new Page<>(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
 	}
