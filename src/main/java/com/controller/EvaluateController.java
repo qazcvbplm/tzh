@@ -3,6 +3,7 @@ package com.controller;
 import com.dao.EvaluateMapper;
 import com.dao.OrdersMapper;
 import com.dao.RunOrdersMapper;
+import com.dto.redis.WxUserAddSourceDTO;
 import com.entity.Base;
 import com.entity.Evaluate;
 import com.util.ResponseObject;
@@ -43,11 +44,11 @@ public class EvaluateController {
 		              Util.checkParams(result);
 		              if(ordersMapper.pl(evaluate.getOrderid())==1){
 		            	  evaluateMapper.insert(evaluate);
-		            	  stringRedisTemplate.convertAndSend("bell", "addsource"+","+userId+","+"3");
+						  stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(userId, 3).toJsonString());
 		              }
 		              if(runOrdersMapper.pl(evaluate.getOrderid())==1){
 		            	  evaluateMapper.insert(evaluate);
-		            	  stringRedisTemplate.convertAndSend("bell", "addsource"+","+userId+","+"3");		
+						  stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(userId, 3).toJsonString());
 		            	  }
 		              return new ResponseObject(true, "添加成功");
 	}

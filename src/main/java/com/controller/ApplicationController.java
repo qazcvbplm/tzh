@@ -4,6 +4,7 @@ package com.controller;
 import com.config.RedisConfig;
 import com.dao.WxUserBellMapper;
 import com.dto.ReplyTextMsg;
+import com.dto.redis.WxUserAddSourceDTO;
 import com.entity.WxUser;
 import com.service.WxUserService;
 import com.util.ResponseObject;
@@ -87,7 +88,7 @@ public class ApplicationController {
 					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text","绑定成功，恭喜您获得88积分奖励和0.5元红包奖励。奖励都已发放至您的客户端小程序中，请自行前往查看！");
 					//增加积分
 					user=minUser.get(0);
-	        		stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, "addsource"+","+user.getOpenId()+","+"88");
+					stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(user.getOpenId(), 88).toJsonString());
 	        		Map<String,Object> ch=new HashMap<>();
 	        		ch.put("phone", user.getOpenId()+"-"+user.getPhone());
 	        	    ch.put("amount", "0.5");
