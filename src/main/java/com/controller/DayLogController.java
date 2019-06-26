@@ -40,7 +40,6 @@ public class DayLogController {
 		              if(day!=null)
 						  query.lambda().eq(DayLogTakeout::getDay, day);
 		query.lambda().orderByDesc(DayLogTakeout::getDay);
-		System.out.println(query.getSqlSelect());
 		              IPage<DayLogTakeout> list=dayLogTakeoutMapper.selectPage(new Page<>(page, size), query);
 		              return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
 	}
