@@ -1,10 +1,9 @@
 package com.config;
 
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 
 @EnableTransactionManagement
 @Configuration
@@ -17,4 +16,21 @@ public class MybatisPlusConfig {
     public PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();
     }
+
+    /* *//**
+     * 乐观锁插件
+     * @return
+     *//*
+    @Bean
+    public OptimisticLockerInterceptor optimisticLockerInterceptor() {
+        return new OptimisticLockerInterceptor();
+    }*/
+
+    /**
+     * SQL执行效率插件
+     *//*
+    @Bean
+    public PerformanceInterceptor performanceInterceptor() {
+        return new PerformanceInterceptor();
+    }*/
 }
