@@ -1,10 +1,13 @@
 package com.redis.message;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dao.MqttMapper;
 import com.dao.SchoolMapper;
 import com.dao.SenderMapper;
 import com.dao.TxLogMapper;
+import com.dto.redis.RedisMessage;
+import com.dto.redis.SchoolAddMoneyDTO;
 import com.entity.Mqtt;
 import com.entity.School;
 import com.entity.TxLog;
@@ -36,18 +39,18 @@ public class SchoolListener {
 	public void receiveMessage(String message) {
 		List<Mqtt> mqtt = mqttMapper.selectList(new QueryWrapper<>());
 		Mqtt ok = null;
-		String[] params = message.split(",");
-		if (params[0].equals("addmoney")) {
-			Integer schoolId = Integer.valueOf(params[1]);
-			School school = this.schoolMapper.selectByPrimaryKey(schoolId);
-			BigDecimal total = new BigDecimal(params[2]);
-			BigDecimal senderPrice = new BigDecimal(params[3]);
+		RedisMessage redisMessage = JSON.parseObject(message, RedisMessage.class);
+		if (redisMessage.getType().equals("addmoney")) {
+			SchoolAddMoneyDTO schoolAddMoneyDTO = JSON.parseObject(message, SchoolAddMoneyDTO.class);
+			School school = this.schoolMapper.selectByPrimaryKey(schoolAddMoneyDTO.getSchoolId());
+			BigDecimal total = schoolAddMoneyDTO.getSelfGet();
+			BigDecimal senderPrice = schoolAddMoneyDTO.getSenderGet();
 			BigDecimal cc = total.add(senderPrice).multiply(school.getRate());
 			Map<String, Object> map = new HashMap();
-			map.put("schoolId", schoolId);
+			map.put("schoolId", schoolAddMoneyDTO.getSchoolId());
 			//////////////////////////////////////////////////////////////////////////////////////////////////////
 			for (Mqtt temp : mqtt) {
-				if (temp.getSchoolId() == schoolId) {
+				if (temp.getSchoolId() == schoolAddMoneyDTO.getSchoolId()) {
 					ok = temp;
 					break;
 				}
@@ -87,7 +90,7 @@ public class SchoolListener {
 			if (this.schoolMapper.endOrder(map) == 0) {
 				LoggerUtil.log("学校增加余额失败：" + message);
 			}
-			cache.amountadd(schoolId, total.add(senderPrice));
+			cache.amountadd(schoolAddMoneyDTO.getSchoolId(), total.add(senderPrice));
 		}
 	}
 

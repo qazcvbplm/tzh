@@ -1,10 +1,13 @@
 package com.redis.message;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.dao.OrdersMapper;
+import com.dao.WxUserMapper;
+import com.dto.redis.WxUserAddSourceDTO;
+import com.entity.Orders;
+import com.entity.WxUser;
+import com.service.SenderService;
+import com.util.LoggerUtil;
+import com.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -12,13 +15,10 @@ import org.springframework.data.redis.listener.KeyExpirationEventMessageListener
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
-import com.dao.OrdersMapper;
-import com.dao.WxUserMapper;
-import com.entity.Orders;
-import com.entity.WxUser;
-import com.service.SenderService;
-import com.util.LoggerUtil;
-import com.wxutil.WxGUtil;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 @Component
 public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
 
@@ -41,7 +41,7 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
 		if(key.toString().startsWith("tsout")){
 			   try {
 				senderService.end(key.toString().split(",")[1],true);
-				stringRedisTemplate.convertAndSend("bell", "addsource"+","+orders.getOpenId()+","+orders.getPayPrice().toString());
+				   stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
 				WxUser wxUser = wxUserMapper.selectByPrimaryKey(orders.getOpenId());
 				WxUser wxGUser = wxUserMapper.findGzh(wxUser.getPhone());
 				if(wxGUser!=null){

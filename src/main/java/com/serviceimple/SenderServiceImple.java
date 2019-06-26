@@ -1,43 +1,30 @@
 package com.serviceimple;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.config.RedisConfig;
+import com.dao.*;
+import com.dto.SenderTj;
+import com.dto.redis.SchoolAddMoneyDTO;
+import com.dto.redis.SenderAddMoneyDTO;
+import com.dto.redis.WxUserAddSourceDTO;
+import com.entity.*;
 import com.exception.YWException;
+import com.redis.message.RedisUtil;
+import com.service.SenderService;
+import com.util.LoggerUtil;
+import com.wx.towallet.WeChatPayUtil;
+import com.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import com.config.RedisConfig;
-import com.dao.OrdersCompleteMapper;
-import com.dao.OrdersMapper;
-import com.dao.RunOrdersMapper;
-import com.dao.SchoolMapper;
-import com.dao.SenderMapper;
-import com.dao.ShopMapper;
-import com.dao.TxLogMapper;
-import com.dao.WxUserBellMapper;
-import com.dao.WxUserMapper;
-import com.dto.SenderTj;
-import com.entity.Orders;
-import com.entity.OrdersComplete;
-import com.entity.RunOrders;
-import com.entity.School;
-import com.entity.Sender;
-import com.entity.TxLog;
-import com.entity.WxUser;
-import com.entity.WxUserBell;
-import com.redis.message.RedisUtil;
-import com.service.SenderService;
-import com.util.LoggerUtil;
-import com.wx.towallet.WeChatPayUtil;
-import com.wxutil.WxGUtil;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SenderServiceImple implements SenderService {
@@ -166,13 +153,16 @@ public class SenderServiceImple implements SenderService {
 				if (orders.getSenderId() != 0) {
 					senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
 					stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL,
-							"addmoney" + "," + sender.getOpenId() + "," + senderGet.toString());
+							new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+					);
 				}
-				stringRedisTemplate.convertAndSend(RedisConfig.SCHOOLBELL, "addmoney" + "," + orders.getSchoolId() + ","
-						+ orders.getPayPrice().subtract(senderGet).toString() + "," + senderGet.toString());
+				stringRedisTemplate.convertAndSend(RedisConfig.SCHOOLBELL,
+						new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
+				);
 				// 增加积分
 				stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL,
-						"addsource" + "," + orders.getOpenId() + "," + orders.getPayPrice().toString());
+						new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+				);
 				
 			} else {
 				return;
@@ -196,12 +186,15 @@ public class SenderServiceImple implements SenderService {
 					if (wxUserBellMapper.charge(map) == 1) {
 						BigDecimal senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
 						stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL,
-								"addmoney" + "," + sender.getOpenId() + "," + senderGet.toString());
-						stringRedisTemplate.convertAndSend(RedisConfig.SCHOOLBELL, "addmoney" + "," + orders.getSchoolId()
-						+ "," + orders.getPayPrice().subtract(senderGet).toString() + "," + senderGet.toString());
+								new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+						);
+						stringRedisTemplate.convertAndSend(RedisConfig.SCHOOLBELL,
+								new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
+						);
 						// 增加积分
 						stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL,
-								"addsource" + "," + orders.getOpenId() + "," + orders.getPayPrice().toString());
+								new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+						);
 					}
 				}
 			else {
@@ -243,14 +236,17 @@ public class SenderServiceImple implements SenderService {
 			Sender sender = senderMapper.selectByPrimaryKey(orders.getSenderId());
 			BigDecimal senderGet = orders.getTotalPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
 			stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL,
-					"addmoney" + "," + sender.getOpenId() + "," + senderGet.toString());
-			stringRedisTemplate.convertAndSend(RedisConfig.SCHOOLBELL, "addmoney" + "," + sender.getSchoolId() + ","
-					+ orders.getTotalPrice().subtract(senderGet).toString() + "," + senderGet.toString());
+					new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+			);
+			stringRedisTemplate.convertAndSend(RedisConfig.SCHOOLBELL,
+					new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getTotalPrice().subtract(senderGet), senderGet).toJsonString()
+			);
 			// senderAddMoney(orders.getTotalPrice(),orders.getSenderId());
 			// 增加积分
 			// addsource(orders.getOpenId(), orders.getTotalPrice().intValue());
 			stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL,
-					"addsource" + "," + orders.getOpenId() + "," + orders.getTotalPrice().toString());
+					new WxUserAddSourceDTO(orders.getOpenId(), orders.getTotalPrice().intValue()).toJsonString()
+			);
 			cache.runCountSuccessadd(orders.getSchoolId());
 			WxUser wxUser = wxUserMapper.selectByPrimaryKey(orders.getOpenId());
 			School school = schoolMapper.selectByPrimaryKey(wxUser.getSchoolId());
