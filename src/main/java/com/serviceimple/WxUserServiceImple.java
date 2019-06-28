@@ -150,6 +150,7 @@ public class WxUserServiceImple implements WxUserService {
             } else {
                 WxUser wxUser = wxUserMapper.selectByPrimaryKey(openId);
                 stringRedisTemplate.opsForValue().set("WX_USER_OPENID_" + openId, JSON.toJSONString(wxUser), 1, TimeUnit.DAYS);
+                return wxUser;
             }
         }
         return wxUserMapper.selectByPrimaryKey(openId);
