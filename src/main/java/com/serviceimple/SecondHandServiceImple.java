@@ -1,17 +1,15 @@
 package com.serviceimple;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dao.SecondHandMapper;
-import com.dao.WxUserMapper;
 import com.entity.SecondHand;
 import com.entity.WxUser;
 import com.service.SecondHandService;
+import com.service.WxUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @Service
 public class SecondHandServiceImple implements SecondHandService{
@@ -19,11 +17,11 @@ public class SecondHandServiceImple implements SecondHandService{
 	@Autowired
 	private SecondHandMapper secondHandMapper;
 	@Autowired
-	private WxUserMapper wxUserMapper;
+    private WxUserService wxUserService;
 
 	@Override
 	public void add(@Valid SecondHand secondHand) {
-		WxUser wxUser=wxUserMapper.selectByPrimaryKey(secondHand.getOpenId());
+        WxUser wxUser = wxUserService.findById(secondHand.getOpenId());
 		secondHand.setAvatarUrl(wxUser.getAvatarUrl());
 		secondHand.setNickName(wxUser.getNickName());
 		secondHandMapper.insert(secondHand);

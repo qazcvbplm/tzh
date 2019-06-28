@@ -8,6 +8,7 @@ import com.github.qcloudsms.httpclient.HTTPException;
 import com.service.SchoolService;
 import com.util.BaiduUtil;
 import com.util.ResponseObject;
+import com.util.SpringUtil;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -64,14 +65,17 @@ public class SchoolController {
 						if(school.getLoginPassWord()!=null){
 							school.setLoginPassWord(Util.EnCode(school.getLoginPassWord()));
 						}
-		              int i=schoolService.update(school);
+        int i = schoolService.update(school);
+        if (i > 0 && SpringUtil.redisCache()) {
+            stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+        }
 		              return new ResponseObject(true,"更新"+i+"条记录");
 	}
 	
 	@ApiOperation(value="登录",httpMethod="POST")
 	@PostMapping("login")
 	public ResponseObject login(HttpServletRequest request,HttpServletResponse response,String loginName,String loginPass,int type){
-		String token="123S";
+        String token = "";
 		if(type==1){
 			School school=schoolService.login(loginName,Util.EnCode(loginPass));
 			if(school!=null){

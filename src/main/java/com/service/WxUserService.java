@@ -1,10 +1,8 @@
 package com.service;
 
-import java.util.List;
-import java.util.Map;
-
-import com.entity.Orders;
 import com.entity.WxUser;
+
+import java.util.List;
 
 public interface WxUserService {
 
@@ -19,7 +17,7 @@ public interface WxUserService {
 
 	Object findcharge(String openId);
 
-	WxUser findByid(String openId);
+    WxUser findById(String openId);
 
 	int addSource(String openId, Integer source);
 
@@ -31,4 +29,7 @@ public interface WxUserService {
 
 	WxUser findGZH(String phone);
 
+    WxUser findGzh(String phone);
+
+    WxUser findByschoolAndPhone(WxUser query);
 }

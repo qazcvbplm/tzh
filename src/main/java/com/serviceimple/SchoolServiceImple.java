@@ -1,27 +1,30 @@
 package com.serviceimple;
+
+import com.alibaba.fastjson.JSON;
+import com.dao.LogsMapper;
+import com.dao.SchoolMapper;
+import com.dao.TxLogMapper;
+import com.entity.Logs;
+import com.entity.School;
+import com.entity.TxLog;
+import com.exception.YWException;
+import com.service.SchoolService;
+import com.util.SpringUtil;
+import com.util.Util;
+import com.wx.towallet.WeChatPayUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.validation.Valid;
-
-import com.exception.YWException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
-
-import com.dao.SchoolMapper;
-import com.dao.TxLogMapper;
-import com.entity.School;
-import com.entity.TxLog;
-import com.service.SchoolService;
-import com.util.LoggerUtil;
-import com.util.Util;
-import com.wx.towallet.WeChatPayUtil;
 
 @Service
 public class SchoolServiceImple implements SchoolService{
@@ -30,6 +33,10 @@ public class SchoolServiceImple implements SchoolService{
 	private SchoolMapper schoolMapper;
 	@Autowired
 	private TxLogMapper txLogMapper;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private LogsMapper logsMapper;
 	@Override
 	public void add(@Valid School school) throws Exception {
 		if(schoolMapper.findByLoginName(school.getLoginName())==null){
@@ -65,6 +72,16 @@ public class SchoolServiceImple implements SchoolService{
 
 	@Override
 	public School findById(Integer schoolId) {
+        if (SpringUtil.redisCache()) {
+            String school = redisTemplate.opsForValue().get("SCHOOL_ID_" + schoolId);
+            if (school != null) {
+                return JSON.parseObject(school, School.class);
+            } else {
+                School rs = schoolMapper.selectByPrimaryKey(schoolId);
+                redisTemplate.opsForValue().set("SCHOOL_ID_" + school, JSON.toJSONString(rs));
+                return rs;
+            }
+        }
 		return schoolMapper.selectByPrimaryKey(schoolId);
 	}
 
@@ -80,7 +97,7 @@ public class SchoolServiceImple implements SchoolService{
 	@Transactional
 	@Override
 	public String tx(int schoolId, BigDecimal amount, String openId) {
-		School school=schoolMapper.selectByPrimaryKey(schoolId);
+        School school = findById(schoolId);
 		Map<String,Object> map=new HashMap<>();
 		map.put("schoolId", schoolId);
 		map.put("amount", amount);
@@ -95,7 +112,7 @@ public class SchoolServiceImple implements SchoolService{
 					return "提现成功";
 				}
 			} catch (Exception e) {
-				LoggerUtil.log(schoolId+","+openId + ":" + amount + e.getMessage());
+                logsMapper.insert(new Logs(schoolId + "," + openId + ":" + amount + e.getMessage()));
 		        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			}
 			throw new YWException("提现失败");
@@ -109,6 +126,16 @@ public class SchoolServiceImple implements SchoolService{
 	public void chargeUse(Map<String, Object> map) {
       schoolMapper.chargeUse(map);		
 	}
-	
-	
+
+    @Override
+    public int sendertx(Map<String, Object> map) {
+        return schoolMapper.sendertx(map);
+    }
+
+    @Override
+    public void charge(Map<String, Object> map2) {
+        schoolMapper.charge(map2);
+    }
+
+
 }

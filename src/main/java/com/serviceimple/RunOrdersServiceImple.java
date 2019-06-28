@@ -1,10 +1,15 @@
 package com.serviceimple;
 
-import com.dao.*;
+import com.dao.ApplicationMapper;
+import com.dao.RunOrdersMapper;
+import com.dao.ShopMapper;
+import com.dao.WxUserBellMapper;
 import com.entity.*;
 import com.exception.YWException;
 import com.redis.message.RedisUtil;
 import com.service.RunOrdersService;
+import com.service.SchoolService;
+import com.service.WxUserService;
 import com.wx.refund.RefundUtil;
 import com.wxutil.AmountUtils;
 import com.wxutil.WxGUtil;
@@ -24,7 +29,7 @@ import java.util.Map;
 public class RunOrdersServiceImple implements RunOrdersService{
 
 	@Autowired
-	private WxUserMapper wxUserMapper;
+    private WxUserService wxUserService;
 	@Autowired
 	private RunOrdersMapper runOrdersMapper;
 	@Autowired
@@ -34,7 +39,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 	@Autowired
 	private ShopMapper shopMapper;
 	@Autowired
-	private SchoolMapper schoolMapper;
+    private SchoolService schoolService;
 	@Autowired
 	private RedisUtil cache;
 	@Override
@@ -79,7 +84,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 			orders.setTotalPrice((orders.getTotalPrice().multiply(application.getVipRunDiscount())).setScale(2, BigDecimal.ROUND_HALF_DOWN));
 		}
 		Map<String,Object> map=new HashMap<>();
-		WxUser user=wxUserMapper.selectByPrimaryKey(orders.getOpenId());
+        WxUser user = wxUserService.findById(orders.getOpenId());
 		map.put("phone",user.getOpenId()+"-"+user.getPhone());
 		map.put("amount", orders.getTotalPrice());
 		if(wxUserBellMapper.pay(map)==1){
@@ -87,7 +92,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 				throw new YWException("订单状态异常");
 			}
 			  WxUserBell userbell= wxUserBellMapper.selectByPrimaryKey(user.getOpenId()+"-"+user.getPhone());
-	       	  WxUser wxGUser=wxUserMapper.findGzh(user.getPhone());
+            WxUser wxGUser = wxUserService.findGzh(user.getPhone());
 	       	  if(wxGUser!=null){
 	       		  Map<String,String> mb=new HashMap<>();
 	       		  mb.put("touser", wxGUser.getOpenId());
@@ -120,7 +125,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 		}
 		if(runOrdersMapper.cancel(id)==1){
 			if(orders.getPayment().equals("微信支付")){
-				School school=schoolMapper.selectByPrimaryKey(orders.getSchoolId());
+                School school = schoolService.findById(orders.getSchoolId());
 				String fee=AmountUtils.changeY2F(orders.getTotalPrice().toString());
                 int result=RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(), school.getWxPayId(), school.getCertPath(),
                 		orders.getId(), fee, fee); 
@@ -132,7 +137,7 @@ public class RunOrdersServiceImple implements RunOrdersService{
 			}
 			if(orders.getPayment().equals("余额支付")){
 				Map<String,Object> map=new HashMap<>();
-				WxUser user=wxUserMapper.selectByPrimaryKey(orders.getOpenId());
+                WxUser user = wxUserService.findById(orders.getOpenId());
 				map.put("phone",user.getOpenId()+"-"+user.getPhone());
 				map.put("amount", orders.getTotalPrice());
 				if(wxUserBellMapper.charge(map)==1){

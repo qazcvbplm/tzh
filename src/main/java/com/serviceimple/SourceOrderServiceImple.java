@@ -1,25 +1,23 @@
 package com.serviceimple;
 
 
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.Valid;
-
+import com.dao.SourceOrderMapper;
+import com.dao.SourceProductMapper;
+import com.dao.WxUserBellMapper;
+import com.entity.SourceOrder;
+import com.entity.SourceProduct;
+import com.entity.WxUser;
 import com.exception.YWException;
+import com.service.SourceOrderService;
+import com.service.WxUserService;
+import com.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dao.SourceOrderMapper;
-import com.dao.SourceProductMapper;
-import com.dao.WxUserBellMapper;
-import com.dao.WxUserMapper;
-import com.entity.SourceOrder;
-import com.entity.SourceProduct;
-import com.entity.WxUser;
-import com.service.SourceOrderService;
-import com.util.Util;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SourceOrderServiceImple implements SourceOrderService{
@@ -29,13 +27,13 @@ public class SourceOrderServiceImple implements SourceOrderService{
 	@Autowired
 	private SourceProductMapper sourceProductMapper;
 	@Autowired
-	private WxUserMapper wxUserMapper;
+    private WxUserService wxUserService;
 	@Autowired
 	private WxUserBellMapper wxUserBellMapper;
 	@Transactional
 	@Override
 	public String add(Integer id, @Valid SourceOrder sourceOrder) {
-		WxUser wxUser=wxUserMapper.selectByPrimaryKey(sourceOrder.getOpenId());
+        WxUser wxUser = wxUserService.findById(sourceOrder.getOpenId());
 		SourceProduct sp=sourceProductMapper.selectByPrimaryKey(id);
 		sourceOrder.setId(Util.GenerateOrderId());
 		sourceOrder.setPayPrice(sp.getPrice());

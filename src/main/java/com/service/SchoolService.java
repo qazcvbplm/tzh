@@ -1,12 +1,11 @@
 package com.service;
 
+import com.entity.School;
+
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
-import javax.validation.Valid;
-
-import com.entity.School;
 
 public interface SchoolService {
 
@@ -25,4 +24,7 @@ public interface SchoolService {
 
 	void chargeUse(Map<String, Object> map);
 
+    int sendertx(Map<String, Object> map);
+
+    void charge(Map<String, Object> map2);
 }

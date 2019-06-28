@@ -3,12 +3,12 @@ package com.redis.message;
 import com.alibaba.fastjson.JSON;
 import com.dao.LogsMapper;
 import com.dao.WxUserBellMapper;
-import com.dao.WxUserMapper;
 import com.dto.redis.RedisMessage;
 import com.dto.redis.SenderAddMoneyDTO;
 import com.dto.redis.WxUserAddSourceDTO;
 import com.entity.Logs;
 import com.entity.WxUser;
+import com.service.WxUserService;
 import com.util.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class WxUserListener {
 
     @Autowired
-    private WxUserMapper wxUserMapper;
+    private WxUserService wxUserService;
     @Autowired
     private WxUserBellMapper wxUserBellMapper;
     @Autowired
@@ -41,7 +41,7 @@ public class WxUserListener {
 
     public void addsource(String openid, int source) {
         //增加积分
-        WxUser wxUser = wxUserMapper.selectByPrimaryKey(openid);
+        WxUser wxUser = wxUserService.findById(openid);
         Map<String, Object> map2 = new HashMap<>();
         map2.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
         map2.put("source", source);
@@ -52,7 +52,7 @@ public class WxUserListener {
 
     public void senderAddMoney(BigDecimal amount, String openId) {
         amount = amount.setScale(2, BigDecimal.ROUND_HALF_DOWN);
-        WxUser wxUser = wxUserMapper.selectByPrimaryKey(openId);
+        WxUser wxUser = wxUserService.findById(openId);
         Map<String, Object> map = new HashMap<>();
         map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
         map.put("amount", amount);

@@ -1,7 +1,5 @@
 package com.controller;
 
-import com.dao.LogsMapper;
-import com.entity.Logs;
 import com.entity.School;
 import com.entity.WxUser;
 import com.feign.AuthController;
@@ -10,6 +8,7 @@ import com.redis.message.RedisUtil;
 import com.service.SchoolService;
 import com.service.WxUserService;
 import com.util.ResponseObject;
+import com.util.SpringUtil;
 import com.util.Util;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
@@ -43,9 +42,7 @@ public class WxUserController {
 	private StringRedisTemplate stringRedisTemplate;
 	@Autowired
 	private RedisUtil cache;
-	@Autowired
-	private LogsMapper logsMapper;
-	
+
 
 	@ApiOperation(value="微信用户登录",httpMethod="POST")
 	@PostMapping("wx/login")
@@ -63,7 +60,7 @@ public class WxUserController {
 			   openid=WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
 			   String token=auth.getToken(openid, "wx","wxuser");
 			   user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
-			   logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
+			   // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
 			   cache.userCountadd(sid);
 			   return new ResponseObject(true, "ok").push("token", token).push("user",user);
 		   }else{
@@ -75,14 +72,14 @@ public class WxUserController {
 	@ApiOperation(value = "获取钱包信息", httpMethod = "POST")
 	@GetMapping("wx/get/bell")
 	public ResponseObject getBell(HttpServletRequest request,HttpServletResponse response,String openId){
-		WxUser wxUser= wxUserService.findByid(openId);
+		WxUser wxUser = wxUserService.findById(openId);
 		return new ResponseObject(true, "ok").push("user",wxUser);
     }
 	
 	@ApiOperation(value="判断是否关注公众号",httpMethod="POST")
 	@GetMapping("wx/check/gz")
 	public ResponseObject checkgz(HttpServletRequest request,HttpServletResponse response,String openId){
-		WxUser wxUser= wxUserService.findByid(openId);
+		WxUser wxUser = wxUserService.findById(openId);
 		WxUser wxGUser=wxUserService.findGZH(wxUser.getPhone());
 		if(null==wxGUser){
 			return new ResponseObject(true, "ok").push("gz",false);
@@ -102,6 +99,9 @@ public class WxUserController {
 			wxUser.setNickName(EmojiParser.removeAllEmojis(wxUser.getNickName()));
 		}
 		wxUser = wxUserService.update(wxUser);
+		if (SpringUtil.redisCache()) {
+			stringRedisTemplate.delete("WX_USER_OPENID_" + wxUser.getOpenId());
+		}
 		return new ResponseObject(true, "ok").push("user", wxUser);
     }
 	

@@ -9,7 +9,9 @@ import com.dto.redis.WxUserAddSourceDTO;
 import com.entity.*;
 import com.exception.YWException;
 import com.redis.message.RedisUtil;
+import com.service.SchoolService;
 import com.service.SenderService;
+import com.service.WxUserService;
 import com.util.LoggerUtil;
 import com.wx.towallet.WeChatPayUtil;
 import com.wxutil.WxGUtil;
@@ -32,7 +34,7 @@ public class SenderServiceImple implements SenderService {
 	@Autowired
 	private SenderMapper senderMapper;
 	@Autowired
-	private WxUserMapper wxUserMapper;
+    private WxUserService wxUserService;
 	@Autowired
 	private OrdersMapper ordersMapper;
 	@Autowired
@@ -42,7 +44,7 @@ public class SenderServiceImple implements SenderService {
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 	@Autowired
-	private SchoolMapper schoolMapper;
+    private SchoolService schoolService;
 	@Autowired
 	private TxLogMapper txLogMapper;
 	@Autowired
@@ -115,9 +117,9 @@ public class SenderServiceImple implements SenderService {
 		orders.setSenderPhone(sender.getPhone());
 		int rs=0;
 		if((rs=ordersMapper.SenderAccept(orders))==1){
-			WxUser wxUser = wxUserMapper.selectByPrimaryKey(orders.getOpenId());
-			School school = schoolMapper.selectByPrimaryKey(wxUser.getSchoolId());
-			WxUser wxGUser = wxUserMapper.findGzh(wxUser.getPhone());
+            WxUser wxUser = wxUserService.findById(orders.getOpenId());
+            School school = schoolService.findById(wxUser.getSchoolId());
+            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
 			if(wxGUser!=null){
 				Map<String, String> mb = new HashMap<>();
 				mb.put("touser", wxGUser.getOpenId());
@@ -145,7 +147,7 @@ public class SenderServiceImple implements SenderService {
 	public void end(String orderId, boolean end) {
 		Orders orders = ordersMapper.selectByPrimaryKey(orderId);
 		Sender sender = senderMapper.selectByPrimaryKey(orders.getSenderId());
-		WxUser wxUser = wxUserMapper.selectByPrimaryKey(orders.getOpenId());
+        WxUser wxUser = wxUserService.findById(orders.getOpenId());
 		if (end) {
 			orders.setDestination(1);
 			if (ordersMapper.end(orders) == 1) {
@@ -202,14 +204,14 @@ public class SenderServiceImple implements SenderService {
 			}
 		}
 		// 对订单进行结算
-		OrdersComplete oc = new OrdersComplete(orders, schoolMapper.selectByPrimaryKey(orders.getSchoolId()),
+        OrdersComplete oc = new OrdersComplete(orders, schoolService.findById(orders.getSchoolId()),
 				shopMapper.selectByPrimaryKey(orders.getShopId()), sender);
 		ocm.insert(oc);
 		cache.takeoutCountSuccessadd(orders.getSchoolId());
 		stringRedisTemplate.convertAndSend(RedisConfig.PRODUCTADD, orderId);
 		if(orders.getTyp().equals("外卖订单")){
-			WxUser wxGUser = wxUserMapper.findGzh(wxUser.getPhone());
-			School school = schoolMapper.selectByPrimaryKey(wxUser.getSchoolId());
+            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
+            School school = schoolService.findById(wxUser.getSchoolId());
 			if(wxGUser!=null){
 				Map<String, String> mb = new HashMap<>();
 				mb.put("touser", wxGUser.getOpenId());
@@ -248,9 +250,9 @@ public class SenderServiceImple implements SenderService {
 					new WxUserAddSourceDTO(orders.getOpenId(), orders.getTotalPrice().intValue()).toJsonString()
 			);
 			cache.runCountSuccessadd(orders.getSchoolId());
-			WxUser wxUser = wxUserMapper.selectByPrimaryKey(orders.getOpenId());
-			School school = schoolMapper.selectByPrimaryKey(wxUser.getSchoolId());
-			WxUser wxGUser = wxUserMapper.findGzh(wxUser.getPhone());
+            WxUser wxUser = wxUserService.findById(orders.getOpenId());
+            School school = schoolService.findById(wxUser.getSchoolId());
+            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
 			if(wxGUser!=null){
 				Map<String, String> mb = new HashMap<>();
 				mb.put("touser", wxGUser.getOpenId());
@@ -280,7 +282,7 @@ public class SenderServiceImple implements SenderService {
 		}
 		Sender sender = senderMapper.selectByPrimaryKey(senderId);
 		amount = amount.multiply(new BigDecimal(1).subtract(sender.getRate())).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-		WxUser wxUser = wxUserMapper.selectByPrimaryKey(sender.getOpenId());
+        WxUser wxUser = wxUserService.findById(sender.getOpenId());
 		Map<String, Object> map = new HashMap<>();
 		map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
 		map.put("amount", amount);
@@ -311,9 +313,9 @@ public class SenderServiceImple implements SenderService {
 		orders.setSenderPhone(sender.getPhone());
 		int rs=0;
 		if((rs=runordersMapper.SenderAccept(orders))==1){
-			WxUser wxUser = wxUserMapper.selectByPrimaryKey(orders.getOpenId());
-			School school = schoolMapper.selectByPrimaryKey(wxUser.getSchoolId());
-			WxUser wxGUser = wxUserMapper.findGzh(wxUser.getPhone());
+            WxUser wxUser = wxUserService.findById(orders.getOpenId());
+            School school = schoolService.findById(wxUser.getSchoolId());
+            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
 			if(wxGUser!=null){
 				Map<String, String> mb = new HashMap<>();
 				mb.put("touser", wxGUser.getOpenId());
@@ -374,8 +376,8 @@ public class SenderServiceImple implements SenderService {
 		WxUser query = new WxUser();
 		query.setSchoolId(sender.getSchoolId());
 		query.setPhone(sender.getPhone());
-		WxUser user = wxUserMapper.findByschoolAndPhone(query);
-		School school = schoolMapper.selectByPrimaryKey(sender.getSchoolId());
+        WxUser user = wxUserService.findByschoolAndPhone(query);
+        School school = schoolService.findById(sender.getSchoolId());
 		if (user == null) {
 			throw new YWException("提现失败，请返回" + school.getName() + "绑定该手机号码");
 		}
@@ -390,7 +392,7 @@ public class SenderServiceImple implements SenderService {
 				if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
 						school.getCertPath(), payId, "127.0.0.1", amount, user.getOpenId(), log) == 1) {
 					txLogMapper.insert(log);
-					if (schoolMapper.sendertx(map) == 0) {
+                    if (schoolService.sendertx(map) == 0) {
 						LoggerUtil.log("配送员提现学校减少金额失败:" + senderId + ":" + amount);
 					}
 					return 1;
@@ -413,9 +415,9 @@ public class SenderServiceImple implements SenderService {
 	@Override
 	public int tx2(String senderId, String userId) {
 		Sender sender = senderMapper.check(senderId);
-		WxUser wxUser = wxUserMapper.selectByPrimaryKey(userId);
-		WxUser senderUser = wxUserMapper.selectByPrimaryKey(senderId);
-		School school = schoolMapper.selectByPrimaryKey(sender.getSchoolId());
+        WxUser wxUser = wxUserService.findById(userId);
+        WxUser senderUser = wxUserService.findById(senderId);
+        School school = schoolService.findById(sender.getSchoolId());
 		WxUserBell wxUserBell = wxUserBellMapper
 				.selectByPrimaryKey(senderUser.getOpenId() + "-" + senderUser.getPhone());
 		Map<String, Object> map = new HashMap();
@@ -431,7 +433,7 @@ public class SenderServiceImple implements SenderService {
 						school.getCertPath(), payId, "127.0.0.1", wxUserBell.getMoney(), wxUser.getOpenId(),
 						log) == 1) {
 					txLogMapper.insert(log);
-					if (schoolMapper.sendertx(map) == 0) {
+                    if (schoolService.sendertx(map) == 0) {
 						LoggerUtil.log("配送员提现学校减少金额失败:" + senderId + ":" + wxUserBell.getMoney());
 					}
 					return 1;
