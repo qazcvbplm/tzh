@@ -80,7 +80,7 @@ public class WxUserController {
 	@GetMapping("wx/check/gz")
 	public ResponseObject checkgz(HttpServletRequest request,HttpServletResponse response,String openId){
 		WxUser wxUser = wxUserService.findById(openId);
-		WxUser wxGUser=wxUserService.findGZH(wxUser.getPhone());
+		WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
 		if(null==wxGUser){
 			return new ResponseObject(true, "ok").push("gz",false);
 		}else{

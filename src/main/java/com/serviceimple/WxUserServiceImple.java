@@ -116,7 +116,7 @@ public class WxUserServiceImple implements WxUserService {
             }
             //发送模板
             WxUserBell userbell = wxUserBellMapper.selectByPrimaryKey(wxUser.getOpenId() + "-" + wxUser.getPhone());
-            WxUser wxGUser = wxUserMapper.findGzh(wxUser.getPhone());
+            WxUser wxGUser = findGzh(wxUser.getPhone());
             if (wxGUser != null) {
                 Map<String, String> mb = new HashMap<>();
                 mb.put("touser", wxGUser.getOpenId());
@@ -176,14 +176,11 @@ public class WxUserServiceImple implements WxUserService {
         return wxUserMapper.findByPhoneGZH(query);
     }
 
-    @Override
-    public WxUser findGZH(String phone) {
-        return wxUserMapper.findGzh(phone);
-    }
 
     @Override
     public WxUser findGzh(String phone) {
-        return wxUserMapper.findGzh(phone);
+        List<WxUser> users = wxUserMapper.findGzh(phone);
+        return users.size() == 1 ? users.get(0) : null;
     }
 
     @Override

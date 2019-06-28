@@ -1,11 +1,8 @@
 package com.dao;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.annotations.Mapper;
-
 import com.entity.WxUser;
+
+import java.util.List;
 
 public interface WxUserMapper {
     int insert(WxUser record);
@@ -28,6 +25,6 @@ public interface WxUserMapper {
 
 	List<WxUser> findByPhoneGZH(String query);
 
-	WxUser findGzh(String phone);
+    List<WxUser> findGzh(String phone);
 
 }

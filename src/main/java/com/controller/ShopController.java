@@ -15,7 +15,6 @@ import com.wxutil.WXUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,13 +35,9 @@ public class ShopController {
 	private SchoolService schoolService;
     @Autowired
     private AuthController auth;
-    @Autowired
-	private StringRedisTemplate cache;
-    
-  
-    
-	
-	@ApiOperation(value="添加",httpMethod="POST")
+
+
+    @ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,@ModelAttribute @Valid Shop shop,BindingResult result){
 		              Util.checkParams(result);
@@ -55,15 +50,6 @@ public class ShopController {
 	@ApiOperation(value="查询",httpMethod="POST")
 	@RequestMapping("find")
 	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,Shop shop){
-		            /*  String rs=null;
-		              List<Shop> list=null;
-			      	  String key=shop.toString();
-			      	  if((rs=cache.opsForValue().get(key))==null){
-			      			list=shopService.find(shop);
-			      			cache.opsForValue().set(key, JSON.toJSONString(list),5,TimeUnit.MINUTES);
-			      	  }else{
-			      		  list=(List<Shop>) JSON.parse(cache.opsForValue().get(key));
-			      	  }*/
 		              int count = shopService.count(shop);
 		              return new ResponseObject(true, "ok").push("list", shopService.find(shop)).push("total", count);
 	}

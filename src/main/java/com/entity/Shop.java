@@ -1,10 +1,9 @@
 package com.entity;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.List;
 
 public class Shop extends Base{
     private Integer id;
@@ -24,6 +23,8 @@ public class Shop extends Base{
     private Integer sendModelFlag;
     @NotNull
     private Integer getModelFlag;
+    @NotNull
+    private Integer tsModelFlag;
     @NotNull
     private Integer score;
     @NotNull
@@ -62,9 +63,16 @@ public class Shop extends Base{
     private List<FullCut> fullCut;
     
     private BigDecimal minDiscount;
-    
 
-	public Shop(Integer schoolId) {
+    public Integer getTsModelFlag() {
+        return tsModelFlag;
+    }
+
+    public void setTsModelFlag(Integer tsModelFlag) {
+        this.tsModelFlag = tsModelFlag;
+    }
+
+    public Shop(Integer schoolId) {
 		super();
 		this.schoolId = schoolId;
 	}

@@ -21,7 +21,7 @@
   </resultMap>
   
   <select id="findGzh" parameterType="string" resultMap="BaseResultMap">
-  select * from wx_user where phone=#{phone} and client='微信公众号'
+  select * from wx_user where phone=#{phone} and client='微信公众号' limit 10
   </select>
   
   <select id="findByPhoneGZH" parameterType="string" resultMap="BaseResultMap">

@@ -1,20 +1,13 @@
 package com.dao;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.entity.Shop;
+
 import java.util.List;
 
-import org.apache.ibatis.annotations.Mapper;
-
-import com.entity.Shop;
-public interface ShopMapper{
-    int insert(Shop record);
-
-    int insertSelective(Shop record);
+public interface ShopMapper extends BaseMapper<Shop> {
 
     Shop selectByPrimaryKey(Integer id);
-
-    int updateByPrimaryKeySelective(Shop record);
-
-    int updateByPrimaryKey(Shop record);
 
 	Shop checkByLoginName(String shopLoginName);
 

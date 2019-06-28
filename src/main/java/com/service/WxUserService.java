@@ -27,8 +27,6 @@ public interface WxUserService {
 
 	List<WxUser> findByPhoneGZH(String phone);
 
-	WxUser findGZH(String phone);
-
     WxUser findGzh(String phone);
 
     WxUser findByschoolAndPhone(WxUser query);

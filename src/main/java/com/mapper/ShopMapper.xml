@@ -11,6 +11,7 @@
     <result column="open_flag" jdbcType="INTEGER" property="openFlag" />
     <result column="send_model_flag" jdbcType="INTEGER" property="sendModelFlag" />
     <result column="get_model_flag" jdbcType="INTEGER" property="getModelFlag" />
+    <result column="ts_model_flag" jdbcType="INTEGER" property="tsModelFlag"/>
     <result column="score" jdbcType="INTEGER" property="score" />
     <result column="start_price" jdbcType="DECIMAL" property="startPrice" />
     <result column="box_price" jdbcType="DECIMAL" property="boxPrice" />
@@ -37,7 +38,7 @@
   
   <sql id="fd">
   id,school_id,shop_name,shop_phone,shop_image,shop_category_id,send_model_flag,get_model_flag,score,start_price,box_price,send_price,send_time,top_title,shop_login_name,shop_login_pass_word,shop_address,rate,lat,lng,vip_discount_flag
-  ,send_price_add_by_count_flag,send_price_add,is_delete,sort
+  ,send_price_add_by_count_flag,send_price_add,is_delete,sort,ts_model_flag
   </sql>
    <select id="count" resultType="int" parameterType="com.entity.Shop">
     select count(*) from shop
@@ -87,7 +88,7 @@
     from shop
     where Id = #{id,jdbcType=INTEGER}
   </select>
-  <insert id="insert" parameterType="com.entity.Shop">
+  <!--<insert id="insert" parameterType="com.entity.Shop">
     insert into shop (school_id, shop_name, 
       shop_phone, shop_image, shop_category_id, 
       open_flag, send_model_flag, get_model_flag, 
@@ -106,7 +107,7 @@
       #{rate,jdbcType=DECIMAL}, #{lat,jdbcType=VARCHAR}, #{lng,jdbcType=VARCHAR}, #{vipDiscountFlag,jdbcType=INTEGER}, 
       #{sendPriceAddByCountFlag,jdbcType=INTEGER}, #{sendPriceAdd,jdbcType=DECIMAL}, 
        #{sort,jdbcType=BIGINT})
-  </insert>
+  </insert>-->
   <update id="updateByPrimaryKeySelective" parameterType="com.entity.Shop">
     update shop
     <set>
