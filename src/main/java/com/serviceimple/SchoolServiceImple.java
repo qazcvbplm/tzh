@@ -78,7 +78,7 @@ public class SchoolServiceImple implements SchoolService{
                 return JSON.parseObject(school, School.class);
             } else {
                 School rs = schoolMapper.selectByPrimaryKey(schoolId);
-                redisTemplate.opsForValue().set("SCHOOL_ID_" + school, JSON.toJSONString(rs));
+				redisTemplate.opsForValue().set("SCHOOL_ID_" + schoolId, JSON.toJSONString(rs));
                 return rs;
             }
         }
