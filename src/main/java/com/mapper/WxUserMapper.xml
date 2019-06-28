@@ -72,8 +72,8 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     *
-    from wx_user left join wx_user_bell on concat(wx_user.open_id,'-',wx_user.phone)=wx_user_bell.phone
-    where wx_user.open_id = #{openId,jdbcType=VARCHAR}
+    from wx_user
+    where open_id = #{openId,jdbcType=VARCHAR}
   </select>
   <insert id="insert" parameterType="com.entity.WxUser">
     insert into wx_user (open_id,client,app_id,school_id)

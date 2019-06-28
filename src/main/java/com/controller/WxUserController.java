@@ -2,6 +2,7 @@ package com.controller;
 
 import com.entity.School;
 import com.entity.WxUser;
+import com.entity.WxUserBell;
 import com.feign.AuthController;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.redis.message.RedisUtil;
@@ -60,6 +61,7 @@ public class WxUserController {
 			   openid=WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
 			   String token=auth.getToken(openid, "wx","wxuser");
 			   user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
+			   user.setBell(wxUserService.getbell(openid));
 			   // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
 			   cache.userCountadd(sid);
 			   return new ResponseObject(true, "ok").push("token", token).push("user",user);
@@ -72,8 +74,8 @@ public class WxUserController {
 	@ApiOperation(value = "获取钱包信息", httpMethod = "POST")
 	@GetMapping("wx/get/bell")
 	public ResponseObject getBell(HttpServletRequest request,HttpServletResponse response,String openId){
-		WxUser wxUser = wxUserService.findById(openId);
-		return new ResponseObject(true, "ok").push("user",wxUser);
+		WxUserBell wxUserBell = wxUserService.getbell(openId);
+		return new ResponseObject(true, "ok").push("bell", wxUserBell);
     }
 	
 	@ApiOperation(value="判断是否关注公众号",httpMethod="POST")

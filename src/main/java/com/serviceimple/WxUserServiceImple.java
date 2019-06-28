@@ -149,7 +149,7 @@ public class WxUserServiceImple implements WxUserService {
                 return JSON.parseObject(rs, WxUser.class);
             } else {
                 WxUser wxUser = wxUserMapper.selectByPrimaryKey(openId);
-                stringRedisTemplate.opsForValue().set("WX_USER_OPENID_" + openId, JSON.toJSONString(wxUser), 1, TimeUnit.DAYS);
+                stringRedisTemplate.opsForValue().set("WX_USER_OPENID_" + openId, JSON.toJSONString(wxUser), 2, TimeUnit.DAYS);
                 return wxUser;
             }
         }
@@ -186,6 +186,12 @@ public class WxUserServiceImple implements WxUserService {
     @Override
     public WxUser findByschoolAndPhone(WxUser query) {
         return wxUserMapper.findByschoolAndPhone(query);
+    }
+
+    @Override
+    public WxUserBell getbell(String openId) {
+        WxUser wxUser = findById(openId);
+        return wxUserBellMapper.selectByPrimaryKey(wxUser.getOpenId() + "-" + wxUser.getPhone());
     }
 
 }

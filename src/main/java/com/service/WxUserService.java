@@ -1,6 +1,7 @@
 package com.service;
 
 import com.entity.WxUser;
+import com.entity.WxUserBell;
 
 import java.util.List;
 
@@ -30,4 +31,6 @@ public interface WxUserService {
     WxUser findGzh(String phone);
 
     WxUser findByschoolAndPhone(WxUser query);
+
+	WxUserBell getbell(String openId);
 }
