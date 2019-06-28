@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class WxUserServiceImple implements WxUserService {
@@ -148,7 +149,7 @@ public class WxUserServiceImple implements WxUserService {
                 return JSON.parseObject(rs, WxUser.class);
             } else {
                 WxUser wxUser = wxUserMapper.selectByPrimaryKey(openId);
-                stringRedisTemplate.opsForValue().set("WX_USER_OPENID_" + openId, JSON.toJSONString(wxUser));
+                stringRedisTemplate.opsForValue().set("WX_USER_OPENID_" + openId, JSON.toJSONString(wxUser), 1, TimeUnit.DAYS);
             }
         }
         return wxUserMapper.selectByPrimaryKey(openId);
