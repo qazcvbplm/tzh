@@ -1,16 +1,17 @@
 package com.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import javax.validation.Valid;
-
 import com.dto.SenderTj;
 import com.entity.Orders;
 import com.entity.RunOrders;
 import com.entity.Sender;
 
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
+
 public interface SenderService {
+
+	Sender findById(Integer id);
 
 	void add(@Valid Sender sender);
 

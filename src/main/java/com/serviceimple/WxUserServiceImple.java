@@ -65,7 +65,10 @@ public class WxUserServiceImple implements WxUserService {
                 throw new YWException("手机号码已被注册");
             }
         }
-        wxUserMapper.updateByPrimaryKeySelective(wxUser);
+        int i = wxUserMapper.updateByPrimaryKeySelective(wxUser);
+        if (SpringUtil.redisCache() && i > 0) {
+            stringRedisTemplate.delete("WX_USER_OPENID_" + wxUser.getOpenId());
+        }
         return wxUserMapper.selectByPrimaryKey(wxUser.getOpenId());
     }
 

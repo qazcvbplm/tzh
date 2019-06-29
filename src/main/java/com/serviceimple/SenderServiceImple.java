@@ -1,5 +1,6 @@
 package com.serviceimple;
 
+import com.alibaba.fastjson.JSON;
 import com.config.RedisConfig;
 import com.dao.*;
 import com.dto.SenderTj;
@@ -13,6 +14,7 @@ import com.service.SchoolService;
 import com.service.SenderService;
 import com.service.WxUserService;
 import com.util.LoggerUtil;
+import com.util.SpringUtil;
 import com.wx.towallet.WeChatPayUtil;
 import com.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,21 @@ public class SenderServiceImple implements SenderService {
 	private RedisUtil cache;
 
 	@Override
+	public Sender findById(Integer id) {
+		if (SpringUtil.redisCache()) {
+			Object rs = stringRedisTemplate.boundHashOps("SENDER_LIST").get(id.toString());
+			if (rs != null) {
+				return JSON.parseObject(rs.toString(), Sender.class);
+			} else {
+				Sender sender = findById(id);
+				stringRedisTemplate.boundHashOps("SENDER_LIST").put(id.toString(), JSON.toJSONString(sender));
+				return sender;
+			}
+		}
+		return senderMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
 	public void add(Sender sender) {
 		if (senderMapper.check(sender.getOpenId()) == null) {
 			senderMapper.insert(sender);
@@ -80,6 +97,9 @@ public class SenderServiceImple implements SenderService {
 
 	@Override
 	public int update(Sender sender) {
+		if (SpringUtil.redisCache()) {
+			stringRedisTemplate.boundHashOps("SENDER_LIST").delete(sender.getId().toString());
+		}
 		return senderMapper.updateByPrimaryKeySelective(sender);
 	}
 
@@ -97,7 +117,7 @@ public class SenderServiceImple implements SenderService {
 
 	@Override
 	public List<Orders> findorderbydjs(int senderId, int page, int size, String status) {
-		Sender sender = senderMapper.selectByPrimaryKey(senderId);
+		Sender sender = findById(senderId);
 		sender.setPage(page);
 		sender.setSize(size);
 		sender.setOrderBy(status);
@@ -110,7 +130,7 @@ public class SenderServiceImple implements SenderService {
 
 	@Override
 	public int acceptOrder(int senderId, String orderId) {
-		Sender sender = senderMapper.selectByPrimaryKey(senderId);
+		Sender sender = findById(senderId);
 		Orders orders = ordersMapper.selectByPrimaryKey(orderId);
 		orders.setSenderId(senderId);
 		orders.setSenderName(sender.getName());
@@ -146,7 +166,7 @@ public class SenderServiceImple implements SenderService {
 	@Override
 	public void end(String orderId, boolean end) {
 		Orders orders = ordersMapper.selectByPrimaryKey(orderId);
-		Sender sender = senderMapper.selectByPrimaryKey(orders.getSenderId());
+		Sender sender = findById(orders.getSenderId());
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
 		if (end) {
 			orders.setDestination(1);
@@ -235,7 +255,7 @@ public class SenderServiceImple implements SenderService {
 	public void endRun(String orderId) {
 		if (runordersMapper.end(orderId) == 1) {
 			RunOrders orders = runordersMapper.selectByPrimaryKey(orderId);
-			Sender sender = senderMapper.selectByPrimaryKey(orders.getSenderId());
+			Sender sender = findById(orders.getSenderId());
 			BigDecimal senderGet = orders.getTotalPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
 			stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL,
 					new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
@@ -280,7 +300,7 @@ public class SenderServiceImple implements SenderService {
 		if (senderId == 0) {
 			return;
 		}
-		Sender sender = senderMapper.selectByPrimaryKey(senderId);
+		Sender sender = findById(senderId);
 		amount = amount.multiply(new BigDecimal(1).subtract(sender.getRate())).setScale(2, BigDecimal.ROUND_HALF_DOWN);
         WxUser wxUser = wxUserService.findById(sender.getOpenId());
 		Map<String, Object> map = new HashMap<>();
@@ -293,7 +313,7 @@ public class SenderServiceImple implements SenderService {
 
 	@Override
 	public List<RunOrders> findorderbyrundjs(int senderId, int page, int size, String status) {
-		Sender sender = senderMapper.selectByPrimaryKey(senderId);
+		Sender sender = findById(senderId);
 		sender.setPage(page);
 		sender.setSize(size);
 		sender.setOrderBy(status);
@@ -306,7 +326,7 @@ public class SenderServiceImple implements SenderService {
 
 	@Override
 	public int acceptOrderRun(int senderId, String orderId) {
-		Sender sender = senderMapper.selectByPrimaryKey(senderId);
+		Sender sender = findById(senderId);
 		RunOrders orders = runordersMapper.selectByPrimaryKey(orderId);
 		orders.setSenderId(senderId);
 		orders.setSenderName(sender.getName());

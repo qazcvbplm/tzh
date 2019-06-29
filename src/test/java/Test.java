@@ -1,8 +1,5 @@
 import com.App;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dao.WxUserMapper;
-import com.entity.TxLog;
 import com.service.TxLogService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,7 @@ public class Test {
 
     @org.junit.Test
     public void test(){
-        IPage<TxLog> list = txLogService.test(new Page<TxLog>(1, 10));
-        int i = 0;
+
+        System.out.println(stringRedisTemplate.boundHashOps("SENDER_LIST").get(3 + "").toString());
     }
 }

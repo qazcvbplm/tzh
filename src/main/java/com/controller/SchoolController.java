@@ -4,12 +4,10 @@ import com.auth.JWTUtil;
 import com.dao.ApplicationMapper;
 import com.entity.Application;
 import com.entity.School;
-import com.feign.AuthController;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.service.SchoolService;
 import com.util.BaiduUtil;
 import com.util.ResponseObject;
-import com.util.SpringUtil;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,9 +65,6 @@ public class SchoolController {
 							school.setLoginPassWord(Util.EnCode(school.getLoginPassWord()));
 						}
         int i = schoolService.update(school);
-        if (i > 0 && SpringUtil.redisCache()) {
-            stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
-        }
 		              return new ResponseObject(true,"更新"+i+"条记录");
 	}
 	

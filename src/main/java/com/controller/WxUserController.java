@@ -4,13 +4,11 @@ import com.auth.JWTUtil;
 import com.entity.School;
 import com.entity.WxUser;
 import com.entity.WxUserBell;
-import com.feign.AuthController;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.redis.message.RedisUtil;
 import com.service.SchoolService;
 import com.service.WxUserService;
 import com.util.ResponseObject;
-import com.util.SpringUtil;
 import com.util.Util;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
@@ -102,9 +100,7 @@ public class WxUserController {
 			wxUser.setNickName(EmojiParser.removeAllEmojis(wxUser.getNickName()));
 		}
 		wxUser = wxUserService.update(wxUser);
-		if (SpringUtil.redisCache()) {
-			stringRedisTemplate.delete("WX_USER_OPENID_" + wxUser.getOpenId());
-		}
+
 		return new ResponseObject(true, "ok").push("user", wxUser);
     }
 	

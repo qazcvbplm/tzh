@@ -37,6 +37,8 @@ public class SchoolServiceImple implements SchoolService{
     private StringRedisTemplate redisTemplate;
     @Autowired
     private LogsMapper logsMapper;
+	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
 	@Override
 	public void add(@Valid School school) throws Exception {
 		if(schoolMapper.findByLoginName(school.getLoginName())==null){
@@ -67,7 +69,11 @@ public class SchoolServiceImple implements SchoolService{
 
 	@Override
 	public int update(School school) {
-		return schoolMapper.updateByPrimaryKeySelective(school);
+		int i = schoolMapper.updateByPrimaryKeySelective(school);
+		if (i > 0 && SpringUtil.redisCache()) {
+			stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+		}
+		return i;
 	}
 
 	@Override

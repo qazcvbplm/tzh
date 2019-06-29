@@ -1,9 +1,9 @@
 package com.entity;
 
-import java.math.BigDecimal;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.math.BigDecimal;
 
 public class OrdersComplete {
 	@TableId(type=IdType.AUTO)
@@ -52,8 +52,6 @@ public class OrdersComplete {
     	this.schoolGetShop=order.getPayPrice().subtract(order.getSendPrice()).multiply(this.schoolGetShopRate);
     	this.schoolGetSender=order.getSendPrice().multiply(this.schoolGetSenderRate);
     	this.schoolGetTotal=this.schoolGetShop.add(this.schoolGetSender).subtract(total);
-    	
-    	
 	}
 
 	public Integer getId() {

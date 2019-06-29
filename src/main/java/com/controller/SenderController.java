@@ -6,7 +6,6 @@ import com.entity.RunOrders;
 import com.entity.Sender;
 import com.service.SenderService;
 import com.util.ResponseObject;
-import com.util.SpringUtil;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,9 +61,6 @@ public class SenderController {
     @PostMapping("update")
     public ResponseObject update(HttpServletRequest request, HttpServletResponse response, Sender sender) {
         int i = senderService.update(sender);
-        if (SpringUtil.redisCache() && i > 0) {
-            cache.delete("SENDER_ID_" + sender.getId());
-        }
         return new ResponseObject(true, "");
     }
 
