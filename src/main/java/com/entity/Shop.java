@@ -1,11 +1,15 @@
 package com.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
 public class Shop extends Base{
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     private Integer schoolId;

@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.auth.JWTUtil;
 import com.dto.SenderTj;
 import com.dto.ShopTj;
 import com.entity.FullCut;
@@ -33,8 +34,8 @@ public class ShopController {
 	private ShopService shopService;
 	@Autowired
 	private SchoolService schoolService;
-    @Autowired
-    private AuthController auth;
+   /* @Autowired
+    private AuthController auth;*/
 
 
     @ApiOperation(value="添加",httpMethod="POST")
@@ -112,7 +113,7 @@ public class ShopController {
 	@PostMapping("android/login")
 	public ResponseObject android_login(HttpServletRequest request,HttpServletResponse response,String loginName,String loginPassWord){
         Shop shop = shopService.login(loginName, loginPassWord);
-        String token = auth.getToken(shop.getId() + "", shop.getShopLoginName(), "android");
+        String token = JWTUtil.sign(shop.getId() + "", shop.getShopLoginName(), "android");
         return new ResponseObject(true, "ok").push("msg", Util.toJson(shop)).push("token", token);
 	}
 	

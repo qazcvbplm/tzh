@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.auth.JWTUtil;
 import com.dao.ApplicationMapper;
 import com.entity.Application;
 import com.entity.School;
@@ -35,8 +36,8 @@ public class SchoolController {
 	private SchoolService schoolService;
 	@Autowired
 	private ApplicationMapper applicationMapper;
-	@Autowired
-	private AuthController auth;
+	/*@Autowired
+	private AuthController auth;*/
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 
@@ -79,7 +80,7 @@ public class SchoolController {
 		if(type==1){
 			School school=schoolService.login(loginName,Util.EnCode(loginPass));
 			if(school!=null){
-				token=auth.getToken(school.getId()+"", school.getLoginName(),"school");
+				token= JWTUtil.sign(school.getId()+"", school.getLoginName(),"school");
 				return new ResponseObject(true,"ok").push("token", token).push("school", school).push("type", "school");
 			}else{
 				return new ResponseObject(false, "账号或密码错误");
@@ -90,7 +91,7 @@ public class SchoolController {
 			login.setLoginPass(Util.EnCode(loginPass));
 			Application application=applicationMapper.login(login);
 			if(application!=null){
-				token=auth.getToken(application.getId()+"", application.getLoginName(),"admin");
+				token=JWTUtil.sign(application.getId()+"", application.getLoginName(),"admin");
 				return new ResponseObject(true,"ok").push("token", token).push("admin", application).push("type", "admin");
 			}else{
 				return new ResponseObject(false, "账号或密码错误");

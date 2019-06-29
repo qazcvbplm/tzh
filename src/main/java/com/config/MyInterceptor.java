@@ -3,6 +3,9 @@ package com.config;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.auth.JWTUtil;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.feign.AuthController;
 import com.util.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +19,24 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class MyInterceptor implements HandlerInterceptor {
 
-	@Autowired
-	private AuthController auth;
-	
+	/*@Autowired
+	private AuthController auth;*/
+
+	public String verify(String token){
+		if(JWTUtil.verify(token)){
+			DecodedJWT de = JWT.decode(token);
+			return de.getClaim("msg").asString();
+		}else{
+			return null;
+		}
+	}
 	
 	 @Override
 	    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 	            throws Exception {
 		 String token =request.getHeader("token");
 		 String msg=null;
-		    if((msg=auth.verify(token))!=null){
+		    if((msg=verify(token))!=null){
 		    	JSONObject json=JSON.parseObject(msg);
 		    	request.setAttribute("Id", json.getString("userId"));
 		    	request.setAttribute("role", json.getString("role"));

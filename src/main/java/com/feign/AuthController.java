@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(value="auth",fallback=AuthController.FaildBack.class)
-@Component
+//@FeignClient(value="auth",fallback=AuthController.FaildBack.class)
+//@Component
 public interface AuthController {
 
 	@PostMapping("auth/verify")

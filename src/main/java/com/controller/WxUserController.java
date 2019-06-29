@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.auth.JWTUtil;
 import com.entity.School;
 import com.entity.WxUser;
 import com.entity.WxUserBell;
@@ -37,8 +38,8 @@ public class WxUserController {
 	private WxUserService wxUserService;
 	@Autowired
 	private SchoolService schoolService;
-	@Autowired
-	private AuthController auth;
+	/*@Autowired
+	private AuthController auth;*/
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 	@Autowired
@@ -59,7 +60,7 @@ public class WxUserController {
 		   WxUser user=null;
 		   if(school!=null){
 			   openid=WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
-			   String token=auth.getToken(openid, "wx","wxuser");
+			   String token= JWTUtil.sign(openid, "wx","wxuser");
 			   user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
 			   user.setBell(wxUserService.getbell(openid));
 			   // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
