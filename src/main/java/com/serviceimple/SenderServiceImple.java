@@ -63,7 +63,7 @@ public class SenderServiceImple implements SenderService {
 			if (rs != null) {
 				return JSON.parseObject(rs.toString(), Sender.class);
 			} else {
-				Sender sender = findById(id);
+				Sender sender = senderMapper.selectByPrimaryKey(id);
 				stringRedisTemplate.boundHashOps("SENDER_LIST").put(id.toString(), JSON.toJSONString(sender));
 				return sender;
 			}

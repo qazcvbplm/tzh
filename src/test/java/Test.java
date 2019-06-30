@@ -23,7 +23,6 @@ public class Test {
 
     @org.junit.Test
     public void test(){
-
-        System.out.println(stringRedisTemplate.boundHashOps("SENDER_LIST").get(3 + "").toString());
+        stringRedisTemplate.delete(stringRedisTemplate.keys("SENDER*"));
     }
 }
