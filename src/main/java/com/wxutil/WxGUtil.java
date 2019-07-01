@@ -1,7 +1,5 @@
 package com.wxutil;
 
-import java.util.Map;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.util.LoggerUtil;
@@ -40,32 +38,9 @@ public class WxGUtil {
      * form_id  表单id  或者支付id
      * keyword 关键字 1,2,3,4,5,6,7.。。。
      */
-    public static void snedM(Map<String,String> map){
+       public static void snedM(JSONObject output) {
     	//发送模板消息
          String access_token=getAccessToken("wx5b97919ccae6d986", "21ffc5cd23e1efa82bb26ee79af691ac");
-         JSONObject output =new JSONObject();
-		JSONObject data=new JSONObject();
-		JSONObject keyword;
-		JSONObject minprogram=null;
-         for (String key : map.keySet()) {
-         	if(key.startsWith("data_")){
-         		keyword=new JSONObject();
-           	    keyword.put("value",map.get(key));
-           	    keyword.put("color", "#173177");
-         		data.put(key.replace("data_", ""), keyword);
-         	}
-         	else if(key.startsWith("min_")){
-         		if(minprogram==null)
-         		minprogram=new JSONObject();
-         		minprogram.put(key.replace("min_", ""), map.get(key));
-         	}else{
-         		output.put(key, map.get(key));
-         	}
-         }
-         if(minprogram!=null){
-        	 output.put("miniprogram", minprogram);
-         }
-         output.put("data", data);
          String rs=PayUtil.httpRequest(msurl+access_token, "POST", output.toString());
          LoggerUtil.log(rs);
     }

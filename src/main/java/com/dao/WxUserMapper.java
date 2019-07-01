@@ -1,6 +1,8 @@
 package com.dao;
 
+import com.dto.Test;
 import com.entity.WxUser;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -27,4 +29,6 @@ public interface WxUserMapper {
 
     List<WxUser> findGzh(String phone);
 
+    @Select("select wx_user.*,wx_user_bell.* from wx_user left join wx_user_bell on wx_user_bell.phone=concat(wx_user.open_id,'-',wx_user.phone) limit 10")
+    List<Test> test();
 }

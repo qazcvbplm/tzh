@@ -3,6 +3,7 @@ package com.serviceimple;
 import com.alibaba.fastjson.JSON;
 import com.controller.OrdersNotify;
 import com.dao.*;
+import com.dto.wxgzh.Message;
 import com.entity.*;
 import com.exception.YWException;
 import com.service.SchoolService;
@@ -23,7 +24,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class WxUserServiceImple implements WxUserService {
@@ -67,7 +67,7 @@ public class WxUserServiceImple implements WxUserService {
         }
         int i = wxUserMapper.updateByPrimaryKeySelective(wxUser);
         if (SpringUtil.redisCache() && i > 0) {
-            stringRedisTemplate.delete("WX_USER_OPENID_" + wxUser.getOpenId());
+            stringRedisTemplate.boundHashOps("WX_USER_LIST").delete(wxUser.getOpenId());
         }
         return wxUserMapper.selectByPrimaryKey(wxUser.getOpenId());
     }
@@ -121,19 +121,14 @@ public class WxUserServiceImple implements WxUserService {
             WxUserBell userbell = wxUserBellMapper.selectByPrimaryKey(wxUser.getOpenId() + "-" + wxUser.getPhone());
             WxUser wxGUser = findGzh(wxUser.getPhone());
             if (wxGUser != null) {
-                Map<String, String> mb = new HashMap<>();
-                mb.put("touser", wxGUser.getOpenId());
-                mb.put("template_id", "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk");
-                mb.put("data_first", " 您的会员帐户余额有变动！");
-                mb.put("data_keyword1", "暂无");
-                mb.put("data_keyword2", "+" + log.getPay().add(log.getSend()));
-                mb.put("data_keyword3", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                mb.put("data_keyword4", "充值");
-                mb.put("data_keyword5", userbell.getMoney() + "");
-                mb.put("data_remark", "如有疑问请在小程序内联系客服人员！");
-                mb.put("min_appid", school.getWxAppId());
-                mb.put("min_path", "pages/mine/payment/payment");
-                WxGUtil.snedM(mb);
+                WxGUtil.snedM(new Message(wxGUser.getOpenId(),
+                        "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
+                        school.getWxAppId(),
+                        "pages/mine/payment/payment",
+                        "暂无",
+                        "+" + log.getPay().add(log.getSend()),
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+                        , "充值", userbell.getMoney() + "", null, null, null, null, null, "如有疑问请在小程序内联系客服人员！").toJson());
             }
         }
     }
@@ -152,7 +147,7 @@ public class WxUserServiceImple implements WxUserService {
                 return JSON.parseObject(rs, WxUser.class);
             } else {
                 WxUser wxUser = wxUserMapper.selectByPrimaryKey(openId);
-                stringRedisTemplate.opsForValue().set("WX_USER_OPENID_" + openId, JSON.toJSONString(wxUser), 2, TimeUnit.DAYS);
+                stringRedisTemplate.boundHashOps("WX_USER_LIST").put(openId, JSON.toJSONString(wxUser));
                 return wxUser;
             }
         }
