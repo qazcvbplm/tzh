@@ -185,7 +185,7 @@ public class WxUserServiceImple implements WxUserService {
     @Override
     public WxUser findGzh(String phone) {
         List<WxUser> users = wxUserMapper.findGzh(phone);
-        return users.size() == 1 ? users.get(0) : null;
+        return users.size() > 0 ? users.get(0) : null;
     }
 
     @Override
