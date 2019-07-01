@@ -117,19 +117,26 @@ public class WxUserServiceImple implements WxUserService {
             } catch (Exception e) {
                 logsMapper.insert(new Logs(e.getMessage()));
             }
-            //发送模板
+
             WxUserBell userbell = wxUserBellMapper.selectByPrimaryKey(wxUser.getOpenId() + "-" + wxUser.getPhone());
-            WxUser wxGUser = findGzh(wxUser.getPhone());
-            if (wxGUser != null) {
-                WxGUtil.snedM(new Message(wxGUser.getOpenId(),
-                        "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
-                        school.getWxAppId(),
-                        "pages/mine/payment/payment",
-                        "暂无",
-                        "+" + log.getPay().add(log.getSend()),
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
-                        , "充值", userbell.getMoney() + "", null, null, null, null, null, "如有疑问请在小程序内联系客服人员！").toJson());
-            }
+            //发送模板
+            sendWXGZHM(wxUser.getPhone(), new Message(null,
+                    "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
+                    school.getWxAppId(),
+                    "pages/mine/payment/payment",
+                    "暂无",
+                    "+" + log.getPay().add(log.getSend()),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+                    , "充值", userbell.getMoney() + "", null, null, null, null, null, "如有疑问请在小程序内联系客服人员！"));
+        }
+    }
+
+    @Override
+    public void sendWXGZHM(String phone, Message message) {
+        WxUser wxGUser = findGzh(phone);
+        if (wxGUser != null) {
+            message.setToUser(wxGUser.getOpenId());
+            WxGUtil.snedM(message.toJson());
         }
     }
 

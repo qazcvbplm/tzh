@@ -1,5 +1,6 @@
 package com.service;
 
+import com.dto.wxgzh.Message;
 import com.entity.WxUser;
 import com.entity.WxUserBell;
 
@@ -15,6 +16,8 @@ public interface WxUserService {
 	Object charge(String string, int chargeId);
 
 	void chargeSuccess(String orderId, String openId, String attach);
+
+	void sendWXGZHM(String phone, Message message);
 
 	Object findcharge(String openId);
 

@@ -7,6 +7,7 @@ import com.dto.SenderTj;
 import com.dto.redis.SchoolAddMoneyDTO;
 import com.dto.redis.SenderAddMoneyDTO;
 import com.dto.redis.WxUserAddSourceDTO;
+import com.dto.wxgzh.Message;
 import com.entity.*;
 import com.exception.YWException;
 import com.redis.message.RedisUtil;
@@ -16,7 +17,6 @@ import com.service.WxUserService;
 import com.util.LoggerUtil;
 import com.util.SpringUtil;
 import com.wx.towallet.WeChatPayUtil;
-import com.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -139,20 +139,13 @@ public class SenderServiceImple implements SenderService {
 		if((rs=ordersMapper.SenderAccept(orders))==1){
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             School school = schoolService.findById(wxUser.getSchoolId());
-            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
-			if(wxGUser!=null){
-				Map<String, String> mb = new HashMap<>();
-				mb.put("touser", wxGUser.getOpenId());
-				mb.put("template_id", "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M");
-				mb.put("data_first", "您的订单已被配送员接手！");
-				mb.put("data_keyword1", sender.getName());
-				mb.put("data_keyword2", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-				mb.put("data_remark", " 配送员正火速配送中，请耐心等待！");
-				mb.put("min_appid", school.getWxAppId());
-	       		mb.put("min_path", "pages/order/orderDetail/orderDetail?orderId=" 
-				+ orders.getId() + "&typ=" + orders.getTyp());
-				WxGUtil.snedM(mb);
-			}
+			wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+					"dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
+					school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
+					+ orders.getId() + "&typ=" + orders.getTyp(),
+					"您的订单已被配送员接手！", sender.getName(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+					null, null, null, null, null, null,
+					null, " 配送员正火速配送中，请耐心等待！"));
 		}
 		return rs;
 	}
@@ -230,24 +223,20 @@ public class SenderServiceImple implements SenderService {
 		cache.takeoutCountSuccessadd(orders.getSchoolId());
 		stringRedisTemplate.convertAndSend(RedisConfig.PRODUCTADD, orderId);
 		if(orders.getTyp().equals("外卖订单")){
-            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
-            School school = schoolService.findById(wxUser.getSchoolId());
-			if(wxGUser!=null){
-				Map<String, String> mb = new HashMap<>();
-				mb.put("touser", wxGUser.getOpenId());
-				mb.put("template_id", "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk");
-				if(orders.getDestination()==1){
-					mb.put("data_first", "您的订单已送达到寝。");
-				}else{
-					mb.put("data_first", "您的订单已送达楼下，请下楼自取。系统已返还"+orders.getSchoolTopDownPrice()+"元至您钱包余额内，请注意查收！");
-				}
-				mb.put("data_keyword1", orderId);
-				mb.put("data_keyword2", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-				mb.put("data_remark", "成功获得"+orders.getPayPrice().intValue()+"积分，可以前往积分商城兑换哟！");
-				mb.put("min_appid", school.getWxAppId());
-				mb.put("min_path", "pages/mine/integral/integral");
-				WxGUtil.snedM(mb);
+			School school = schoolService.findById(wxUser.getSchoolId());
+			Message message = new Message(null,
+					"8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
+					school.getWxAppId(), "pages/mine/integral/integral",
+					null, orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+					null, null, null, null, null, null,
+					null, "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！");
+			if (orders.getDestination() == 1) {
+				message.setDataFirst("您的订单已送达到寝。");
+			} else {
+				message.setDataFirst("您的订单已送达楼下，请下楼自取。系统已返还" + orders.getSchoolTopDownPrice() + "元至您钱包余额内，请注意查收！");
 			}
+			wxUserService.sendWXGZHM(wxUser.getPhone(), message);
+
 		}
 	}
 
@@ -272,19 +261,13 @@ public class SenderServiceImple implements SenderService {
 			cache.runCountSuccessadd(orders.getSchoolId());
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             School school = schoolService.findById(wxUser.getSchoolId());
-            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
-			if(wxGUser!=null){
-				Map<String, String> mb = new HashMap<>();
-				mb.put("touser", wxGUser.getOpenId());
-				mb.put("template_id", "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk");
-				mb.put("data_first", "您的跑腿订单已经完成!");
-				mb.put("data_keyword1", orders.getId());
-				mb.put("data_keyword2", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-				mb.put("data_remark", "成功获得"+orders.getTotalPrice().intValue()+"积分，可以前往积分商城兑换哟！");
-				mb.put("min_appid", school.getWxAppId());
-	       		mb.put("min_path", "pages/mine/integral/integral");
-				WxGUtil.snedM(mb);
-			}
+			wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+					"8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
+					school.getWxAppId(), "pages/mine/integral/integral",
+					"您的跑腿订单已经完成!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+					null, null, null, null, null, null,
+					null, "成功获得" + orders.getTotalPrice().intValue() + "积分，可以前往积分商城兑换哟！"));
+
 		}
 	}
 
@@ -335,20 +318,13 @@ public class SenderServiceImple implements SenderService {
 		if((rs=runordersMapper.SenderAccept(orders))==1){
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             School school = schoolService.findById(wxUser.getSchoolId());
-            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
-			if(wxGUser!=null){
-				Map<String, String> mb = new HashMap<>();
-				mb.put("touser", wxGUser.getOpenId());
-				mb.put("template_id", "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M");
-				mb.put("data_first", "您的订单已被配送员接手！");
-				mb.put("data_keyword1", sender.getName());
-				mb.put("data_keyword2", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-				mb.put("data_remark", " 配送员正火速配送中，请耐心等待！");
-				mb.put("min_appid", school.getWxAppId());
-	       		mb.put("min_path", "pages/order/orderDetail/orderDetail?orderId=" 
-				+ orders.getId() + "&typ=" + orders.getTyp());
-				WxGUtil.snedM(mb);
-			}
+			wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+					"dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
+					school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
+					+ orders.getId() + "&typ=" + orders.getTyp(),
+					"您的订单已被配送员接手！", sender.getName(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+					null, null, null, null, null, null,
+					null, " 配送员正火速配送中，请耐心等待！"));
 		}
 		return rs;
 	}

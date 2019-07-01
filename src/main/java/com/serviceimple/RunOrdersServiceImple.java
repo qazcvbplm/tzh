@@ -4,6 +4,7 @@ import com.dao.ApplicationMapper;
 import com.dao.RunOrdersMapper;
 import com.dao.ShopMapper;
 import com.dao.WxUserBellMapper;
+import com.dto.wxgzh.Message;
 import com.entity.*;
 import com.exception.YWException;
 import com.redis.message.RedisUtil;
@@ -12,7 +13,6 @@ import com.service.SchoolService;
 import com.service.WxUserService;
 import com.wx.refund.RefundUtil;
 import com.wxutil.AmountUtils;
-import com.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,20 +92,12 @@ public class RunOrdersServiceImple implements RunOrdersService{
 				throw new YWException("订单状态异常");
 			}
 			  WxUserBell userbell= wxUserBellMapper.selectByPrimaryKey(user.getOpenId()+"-"+user.getPhone());
-            WxUser wxGUser = wxUserService.findGzh(user.getPhone());
-	       	  if(wxGUser!=null){
-	       		  Map<String,String> mb=new HashMap<>();
-	       		  mb.put("touser", wxGUser.getOpenId());
-	       		  mb.put("template_id", "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk");
-	       		  mb.put("data_first", " 您的会员帐户余额有变动！");
-	       		  mb.put("data_keyword1",  "暂无");
-	       		  mb.put("data_keyword2", "-"+orders.getTotalPrice());
-	       		  mb.put("data_keyword3",  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-	       		  mb.put("data_keyword4",  "消费");
-	       		  mb.put("data_keyword5", userbell.getMoney()+"");
-	       		  mb.put("data_remark", "如有疑问请在小程序内联系客服人员！");
-	       		  WxGUtil.snedM(mb);
-	       	  }
+            wxUserService.sendWXGZHM(user.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
+                    null, null
+                    + orders.getId() + "&typ=" + orders.getTyp(),
+                    " 您的会员帐户余额有变动！", "暂无", "-" + orders.getTotalPrice(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                    "消费", userbell.getMoney() + "", null, null, null,
+                    null, "如有疑问请在小程序内联系客服人员！"));
 			return 1;
 		}else{
 			throw new YWException("余额不足");

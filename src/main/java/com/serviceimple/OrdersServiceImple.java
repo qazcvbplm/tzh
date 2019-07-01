@@ -3,6 +3,7 @@ package com.serviceimple;
 import com.alibaba.fastjson.JSON;
 import com.config.RedisConfig;
 import com.dao.*;
+import com.dto.wxgzh.Message;
 import com.entity.*;
 import com.exception.YWException;
 import com.redis.message.RedisUtil;
@@ -11,7 +12,6 @@ import com.service.SchoolService;
 import com.service.WxUserService;
 import com.wx.refund.RefundUtil;
 import com.wxutil.AmountUtils;
-import com.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -153,20 +153,12 @@ public class OrdersServiceImple implements OrdersService {
 				}
                 WxUser wxUser = wxUserService.findById(orders.getOpenId());
                 School school = schoolService.findById(wxUser.getSchoolId());
-                WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
-				if(wxGUser!=null){
-					Map<String, String> mb = new HashMap<>();
-					mb.put("touser", wxGUser.getOpenId());
-					mb.put("template_id", "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg");
-					mb.put("data_first", "您的订单已被商家接手!");
-					mb.put("data_keyword1", orderId);
-					mb.put("data_keyword2", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-					mb.put("data_remark", " 商家正火速给您备餐中，请耐心等待");
-					mb.put("min_appid", school.getWxAppId());
-		       		mb.put("min_path", "pages/order/orderDetail/orderDetail?orderId=" 
-					+ orders.getId() + "&typ=" + orders.getTyp());
-					WxGUtil.snedM(mb);
-				}
+				wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null, "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg",
+						school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
+						+ orders.getId() + "&typ=" + orders.getTyp(),
+						"您的订单已被商家接手!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+						null, null, null, null, null, null,
+						null, " 商家正火速给您备餐中，请耐心等待"));
 				return orders.getShopId();
 			}
 			return 0;
@@ -207,24 +199,12 @@ public class OrdersServiceImple implements OrdersService {
 				throw new YWException("订单状态异常");
 			}
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
-		  WxUserBell userbell= wxUserBellMapper.selectByPrimaryKey(wxUser.getOpenId()+"-"+wxUser.getPhone());
-            WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
-       	  if(wxGUser!=null){
-       		  Map<String,String> mb=new HashMap<>();
-       		  mb.put("touser", wxGUser.getOpenId());
-       		  mb.put("template_id", "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk");
-       		  mb.put("data_first", " 您的会员帐户余额有变动！");
-       		  mb.put("data_keyword1",  "暂无");
-       		  mb.put("data_keyword2", "-"+orders.getPayPrice());
-       		  mb.put("data_keyword3",  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-       		  mb.put("data_keyword4",  "消费");
-       		  mb.put("data_keyword5", userbell.getMoney()+"");
-       		  mb.put("data_remark", "如有疑问请在小程序内联系客服人员！");
-       		  mb.put("min_appid", school.getWxAppId());
-       		  mb.put("min_path", "pages/mine/payment/payment");
-       		  WxGUtil.snedM(mb);
-       	  }
-       //	stringRedisTemplate.boundListOps("shopDJS"+orders.getShopId()).rightPush(value);
+			WxUserBell userbell = wxUserBellMapper.selectByPrimaryKey(wxUser.getOpenId() + "-" + wxUser.getPhone());
+			wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk"
+					, school.getWxAppId(), "pages/mine/payment/payment", " 您的会员帐户余额有变动！", "暂无", "-" + orders.getPayPrice(),
+					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), "消费",
+					userbell.getMoney() + "", null, null,
+					null, null, "如有疑问请在小程序内联系客服人员！"));
 			return 1;
 		} else {
 			throw new YWException("余额不足");
