@@ -19,7 +19,8 @@ import java.util.*;
 
 @Component
 public class Task {
-	@Autowired
+	
+    @Autowired
 	private SchoolMapper schoolMapper;
 	@Autowired
 	private ShopMapper shopMapper;
