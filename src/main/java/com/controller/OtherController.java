@@ -1,13 +1,13 @@
 package com.controller;
 
-import com.dao.LogsMapper;
-import com.dao.SchoolMapper;
-import com.dao.WxUserMapper;
-import com.entity.Logs;
-import com.entity.School;
-import com.entity.TxLog;
-import com.exception.YWException;
 import com.wx.towallet.WeChatPayUtil;
+import ops.school.api.dao.LogsMapper;
+import ops.school.api.dao.SchoolMapper;
+import ops.school.api.dao.WxUserMapper;
+import ops.school.api.entity.Logs;
+import ops.school.api.entity.School;
+import ops.school.api.entity.TxLog;
+import ops.school.api.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

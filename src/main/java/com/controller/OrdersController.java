@@ -1,9 +1,6 @@
 package com.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.entity.OrderProduct;
-import com.entity.Orders;
-import com.entity.School;
 import com.service.OrdersService;
 import com.service.ProductService;
 import com.service.SchoolService;
@@ -15,6 +12,9 @@ import com.vdurmont.emoji.EmojiParser;
 import com.wxutil.WXpayUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.entity.OrderProduct;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.School;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

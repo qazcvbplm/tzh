@@ -1,6 +1,6 @@
 package com.service;
 
-import com.entity.School;
+import ops.school.api.entity.School;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;

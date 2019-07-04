@@ -1,7 +1,6 @@
 package com.feign;
 
-import com.exception.YWException;
-import org.springframework.cloud.openfeign.FeignClient;
+import ops.school.api.exception.YWException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;

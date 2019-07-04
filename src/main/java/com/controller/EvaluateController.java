@@ -1,16 +1,16 @@
 package com.controller;
 
 import com.config.RedisConfig;
-import com.dao.EvaluateMapper;
-import com.dao.OrdersMapper;
-import com.dao.RunOrdersMapper;
 import com.dto.redis.WxUserAddSourceDTO;
-import com.entity.Base;
-import com.entity.Evaluate;
 import com.util.ResponseObject;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.EvaluateMapper;
+import ops.school.api.dao.OrdersMapper;
+import ops.school.api.dao.RunOrdersMapper;
+import ops.school.api.entity.Base;
+import ops.school.api.entity.Evaluate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

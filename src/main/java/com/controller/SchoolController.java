@@ -1,9 +1,6 @@
 package com.controller;
 
 import com.auth.JWTUtil;
-import com.dao.ApplicationMapper;
-import com.entity.Application;
-import com.entity.School;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.service.SchoolService;
 import com.util.BaiduUtil;
@@ -11,6 +8,9 @@ import com.util.ResponseObject;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.ApplicationMapper;
+import ops.school.api.entity.Application;
+import ops.school.api.entity.School;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

@@ -1,12 +1,12 @@
 package com.redis.message;
 
-import com.dao.OrdersMapper;
 import com.dto.redis.WxUserAddSourceDTO;
-import com.entity.Orders;
-import com.entity.WxUser;
 import com.service.SenderService;
 import com.service.WxUserService;
 import com.util.LoggerUtil;
+import ops.school.api.dao.OrdersMapper;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.WxUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.core.StringRedisTemplate;

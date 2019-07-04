@@ -1,14 +1,24 @@
 /*    */ package com.wx.towallet;
-import com.entity.TxLog;
-/*    */ 
-/*    */ import com.exception.YWException;
+
 import com.util.LoggerUtil;
-/*    */ import com.util.XMLUtil;
-/*    */ import java.math.BigDecimal;
-/*    */ import java.util.ArrayList;
-/*    */ import java.util.List;
-/*    */ import java.util.Map;
-/*    */ import java.util.TreeMap;
+import com.util.XMLUtil;
+import ops.school.api.entity.TxLog;
+import ops.school.api.exception.YWException;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+/*    */
+/*    */
+/*    */
+/*    */
+/*    */
+/*    */
+/*    */
+/*    */
 /*    */ 
 /*    */ public class WeChatPayUtil
 /*    */ {
@@ -50,7 +60,8 @@ import com.util.LoggerUtil;
 /* 60 */       return 1;
 /*    */     }
              log.setResult(resultMap.get("err_code_des")+","+resultMap.get("return_msg"));
-             throw new YWException(resultMap.get("return_msg").toString());
+    throw new
+            YWException(resultMap.get("return_msg").toString());
              /*    */   }
 /*    */ }
 

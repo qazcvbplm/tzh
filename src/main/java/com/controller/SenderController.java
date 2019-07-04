@@ -1,14 +1,14 @@
 package com.controller;
 
-import com.dto.SenderTj;
-import com.entity.Orders;
-import com.entity.RunOrders;
-import com.entity.Sender;
 import com.service.SenderService;
 import com.util.ResponseObject;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dto.SenderTj;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.RunOrders;
+import ops.school.api.entity.Sender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

@@ -1,15 +1,13 @@
 package com.serviceimple;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
+import com.service.SourceProductService;
+import ops.school.api.dao.SourceProductMapper;
+import ops.school.api.entity.SourceProduct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dao.SourceProductMapper;
-import com.entity.SourceProduct;
-import com.service.SourceProductService;
+import javax.validation.Valid;
+import java.util.List;
 
 @Service
 public class SourceProductServiceImple implements SourceProductService{

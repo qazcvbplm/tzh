@@ -1,16 +1,16 @@
 package com.serviceimple;
 
 
-import com.dao.SourceOrderMapper;
-import com.dao.SourceProductMapper;
-import com.dao.WxUserBellMapper;
-import com.entity.SourceOrder;
-import com.entity.SourceProduct;
-import com.entity.WxUser;
-import com.exception.YWException;
 import com.service.SourceOrderService;
 import com.service.WxUserService;
 import com.util.Util;
+import ops.school.api.dao.SourceOrderMapper;
+import ops.school.api.dao.SourceProductMapper;
+import ops.school.api.dao.WxUserBellMapper;
+import ops.school.api.entity.SourceOrder;
+import ops.school.api.entity.SourceProduct;
+import ops.school.api.entity.WxUser;
+import ops.school.api.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

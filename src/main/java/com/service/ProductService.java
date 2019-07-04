@@ -1,10 +1,9 @@
 package com.service;
 
+import ops.school.api.entity.Product;
+
 import java.math.BigDecimal;
 import java.util.List;
-
-
-import com.entity.Product;
 
 public interface ProductService {
 

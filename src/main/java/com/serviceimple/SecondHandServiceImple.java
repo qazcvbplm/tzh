@@ -1,10 +1,10 @@
 package com.serviceimple;
 
-import com.dao.SecondHandMapper;
-import com.entity.SecondHand;
-import com.entity.WxUser;
 import com.service.SecondHandService;
 import com.service.WxUserService;
+import ops.school.api.dao.SecondHandMapper;
+import ops.school.api.entity.SecondHand;
+import ops.school.api.entity.WxUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

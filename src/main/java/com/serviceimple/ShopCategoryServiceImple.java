@@ -1,14 +1,12 @@
 package com.serviceimple;
 
-import java.util.List;
-
+import com.service.ShopCategoryService;
+import ops.school.api.dao.ShopCategoryMapper;
+import ops.school.api.entity.ShopCategory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.dao.ShopCategoryMapper;
-import com.entity.ShopCategory;
-import com.service.ShopCategoryService;
+import java.util.List;
 
 @Service
 public class ShopCategoryServiceImple implements ShopCategoryService{

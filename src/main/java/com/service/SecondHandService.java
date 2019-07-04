@@ -1,10 +1,9 @@
 package com.service;
 
-import java.util.List;
+import ops.school.api.entity.SecondHand;
 
 import javax.validation.Valid;
-
-import com.entity.SecondHand;
+import java.util.List;
 
 public interface SecondHandService {
 

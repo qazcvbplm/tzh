@@ -1,8 +1,8 @@
 package com.service;
 
 import com.dto.wxgzh.Message;
-import com.entity.WxUser;
-import com.entity.WxUserBell;
+import ops.school.api.entity.WxUser;
+import ops.school.api.entity.WxUserBell;
 
 import java.util.List;
 

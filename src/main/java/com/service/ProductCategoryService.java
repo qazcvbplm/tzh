@@ -1,10 +1,9 @@
 package com.service;
 
-import java.util.List;
+import ops.school.api.entity.ProductCategory;
 
 import javax.validation.Valid;
-
-import com.entity.ProductCategory;
+import java.util.List;
 
 public interface ProductCategoryService {
 

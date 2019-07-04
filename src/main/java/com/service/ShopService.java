@@ -1,14 +1,13 @@
 package com.service;
 
-import java.util.List;
+import ops.school.api.dto.SenderTj;
+import ops.school.api.dto.ShopTj;
+import ops.school.api.entity.FullCut;
+import ops.school.api.entity.Shop;
+import ops.school.api.entity.ShopOpenTime;
 
 import javax.validation.Valid;
-
-import com.dto.SenderTj;
-import com.dto.ShopTj;
-import com.entity.FullCut;
-import com.entity.Shop;
-import com.entity.ShopOpenTime;
+import java.util.List;
 
 public interface ShopService {
 

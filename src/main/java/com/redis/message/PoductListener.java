@@ -1,16 +1,15 @@
 package com.redis.message;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.service.OrdersService;
+import ops.school.api.dao.ProductMapper;
+import ops.school.api.entity.OrderProduct;
+import ops.school.api.entity.Orders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dao.ProductMapper;
-import com.entity.OrderProduct;
-import com.entity.Orders;
-import com.service.OrdersService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class PoductListener {

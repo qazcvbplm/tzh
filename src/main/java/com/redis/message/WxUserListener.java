@@ -1,15 +1,15 @@
 package com.redis.message;
 
 import com.alibaba.fastjson.JSON;
-import com.dao.LogsMapper;
-import com.dao.WxUserBellMapper;
 import com.dto.redis.RedisMessage;
 import com.dto.redis.SenderAddMoneyDTO;
 import com.dto.redis.WxUserAddSourceDTO;
-import com.entity.Logs;
-import com.entity.WxUser;
 import com.service.WxUserService;
 import com.util.LoggerUtil;
+import ops.school.api.dao.LogsMapper;
+import ops.school.api.dao.WxUserBellMapper;
+import ops.school.api.entity.Logs;
+import ops.school.api.entity.WxUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,21 +1,20 @@
 package com.serviceimple;
 
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.exception.YWException;
+import com.service.ProductService;
+import ops.school.api.dao.ProductAttributeMapper;
+import ops.school.api.dao.ProductMapper;
+import ops.school.api.entity.Product;
+import ops.school.api.entity.ProductAttribute;
+import ops.school.api.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dao.ProductAttributeMapper;
-import com.dao.ProductMapper;
-import com.entity.Product;
-import com.entity.ProductAttribute;
-import com.service.ProductService;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProductServiceImple implements ProductService{

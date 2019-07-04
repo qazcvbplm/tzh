@@ -1,11 +1,11 @@
 package com.controller;
 
-import com.dao.SignMapper;
-import com.entity.Sign;
 import com.service.WxUserService;
 import com.util.ResponseObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.SignMapper;
+import ops.school.api.entity.Sign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

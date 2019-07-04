@@ -1,11 +1,11 @@
 package com;
 
 
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSON;
+import com.service.OrdersService;
 import com.util.SpringUtil;
+import ops.school.api.entity.Orders;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -16,19 +16,17 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.fastjson.JSON;
-import com.entity.Orders;
-import com.service.OrdersService;
 import org.springframework.web.client.RestTemplate;
+
+import javax.sql.DataSource;
+import java.util.List;
 
 
 @SpringBootApplication
 @EnableFeignClients
 @EnableEurekaClient
 @EnableScheduling
-@MapperScan("com.dao")
+@MapperScan("ops.school.api.dao")
 public class App {
 	
 	@Autowired

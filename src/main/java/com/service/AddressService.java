@@ -1,9 +1,9 @@
 package com.service;
 
 
-import java.util.List;
+import ops.school.api.entity.Address;
 
-import com.entity.Address;
+import java.util.List;
 
 public interface AddressService {
 

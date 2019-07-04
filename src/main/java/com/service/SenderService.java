@@ -1,9 +1,9 @@
 package com.service;
 
-import com.dto.SenderTj;
-import com.entity.Orders;
-import com.entity.RunOrders;
-import com.entity.Sender;
+import ops.school.api.dto.SenderTj;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.RunOrders;
+import ops.school.api.entity.Sender;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;

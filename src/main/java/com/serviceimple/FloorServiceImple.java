@@ -1,15 +1,13 @@
 package com.serviceimple;
 
-import java.util.List;
-
+import com.service.FloorService;
+import ops.school.api.dao.FloorMapper;
+import ops.school.api.dao.WxUserMapper;
+import ops.school.api.entity.Floor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.dao.FloorMapper;
-import com.dao.WxUserMapper;
-import com.entity.Floor;
-import com.service.FloorService;
+import java.util.List;
 
 @Service
 public class FloorServiceImple implements FloorService {

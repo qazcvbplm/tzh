@@ -2,17 +2,17 @@ package com.redis.message;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.dao.MqttMapper;
-import com.dao.SchoolMapper;
-import com.dao.SenderMapper;
-import com.dao.TxLogMapper;
 import com.dto.redis.RedisMessage;
 import com.dto.redis.SchoolAddMoneyDTO;
-import com.entity.Mqtt;
-import com.entity.School;
-import com.entity.TxLog;
 import com.util.LoggerUtil;
 import com.wx.towallet.WeChatPayUtil;
+import ops.school.api.dao.MqttMapper;
+import ops.school.api.dao.SchoolMapper;
+import ops.school.api.dao.SenderMapper;
+import ops.school.api.dao.TxLogMapper;
+import ops.school.api.entity.Mqtt;
+import ops.school.api.entity.School;
+import ops.school.api.entity.TxLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

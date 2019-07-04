@@ -2,14 +2,14 @@ package com.scheduled;
 
 
 import com.controller.SignController;
-import com.dao.*;
-import com.dto.RunOrdersTj;
-import com.entity.DayLogTakeout;
-import com.entity.Orders;
-import com.entity.School;
-import com.entity.Shop;
 import com.redis.message.RedisUtil;
 import com.util.LoggerUtil;
+import ops.school.api.dao.*;
+import ops.school.api.dto.RunOrdersTj;
+import ops.school.api.entity.DayLogTakeout;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.School;
+import ops.school.api.entity.Shop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,8 +19,8 @@ import java.util.*;
 
 @Component
 public class Task {
-	
-    @Autowired
+
+	@Autowired
 	private SchoolMapper schoolMapper;
 	@Autowired
 	private ShopMapper shopMapper;

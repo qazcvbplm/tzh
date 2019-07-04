@@ -1,7 +1,5 @@
 package com.controller;
 
-import com.entity.RunOrders;
-import com.entity.School;
 import com.service.RunOrdersService;
 import com.service.SchoolService;
 import com.util.ResponseObject;
@@ -9,6 +7,8 @@ import com.util.Util;
 import com.wxutil.WXpayUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.entity.RunOrders;
+import ops.school.api.entity.School;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;

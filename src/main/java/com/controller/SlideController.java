@@ -1,13 +1,13 @@
 package com.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.dao.SlideMapper;
-import com.entity.Slide;
 import com.util.ResponseObject;
 import com.util.SpringUtil;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.SlideMapper;
+import ops.school.api.entity.Slide;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

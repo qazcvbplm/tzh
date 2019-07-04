@@ -1,14 +1,14 @@
 package com.controller;
 
-import com.dao.ApplicationMapper;
-import com.entity.Application;
-import com.entity.SourceOrder;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.service.SourceOrderService;
 import com.util.ResponseObject;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.ApplicationMapper;
+import ops.school.api.entity.Application;
+import ops.school.api.entity.SourceOrder;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;

@@ -1,14 +1,12 @@
 package com.redis.message;
 
-import java.math.BigDecimal;
-import java.util.Set;
-
+import ops.school.api.dto.SchoolIndexDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.dto.SchoolIndexDto;
+import java.math.BigDecimal;
+import java.util.Set;
 
 @Component
 public class RedisUtil {

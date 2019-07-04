@@ -1,10 +1,9 @@
 package com.service;
 
-import java.util.List;
+import ops.school.api.entity.SourceOrder;
 
 import javax.validation.Valid;
-
-import com.entity.SourceOrder;
+import java.util.List;
 
 public interface SourceOrderService {
 

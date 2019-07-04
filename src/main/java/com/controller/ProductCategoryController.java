@@ -1,11 +1,11 @@
 package com.controller;
 
-import com.entity.ProductCategory;
 import com.service.ProductCategoryService;
 import com.util.ResponseObject;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.entity.ProductCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;

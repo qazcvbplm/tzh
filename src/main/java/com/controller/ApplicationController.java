@@ -2,15 +2,15 @@ package com.controller;
 
 
 import com.config.RedisConfig;
-import com.dao.WxUserBellMapper;
-import com.dto.ReplyTextMsg;
 import com.dto.redis.WxUserAddSourceDTO;
-import com.entity.WxUser;
 import com.service.WxUserService;
 import com.util.ResponseObject;
 import com.wxutil.XMLUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.WxUserBellMapper;
+import ops.school.api.dto.ReplyTextMsg;
+import ops.school.api.entity.WxUser;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

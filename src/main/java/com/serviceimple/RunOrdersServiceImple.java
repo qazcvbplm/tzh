@@ -1,18 +1,18 @@
 package com.serviceimple;
 
-import com.dao.ApplicationMapper;
-import com.dao.RunOrdersMapper;
-import com.dao.ShopMapper;
-import com.dao.WxUserBellMapper;
 import com.dto.wxgzh.Message;
-import com.entity.*;
-import com.exception.YWException;
 import com.redis.message.RedisUtil;
 import com.service.RunOrdersService;
 import com.service.SchoolService;
 import com.service.WxUserService;
 import com.wx.refund.RefundUtil;
 import com.wxutil.AmountUtils;
+import ops.school.api.dao.ApplicationMapper;
+import ops.school.api.dao.RunOrdersMapper;
+import ops.school.api.dao.ShopMapper;
+import ops.school.api.dao.WxUserBellMapper;
+import ops.school.api.entity.*;
+import ops.school.api.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

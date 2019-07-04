@@ -3,6 +3,7 @@ package com.exception;
 
 import com.util.LoggerUtil;
 import com.util.ResponseObject;
+import ops.school.api.exception.YWException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 

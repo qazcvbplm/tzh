@@ -2,13 +2,13 @@ package com.serviceimple;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dao.*;
-import com.dto.SenderTj;
-import com.dto.ShopTj;
-import com.entity.*;
-import com.exception.YWException;
 import com.service.ShopService;
 import com.util.ShopTimeUtil;
+import ops.school.api.dao.*;
+import ops.school.api.dto.SenderTj;
+import ops.school.api.dto.ShopTj;
+import ops.school.api.entity.*;
+import ops.school.api.exception.YWException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

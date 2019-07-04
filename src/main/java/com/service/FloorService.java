@@ -1,9 +1,9 @@
 package com.service;
 
 
-import java.util.List;
+import ops.school.api.entity.Floor;
 
-import com.entity.Floor;
+import java.util.List;
 
 public interface FloorService {
 

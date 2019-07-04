@@ -1,9 +1,6 @@
 package com.controller;
 
 import com.auth.JWTUtil;
-import com.entity.School;
-import com.entity.WxUser;
-import com.entity.WxUserBell;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.redis.message.RedisUtil;
 import com.service.SchoolService;
@@ -16,6 +13,9 @@ import com.wxutil.WXUtil;
 import com.wxutil.WxGUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.entity.School;
+import ops.school.api.entity.WxUser;
+import ops.school.api.entity.WxUserBell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;

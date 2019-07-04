@@ -1,13 +1,6 @@
 package com.controller;
 
 import com.auth.JWTUtil;
-import com.dto.SenderTj;
-import com.dto.ShopTj;
-import com.entity.FullCut;
-import com.entity.School;
-import com.entity.Shop;
-import com.entity.ShopOpenTime;
-import com.feign.AuthController;
 import com.service.SchoolService;
 import com.service.ShopService;
 import com.util.ResponseObject;
@@ -15,6 +8,12 @@ import com.util.Util;
 import com.wxutil.WXUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dto.SenderTj;
+import ops.school.api.dto.ShopTj;
+import ops.school.api.entity.FullCut;
+import ops.school.api.entity.School;
+import ops.school.api.entity.Shop;
+import ops.school.api.entity.ShopOpenTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;

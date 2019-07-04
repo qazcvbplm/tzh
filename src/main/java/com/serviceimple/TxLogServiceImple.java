@@ -3,9 +3,9 @@ package com.serviceimple;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dao.TxLogMapper;
-import com.entity.TxLog;
 import com.service.TxLogService;
+import ops.school.api.dao.TxLogMapper;
+import ops.school.api.entity.TxLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

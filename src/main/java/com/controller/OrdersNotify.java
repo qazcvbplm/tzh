@@ -1,12 +1,12 @@
 package com.controller;
 
-import com.entity.Orders;
-import com.entity.RunOrders;
 import com.service.OrdersService;
 import com.service.RunOrdersService;
 import com.service.WxUserService;
 import com.wxutil.XMLUtil;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.RunOrders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;

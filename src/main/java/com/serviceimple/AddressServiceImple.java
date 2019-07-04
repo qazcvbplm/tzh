@@ -1,14 +1,12 @@
 package com.serviceimple;
 
-import java.util.List;
-
+import com.service.AddressService;
+import ops.school.api.dao.AddressMapper;
+import ops.school.api.entity.Address;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.dao.AddressMapper;
-import com.entity.Address;
-import com.service.AddressService;
+import java.util.List;
 
 @Service
 public class AddressServiceImple implements AddressService{

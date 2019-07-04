@@ -1,11 +1,9 @@
 package com.service;
 
-import java.util.List;
+import ops.school.api.entity.RunOrders;
 
 import javax.validation.Valid;
-
-import com.entity.Orders;
-import com.entity.RunOrders;
+import java.util.List;
 
 public interface RunOrdersService {
 

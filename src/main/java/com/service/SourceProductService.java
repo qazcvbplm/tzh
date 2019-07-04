@@ -1,10 +1,9 @@
 package com.service;
 
-import java.util.List;
+import ops.school.api.entity.SourceProduct;
 
 import javax.validation.Valid;
-
-import com.entity.SourceProduct;
+import java.util.List;
 
 public interface SourceProductService {
 

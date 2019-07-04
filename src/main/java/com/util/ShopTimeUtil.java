@@ -1,6 +1,6 @@
 package com.util;
 
-import com.exception.YWException;
+import ops.school.api.exception.YWException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
