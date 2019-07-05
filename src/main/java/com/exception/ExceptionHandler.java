@@ -6,7 +6,6 @@ import com.util.ResponseObject;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 @ControllerAdvice
@@ -21,9 +20,12 @@ public class ExceptionHandler {
     @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(RuntimeException.class)
     public ResponseObject errorHandler(Exception ex) {
-        stringWriter = new StringWriter();
-        ex.printStackTrace(new PrintWriter(stringWriter));
-        LoggerUtil.log(stringWriter.toString());
+        StackTraceElement[] trace = ex.getStackTrace();
+        StringBuilder out = new StringBuilder();
+        for (StackTraceElement s : trace) {
+            out.append("\tat " + s + "\r\n");
+        }
+        LoggerUtil.log(out.toString());
         if (ex instanceof YWException) {
             return new ResponseObject(false, ex.getMessage());
     	}
