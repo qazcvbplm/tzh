@@ -2,15 +2,15 @@ package com.controller;
 
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.service.SchoolService;
-import com.util.BaiduUtil;
 import com.util.ResponseObject;
-import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
 import ops.school.api.dao.ApplicationMapper;
 import ops.school.api.entity.Application;
 import ops.school.api.entity.School;
+import ops.school.api.util.BaiduUtil;
+import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -102,7 +102,7 @@ public class SchoolController {
 		if(stringRedisTemplate.boundHashOps("extra_send_price").get(origin+","+des)!=null){
 			distance= Integer.valueOf(stringRedisTemplate.boundHashOps("extra_send_price").get(origin+","+des).toString());
 		}else{
-			distance=BaiduUtil.DistanceAll(origin, des);
+            distance = BaiduUtil.DistanceAll(origin, des);
 			stringRedisTemplate.boundHashOps("extra_send_price").put(origin+","+des, distance+"");
 		}
 		School school=schoolService.findById(schoolId);
