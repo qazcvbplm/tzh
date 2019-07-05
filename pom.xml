@@ -164,7 +164,6 @@
         </plugins>
         <resources>
             <resource>
-
                 <directory>classpath*:ops/school/api/mapper</directory>
                 <includes>
                     <include>**/*.xml</include>

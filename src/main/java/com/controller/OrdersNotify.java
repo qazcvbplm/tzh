@@ -46,8 +46,8 @@ public class OrdersNotify {
 			String return_msg = map.get("return_msg");
 			// 业务结果,判断交易是否成功
 			String result_code = map.get("result_code");
-			
-			 if(return_code=="SUCCESS"||return_code.equals("SUCCESS"))
+
+        if (return_code.equals("SUCCESS") || result_code.equals("SUCCESS"))
 		     {
 				String orderId=map.get("out_trade_no");
 				Orders orders= ordersService.findById(orderId);
@@ -70,8 +70,8 @@ public class OrdersNotify {
 			String return_msg = map.get("return_msg");
 			// 业务结果,判断交易是否成功
 			String result_code = map.get("result_code");
-			
-			 if(return_code=="SUCCESS"||return_code.equals("SUCCESS"))
+
+        if (return_code.equals("SUCCESS") || result_code.equals("SUCCESS"))
 		     {
 				String orderId=map.get("out_trade_no");
 				RunOrders orders= runordersService.findById(orderId);
@@ -93,8 +93,8 @@ public class OrdersNotify {
 			String return_msg = map.get("return_msg");
 			// 业务结果,判断交易是否成功
 			String result_code = map.get("result_code");
-			
-			 if(return_code=="SUCCESS"||return_code.equals("SUCCESS"))
+
+        if (return_code.equals("SUCCESS") || result_code.equals("SUCCESS"))
 		     {
 				String orderId=map.get("out_trade_no");
 				String openId=map.get("openid");
