@@ -1,6 +1,5 @@
 package com.controller;
 
-import com.auth.JWTUtil;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.redis.message.RedisUtil;
 import com.service.SchoolService;
@@ -13,6 +12,7 @@ import com.wxutil.WXUtil;
 import com.wxutil.WxGUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.auth.JWTUtil;
 import ops.school.api.entity.School;
 import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;

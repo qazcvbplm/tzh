@@ -1,6 +1,5 @@
 package com.controller;
 
-import com.auth.JWTUtil;
 import com.service.SchoolService;
 import com.service.ShopService;
 import com.util.ResponseObject;
@@ -8,6 +7,7 @@ import com.util.Util;
 import com.wxutil.WXUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.auth.JWTUtil;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.entity.FullCut;

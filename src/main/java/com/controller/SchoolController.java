@@ -1,6 +1,5 @@
 package com.controller;
 
-import com.auth.JWTUtil;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.service.SchoolService;
 import com.util.BaiduUtil;
@@ -8,6 +7,7 @@ import com.util.ResponseObject;
 import com.util.Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.auth.JWTUtil;
 import ops.school.api.dao.ApplicationMapper;
 import ops.school.api.entity.Application;
 import ops.school.api.entity.School;
@@ -86,7 +86,7 @@ public class SchoolController {
 			login.setLoginPass(Util.EnCode(loginPass));
 			Application application=applicationMapper.login(login);
 			if(application!=null){
-				token=JWTUtil.sign(application.getId()+"", application.getLoginName(),"admin");
+				token = JWTUtil.sign(application.getId() + "", application.getLoginName(), "admin");
 				return new ResponseObject(true,"ok").push("token", token).push("admin", application).push("type", "admin");
 			}else{
 				return new ResponseObject(false, "账号或密码错误");
