@@ -1,9 +1,10 @@
 package ops.school.controller;
 
-import ops.school.service.ShopCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.ShopCategory;
+import ops.school.api.service.ShopCategoryService;
+import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -43,7 +44,7 @@ public class ShopCategoryController {
 	
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
-	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,ShopCategory shopCategory){
+	public ResponseObject update(HttpServletRequest request, HttpServletResponse response, ShopCategory shopCategory) {
 		              int r = shopCategoryService.update(shopCategory);
 		              return new ResponseObject(true, "更新"+r+"条记录");
 	}

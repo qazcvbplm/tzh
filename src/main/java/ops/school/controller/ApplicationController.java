@@ -1,15 +1,16 @@
 package ops.school.controller;
 
 
-import ops.school.config.RedisConfig;
-import ops.school.dto.redis.WxUserAddSourceDTO;
-import ops.school.service.WxUserService;
-import ops.school.wxutil.XMLUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ReplyTextMsg;
+import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.WxUser;
+import ops.school.api.service.WxUserService;
+import ops.school.api.util.ResponseObject;
+import ops.school.api.wxutil.XMLUtil;
+import ops.school.config.RedisConfig;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

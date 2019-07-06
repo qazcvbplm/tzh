@@ -1,9 +1,10 @@
 package ops.school.controller;
 
-import ops.school.service.FloorService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Floor;
+import ops.school.api.service.FloorService;
+import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -38,7 +39,7 @@ public class FloorController {
 	
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
-	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Floor floor){
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Floor floor) {
 		              floor.setQuery(request.getAttribute("Id").toString());
 		              floor.setQueryType(request.getAttribute("role").toString());
 		              List<Floor> list=floorService.find(floor);

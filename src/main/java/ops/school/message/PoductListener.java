@@ -3,7 +3,7 @@ package ops.school.message;
 import ops.school.api.dao.ProductMapper;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
-import ops.school.service.OrdersService;
+import ops.school.api.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

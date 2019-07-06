@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import ops.school.api.dao.ChargeLogMapper;
 import ops.school.api.dao.ChargeMapper;
 import ops.school.api.entity.Charge;
+import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -47,7 +48,7 @@ public class ChargeController {
 	
 	@ApiOperation(value="删除",httpMethod="POST")
 	@PostMapping("remove")
-	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,int id){
+	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, int id) {
 		              int i=chargeMapper.remove(id);
 		              return new ResponseObject(true, "移除"+i+"条记录");
 	}

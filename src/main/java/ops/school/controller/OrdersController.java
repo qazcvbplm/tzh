@@ -1,18 +1,20 @@
 package ops.school.controller;
 
 import com.alibaba.fastjson.JSON;
-import ops.school.service.OrdersService;
-import ops.school.service.ProductService;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
-import ops.school.service.SchoolService;
-import ops.school.wxutil.WXpayUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.School;
+import ops.school.api.service.OrdersService;
+import ops.school.api.service.ProductService;
+import ops.school.api.service.SchoolService;
+import ops.school.api.util.ResponseObject;
+import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
+import ops.school.api.wxutil.WXpayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -142,7 +144,7 @@ public class OrdersController {
 	
 	@ApiOperation(value="商家查询待接手订单",httpMethod="POST")
 	@PostMapping("android/findDjs")
-	public ResponseObject android_findDjs(HttpServletRequest request,HttpServletResponse response,int shopId){
+    public ResponseObject android_findDjs(HttpServletRequest request, HttpServletResponse response, int shopId) {
 			 List<Orders> list;
         if (SpringUtil.redisCache()) {
 				 list=JSON.parseArray(stringRedisTemplate.boundHashOps("SHOP_DJS"+shopId).values().toString(),Orders.class);

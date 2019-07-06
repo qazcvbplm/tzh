@@ -1,8 +1,5 @@
 package ops.school.controller;
 
-import ops.school.service.SchoolService;
-import ops.school.service.ShopService;
-import ops.school.wxutil.WXUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
@@ -12,7 +9,11 @@ import ops.school.api.entity.FullCut;
 import ops.school.api.entity.School;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopOpenTime;
+import ops.school.api.service.SchoolService;
+import ops.school.api.service.ShopService;
+import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.api.wxutil.WXUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;

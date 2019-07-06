@@ -1,12 +1,12 @@
 package ops.school.message;
 
-import ops.school.dto.redis.WxUserAddSourceDTO;
-import ops.school.service.SenderService;
 import ops.school.api.dao.OrdersMapper;
+import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.WxUser;
-import ops.school.service.WxUserService;
-import ops.school.util.LoggerUtil;
+import ops.school.api.service.SenderService;
+import ops.school.api.service.WxUserService;
+import ops.school.api.util.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -40,7 +40,7 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
 				senderService.end(key.toString().split(",")[1],true);
 				   stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
 				WxUser wxUser = wxUserService.findById(orders.getOpenId());
-				wxUserService.sendWXGZHM(wxUser.getPhone(), new ops.school.dto.wxgzh.Message(null,
+				wxUserService.sendWXGZHM(wxUser.getPhone(), new ops.school.api.dto.wxgzh.Message(null,
 						"8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
 						null, null,
 						"您的" + orders.getTyp() + "已经自动完成!", orders.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
