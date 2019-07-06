@@ -1,0 +1,57 @@
+package ops.school.message;
+
+import ops.school.dto.redis.WxUserAddSourceDTO;
+import ops.school.service.SenderService;
+import ops.school.api.dao.OrdersMapper;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.WxUser;
+import ops.school.service.WxUserService;
+import ops.school.util.LoggerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+@Component
+public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
+
+	public KeyOutTimeListener(RedisMessageListenerContainer listenerContainer) {
+		super(listenerContainer);
+	}
+	
+	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
+	@Autowired
+	private SenderService senderService;
+	@Autowired
+	private OrdersMapper orderMapper;
+	@Autowired
+	private WxUserService wxUserService;
+	
+	@Override
+	public void onMessage(Message key, byte[] arg1) {
+		if(key.toString().startsWith("tsout")){
+			Orders orders = orderMapper.selectByPrimaryKey(key.toString().split(",")[1]);
+			try {
+				senderService.end(key.toString().split(",")[1],true);
+				   stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
+				WxUser wxUser = wxUserService.findById(orders.getOpenId());
+				wxUserService.sendWXGZHM(wxUser.getPhone(), new ops.school.dto.wxgzh.Message(null,
+						"8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
+						null, null,
+						"您的" + orders.getTyp() + "已经自动完成!", orders.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+						null, null, null, null, null, null,
+						null, "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！"));
+
+			} catch (Exception e) {
+				LoggerUtil.log("堂食完成失败:"+e.getMessage());
+			}
+					 //增加积分
+		}
+	}
+
+}

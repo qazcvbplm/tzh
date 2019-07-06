@@ -1,5 +1,5 @@
-import com.App;
-import com.service.TxLogService;
+import ops.school.App;
+import ops.school.service.TxLogService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

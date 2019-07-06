@@ -16,7 +16,7 @@
 			<property name="forceBigDecimals" value="false" />
 		</javaTypeResolver>
 		<!-- 生成模型的包名和位置 -->
-        <javaModelGenerator targetPackage="ops.school.api.entity" targetProject="springboot/src/main/java">
+        <javaModelGenerator targetPackage="ops.ops.api.entity" targetProject="springboot/src/main/java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
@@ -25,7 +25,7 @@
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- 生成DAO的包名和位置 -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="ops.school.api.dao"
+        <javaClientGenerator type="XMLMAPPER" targetPackage="ops.ops.api.dao"
                              targetProject="springboot/src/main/java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>

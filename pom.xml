@@ -151,7 +151,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.App</mainClass>
+                    <mainClass>ops.school.App</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -164,7 +164,7 @@
         </plugins>
         <!--<resources>
             <resource>
-                <directory>classpath*:ops/school/api/mapper</directory>
+                <directory>classpath*:ops/ops/api/mapper</directory>
                 <includes>
                     <include>**/*.xml</include>
                 </includes>
