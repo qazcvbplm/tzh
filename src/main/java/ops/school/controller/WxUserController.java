@@ -1,12 +1,10 @@
 package ops.school.controller;
 
 import com.github.qcloudsms.httpclient.HTTPException;
-import ops.school.message.RedisUtil;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 import ops.school.service.SchoolService;
 import ops.school.service.WxUserService;
-import ops.school.util.ResponseObject;
 import ops.school.wxutil.WXUtil;
 import ops.school.wxutil.WxGUtil;
 import io.swagger.annotations.Api;

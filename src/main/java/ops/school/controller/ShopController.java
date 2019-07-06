@@ -2,7 +2,6 @@ package ops.school.controller;
 
 import ops.school.service.SchoolService;
 import ops.school.service.ShopService;
-import ops.school.util.ResponseObject;
 import ops.school.wxutil.WXUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

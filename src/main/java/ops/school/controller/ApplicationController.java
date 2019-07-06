@@ -4,7 +4,6 @@ package ops.school.controller;
 import ops.school.config.RedisConfig;
 import ops.school.dto.redis.WxUserAddSourceDTO;
 import ops.school.service.WxUserService;
-import ops.school.util.ResponseObject;
 import ops.school.wxutil.XMLUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

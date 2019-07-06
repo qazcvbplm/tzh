@@ -8,7 +8,6 @@ import ops.school.api.dao.ApplicationMapper;
 import ops.school.api.entity.Application;
 import ops.school.api.entity.SourceOrder;
 import ops.school.api.util.Util;
-import ops.school.util.ResponseObject;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;

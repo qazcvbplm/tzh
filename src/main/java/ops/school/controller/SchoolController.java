@@ -10,7 +10,6 @@ import ops.school.api.entity.School;
 import ops.school.api.util.BaiduUtil;
 import ops.school.api.util.Util;
 import ops.school.service.SchoolService;
-import ops.school.util.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

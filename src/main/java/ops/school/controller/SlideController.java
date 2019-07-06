@@ -6,8 +6,6 @@ import io.swagger.annotations.ApiOperation;
 import ops.school.api.dao.SlideMapper;
 import ops.school.api.entity.Slide;
 import ops.school.api.util.Util;
-import ops.school.util.ResponseObject;
-import ops.school.util.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

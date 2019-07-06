@@ -5,7 +5,6 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fastjson.JSON;
 import ops.school.api.entity.Orders;
 import ops.school.service.OrdersService;
-import ops.school.util.SpringUtil;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

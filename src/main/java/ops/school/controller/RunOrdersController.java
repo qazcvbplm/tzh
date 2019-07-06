@@ -2,7 +2,6 @@ package ops.school.controller;
 
 import ops.school.service.RunOrdersService;
 import ops.school.service.SchoolService;
-import ops.school.util.ResponseObject;
 import ops.school.wxutil.WXpayUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

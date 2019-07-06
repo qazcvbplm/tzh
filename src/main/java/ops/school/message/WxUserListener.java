@@ -9,7 +9,6 @@ import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.entity.Logs;
 import ops.school.api.entity.WxUser;
 import ops.school.service.WxUserService;
-import ops.school.util.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
