@@ -1,5 +1,7 @@
 package ops.school.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
@@ -9,7 +11,9 @@ import ops.school.api.entity.FullCut;
 import ops.school.api.entity.School;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopOpenTime;
+import ops.school.api.service.FullCutService;
 import ops.school.api.service.SchoolService;
+import ops.school.api.service.ShopOpenTimeService;
 import ops.school.api.service.ShopService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
@@ -33,6 +37,10 @@ public class ShopController {
 	private ShopService shopService;
 	@Autowired
 	private SchoolService schoolService;
+	@Autowired
+	private FullCutService fullCutService;
+	@Autowired
+	private ShopOpenTimeService shopOpenTimeService;
    /* @Autowired
     private AuthController auth;*/
 
@@ -50,8 +58,10 @@ public class ShopController {
 	@ApiOperation(value="查询",httpMethod="POST")
 	@RequestMapping("find")
 	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,Shop shop){
-		              int count = shopService.count(shop);
-		              return new ResponseObject(true, "ok").push("list", shopService.find(shop)).push("total", count);
+		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
+		return new ResponseObject(true, "ok")
+				.push("list", shopService.page(new Page<>(shop.getPage(), shop.getSize()), query))
+				.push("total", shopService.count(query));
 	}
 	
 	@ApiOperation(value="更新",httpMethod="POST")
@@ -66,28 +76,32 @@ public class ShopController {
 	@PostMapping("add_fullcut")
 	public ResponseObject add_fullcut(HttpServletRequest request,HttpServletResponse response,@ModelAttribute @Valid FullCut fullcut,BindingResult result){
 		              Util.checkParams(result);
-		              shopService.addFullCut(fullcut);
+		fullCutService.save(fullcut);
 		              return new ResponseObject(true, "添加成功");
 	}
 	
 	@ApiOperation(value="删除满减",httpMethod="POST")
 	@PostMapping("delete_fullcut")
 	public ResponseObject add_fullcut(HttpServletRequest request,HttpServletResponse response,int id){
-		              int i=shopService.deleteFullCut(id);
-		              return new ResponseObject(true, "删除"+i+"条记录");
+		if (fullCutService.removeById(id)) {
+			return new ResponseObject(true, "删除成功");
+		} else {
+			return new ResponseObject(false, "删除失败");
+		}
+
 	}
 	
 	@ApiOperation(value="查询满减",httpMethod="POST")
 	@PostMapping("find_fullcut")
 	public ResponseObject find_fullcut(HttpServletRequest request,HttpServletResponse response,int shopId){
-		              List<FullCut> list=shopService.findFullCut(shopId);
+		List<FullCut> list = fullCutService.findByShopId(shopId);
 		              return new ResponseObject(true, "ok").push("list", list);
 	}
 	
 	@ApiOperation(value="按店铺查询营业时间",httpMethod="POST")
 	@PostMapping("find/openTime")
 	public ResponseObject openTime(HttpServletRequest request,HttpServletResponse response,int shopId){
-		List<ShopOpenTime> list = shopService.findOpenTime(shopId);
+		List<ShopOpenTime> list = shopOpenTimeService.findByShopId(shopId);
 		return new ResponseObject(true, "ok").push("time", list);
 	}
 	
@@ -95,14 +109,14 @@ public class ShopController {
 	@PostMapping("add/openTime")
 	public ResponseObject openTime(HttpServletRequest request,HttpServletResponse response,@ModelAttribute @Valid ShopOpenTime time,BindingResult result){
 		Util.checkParams(result);
-		shopService.addOpenTime(time);
+		shopOpenTimeService.save(time);
 		return new ResponseObject(true, "ok");
 	}
 	
 	@ApiOperation(value="删除营业时间",httpMethod="POST")
 	@PostMapping("delete/deleteopenTime")
 	public ResponseObject deleteopenTime(HttpServletRequest request,HttpServletResponse response,int id){
-		shopService.removeopentime(id);
+		shopOpenTimeService.removeById(id);
 		return new ResponseObject(true, "ok");
 	}
 	
@@ -147,7 +161,7 @@ public class ShopController {
 	@ApiOperation(value="店铺二维码",httpMethod="POST")
 	@PostMapping("barcode")
 	public ResponseObject barcode(HttpServletRequest request,HttpServletResponse response,int id){
-		     Shop shop=shopService.findById(id);
+		Shop shop = shopService.getById(id);
 		     School school=schoolService.findById(shop.getSchoolId());
 		     String path="/home/nginx/shopbarcode/shopbarcode/";
 		     File dir=new File(path);

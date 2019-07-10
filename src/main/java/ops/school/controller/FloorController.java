@@ -51,7 +51,11 @@ public class FloorController {
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Floor floor){
-		              int i=floorService.update(floor);
-		              return new ResponseObject(true, "更新"+i+"条记录");
+        if (floorService.updateById(floor)) {
+            return new ResponseObject(true, "更新成功");
+        } else {
+            return new ResponseObject(false, "更新失败");
+        }
+
 	}
 }

@@ -56,9 +56,6 @@ public class OrdersController {
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
 							  Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @ModelAttribute @Valid Orders orders, BindingResult result){
 		              Util.checkParams(result);
-		              /*if(Util.containsEmoji(orders.getRemark())){
-		            	  orders.setRemark(Util.filterEmoji(orders.getRemark()));
-		              }*/
 		              if(orders.getRemark()!=null&&EmojiManager.isEmoji(orders.getRemark())){
 		            	  orders.setRemark(EmojiParser.removeAllEmojis(orders.getRemark()));
 		              }

@@ -1,9 +1,10 @@
 package ops.school.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.NoticeMapper;
 import ops.school.api.entity.Notice;
+import ops.school.api.service.NoticeService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class NoticeController {
 
 
     @Autowired
-	private NoticeMapper noticeMapper;
+	private NoticeService noticeService;
 	
 	
 	@ApiOperation(value="添加",httpMethod="POST")
@@ -33,21 +34,25 @@ public class NoticeController {
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
 							  @ModelAttribute @Valid Notice notice, BindingResult result){
 		              Util.checkParams(result);
-		              noticeMapper.insert(notice);
+		noticeService.save(notice);
 		              return new ResponseObject(true, "添加成功");
 	}
 	
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Notice notice){
-		              List<Notice> list = noticeMapper.find(notice);
+		List<Notice> list = noticeService.list(new QueryWrapper<Notice>().setEntity(notice));
 		              return new ResponseObject(true, "ok").push("list", list);
 	}
 	
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Notice notice){
-		              int i= noticeMapper.updateByPrimaryKeySelective(notice);
-		              return new ResponseObject(true, "更新"+i+"条记录").push("result", i);
+		if (noticeService.updateById(notice)) {
+			return new ResponseObject(true, "更新成功");
+		} else {
+			return new ResponseObject(false, "更新失败");
+		}
+
 	}
 }

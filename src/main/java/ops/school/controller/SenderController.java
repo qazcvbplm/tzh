@@ -10,7 +10,6 @@ import ops.school.api.service.SenderService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +26,6 @@ public class SenderController {
 
     @Autowired
     private SenderService senderService;
-    @Autowired
-    private StringRedisTemplate cache;
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")

@@ -2,9 +2,9 @@ package ops.school.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.ChargeLogMapper;
-import ops.school.api.dao.ChargeMapper;
 import ops.school.api.entity.Charge;
+import ops.school.api.service.ChargeLogService;
+import ops.school.api.service.ChargeService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +26,15 @@ public class ChargeController {
 
 
     @Autowired
-	private ChargeMapper chargeMapper;
+	private ChargeService chargeService;
 	@Autowired
-	private ChargeLogMapper chargeLogMapper;
+	private ChargeLogService chargeLogService;
 	
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Charge charge, BindingResult result){
 		              Util.checkParams(result);
-		              chargeMapper.insert(charge);
+		chargeService.save(charge);
 		              return new ResponseObject(true, "添加成功");
 	}
 	
@@ -42,15 +42,19 @@ public class ChargeController {
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
 	public ResponseObject add(HttpServletRequest request,HttpServletResponse response){
-		              List<Charge> list=chargeMapper.find();
+		List<Charge> list = chargeService.list();
 		              return new ResponseObject(true, "ok").push("list", list);
 	}
 	
 	@ApiOperation(value="删除",httpMethod="POST")
 	@PostMapping("remove")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, int id) {
-		              int i=chargeMapper.remove(id);
-		              return new ResponseObject(true, "移除"+i+"条记录");
+		if (chargeService.removeById(id)) {
+			return new ResponseObject(true, "移除成功");
+		} else {
+			return new ResponseObject(true, "移除失败");
+		}
+
 	}
 	
 	/*@ApiOperation(value="按照appid统计",httpMethod="POST")

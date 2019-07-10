@@ -3,9 +3,12 @@ package ops.school.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Product;
+import ops.school.api.entity.ProductAttribute;
+import ops.school.api.service.ProductAttributeService;
 import ops.school.api.service.ProductService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.service.TProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,10 @@ public class ProductController {
 
     @Autowired
 	private ProductService productService;
+    @Autowired
+    private ProductAttributeService productAttributeService;
+    @Autowired
+    private TProductService tProductService;
 
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
@@ -32,7 +39,7 @@ public class ProductController {
 		              Util.checkParams(result);
 		              if(attributePrice.length>0){
 		            	  if(attributePrice.length==attributeName.length){
-		            		  productService.add(attributePrice,attributeName,product);
+                              tProductService.add(attributePrice, attributeName, product);
 		            		  return new ResponseObject(true, "添加成功");
 		            	  }
 		              }
@@ -58,8 +65,12 @@ public class ProductController {
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Product product){
-		             int i=productService.update(product);
-		             return new ResponseObject(true, "更新了"+i+"条记录");
+        if (productService.updateById(product)) {
+            return new ResponseObject(true, "更新成功");
+        } else {
+            return new ResponseObject(true, "更新失败");
+        }
+
 	}
 	
 	
@@ -68,7 +79,7 @@ public class ProductController {
 	public ResponseObject adda(HttpServletRequest request,HttpServletResponse response,
 			@RequestParam int pid,@RequestParam BigDecimal attributePrice,
 			@RequestParam String attributeName ){
-		             int i=productService.adda(pid,attributePrice,attributeName );
+        productAttributeService.save(new ProductAttribute(pid, attributeName, attributePrice));
 		             return new ResponseObject(true, "ok");
 	}
 	
@@ -76,8 +87,11 @@ public class ProductController {
 	@PostMapping("removea")
 	public ResponseObject removea(HttpServletRequest request,HttpServletResponse response,
 			@RequestParam int id){
-		             int i=productService.removea(id);
-		             return new ResponseObject(true, "ok");
+        if (productAttributeService.removeById(id)) {
+            return new ResponseObject(true, "删除成功");
+        } else {
+            return new ResponseObject(false, "删除请重试");
+        }
 	}
 	
 }

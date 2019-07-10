@@ -3,10 +3,10 @@ package ops.school.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ReplyTextMsg;
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.WxUser;
+import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.wxutil.XMLUtil;
@@ -39,7 +39,7 @@ public class ApplicationController {
 	@Autowired
 	private WxUserController wxUserController;
 	@Autowired
-	private WxUserBellMapper wxUserBellMapper;
+	private WxUserBellService wxUserBellService;
 
 
     @RequestMapping("check")
@@ -92,7 +92,7 @@ public class ApplicationController {
 	        		Map<String,Object> ch=new HashMap<>();
 	        		ch.put("phone", user.getOpenId()+"-"+user.getPhone());
 	        	    ch.put("amount", "0.5");
-	        	    wxUserBellMapper.charge(ch);
+					wxUserBellService.charge(ch);
 					return re.Msg2Xml();
 				}else{
 					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text","绑定失败请联系管理员");

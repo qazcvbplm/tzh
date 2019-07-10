@@ -3,8 +3,8 @@ package ops.school.controller;
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.SlideMapper;
 import ops.school.api.entity.Slide;
+import ops.school.api.service.SlideService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
@@ -27,7 +27,7 @@ import java.util.List;
 public class SlideController {
 
 	@Autowired
-	private SlideMapper slideMapper;
+	private SlideService slideService;
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 
@@ -38,7 +38,7 @@ public class SlideController {
         if (SpringUtil.redisCache()) {
 		            	  stringRedisTemplate.boundHashOps("SLIDE_LIST").delete(slide.getSchoolId()+"");
 		              }
-		              slideMapper.insert(slide);
+		slideService.save(slide);
 		              return new ResponseObject(true, "添加成功");
 	}
 	
@@ -50,7 +50,7 @@ public class SlideController {
 							if(stringRedisTemplate.boundHashOps("SLIDE_LIST").get(schoolId+"")!=null){
 								 list=JSON.parseArray(stringRedisTemplate.boundHashOps("SLIDE_LIST").get(schoolId+"").toString(), Slide.class);
 							}else{
-								list = slideMapper.find(schoolId);
+								list = slideService.findBySchoolId(schoolId);
 								stringRedisTemplate.boundHashOps("SLIDE_LIST").put(schoolId+"", JSON.toJSONString(list));
 							}
 						}
@@ -60,11 +60,11 @@ public class SlideController {
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Slide slide){
-		              int i= slideMapper.updateByPrimaryKeySelective(slide);
-        if (SpringUtil.redisCache()) {
-		            	  Slide temp=slideMapper.findById(slide.getId());
+		boolean rs = slideService.updateById(slide);
+		if (SpringUtil.redisCache()) {
+			Slide temp = slideService.getById(slide.getId());
 		            	  stringRedisTemplate.boundHashOps("SLIDE_LIST").delete(temp.getSchoolId()+"");
 		              }
-		              return new ResponseObject(true, "更新"+i+"条记录").push("result", i);
+		return new ResponseObject(true, "更新成功");
 	}
 }

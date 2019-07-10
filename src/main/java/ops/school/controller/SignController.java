@@ -2,10 +2,11 @@ package ops.school.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.SignMapper;
 import ops.school.api.entity.Sign;
+import ops.school.api.service.SignService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.ResponseObject;
+import ops.school.service.TWxUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,9 +24,11 @@ import java.util.Date;
 public class SignController {
 
 	@Autowired
-	private SignMapper signMapper;
+	private SignService signService;
 	@Autowired
 	private WxUserService wxUserService;
+	@Autowired
+	private TWxUserService tWxUserService;
 
 
 	public static int day;
@@ -37,7 +40,7 @@ public class SignController {
 	@ApiOperation(value="签到",httpMethod="POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @RequestParam String openId){
-		              Sign sign=signMapper.findLast(openId);
+		Sign sign = signService.findLast(openId);
 		              if(sign==null){
 		            	  sign=new Sign(openId, day, 3, 1);
 		              }else{
@@ -54,8 +57,8 @@ public class SignController {
 		            		  }
 		            	  }
 		              }
-		              signMapper.insert(sign);
-		              int i=wxUserService.addSource(openId,sign.getSource());
+		signService.save(sign);
+		int i = tWxUserService.addSource(openId, sign.getSource());
 		              return new ResponseObject(true, "成功获得"+sign.getSource()+"积分");
 	}
 }

@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.DayLogTakeoutMapper;
 import ops.school.api.entity.DayLogTakeout;
+import ops.school.api.service.DayLogTakeoutService;
 import ops.school.api.util.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +24,7 @@ public class DayLogController {
 
 
     @Autowired
-    private DayLogTakeoutMapper dayLogTakeoutMapper;
+    private DayLogTakeoutService dayLogTakeoutService;
 
     @ApiOperation(value = "查询", httpMethod = "POST")
     @PostMapping("find")
@@ -40,7 +40,7 @@ public class DayLogController {
         if (day != null)
             query.lambda().eq(DayLogTakeout::getDay, day);
         query.lambda().orderByDesc(DayLogTakeout::getDay);
-        IPage<DayLogTakeout> list = dayLogTakeoutMapper.selectPage(new Page<>(page, size), query);
+        IPage<DayLogTakeout> list = dayLogTakeoutService.page(new Page<>(page, size), query);
         return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
     }
 }

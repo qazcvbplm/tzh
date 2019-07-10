@@ -4,13 +4,14 @@ import com.github.qcloudsms.httpclient.HTTPException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
-import ops.school.api.dao.ApplicationMapper;
 import ops.school.api.entity.Application;
 import ops.school.api.entity.School;
+import ops.school.api.service.ApplicationService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.util.BaiduUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.service.TSchoolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -33,9 +34,9 @@ public class SchoolController {
     @Autowired
 	private SchoolService schoolService;
 	@Autowired
-	private ApplicationMapper applicationMapper;
-	/*@Autowired
-	private AuthController auth;*/
+	private ApplicationService applicationService;
+	@Autowired
+	private TSchoolService tSchoolService;
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 
@@ -84,7 +85,7 @@ public class SchoolController {
 			Application login=new Application();
 			login.setLoginName(loginName);
 			login.setLoginPass(Util.EnCode(loginPass));
-			Application application=applicationMapper.login(login);
+			Application application = applicationService.login(login.getLoginName(), login.getLoginPass());
 			if(application!=null){
 				token = JWTUtil.sign(application.getId() + "", application.getLoginName(), "admin");
 				return new ResponseObject(true,"ok").push("token", token).push("admin", application).push("type", "admin");
@@ -127,7 +128,7 @@ public class SchoolController {
 		          String res="";
 		          if(cache!=null&&cache.equals(codes)){
 		        	  stringRedisTemplate.delete(schoolId+school.getPhone());
-		        	  res=schoolService.tx(schoolId,amount,openId);
+					  res = tSchoolService.tx(schoolId, amount, openId);
 		          }else{
 		        	  return new ResponseObject(false, "验证码错误或者失效");
 		          }

@@ -32,7 +32,7 @@ public class AddressController {
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Address address, BindingResult result){
 		              Util.checkParams(result);
 		              address.setOpenId(request.getAttribute("Id").toString());
-		              addressService.add(address);
+        addressService.save(address);
 		              return new ResponseObject(true, "添加成功");
 	}
 	
@@ -49,7 +49,11 @@ public class AddressController {
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,Address address){
-		              int i= addressService.update(address);
-		              return new ResponseObject(true, "更新"+i+"条记录").push("result", i);
+        if (addressService.updateById(address)) {
+            return new ResponseObject(true, "更新成功");
+        } else {
+            return new ResponseObject(false, "更新失败");
+        }
+
 	}
 }

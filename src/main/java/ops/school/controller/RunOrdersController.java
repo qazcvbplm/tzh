@@ -9,6 +9,7 @@ import ops.school.api.service.SchoolService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
+import ops.school.service.TRunOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,6 +35,8 @@ public class RunOrdersController {
 	private RunOrdersService runOrdersService;
 	@Autowired
 	private SchoolService schoolService;
+	@Autowired
+	private TRunOrdersService tRunOrdersService;
 	
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
@@ -69,7 +72,7 @@ public class RunOrdersController {
 			  return new ResponseObject(true, "ok").push("msg", msg);
 		 } 
 		 if(payment.equals("余额支付")){
-			 if(runOrdersService.pay(orders)==1){
+			 if (tRunOrdersService.pay(orders) == 1) {
 				 Map<String,Object> map=new HashMap<>();
 				 map.put("schoolId", orders.getSchoolId());
 				 map.put("amount", orders.getTotalPrice());

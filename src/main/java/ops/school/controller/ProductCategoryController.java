@@ -46,7 +46,12 @@ public class ProductCategoryController {
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,ProductCategory pc){
-		              int i = productCategoryService.update(pc);
-		              return new ResponseObject(true, "更新"+i+"条记录");
+        if (productCategoryService.updateById(pc)) {
+            return new ResponseObject(true, "更新成功");
+        } else {
+            return new ResponseObject(false
+                    , "更新失败");
+        }
+
 	}
 }
