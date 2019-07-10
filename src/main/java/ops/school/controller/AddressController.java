@@ -25,9 +25,9 @@ public class AddressController {
 	
 	@Autowired
 	private AddressService addressService;
+	
 
-
-	@ApiOperation(value="添加",httpMethod="POST")
+    @ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Address address, BindingResult result){
 		              Util.checkParams(result);
