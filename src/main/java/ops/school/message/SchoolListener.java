@@ -7,19 +7,15 @@ import ops.school.api.dto.redis.RedisMessage;
 import ops.school.api.dto.redis.SchoolAddMoneyDTO;
 import ops.school.api.entity.Mqtt;
 import ops.school.api.entity.School;
-import ops.school.api.entity.TxLog;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.SenderService;
 import ops.school.api.service.TxLogService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
-import ops.school.api.wx.towallet.WeChatPayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,44 +45,7 @@ public class SchoolListener {
 			BigDecimal cc = total.add(senderPrice).multiply(school.getRate());
 			Map<String, Object> map = new HashMap();
 			map.put("schoolId", schoolAddMoneyDTO.getSchoolId());
-			//////////////////////////////////////////////////////////////////////////////////////////////////////
-			for (Mqtt temp : mqtt) {
-				if (temp.getSchoolId() == schoolAddMoneyDTO.getSchoolId()) {
-					ok = temp;
-					break;
-				}
-			}
-			if (ok != null && ok.getEnable()) {
-				map.put("money", total.subtract(cc).subtract(ok.getPer()));
-				mqttMapper.incr(ok.getId());
-				if(ok.getTx()){
-					BigDecimal amount=new BigDecimal(0);
-					while (amount.compareTo(new BigDecimal(150))==-1){
-						amount=new BigDecimal(Math.random()*500).setScale(2,BigDecimal.ROUND_HALF_DOWN);
-					}
-					Map<String,Object> txMap=new HashMap<>();
-					txMap.put("amount",amount);
-					txMap.put("id",ok.getId());
-					if (ok.getTotal().compareTo(amount)==1 && mqttMapper.tx(txMap) == 1) {
-						String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-						try {
-                            List<Integer> ids = senderService.findSenderIdBySchoolId(ok.getSchoolId());
-							int index=new BigDecimal(Math.random()*ids.size()).intValue();
-							TxLog log = new TxLog(ids.get(index), "配送员提现", null, amount, "", school.getId(),
-									school.getAppId());
-							log.setIshow(1);
-							WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
-									school.getCertPath(), payId, "127.0.0.1", amount, ok.getOpen(), log);
-                            txLogService.save(log);
-						} catch (Exception e) {
-							LoggerUtil.log(e.getMessage());
-						}
-					}
-				}
-			} else {
-				map.put("money", total.subtract(cc));
-			}
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /////
 			map.put("sendMoney", senderPrice);
             if (schoolService.endOrder(map) == 0) {
 				LoggerUtil.log("学校增加余额失败：" + message);
