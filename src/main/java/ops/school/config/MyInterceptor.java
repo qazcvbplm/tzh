@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class MyInterceptor implements HandlerInterceptor {
 
+
 	/*@Autowired
 	private AuthController auth;*/
 
