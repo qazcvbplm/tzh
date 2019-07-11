@@ -1,12 +1,13 @@
 package ops.school.message;
 
-import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.WxUser;
+import ops.school.api.service.OrdersService;
 import ops.school.api.service.SenderService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
+import ops.school.service.TSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,16 +29,18 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
 	@Autowired
 	private SenderService senderService;
 	@Autowired
-	private OrdersMapper orderMapper;
+    private OrdersService ordersService;
 	@Autowired
 	private WxUserService wxUserService;
+    @Autowired
+    private TSenderService tSenderService;
 	
 	@Override
 	public void onMessage(Message key, byte[] arg1) {
 		if(key.toString().startsWith("tsout")){
-			Orders orders = orderMapper.selectByPrimaryKey(key.toString().split(",")[1]);
+            Orders orders = ordersService.findById(key.toString().split(",")[1]);
 			try {
-				senderService.end(key.toString().split(",")[1],true);
+                tSenderService.end(key.toString().split(",")[1], true);
 				   stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
 				WxUser wxUser = wxUserService.findById(orders.getOpenId());
 				wxUserService.sendWXGZHM(wxUser.getPhone(), new ops.school.api.dto.wxgzh.Message(null,

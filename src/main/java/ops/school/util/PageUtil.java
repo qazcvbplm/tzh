@@ -11,4 +11,14 @@ public class PageUtil {
     public static IPage noPage() {
         return new Page(0, 100);
     }
+
+    public static IPage getPage(Integer page, Integer size) {
+        if (page == null || page < 0) {
+            page = 0;
+        }
+        if (size == null || size < 0) {
+            size = 10;
+        }
+        return new Page(page, size);
+    }
 }

@@ -7,6 +7,8 @@ import ops.school.api.service.OrdersService;
 import ops.school.api.service.RunOrdersService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.wxutil.XMLUtil;
+import ops.school.service.TOrdersService;
+import ops.school.service.TWxUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +33,10 @@ public class OrdersNotify {
 	private RunOrdersService runordersService;
 	@Autowired
 	private WxUserService wxUserService;
-
+    @Autowired
+    private TWxUserService tWxUserService;
+    @Autowired
+    private TOrdersService tOrdersService;
 
 	public static final String URL="https://www.chuyinkeji.cn/ops/";
 
@@ -52,7 +57,7 @@ public class OrdersNotify {
 				String orderId=map.get("out_trade_no");
 				Orders orders= ordersService.findById(orderId);
 				if(orders.getStatus().equals("待付款")){
-					if(ordersService.paySuccess(orderId,"微信支付")==1){
+                    if (tOrdersService.paySuccess(orderId, "微信支付") == 1) {
 						//wxUserService.addSourcePaySuccess(orders);
 						Success(response);
 					}
@@ -99,7 +104,7 @@ public class OrdersNotify {
 				String orderId=map.get("out_trade_no");
 				String openId=map.get("openid");
 				String attach=map.get("attach");
-				wxUserService.chargeSuccess(orderId,openId,attach);
+                 tWxUserService.chargeSuccess(orderId, openId, attach);
 				Success(response);
 		     }
 	}

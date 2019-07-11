@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
-import ops.school.api.dto.SenderTj;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.entity.FullCut;
 import ops.school.api.entity.School;
@@ -18,6 +17,7 @@ import ops.school.api.service.ShopService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
+import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +41,8 @@ public class ShopController {
 	private FullCutService fullCutService;
 	@Autowired
 	private ShopOpenTimeService shopOpenTimeService;
+    @Autowired
+    private TOrdersService tOrdersService;
    /* @Autowired
     private AuthController auth;*/
 
@@ -141,19 +143,19 @@ public class ShopController {
 	
 	
 	
-	@ApiOperation(value="商家临时统计",httpMethod="POST")
+/*	@ApiOperation(value="商家临时统计",httpMethod="POST")
 	@PostMapping("nocheck/shoptempstatistics")
 	public ResponseObject shoptempstatistics(HttpServletRequest request,HttpServletResponse response,
 			@RequestParam Integer shopId,@RequestParam String beginTime,@RequestParam String endTime){
 		                  SenderTj result=shopService.statistics(shopId,beginTime,endTime);
 		                  return new ResponseObject(true, "ok").push("result", result);
-	}
+	}*/
 
 	@ApiOperation(value="商家统计",httpMethod="POST")
 	@PostMapping("nocheck/shopstatistics")
 	public ResponseObject shopstatistics(HttpServletRequest request,HttpServletResponse response,
 										   @RequestParam Integer shopId,@RequestParam String beginTime,@RequestParam String endTime){
-		ShopTj result=shopService.shopstatistics(shopId,beginTime,endTime);
+        ShopTj result = tOrdersService.shopstatistics(shopId, beginTime, endTime);
 		return new ResponseObject(true, "ok").push("result", result);
 	}
 	

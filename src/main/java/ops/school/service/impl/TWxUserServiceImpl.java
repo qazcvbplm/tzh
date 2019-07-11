@@ -1,20 +1,20 @@
 package ops.school.service.impl;
 
 import ops.school.api.config.Server;
-import ops.school.api.entity.Charge;
-import ops.school.api.entity.School;
-import ops.school.api.entity.WxUser;
-import ops.school.api.entity.WxUserBell;
-import ops.school.api.service.ChargeService;
-import ops.school.api.service.SchoolService;
-import ops.school.api.service.WxUserBellService;
-import ops.school.api.service.WxUserService;
+import ops.school.api.dto.wxgzh.Message;
+import ops.school.api.entity.*;
+import ops.school.api.service.*;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
 import ops.school.service.TWxUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +30,10 @@ public class TWxUserServiceImpl implements TWxUserService {
     private ChargeService chargeService;
     @Autowired
     private SchoolService schoolService;
+    @Autowired
+    private ChargeLogService chargeLogService;
+    @Autowired
+    private LogsService logsService;
 
     @Override
     public int addSource(String openId, Integer source) {
@@ -59,5 +63,42 @@ public class TWxUserServiceImpl implements TWxUserService {
                     "127.0.0.1", chargeId + "", Server.URL + "notify/charge");
         }
         return null;
+    }
+
+    @Transactional
+    @Override
+    public void chargeSuccess(String orderId, String openId, String attach) {
+        WxUser wxUser = wxUserService.findById(openId);
+        School school = schoolService.findById(wxUser.getSchoolId());
+        Charge charge = chargeService.getById(Integer.valueOf(attach));
+        ChargeLog log = new ChargeLog(orderId, new BigDecimal(charge.getFull()), new BigDecimal(charge.getSend()), openId, wxUser.getAppId());
+        chargeLogService.save(log);
+        Map<String, Object> map = new HashMap<>();
+        map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
+        map.put("amount", log.getPay().add(log.getSend()));
+        if (wxUserBellService.charge(map) == 0) {
+            LoggerUtil.log("充值失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString()));
+        } else {
+            Map<String, Object> map2 = new HashMap<>();
+            map2.put("schoolId", school.getId());
+            map2.put("charge", log.getPay());
+            map2.put("send", log.getSend());
+            try {
+                schoolService.charge(map2);
+            } catch (Exception e) {
+                logsService.save(new Logs(e.getMessage()));
+            }
+
+            WxUserBell userbell = wxUserBellService.getById(wxUser.getOpenId() + "-" + wxUser.getPhone());
+            //发送模板
+            wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+                    "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
+                    school.getWxAppId(),
+                    "pages/mine/payment/payment",
+                    "暂无",
+                    "+" + log.getPay().add(log.getSend()),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+                    , "充值", userbell.getMoney() + "", null, null, null, null, null, "如有疑问请在小程序内联系客服人员！"));
+        }
     }
 }

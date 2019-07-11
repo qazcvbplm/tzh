@@ -1,13 +1,13 @@
 package ops.school.message;
 
 import com.alibaba.fastjson.JSON;
-import ops.school.api.dao.LogsMapper;
-import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.redis.RedisMessage;
 import ops.school.api.dto.redis.SenderAddMoneyDTO;
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.Logs;
 import ops.school.api.entity.WxUser;
+import ops.school.api.service.LogsService;
+import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +23,9 @@ public class WxUserListener {
     @Autowired
     private WxUserService wxUserService;
     @Autowired
-    private WxUserBellMapper wxUserBellMapper;
+    private WxUserBellService wxUserBellService;
     @Autowired
-    private LogsMapper logsMapper;
+    private LogsService logsService;
 
     public void receiveMessage(String message) {
         RedisMessage redisMessage = JSON.parseObject(message, RedisMessage.class);
@@ -45,7 +45,7 @@ public class WxUserListener {
         Map<String, Object> map2 = new HashMap<>();
         map2.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
         map2.put("source", source);
-        if (wxUserBellMapper.addSource(map2) == 0) {
+        if (wxUserBellService.addSource(map2) == 0) {
             LoggerUtil.log("用户增加积分失败：" + wxUser.getOpenId() + "-" + wxUser.getPhone() + source);
         }
     }
@@ -56,8 +56,8 @@ public class WxUserListener {
         Map<String, Object> map = new HashMap<>();
         map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
         map.put("amount", amount);
-        if (wxUserBellMapper.charge(map) == 0) {
-            logsMapper.insert(new Logs("配送员送达订单增加余额失败：" + wxUser.getOpenId() + "-" + wxUser.getPhone() + "," + amount.toString()));
+        if (wxUserBellService.charge(map) == 0) {
+            logsService.save(new Logs("配送员送达订单增加余额失败：" + wxUser.getOpenId() + "-" + wxUser.getPhone() + "," + amount.toString()));
         }
     }
 

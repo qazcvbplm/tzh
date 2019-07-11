@@ -1,9 +1,9 @@
 package ops.school.message;
 
-import ops.school.api.dao.ProductMapper;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.service.OrdersService;
+import ops.school.api.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ public class PoductListener {
 	@Autowired
 	private OrdersService orderService;
 	@Autowired
-	private ProductMapper productMapper;
+    private ProductService productService;
 	
 	 public void receiveMessage(String message){
 		 Orders orders=orderService.findById(message);
@@ -26,7 +26,7 @@ public class PoductListener {
 			 Map<String,Object> map=new HashMap<>();
 			 map.put("id", temp.getProductId());
 			 map.put("count", temp.getProductCount());
-			  productMapper.sale(map);
+             productService.sales(map);
 		 }
 	  }
 }

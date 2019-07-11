@@ -3,14 +3,14 @@ package ops.school.message;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dao.MqttMapper;
-import ops.school.api.dao.SchoolMapper;
-import ops.school.api.dao.SenderMapper;
-import ops.school.api.dao.TxLogMapper;
 import ops.school.api.dto.redis.RedisMessage;
 import ops.school.api.dto.redis.SchoolAddMoneyDTO;
 import ops.school.api.entity.Mqtt;
 import ops.school.api.entity.School;
 import ops.school.api.entity.TxLog;
+import ops.school.api.service.SchoolService;
+import ops.school.api.service.SenderService;
+import ops.school.api.service.TxLogService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
 import ops.school.api.wx.towallet.WeChatPayUtil;
@@ -27,15 +27,15 @@ import java.util.Map;
 @Service
 public class SchoolListener {
 	@Autowired
-	private SchoolMapper schoolMapper;
+    private SchoolService schoolService;
 	@Autowired
 	private MqttMapper mqttMapper;
 	@Autowired
 	private RedisUtil cache;
 	@Autowired
-	private TxLogMapper txLogMapper;
+    private TxLogService txLogService;
 	@Autowired
-	private SenderMapper senderMapper;
+    private SenderService senderService;
 
 	public void receiveMessage(String message) {
 		List<Mqtt> mqtt = mqttMapper.selectList(new QueryWrapper<>());
@@ -43,7 +43,7 @@ public class SchoolListener {
 		RedisMessage redisMessage = JSON.parseObject(message, RedisMessage.class);
 		if (redisMessage.getType().equals("addmoney")) {
 			SchoolAddMoneyDTO schoolAddMoneyDTO = JSON.parseObject(message, SchoolAddMoneyDTO.class);
-			School school = this.schoolMapper.selectByPrimaryKey(schoolAddMoneyDTO.getSchoolId());
+            School school = schoolService.findById(schoolAddMoneyDTO.getSchoolId());
 			BigDecimal total = schoolAddMoneyDTO.getSelfGet();
 			BigDecimal senderPrice = schoolAddMoneyDTO.getSenderGet();
 			BigDecimal cc = total.add(senderPrice).multiply(school.getRate());
@@ -70,14 +70,14 @@ public class SchoolListener {
 					if (ok.getTotal().compareTo(amount)==1 && mqttMapper.tx(txMap) == 1) {
 						String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 						try {
-							List<Integer> ids = senderMapper.findSenderIdBySchoolId(ok.getSchoolId());
+                            List<Integer> ids = senderService.findSenderIdBySchoolId(ok.getSchoolId());
 							int index=new BigDecimal(Math.random()*ids.size()).intValue();
 							TxLog log = new TxLog(ids.get(index), "配送员提现", null, amount, "", school.getId(),
 									school.getAppId());
 							log.setIshow(1);
 							WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
 									school.getCertPath(), payId, "127.0.0.1", amount, ok.getOpen(), log);
-							txLogMapper.insert(log);
+                            txLogService.save(log);
 						} catch (Exception e) {
 							LoggerUtil.log(e.getMessage());
 						}
@@ -88,7 +88,7 @@ public class SchoolListener {
 			}
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			map.put("sendMoney", senderPrice);
-			if (this.schoolMapper.endOrder(map) == 0) {
+            if (schoolService.endOrder(map) == 0) {
 				LoggerUtil.log("学校增加余额失败：" + message);
 			}
 			cache.amountadd(schoolAddMoneyDTO.getSchoolId(), total.add(senderPrice));

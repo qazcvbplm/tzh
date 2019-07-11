@@ -15,6 +15,7 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
+import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -40,7 +41,9 @@ public class OrdersController {
 	@Autowired
 	private OrdersService ordersService;
 	@Autowired
-	private SchoolService schoolService;
+    private TOrdersService tOrdersService;
+    @Autowired
+    private SchoolService schoolService;
 	@Autowired
 	private ProductService productService;
 	@Autowired
@@ -63,7 +66,7 @@ public class OrdersController {
 		              if((productIds.length==attributeIndex.length)&&(productIds.length==counts.length)){
 		            	  if(productIds.length>0){
 		            		  orders.setOpenId(request.getAttribute("Id").toString());
-		            		  ordersService.addTakeout(productIds,attributeIndex,counts,orders);
+                              tOrdersService.addTakeout(productIds, attributeIndex, counts, orders);
 		            		  return new ResponseObject(true, orders.getId());
 		            	  }
 		              }
@@ -99,7 +102,7 @@ public class OrdersController {
 			  return new ResponseObject(true, "ok").push("msg", msg);
 		 }
 		 if(payment.equals("余额支付")){
-			 if(ordersService.pay(orders)==1){
+             if (tOrdersService.pay(orders) == 1) {
 				 Map<String,Object> map=new HashMap<>();
 				 map.put("schoolId", orders.getSchoolId());
 				 map.put("amount", orders.getPayPrice());
@@ -115,8 +118,7 @@ public class OrdersController {
 	@PostMapping("cancel")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,
 			String id){
-		
-		    int i=ordersService.cancel(id);
+        int i = tOrdersService.cancel(id);
 		    if(i>0){
 		    	if(stringRedisTemplate.boundHashOps("SHOP_DJS"+i).delete(id)<=0){
 		      		 return new ResponseObject(false,"联系管理员");
@@ -169,7 +171,7 @@ public class OrdersController {
 	@ApiOperation(value="商家接手订单",httpMethod="POST")
 	@PostMapping("android/acceptorder")
 	public ResponseObject android_findDjs(HttpServletRequest request,HttpServletResponse response,String orderId){
-		     int i=ordersService.shopAcceptOrderById(orderId);
+        int i = tOrdersService.shopAcceptOrderById(orderId);
 		     if(i>0){
                  if (SpringUtil.redisCache()) {
 		    		 stringRedisTemplate.boundHashOps("SHOP_DJS"+i).delete(orderId);

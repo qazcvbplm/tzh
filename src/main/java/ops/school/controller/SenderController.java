@@ -9,6 +9,7 @@ import ops.school.api.entity.Sender;
 import ops.school.api.service.SenderService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.service.TSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -26,6 +26,8 @@ public class SenderController {
 
     @Autowired
     private SenderService senderService;
+    @Autowired
+    private TSenderService tSenderService;
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
@@ -72,14 +74,14 @@ public class SenderController {
     @ApiOperation(value = "配送员查询外卖订单", httpMethod = "POST")
     @PostMapping("nocheck/findorderbytakeout")
     public ResponseObject findorderbydjs(HttpServletRequest request, HttpServletResponse response, int senderId, int page, int size, String status) {
-        List<Orders> list = senderService.findorderbydjs(senderId, page, size, status);
+        List<Orders> list = tSenderService.findorderbydjs(senderId, page, size, status);
         return new ResponseObject(true, "ok").push("list", list);
     }
 
     @ApiOperation(value = "接手订单", httpMethod = "POST")
     @PostMapping("nocheck/senderaccept")
     public ResponseObject senderaccept(HttpServletRequest request, HttpServletResponse response, int senderId, String orderId) {
-        int result = senderService.acceptOrder(senderId, orderId);
+        int result = tSenderService.acceptOrder(senderId, orderId);
         if (result == 1)
             return new ResponseObject(true, "接手成功");
         else
@@ -89,7 +91,7 @@ public class SenderController {
     @ApiOperation(value = "取件", httpMethod = "POST")
     @PostMapping("nocheck/senderget")
     public ResponseObject senderget(HttpServletRequest request, HttpServletResponse response, String orderId) {
-        int result = senderService.sendergetorder(orderId);
+        int result = tSenderService.sendergetorder(orderId);
         return new ResponseObject(true, "取件成功");
     }
 
@@ -97,7 +99,7 @@ public class SenderController {
     @PostMapping("nocheck/senderend")
     public ResponseObject senderend(HttpServletRequest request, HttpServletResponse response,
                                     @RequestParam String orderId, @RequestParam boolean end, @RequestParam int senderId) {
-        senderService.end(orderId, end);
+        tSenderService.end(orderId, end);
         return new ResponseObject(true, "送达完成");
     }
 
@@ -105,14 +107,14 @@ public class SenderController {
     @ApiOperation(value = "配送员查询跑腿订单", httpMethod = "POST")
     @PostMapping("nocheck/findorderbyrun")
     public ResponseObject findorderbyrun(HttpServletRequest request, HttpServletResponse response, int senderId, int page, int size, String status) {
-        List<RunOrders> list = senderService.findorderbyrundjs(senderId, page, size, status);
+        List<RunOrders> list = tSenderService.findorderbyrundjs(senderId, page, size, status);
         return new ResponseObject(true, "ok").push("list", list);
     }
 
     @ApiOperation(value = "接手跑腿订单", httpMethod = "POST")
     @PostMapping("nocheck/senderacceptrun")
     public ResponseObject senderacceptrun(HttpServletRequest request, HttpServletResponse response, int senderId, String orderId) {
-        int result = senderService.acceptOrderRun(senderId, orderId);
+        int result = tSenderService.acceptOrderRun(senderId, orderId);
         if (result == 1)
             return new ResponseObject(true, "接手成功");
         else
@@ -123,7 +125,7 @@ public class SenderController {
     @PostMapping("nocheck/senderendrun")
     public ResponseObject senderend(HttpServletRequest request, HttpServletResponse response,
                                     @RequestParam String orderId) {
-        senderService.endRun(orderId);
+        tSenderService.endRun(orderId);
         return new ResponseObject(true, "送达完成");
     }
 
@@ -132,11 +134,11 @@ public class SenderController {
     @PostMapping("nocheck/senderstatistics")
     public ResponseObject senderstatistics(HttpServletRequest request, HttpServletResponse response,
                                            @RequestParam Integer senderId, @RequestParam String beginTime, @RequestParam String endTime) {
-        SenderTj result = senderService.statistics(senderId, beginTime, endTime);
+        SenderTj result = tSenderService.statistics(senderId, beginTime, endTime);
         return new ResponseObject(true, "ok").push("result", result);
     }
 
-    @ApiOperation(value = "配送员提现", httpMethod = "POST")
+   /* @ApiOperation(value = "配送员提现", httpMethod = "POST")
     @PostMapping({"sendertx"})
     public ResponseObject sendertx(HttpServletRequest request, HttpServletResponse response, @RequestParam BigDecimal amount, @RequestParam String senderId) {
         if (amount.compareTo(new BigDecimal(1)) == -1) {
@@ -147,12 +149,12 @@ public class SenderController {
             return new ResponseObject(true, "提现成功");
         }
         return new ResponseObject(false, "提现失败");
-    }
+    }*/
 
     @ApiOperation(value = "配送员提现2", httpMethod = "POST")
     @PostMapping({"sendertx2"})
     public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response, @RequestParam String userId, @RequestParam String senderId) {
-        int result = this.senderService.tx2(senderId, userId);
+        int result = tSenderService.tx2(senderId, userId);
         if (result == 1) {
             return new ResponseObject(true, "提现成功");
         }
