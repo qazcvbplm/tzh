@@ -32,7 +32,7 @@ public class SourceProductController {
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
 							  @ModelAttribute @Valid SourceProduct sourceProduct, BindingResult result){
 		              Util.checkParams(result);
-		              sourceProductService.add(sourceProduct);
+        sourceProductService.save(sourceProduct);
 		              return new ResponseObject(true, "添加成功");
 	}
 	
@@ -47,7 +47,6 @@ public class SourceProductController {
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
 	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,SourceProduct sourceProduct){
-		              int i= sourceProductService.update(sourceProduct);
-		              return new ResponseObject(true, "更新"+i+"条记录").push("result", i);
+        return new ResponseObject(sourceProductService.updateById(sourceProduct), "");
 	}
 }

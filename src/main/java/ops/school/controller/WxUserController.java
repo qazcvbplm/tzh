@@ -1,14 +1,18 @@
 package ops.school.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
+import ops.school.api.entity.ChargeLog;
 import ops.school.api.entity.School;
 import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;
+import ops.school.api.service.ChargeLogService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.RedisUtil;
@@ -16,6 +20,8 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
 import ops.school.api.wxutil.WxGUtil;
+import ops.school.service.TWxUserService;
+import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -27,143 +33,145 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@Api(tags="微信用户模块")
+@Api(tags = "微信用户模块")
 @RequestMapping("ops/user")
 public class WxUserController {
 
-	
-	@Autowired
-	private WxUserService wxUserService;
-	@Autowired
-	private SchoolService schoolService;
-	/*@Autowired
-	private AuthController auth;*/
-	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
-	@Autowired
-	private RedisUtil cache;
+
+    @Autowired
+    private WxUserService wxUserService;
+    @Autowired
+    private SchoolService schoolService;
+    @Autowired
+    private TWxUserService tWxUserService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private ChargeLogService chargeLogService;
+    @Autowired
+    private RedisUtil cache;
 
 
-	@ApiOperation(value="微信用户登录",httpMethod="POST")
-	@PostMapping("wx/login")
-	public ResponseObject login(HttpServletRequest request, HttpServletResponse response, String code, String schoolId) {
-		Integer sid;
-		try {
-			sid = Integer.parseInt(schoolId);
-		} catch (Exception e) {
-			return null;
-		}
-		School school = schoolService.findById(sid);
-		   String openid=null;
-		   WxUser user=null;
-		   if(school!=null){
-			   openid= WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
-			   String token= JWTUtil.sign(openid, "wx","wxuser");
-			   user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
-			   user.setBell(wxUserService.getbell(openid));
-			   // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
-			   cache.userCountadd(sid);
-			   return new ResponseObject(true, "ok").push("token", token).push("user",user);
-		   }else{
-			   return new ResponseObject(false, "请选择学校");
-		   }
+    @ApiOperation(value = "微信用户登录", httpMethod = "POST")
+    @PostMapping("wx/login")
+    public ResponseObject login(HttpServletRequest request, HttpServletResponse response, String code, String schoolId) {
+        Integer sid;
+        try {
+            sid = Integer.parseInt(schoolId);
+        } catch (Exception e) {
+            return null;
+        }
+        School school = schoolService.findById(sid);
+        String openid = null;
+        WxUser user = null;
+        if (school != null) {
+            openid = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
+            String token = JWTUtil.sign(openid, "wx", "wxuser");
+            user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
+            user.setBell(tWxUserService.getbell(openid));
+            // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
+            cache.userCountadd(sid);
+            return new ResponseObject(true, "ok").push("token", token).push("user", user);
+        } else {
+            return new ResponseObject(false, "请选择学校");
+        }
     }
 
 
-	@ApiOperation(value = "获取钱包信息", httpMethod = "POST")
-	@GetMapping("wx/get/bell")
-	public ResponseObject getBell(HttpServletRequest request,HttpServletResponse response,String openId){
-		WxUserBell wxUserBell = wxUserService.getbell(openId);
-		return new ResponseObject(true, "ok").push("bell", wxUserBell);
+    @ApiOperation(value = "获取钱包信息", httpMethod = "POST")
+    @GetMapping("wx/get/bell")
+    public ResponseObject getBell(HttpServletRequest request, HttpServletResponse response, String openId) {
+        WxUserBell wxUserBell = tWxUserService.getbell(openId);
+        return new ResponseObject(true, "ok").push("bell", wxUserBell);
     }
-	
-	@ApiOperation(value="判断是否关注公众号",httpMethod="POST")
-	@GetMapping("wx/check/gz")
-	public ResponseObject checkgz(HttpServletRequest request,HttpServletResponse response,String openId){
-		WxUser wxUser = wxUserService.findById(openId);
-		WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
-		if(null==wxGUser){
-			return new ResponseObject(true, "ok").push("gz",false);
-		}else{
-			return new ResponseObject(true, "ok").push("gz", WxGUtil.checkGz(wxGUser.getOpenId()));
-		}
-		
-    }
-	
-	
-	@ApiOperation(value="微信用户更新",httpMethod="POST")
-	@PostMapping("wx/update")
-	public ResponseObject update(HttpServletRequest request,HttpServletResponse response,@ModelAttribute WxUser wxUser){
-		wxUser.setOpenId(request.getAttribute("Id").toString());
-		wxUser.setPhone(null);
-		if(wxUser.getNickName()!=null&&EmojiManager.isEmoji(wxUser.getNickName())){
-			wxUser.setNickName(EmojiParser.removeAllEmojis(wxUser.getNickName()));
-		}
-		wxUser = wxUserService.update(wxUser);
 
-		return new ResponseObject(true, "ok").push("user", wxUser);
+    @ApiOperation(value = "判断是否关注公众号", httpMethod = "POST")
+    @GetMapping("wx/check/gz")
+    public ResponseObject checkgz(HttpServletRequest request, HttpServletResponse response, String openId) {
+        WxUser wxUser = wxUserService.findById(openId);
+        WxUser wxGUser = wxUserService.findGzh(wxUser.getPhone());
+        if (null == wxGUser) {
+            return new ResponseObject(true, "ok").push("gz", false);
+        } else {
+            return new ResponseObject(true, "ok").push("gz", WxGUtil.checkGz(wxGUser.getOpenId()));
+        }
+
     }
-	
-	@ApiOperation(value="查询微信用户",httpMethod="POST")
-	@PostMapping("find")
-	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,WxUser wxUser){
-		wxUser.setQueryType(request.getAttribute("role").toString());
-		wxUser.setQuery(request.getAttribute("Id").toString());
-		List<WxUser> list = wxUserService.find(wxUser);
-		wxUser.setTotal(1);
-		return new ResponseObject(true, "ok").push("list", list).push("total", wxUserService.find(wxUser));
+
+
+    @ApiOperation(value = "微信用户更新", httpMethod = "POST")
+    @PostMapping("wx/update")
+    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, @ModelAttribute WxUser wxUser) {
+        wxUser.setOpenId(request.getAttribute("Id").toString());
+        wxUser.setPhone(null);
+        if (wxUser.getNickName() != null && EmojiManager.isEmoji(wxUser.getNickName())) {
+            wxUser.setNickName(EmojiParser.removeAllEmojis(wxUser.getNickName()));
+        }
+        wxUser = wxUserService.update(wxUser);
+
+        return new ResponseObject(true, "ok").push("user", wxUser);
     }
-	
-	
-	@ApiOperation(value="获取验证码",httpMethod="POST")
-	@PostMapping("getcode")
-	public ResponseObject getcode(HttpServletRequest request,HttpServletResponse response,@RequestParam String phone){
-		StringBuilder codes=new StringBuilder();
-		for(int i=0;i<4;i++){
-			codes.append((int)(Math.random()*9));
-		}
-		try {
-			Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", phone, 244026, codes.toString(), null);
-			stringRedisTemplate.opsForValue().set(phone, codes.toString(),5, TimeUnit.MINUTES);
-		} catch (HTTPException | IOException | org.json.JSONException e) {
-			return new ResponseObject(false, "发送失败");
-		}
-		return new ResponseObject(true, "ok");
+
+    @ApiOperation(value = "查询微信用户", httpMethod = "POST")
+    @PostMapping("find")
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, WxUser wxUser) {
+        wxUser.setQueryType(request.getAttribute("role").toString());
+        wxUser.setQuery(request.getAttribute("Id").toString());
+        List<WxUser> list = wxUserService.find(wxUser);
+        wxUser.setTotal(1);
+        return new ResponseObject(true, "ok").push("list", list).push("total", wxUserService.find(wxUser));
     }
-	
-	@ApiOperation(value="绑定手机",httpMethod="POST")
-	@PostMapping("bind")
-	public ResponseObject bind(HttpServletRequest request,HttpServletResponse response,@RequestParam String phone,@RequestParam String codes){
-		String code=stringRedisTemplate.opsForValue().get(phone);
-		if(code!=null){
-			if(codes.equals(code)){
-				String id=request.getAttribute("Id").toString();
-				WxUser wxUser=new WxUser();
-				wxUser.setPhone(phone);
-				wxUser.setOpenId(id);
-				stringRedisTemplate.delete(phone);
-				return new ResponseObject(true, "绑定成功").push("user", wxUserService.update(wxUser));
-			}else{
-				return new ResponseObject(false, "验证码错误");
-			}
-		}else{
-			return new ResponseObject(false, "验证码过期");
-		}
+
+
+    @ApiOperation(value = "获取验证码", httpMethod = "POST")
+    @PostMapping("getcode")
+    public ResponseObject getcode(HttpServletRequest request, HttpServletResponse response, @RequestParam String phone) {
+        StringBuilder codes = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            codes.append((int) (Math.random() * 9));
+        }
+        try {
+            Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", phone, 244026, codes.toString(), null);
+            stringRedisTemplate.opsForValue().set(phone, codes.toString(), 5, TimeUnit.MINUTES);
+        } catch (HTTPException | IOException | org.json.JSONException e) {
+            return new ResponseObject(false, "发送失败");
+        }
+        return new ResponseObject(true, "ok");
     }
-	
-	
-	@ApiOperation(value="充值",httpMethod="POST")
-	@PostMapping("charges")
-	public ResponseObject charges(HttpServletRequest request,HttpServletResponse response,int chargeId){
-		                  Object obj=wxUserService.charge(request.getAttribute("Id").toString(),chargeId);
-		                  return new ResponseObject(true, "ok").push("msg", obj);
+
+    @ApiOperation(value = "绑定手机", httpMethod = "POST")
+    @PostMapping("bind")
+    public ResponseObject bind(HttpServletRequest request, HttpServletResponse response, @RequestParam String phone, @RequestParam String codes) {
+        String code = stringRedisTemplate.opsForValue().get(phone);
+        if (code != null) {
+            if (codes.equals(code)) {
+                String id = request.getAttribute("Id").toString();
+                WxUser wxUser = new WxUser();
+                wxUser.setPhone(phone);
+                wxUser.setOpenId(id);
+                stringRedisTemplate.delete(phone);
+                return new ResponseObject(true, "绑定成功").push("user", wxUserService.update(wxUser));
+            } else {
+                return new ResponseObject(false, "验证码错误");
+            }
+        } else {
+            return new ResponseObject(false, "验证码过期");
+        }
     }
-	
-	@ApiOperation(value="查询充值记录",httpMethod="POST")
-	@PostMapping("findcharges")
-	public ResponseObject charges(HttpServletRequest request,HttpServletResponse response,String openId){
-		                  Object obj=wxUserService.findcharge(openId);
-		                  return new ResponseObject(true, "ok").push("msg", obj);
+
+
+    @ApiOperation(value = "充值", httpMethod = "POST")
+    @PostMapping("charges")
+    public ResponseObject charges(HttpServletRequest request, HttpServletResponse response, int chargeId) {
+        Object obj = tWxUserService.charge(request.getAttribute("Id").toString(), chargeId);
+        return new ResponseObject(true, "ok").push("msg", obj);
     }
-	
+
+    @ApiOperation(value = "查询充值记录", httpMethod = "POST")
+    @PostMapping("findcharges")
+    public ResponseObject charges(HttpServletRequest request, HttpServletResponse response, String openId) {
+        IPage<ChargeLog> res = chargeLogService.page(PageUtil.noPage(), new QueryWrapper<ChargeLog>().lambda().eq(ChargeLog::getOpenId, openId));
+        return new ResponseObject(true, "ok").push("msg", res.getRecords());
+    }
+
 }

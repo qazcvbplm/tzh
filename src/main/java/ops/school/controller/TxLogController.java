@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.TxLogMapper;
 import ops.school.api.entity.TxLog;
+import ops.school.api.service.TxLogService;
 import ops.school.api.util.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TxLogController {
 
 	@Autowired
-	private TxLogMapper txLogMapper;
+    private TxLogService txLogService;
 
 
     @ApiOperation(value = "查询", httpMethod = "POST")
@@ -37,7 +37,7 @@ public class TxLogController {
 		if(appId!=null)
 			query.lambda().eq(TxLog::getAppId, appId);
 		query.lambda().orderByDesc(TxLog::getCreateTime);
-		IPage<TxLog> rs=txLogMapper.selectPage(new Page<>(page, size), query);
+        IPage<TxLog> rs = txLogService.page(new Page<>(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
 	}
 
@@ -53,7 +53,7 @@ public class TxLogController {
 		query.lambda().eq(TxLog::getIshow, "0");
 		query.select("id", "txer_id", "type", "create_time", "amount");
 		query.lambda().orderByDesc(TxLog::getCreateTime);
-		IPage<TxLog> rs = txLogMapper.selectPage(new Page<>(page, size), query);
+        IPage<TxLog> rs = txLogService.page(new Page<>(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
 	}
 }
