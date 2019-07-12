@@ -46,7 +46,6 @@ public class ShopController {
    /* @Autowired
     private AuthController auth;*/
 
-
     @ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Shop shop, BindingResult result){
@@ -55,8 +54,7 @@ public class ShopController {
 		              shopService.add(shop);
 		              return new ResponseObject(true, "添加成功");
 	}
-	
-	
+
 	@ApiOperation(value="查询",httpMethod="POST")
 	@RequestMapping("find")
 	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,Shop shop){
@@ -72,7 +70,6 @@ public class ShopController {
 		              int i = shopService.update(shop);
 		              return new ResponseObject(true, "更新"+i+"条记录");
 	}
-	
 	
 	@ApiOperation(value="添加满减",httpMethod="POST")
 	@PostMapping("add_fullcut")
@@ -122,8 +119,6 @@ public class ShopController {
 		return new ResponseObject(true, "ok");
 	}
 	
-	
-	
 	@ApiOperation(value="店铺登录",httpMethod="POST")
 	@PostMapping("android/login")
 	public ResponseObject android_login(HttpServletRequest request,HttpServletResponse response,String loginName,String loginPassWord){
@@ -137,11 +132,6 @@ public class ShopController {
 	public String openorclose(HttpServletRequest request,HttpServletResponse response,Integer id){
 		return shopService.openorclose(id)+"";
 	}
-	
-	
-	
-	
-	
 	
 /*	@ApiOperation(value="商家临时统计",httpMethod="POST")
 	@PostMapping("nocheck/shoptempstatistics")
@@ -158,8 +148,7 @@ public class ShopController {
         ShopTj result = tOrdersService.shopstatistics(shopId, beginTime, endTime);
 		return new ResponseObject(true, "ok").push("result", result);
 	}
-	
-	
+
 	@ApiOperation(value="店铺二维码",httpMethod="POST")
 	@PostMapping("barcode")
 	public ResponseObject barcode(HttpServletRequest request,HttpServletResponse response,int id){

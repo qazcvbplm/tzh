@@ -28,10 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @Api(tags="订单模块")
@@ -48,11 +46,6 @@ public class OrdersController {
 	private ProductService productService;
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-
-	
-	
-	
-	
 	
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
@@ -172,10 +165,14 @@ public class OrdersController {
 	@PostMapping("android/acceptorder")
 	public ResponseObject android_findDjs(HttpServletRequest request,HttpServletResponse response,String orderId){
         int i = tOrdersService.shopAcceptOrderById(orderId);
+		Orders orders = ordersService.findById(orderId);
 		     if(i>0){
                  if (SpringUtil.redisCache()) {
 		    		 stringRedisTemplate.boundHashOps("SHOP_DJS"+i).delete(orderId);
-		    		 Orders order=ordersService.findById(orderId);
+		    		 // 从所有待接手订单中删除
+		    		 stringRedisTemplate.boundHashOps("ALL_DJS").delete(orderId);
+		    		 // 新建所有商家已接手的订单缓存
+		    		 stringRedisTemplate.boundHashOps("SHOP_YJS").put(orderId, JSON.toJSONString(orders));
 		    	 }
 		    	 return new ResponseObject(true, "接手成功").push("order",Util.toJson(ordersService.findById(orderId)));
 		     }

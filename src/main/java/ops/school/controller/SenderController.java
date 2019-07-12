@@ -11,6 +11,7 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.service.TSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,8 @@ public class SenderController {
     private SenderService senderService;
     @Autowired
     private TSenderService tSenderService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
@@ -82,10 +85,14 @@ public class SenderController {
     @PostMapping("nocheck/senderaccept")
     public ResponseObject senderaccept(HttpServletRequest request, HttpServletResponse response, int senderId, String orderId) {
         int result = tSenderService.acceptOrder(senderId, orderId);
-        if (result == 1)
+        if (result == 1){
+            // 从所有商家已接手订单中删除
+            stringRedisTemplate.boundHashOps("SHOP_YJS").delete(orderId);
             return new ResponseObject(true, "接手成功");
-        else
+        }
+        else {
             return new ResponseObject(false, "手慢了");
+        }
     }
 
     @ApiOperation(value = "取件", httpMethod = "POST")

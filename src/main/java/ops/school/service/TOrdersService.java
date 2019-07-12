@@ -23,4 +23,5 @@ public interface TOrdersService {
     int shopAcceptOrderById(String orderId);
 
     ShopTj shopstatistics(Integer shopId, String beginTime, String endTime);
+
 }

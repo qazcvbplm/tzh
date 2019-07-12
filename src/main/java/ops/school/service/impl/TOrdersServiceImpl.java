@@ -1,7 +1,9 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
+import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.sql.Wrapper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -140,6 +143,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             String ordersStr = JSON.toJSONString(orders);
             orders.setStatus("待接手");
             stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).put(orderId, JSON.toJSONString(orders));
+            stringRedisTemplate.boundHashOps("ALL_DJS").put(orderId, JSON.toJSONString(orders));
             stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
         }
         return rs;
@@ -169,6 +173,11 @@ public class TOrdersServiceImpl implements TOrdersService {
                 WxUser user = wxUserService.findById(orders.getOpenId());
                 map.put("phone", user.getOpenId() + "-" + user.getPhone());
                 map.put("amount", orders.getPayPrice());
+                // 取消订单时,将余额支付时的订单金额退回学校余额内
+                Map<String,Object> map1 = new HashMap<>();
+                map1.put("schoolId",user.getSchoolId());
+                map1.put("charge",orders.getPayPrice());
+                schoolService.charge(map1);
                 if (wxUserBellService.charge(map) == 1) {
                     return orders.getShopId();
                 } else {
@@ -225,4 +234,5 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         return new ShopTj(0, 0, new BigDecimal(0), new BigDecimal(0), new BigDecimal(0), new BigDecimal(0));
     }
+
 }
