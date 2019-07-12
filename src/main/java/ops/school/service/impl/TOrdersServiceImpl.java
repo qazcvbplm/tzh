@@ -1,7 +1,6 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import ops.school.api.config.Server;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
@@ -140,7 +139,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             String ordersStr = JSON.toJSONString(orders);
             orders.setStatus("待接手");
             stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).put(orderId, JSON.toJSONString(orders));
-            stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
+            //stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
         }
         return rs;
     }
