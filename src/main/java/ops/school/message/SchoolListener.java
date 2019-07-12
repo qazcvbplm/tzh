@@ -45,7 +45,6 @@ public class SchoolListener {
 			BigDecimal cc = total.add(senderPrice).multiply(school.getRate());
 			Map<String, Object> map = new HashMap();
 			map.put("schoolId", schoolAddMoneyDTO.getSchoolId());
-            /////
 			map.put("sendMoney", senderPrice);
             if (schoolService.endOrder(map) == 0) {
 				LoggerUtil.log("学校增加余额失败：" + message);

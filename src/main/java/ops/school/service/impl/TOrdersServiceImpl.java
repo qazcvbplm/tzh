@@ -145,6 +145,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).put(orderId, JSON.toJSONString(orders));
             stringRedisTemplate.boundHashOps("ALL_DJS").put(orderId, JSON.toJSONString(orders));
             stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
+            //stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
         }
         return rs;
     }
