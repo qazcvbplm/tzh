@@ -1,9 +1,7 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
-import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.sql.Wrapper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -107,7 +104,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             orders.setPayPrice((orders.getPayPrice().multiply(application.getVipTakeoutDiscount())).setScale(2,
                     BigDecimal.ROUND_HALF_DOWN));
         }
-
+        // 余额支付，用户数据更新
         Map<String, Object> map = new HashMap<>();
         WxUser user = wxUserService.findById(orders.getOpenId());
         map.put("phone", user.getOpenId() + "-" + user.getPhone());
@@ -154,35 +151,44 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Override
     public int cancel(String id) {
         Orders orders = ordersService.findById(id);
+        WxUser user = wxUserService.findById(orders.getOpenId());
+        School school = schoolService.findById(user.getSchoolId());
         if (System.currentTimeMillis() - orders.getPayTimeLong() < 5 * 60 * 1000) {
             return 2;
         }
-        if (ordersService.cancel(id) == 1) {
-            if (orders.getPayment().equals("微信支付")) {
-                School school = schoolService.findById(orders.getSchoolId());
-                String fee = AmountUtils.changeY2F(orders.getPayPrice().toString());
+        orders.setStatus("已取消");
+        if (ordersService.updateById(orders)) {
+            // 当订单内粮票额度不等于0时
+            if (orders.getPayFoodCoupon() != new BigDecimal("0")) {
+                // 订单消费的粮票要退回用户粮票内
+                wxUserBellService.addFoodCoupon(user.getOpenId() + "-" + user.getPhone(), orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
+                // 取消订单时，将粮票消费的金额退回学校剩余粮票内
+                school.setUserChargeSend(school.getUserChargeSend().add(orders.getPayFoodCoupon()));
+                schoolService.update(school);
+            }
+            if (orders.getPayment().equals("余额支付")) {
+                // 订单消费的余额要退回用户余额内
+                Map<String, Object> map = new HashMap<>();
+                map.put("phone", user.getOpenId() + "-" + user.getPhone());
+                map.put("amount", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
+                // 取消订单时,将余额支付时的订单金额退回学校余额内
+                Map<String,Object> map1 = new HashMap<>();
+                map1.put("schoolId",user.getSchoolId());
+                map1.put("charge", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
+                schoolService.charge(map1);
+                if (wxUserBellService.charge(map) == 1) {
+                    return orders.getShopId();
+                } else {
+                    throw new YWException("退款失败联系管理员");
+                }
+            } else if (orders.getPayment().equals("微信支付")) {
+                String fee = AmountUtils.changeY2F(orders.getPayPrice().subtract(orders.getPayFoodCoupon()).toString());
                 int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),
                         school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
                 if (result != 1) {
                     throw new YWException("退款失败联系管理员");
                 } else {
                     return orders.getShopId();
-                }
-            }
-            if (orders.getPayment().equals("余额支付")) {
-                Map<String, Object> map = new HashMap<>();
-                WxUser user = wxUserService.findById(orders.getOpenId());
-                map.put("phone", user.getOpenId() + "-" + user.getPhone());
-                map.put("amount", orders.getPayPrice());
-                // 取消订单时,将余额支付时的订单金额退回学校余额内
-                Map<String,Object> map1 = new HashMap<>();
-                map1.put("schoolId",user.getSchoolId());
-                map1.put("charge",orders.getPayPrice());
-                schoolService.charge(map1);
-                if (wxUserBellService.charge(map) == 1) {
-                    return orders.getShopId();
-                } else {
-                    throw new YWException("退款失败联系管理员");
                 }
             }
         }

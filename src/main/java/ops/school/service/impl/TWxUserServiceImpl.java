@@ -75,8 +75,10 @@ public class TWxUserServiceImpl implements TWxUserService {
         chargeLogService.save(log); // 添加进充值记录
         Map<String, Object> map = new HashMap<>();
         map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
-        map.put("amount", log.getPay().add(log.getSend()));
+        map.put("amount", log.getPay());
         if (wxUserBellService.charge(map) == 0) {
+            // 把赠送金额存进用户的粮票里面
+            wxUserBellService.addFoodCoupon(wxUser.getOpenId() + "-" + wxUser.getPhone(), log.getSend());
             LoggerUtil.log("充值失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString()));
         } else {
             Map<String, Object> map2 = new HashMap<>();

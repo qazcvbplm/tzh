@@ -28,8 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Api(tags="订单模块")
@@ -111,18 +113,24 @@ public class OrdersController {
 	@PostMapping("cancel")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,
 			String id){
+        Orders orders = ordersService.findById(id);
         int i = tOrdersService.cancel(id);
-		    if(i>0){
-		    	if(stringRedisTemplate.boundHashOps("SHOP_DJS"+i).delete(id)<=0){
-		      		 return new ResponseObject(false,"联系管理员");
-		      	}
-		    	return new ResponseObject(true, "ok");
-		    } 
-		    else if(i==2){
-		    	return new ResponseObject(false, "5分钟后才能退款");
-		    }else{
-		    	return new ResponseObject(false, "请重试");
-		    }
+        if (i > 2) {
+            if (orders.getStatus() == "待接手") {
+                if (stringRedisTemplate.boundHashOps("SHOP_DJS" + i).delete(id) <= 0 && stringRedisTemplate.boundHashOps("ALL_DJS").delete(id) <= 0) {
+                    return new ResponseObject(false, "联系管理员");
+                }
+            } else if (orders.getStatus() == "商家已接手") {
+                if (stringRedisTemplate.boundHashOps("SHOP_YJS").delete(id) <= 0) {
+                    return new ResponseObject(false, "联系管理员");
+                }
+            }
+            return new ResponseObject(true, "ok");
+        } else if (i == 2) {
+            return new ResponseObject(false, "5分钟后才能退款");
+        } else {
+            return new ResponseObject(false, "请重试");
+        }
 	}
 	
 	

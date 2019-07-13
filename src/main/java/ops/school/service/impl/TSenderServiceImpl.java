@@ -98,11 +98,14 @@ public class TSenderServiceImpl implements TSenderService {
         Orders orders = ordersService.findById(orderId);
         Sender sender = senderService.findById(orders.getSenderId());
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
+        BigDecimal returnPrice = new BigDecimal("0.0");
         if (end) {
+            // 已送达到楼上
             orders.setDestination(1);
             if (ordersService.end(orders) == 1) {
                 BigDecimal senderGet = new BigDecimal(0);
                 if (orders.getSenderId() != 0) {
+                    // 配送员获得金额
                     senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
                     stringRedisTemplate.convertAndSend(Server.SENDERBELL,
                             new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
@@ -120,8 +123,8 @@ public class TSenderServiceImpl implements TSenderService {
                 return;
             }
         } else {
+            // 放置楼下
             orders.setDestination(0);
-            BigDecimal returnPrice;
             if (orders.getSendPrice().compareTo(orders.getSchoolTopDownPrice()) == -1) {
                 orders.setPayPrice(orders.getPayPrice().subtract(orders.getSendPrice()));
                 orders.setSendPrice(new BigDecimal(0));
@@ -131,11 +134,14 @@ public class TSenderServiceImpl implements TSenderService {
                 orders.setSendPrice(orders.getSendPrice().subtract(orders.getSchoolTopDownPrice()));
                 returnPrice = orders.getSchoolTopDownPrice();
             }
-            Map<String, Object> map = new HashMap<>();
-            map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
-            map.put("amount", returnPrice);
+            // 楼下取餐会获得楼下返还
             if (ordersService.end(orders) == 1) {
-                if (wxUserBellService.charge(map) == 1) {
+                // 将楼下返还金额充值到用户的粮票内
+                if (wxUserBellService.addFoodCoupon(wxUser.getOpenId() + "-" + wxUser.getPhone(), returnPrice)) {
+                    // 将用户楼下返还金额添加到学校剩余粮票总额内
+                    School school = schoolService.findById(orders.getSchoolId());
+                    school.setUserChargeSend(school.getUserChargeSend().add(returnPrice));
+                    schoolService.update(school);
                     BigDecimal senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
                     stringRedisTemplate.convertAndSend(Server.SENDERBELL,
                             new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
@@ -169,7 +175,7 @@ public class TSenderServiceImpl implements TSenderService {
             if (orders.getDestination() == 1) {
                 message.setDataFirst("您的订单已送达到寝。");
             } else {
-                message.setDataFirst("您的订单已送达楼下，请下楼自取。系统已返还" + orders.getSchoolTopDownPrice() + "元至您钱包余额内，请注意查收！");
+                message.setDataFirst("您的订单已送达楼下，请下楼自取。系统已返还" + returnPrice + "元至您粮票余额内，请注意查收！");
             }
             wxUserService.sendWXGZHM(wxUser.getPhone(), message);
 
