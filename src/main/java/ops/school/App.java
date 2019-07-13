@@ -50,8 +50,9 @@ public class App {
 		for(Orders temp:orders){
 			stringRedisTemplate.boundHashOps("SHOP_DJS"+temp.getShopId()).put(temp.getId(), JSON.toJSONString(temp));
 		}
-	        return "ok";
+	    return "ok";
 	 }
+
 
 	@Bean
 	public RestTemplate restTemplate() {
