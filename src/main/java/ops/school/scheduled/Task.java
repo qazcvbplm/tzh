@@ -166,7 +166,6 @@ public class Task {
                     if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SENDER" + school.getPhone()) == null) {
                         try {
                             Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getPhone(), 372793, "", null);
-                            stringRedisTemplate.opsForValue().set(school.getPhone(), "", 5, TimeUnit.MINUTES);
                         } catch (HTTPException | IOException | org.json.JSONException e) {
                             e.printStackTrace();
                         }
