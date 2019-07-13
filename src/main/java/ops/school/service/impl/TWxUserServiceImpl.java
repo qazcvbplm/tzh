@@ -72,7 +72,7 @@ public class TWxUserServiceImpl implements TWxUserService {
         School school = schoolService.findById(wxUser.getSchoolId());
         Charge charge = chargeService.getById(Integer.valueOf(attach));
         ChargeLog log = new ChargeLog(orderId, new BigDecimal(charge.getFull()), new BigDecimal(charge.getSend()), openId, wxUser.getAppId());
-        chargeLogService.save(log);
+        chargeLogService.save(log); // 添加进充值记录
         Map<String, Object> map = new HashMap<>();
         map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
         map.put("amount", log.getPay().add(log.getSend()));

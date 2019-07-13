@@ -213,5 +213,6 @@
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.11" level="project" />
     <orderEntry type="library" name="Maven: com.auth0:java-jwt:3.3.0" level="project" />
     <orderEntry type="library" name="Maven: ops.school:api:1.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: ops.school:base:1.0-SNAPSHOT" level="project" />
   </component>
 </module>
