@@ -161,7 +161,7 @@ public class Task {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String curTime = df.format(currentTime);
                 // 获取商家接手时间
-                long differTime = TimeUtil.dateDiff(orders.get(0).getShopAcceptTime(), curTime);
+                long differTime = TimeUtil.dateDiff(order.getShopAcceptTime(), curTime);
                 if (differTime > 10) {
                     if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SENDER" + school.getPhone()) == null) {
                         try {
