@@ -1,5 +1,6 @@
 package ops.school.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.dto.redis.SchoolAddMoneyDTO;
@@ -98,7 +99,7 @@ public class TSenderServiceImpl implements TSenderService {
         Orders orders = ordersService.findById(orderId);
         Sender sender = senderService.findById(orders.getSenderId());
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
-        BigDecimal returnPrice = new BigDecimal("0.0");
+        BigDecimal returnPrice = new BigDecimal("0");
         if (end) {
             // 已送达到楼上
             orders.setDestination(1);
@@ -141,7 +142,7 @@ public class TSenderServiceImpl implements TSenderService {
                     // 将用户楼下返还金额添加到学校剩余粮票总额内
                     School school = schoolService.findById(orders.getSchoolId());
                     school.setUserChargeSend(school.getUserChargeSend().add(returnPrice));
-                    schoolService.update(school);
+                    schoolService.updateById(school);
                     BigDecimal senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
                     stringRedisTemplate.convertAndSend(Server.SENDERBELL,
                             new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
@@ -283,37 +284,79 @@ public class TSenderServiceImpl implements TSenderService {
 
     @Transactional
     @Override
-    public int tx2(String senderId, String userId) {
+    public int tx2(Integer txId, Integer status, String senderId, String userId) {
         Sender sender = senderService.check(senderId);
+        // 提现指定账户
         WxUser wxUser = wxUserService.findById(userId);
+        // 提现来源账户
         WxUser senderUser = wxUserService.findById(senderId);
         School school = schoolService.findById(sender.getSchoolId());
+        // 通过txId查询提现记录表
+        TxLog log = txLogService.getOne(new QueryWrapper<TxLog>().lambda().eq(TxLog::getId, txId));
         WxUserBell wxUserBell = wxUserBellService
                 .getById(senderUser.getOpenId() + "-" + senderUser.getPhone());
-        Map<String, Object> map = new HashMap();
-        map.put("phone", senderId + "-" + sender.getPhone());
-        map.put("amount", wxUserBell.getMoney());
-        map.put("schoolId", sender.getSchoolId());
-        if (wxUserBellService.pay(map) == 1) {
-            try {
-                String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                TxLog log = new TxLog(sender.getId(), "配送员提现", null, wxUserBell.getMoney(), "", sender.getSchoolId(),
-                        wxUser.getAppId());
-                if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
-                        school.getCertPath(), payId, "127.0.0.1", wxUserBell.getMoney(), wxUser.getOpenId(),
-                        log) == 1) {
-                    txLogService.save(log);
-                    if (schoolService.sendertx(map) == 0) {
-                        LoggerUtil.log("配送员提现学校减少金额失败:" + senderId + ":" + wxUserBell.getMoney());
+        // status 为1时，表示审核成功
+        if (status == 1) {
+            Map<String, Object> map = new HashMap();
+            map.put("phone", senderId + "-" + sender.getPhone());
+            map.put("amount", wxUserBell.getMoney());
+            map.put("schoolId", sender.getSchoolId());
+            if (wxUserBellService.pay(map) == 1) {
+                try {
+                    String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                    // 审核成功(提现成功)
+                    log.setIsTx(1);
+                    if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
+                            school.getCertPath(), payId, "127.0.0.1", wxUserBell.getMoney(), wxUser.getOpenId(),
+                            log) == 1) {
+                        txLogService.updateById(log);
+                        if (schoolService.sendertx(map) == 0) {
+                            LoggerUtil.log("配送员提现学校减少金额失败:" + senderId + ":" + wxUserBell.getMoney());
+                        }
+                        return 1;
                     }
-                    return 1;
+                } catch (Exception e) {
+                    LoggerUtil.log(senderId + ":" + wxUserBell.getMoney() + e.getMessage());
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 }
-            } catch (Exception e) {
-                LoggerUtil.log(senderId + ":" + wxUserBell.getMoney() + e.getMessage());
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return 2;
             }
+            throw new YWException("余额不足");
+        } else if (status == 2) {
+            // 审核失败（提现失败）
+            log.setIsTx(2);
+            txLogService.updateById(log);
             return 2;
         }
-        throw new YWException("余额不足");
+        return 2;
+    }
+
+    /**
+     * 配送员申请提现
+     *
+     * @param senderId
+     * @param userId
+     * @return
+     */
+    @Override
+    public int txApply(String senderId, String userId) {
+        Sender sender = senderService.check(senderId);
+        // 提现指定账户
+        WxUser wxUser = wxUserService.findById(userId);
+        // 提现来源账户
+        WxUser senderUser = wxUserService.findById(senderId);
+        WxUserBell wxUserBell = wxUserBellService
+                .getById(senderUser.getOpenId() + "-" + senderUser.getPhone());
+        TxLog log = new TxLog(sender.getId(), "配送员提现", null, wxUserBell.getMoney(), "", sender.getSchoolId(),
+                wxUser.getAppId());
+        // 申请提现设置isTx为0
+        log.setIsTx(0);
+        boolean result = txLogService.save(log);
+        // 添加成功
+        if (result) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

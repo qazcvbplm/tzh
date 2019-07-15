@@ -27,5 +27,8 @@ public interface TSenderService {
     SenderTj statistics(int senderId, String beginTime, String endTime);
 
     @Transactional
-    int tx2(String senderId, String userId);
+    int tx2(Integer txId, Integer status, String senderId, String userId);
+
+    @Transactional
+    int txApply(String senderId, String userId);
 }

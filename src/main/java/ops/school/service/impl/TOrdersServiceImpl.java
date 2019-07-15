@@ -156,39 +156,43 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (System.currentTimeMillis() - orders.getPayTimeLong() < 5 * 60 * 1000) {
             return 2;
         }
-        orders.setStatus("已取消");
-        if (ordersService.updateById(orders)) {
-            // 当订单内粮票额度不等于0时
-            if (orders.getPayFoodCoupon() != new BigDecimal("0")) {
-                // 订单消费的粮票要退回用户粮票内
-                wxUserBellService.addFoodCoupon(user.getOpenId() + "-" + user.getPhone(), orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
-                // 取消订单时，将粮票消费的金额退回学校剩余粮票内
-                school.setUserChargeSend(school.getUserChargeSend().add(orders.getPayFoodCoupon()));
-                schoolService.update(school);
-            }
-            if (orders.getPayment().equals("余额支付")) {
-                // 订单消费的余额要退回用户余额内
-                Map<String, Object> map = new HashMap<>();
-                map.put("phone", user.getOpenId() + "-" + user.getPhone());
-                map.put("amount", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
-                // 取消订单时,将余额支付时的订单金额退回学校余额内
-                Map<String,Object> map1 = new HashMap<>();
-                map1.put("schoolId",user.getSchoolId());
-                map1.put("charge", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
-                schoolService.charge(map1);
-                if (wxUserBellService.charge(map) == 1) {
-                    return orders.getShopId();
-                } else {
-                    throw new YWException("退款失败联系管理员");
+        String temp = orders.getStatus();
+        if (!orders.getStatus().equals("已取消")) {
+            if (ordersService.cancel(id) == 1) {
+                // 当订单内粮票额度不等于0时
+                if (orders.getPayFoodCoupon().compareTo(new BigDecimal("0")) != 0) {
+                    // 订单消费的粮票要退回用户粮票内
+                    wxUserBellService.addFoodCoupon(user.getOpenId() + "-" + user.getPhone(), orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
+                    // 取消订单时，将粮票消费的金额退回学校剩余粮票内
+                    school.setUserChargeSend(school.getUserChargeSend().add(orders.getPayFoodCoupon()));
+                    schoolService.updateById(school);
                 }
-            } else if (orders.getPayment().equals("微信支付")) {
-                String fee = AmountUtils.changeY2F(orders.getPayPrice().subtract(orders.getPayFoodCoupon()).toString());
-                int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),
-                        school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
-                if (result != 1) {
-                    throw new YWException("退款失败联系管理员");
-                } else {
-                    return orders.getShopId();
+                if (!temp.equals("待付款")) {
+                    if (orders.getPayment().equals("余额支付")) {
+                        // 订单消费的余额要退回用户余额内
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("phone", user.getOpenId() + "-" + user.getPhone());
+                        map.put("amount", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
+                        // 取消订单时,将余额支付时的订单金额退回学校余额内
+                        Map<String, Object> map1 = new HashMap<>();
+                        map1.put("schoolId", user.getSchoolId());
+                        map1.put("charge", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
+                        schoolService.charge(map1);
+                        if (wxUserBellService.charge(map) == 1) {
+                            return orders.getShopId();
+                        } else {
+                            throw new YWException("退款失败联系管理员");
+                        }
+                    } else if (orders.getPayment().equals("微信支付")) {
+                        String fee = AmountUtils.changeY2F(orders.getPayPrice().subtract(orders.getPayFoodCoupon()).toString());
+                        int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),
+                                school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
+                        if (result != 1) {
+                            throw new YWException("退款失败联系管理员");
+                        } else {
+                            return orders.getShopId();
+                        }
+                    }
                 }
             }
         }
