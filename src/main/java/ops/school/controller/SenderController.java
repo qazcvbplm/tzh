@@ -145,24 +145,39 @@ public class SenderController {
         return new ResponseObject(true, "ok").push("result", result);
     }
 
-    /*// 配送员提现申请
+    /**
+     * 配送员提现申请
+     *
+     * @param request
+     * @param response
+     * @param userId   提现指定账户（TO）
+     * @param senderId 提现原始账户（FROM）
+     * @return
+     */
    @ApiOperation(value = "配送员提现申请", httpMethod = "POST")
     @PostMapping({"sendertxapply"})
-    public ResponseObject sendertx(HttpServletRequest request, HttpServletResponse response, @RequestParam BigDecimal amount, @RequestParam String senderId) {
-        if (amount.compareTo(new BigDecimal(1)) == -1) {
-            return new ResponseObject(false, "金额至少大于1");
-        }
-        int result = this.senderService.tx(senderId, amount);
-        if (result == 1) {
-            return new ResponseObject(true, "提现成功");
-        }
-        return new ResponseObject(false, "提现失败");
-    }*/
+   public ResponseObject sendertx(HttpServletRequest request, HttpServletResponse response, @RequestParam String userId, @RequestParam String senderId) {
+       int result = tSenderService.txApply(senderId,userId);
+       if (result == 1) {
+           return new ResponseObject(true, "申请提现成功");
+       }
+       return new ResponseObject(false, "申请提现失败");
+   }
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @param txId  提现记录表Id
+     * @param status  提现审核状态（1.成功，2.失败）
+     * @param userId  提现指定账户（TO）
+     * @param senderId 提现原始账户（FROM）
+     * @return
+     */
     @ApiOperation(value = "配送员提现2", httpMethod = "POST")
     @PostMapping({"sendertx2"})
-    public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response, @RequestParam String userId, @RequestParam String senderId) {
-        int result = tSenderService.tx2(senderId, userId);
+    public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response, @RequestParam Integer txId, @RequestParam Integer status, @RequestParam String userId, @RequestParam String senderId) {
+        int result = tSenderService.tx2(txId, status, senderId, userId);
         if (result == 1) {
             return new ResponseObject(true, "提现成功");
         }

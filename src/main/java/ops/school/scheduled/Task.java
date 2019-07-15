@@ -150,9 +150,7 @@ public class Task {
         if (SpringUtil.redisCache()) {
             orders = JSON.parseArray(stringRedisTemplate.boundHashOps("SHOP_YJS").values().toString(), Orders.class);
         } else {
-            Orders orders1 = new Orders();
-            orders1.setStatus("商家已接手");
-            orders = ordersService.find(orders1);
+            orders = ordersService.list(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "商家已接手"));
         }
         if (!orders.isEmpty()) {
             for (Orders order : orders) {
