@@ -53,8 +53,8 @@ public class EvaluateController {
 		            	  }
 		              return new ResponseObject(true, "添加成功");
 	}
-	
-	
+
+
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Evaluate evaluate){
@@ -73,5 +73,12 @@ public class EvaluateController {
         return new ResponseObject(true, "ok").push("list", list);
     }
 
-
+    @ApiOperation(value = "更新",httpMethod = "POST")
+    @PostMapping("update")
+    public ResponseObject update(HttpServletRequest request, HttpServletResponse response,@ModelAttribute @Valid Evaluate evaluate,
+                                 BindingResult result){
+        Util.checkParams(result);
+	    evaluateService.updateById(evaluate);
+	    return new ResponseObject(true,"ok");
+    }
 }

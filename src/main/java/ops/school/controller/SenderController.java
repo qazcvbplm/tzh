@@ -9,6 +9,7 @@ import ops.school.api.entity.Sender;
 import ops.school.api.service.SenderService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.service.TCommonService;
 import ops.school.service.TSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -31,6 +33,8 @@ public class SenderController {
     private TSenderService tSenderService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private TCommonService tCommonService;
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
@@ -156,8 +160,8 @@ public class SenderController {
      */
    @ApiOperation(value = "配送员提现申请", httpMethod = "POST")
     @PostMapping({"sendertxapply"})
-   public ResponseObject sendertx(HttpServletRequest request, HttpServletResponse response, @RequestParam String userId, @RequestParam String senderId) {
-       int result = tSenderService.txApply(senderId,userId);
+   public ResponseObject sendertx(HttpServletRequest request, HttpServletResponse response, @RequestParam BigDecimal amount, @RequestParam String userId, @RequestParam String senderId) {
+       int result = tCommonService.txApply(amount,senderId,userId);
        if (result == 1) {
            return new ResponseObject(true, "申请提现成功");
        }
@@ -176,8 +180,8 @@ public class SenderController {
      */
     @ApiOperation(value = "配送员提现2", httpMethod = "POST")
     @PostMapping({"sendertx2"})
-    public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response, @RequestParam Integer txId, @RequestParam Integer status, @RequestParam String userId, @RequestParam String senderId) {
-        int result = tSenderService.tx2(txId, status, senderId, userId);
+    public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response,@RequestParam BigDecimal amount, @RequestParam Integer txId, @RequestParam Integer status, @RequestParam String userId, @RequestParam String senderId) {
+        int result = tCommonService.txAudit(amount,txId, status, senderId, userId);
         if (result == 1) {
             return new ResponseObject(true, "提现成功");
         }
