@@ -331,13 +331,13 @@ public class TSenderServiceImpl implements TSenderService {
         return 2;
     }
 
-    /**
+   /* *//**
      * 配送员申请提现
      *
      * @param senderId
      * @param userId
      * @return
-     */
+     *//*
     @Override
     public int txApply(String senderId, String userId) {
         Sender sender = senderService.check(senderId);
@@ -358,5 +358,5 @@ public class TSenderServiceImpl implements TSenderService {
         } else {
             return 0;
         }
-    }
+    }*/
 }

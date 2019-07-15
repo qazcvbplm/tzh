@@ -34,11 +34,12 @@ public class TCommonServiceImpl implements TCommonService {
         Pattern pt = Pattern.compile("[0-9]*");
         // 提现指定账户
         WxUser wxUser = wxUserService.findById(userId);
-        boolean result = false;
+        TxLog log = new TxLog();
         // 满足以下提现的是商家提现
         if (!sourceId.isEmpty() && pt.matcher(sourceId).matches()) {
             // 商家信息
             Shop shop = shopService.getById(Integer.valueOf(sourceId));
+            log = new TxLog(shop.getId(), "商家提现", null, shop.getTxAmount(), "", shop.getSchoolId(), wxUser.getAppId());
         } else if (!sourceId.isEmpty()) {
             // 配送员提现
             Sender sender = senderService.check(sourceId);
@@ -46,12 +47,12 @@ public class TCommonServiceImpl implements TCommonService {
             WxUser senderUser = wxUserService.findById(sourceId);
             WxUserBell wxUserBell = wxUserBellService
                     .getById(senderUser.getOpenId() + "-" + senderUser.getPhone());
-            TxLog log = new TxLog(sender.getId(), "配送员提现", null, wxUserBell.getMoney(), "", sender.getSchoolId(),
+            log = new TxLog(sender.getId(), "配送员提现", null, wxUserBell.getMoney(), "", sender.getSchoolId(),
                     wxUser.getAppId());
-            // 申请提现设置isTx为0
-            log.setIsTx(0);
-            result = txLogService.save(log);
         }
+        // 申请提现设置isTx为0
+        log.setIsTx(0);
+        boolean result = txLogService.save(log);
         if (result) {
             return 1;
         } else {

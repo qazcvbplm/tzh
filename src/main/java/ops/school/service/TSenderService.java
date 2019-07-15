@@ -29,6 +29,4 @@ public interface TSenderService {
     @Transactional
     int tx2(Integer txId, Integer status, String senderId, String userId);
 
-    @Transactional
-    int txApply(String senderId, String userId);
 }
