@@ -1,6 +1,7 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.wxgzh.Message;
@@ -10,6 +11,9 @@ import ops.school.api.service.*;
 import ops.school.api.util.RedisUtil;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
+import ops.school.constants.OrderContants;
+import ops.school.enums.PublicErrorEnums;
+import ops.school.exception.Assertions;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -244,6 +248,45 @@ public class TOrdersServiceImpl implements TOrdersService {
             return rs;
         }
         return new ShopTj(0, 0, new BigDecimal(0), new BigDecimal(0), new BigDecimal(0), new BigDecimal(0));
+    }
+
+    @Override
+    public Map countKindsOrderByBIdAndTime(String buildId, String beginTime, String endTime) {
+        Assertions.hasText(buildId, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.hasText(beginTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.hasText(endTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Floor floor = floorService.getById(buildId);
+        Assertions.notNull(floor,PublicErrorEnums.FLOOR_SELECT_NULL);
+        Orders order = new Orders();
+        //订单总数
+        QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("floor_id",buildId)
+                .ge("create_time",beginTime)
+                .le("create_time",endTime);
+        Integer allOrders = ordersService.count(queryWrapper);
+        //外卖订单
+        QueryWrapper<Orders> queryWrapperTakeOut = new QueryWrapper<>();
+        queryWrapperTakeOut
+                .eq("floor_id",buildId)
+                .eq("typ", OrderContants.orderTypeTakeOut)
+                .ge("create_time",beginTime)
+                .le("create_time",endTime);
+        Integer allOrdersTakeOut = ordersService.count(queryWrapper);
+        //跑腿订单
+        QueryWrapper<Orders> queryWrapperRunning = new QueryWrapper<>();
+        queryWrapperTakeOut
+                .eq("floor_id",buildId)
+                .eq("typ", OrderContants.orderTypeRunning)
+                .ge("create_time",beginTime)
+                .le("create_time",endTime);
+        Integer allOrdersRunning = ordersService.count(queryWrapper);
+        //营业额
+        Map result = new HashMap();
+        result.put("allOrders",allOrders);
+        result.put("allOrdersTakeOut",allOrdersTakeOut);
+        result.put("allOrdersRunning",allOrdersRunning);
+        return result;
     }
 
 }
