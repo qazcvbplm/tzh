@@ -1,6 +1,5 @@
 package ops.school.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.dto.redis.SchoolAddMoneyDTO;
@@ -292,7 +291,7 @@ public class TSenderServiceImpl implements TSenderService {
         WxUser senderUser = wxUserService.findById(senderId);
         School school = schoolService.findById(sender.getSchoolId());
         // 通过txId查询提现记录表
-        TxLog log = txLogService.getOne(new QueryWrapper<TxLog>().lambda().eq(TxLog::getId, txId));
+        TxLog log = txLogService.getById(txId);
         WxUserBell wxUserBell = wxUserBellService
                 .getById(senderUser.getOpenId() + "-" + senderUser.getPhone());
         // status 为1时，表示审核成功
@@ -301,6 +300,7 @@ public class TSenderServiceImpl implements TSenderService {
             map.put("phone", senderId + "-" + sender.getPhone());
             map.put("amount", wxUserBell.getMoney());
             map.put("schoolId", sender.getSchoolId());
+            // 从配送员余额中扣除提现金额
             if (wxUserBellService.pay(map) == 1) {
                 try {
                     String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
