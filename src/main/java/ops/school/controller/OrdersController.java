@@ -116,11 +116,11 @@ public class OrdersController {
         Orders orders = ordersService.findById(id);
         int i = tOrdersService.cancel(id);
         if (i > 2) {
-            if (orders.getStatus() == "待接手") {
+            if (orders.getStatus().equals("待接手")) {
                 if (stringRedisTemplate.boundHashOps("SHOP_DJS" + i).delete(id) <= 0 && stringRedisTemplate.boundHashOps("ALL_DJS").delete(id) <= 0) {
                     return new ResponseObject(false, "联系管理员");
                 }
-            } else if (orders.getStatus() == "商家已接手") {
+            } else if (orders.getStatus().equals("商家已接手")) {
                 if (stringRedisTemplate.boundHashOps("SHOP_YJS").delete(id) <= 0) {
                     return new ResponseObject(false, "联系管理员");
                 }

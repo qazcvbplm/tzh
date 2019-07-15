@@ -145,8 +145,9 @@ public class SenderController {
         return new ResponseObject(true, "ok").push("result", result);
     }
 
-   /* @ApiOperation(value = "配送员提现", httpMethod = "POST")
-    @PostMapping({"sendertx"})
+    /*// 配送员提现申请
+   @ApiOperation(value = "配送员提现申请", httpMethod = "POST")
+    @PostMapping({"sendertxapply"})
     public ResponseObject sendertx(HttpServletRequest request, HttpServletResponse response, @RequestParam BigDecimal amount, @RequestParam String senderId) {
         if (amount.compareTo(new BigDecimal(1)) == -1) {
             return new ResponseObject(false, "金额至少大于1");
