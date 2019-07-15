@@ -121,8 +121,6 @@ public class TCommonServiceImpl implements TCommonService {
                 map.put("amount",amount);
                 map.put("shopId",shop.getId());
                 if (shopService.shoptx(map) == 1) {
-
-                    
                     try {
                         String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                         // 审核成功(提现成功)
