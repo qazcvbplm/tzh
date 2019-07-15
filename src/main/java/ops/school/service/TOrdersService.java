@@ -5,6 +5,7 @@ import ops.school.api.entity.Orders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 public interface TOrdersService {
     @Transactional
@@ -24,4 +25,5 @@ public interface TOrdersService {
 
     ShopTj shopstatistics(Integer shopId, String beginTime, String endTime);
 
+    Map countKindsOrderByBIdAndTime(String buildId,String beginTime,String endTime);
 }

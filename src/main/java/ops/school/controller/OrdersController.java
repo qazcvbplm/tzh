@@ -15,14 +15,13 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
+import ops.school.enums.PublicErrorEnums;
+import ops.school.exception.Assertions;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -131,6 +130,28 @@ public class OrdersController {
         } else {
             return new ResponseObject(false, "请重试");
         }
+	}
+
+	/**
+	 * @date:   2019/7/15 18:12
+	 * @author: QinDaoFang
+	 * @version:version
+	 * @return: ops.school.api.util.ResponseObject
+	 * @param   request
+	 * @param   response
+	 * @param   buildId
+	 * @param   beginTime
+	 * @param   endTime
+	 * @Desc:   desc
+	 */
+	@ApiOperation(value="根据楼栋和时间范围查询订单等信息",httpMethod="POST")
+	@PostMapping("orders2")
+	public ResponseObject countKindsOrderByBIdAndTime(HttpServletRequest request, HttpServletResponse response,@RequestParam String buildId, @RequestParam String beginTime, @RequestParam String endTime){
+		Assertions.hasText(buildId, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+		Assertions.hasText(beginTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+		Assertions.hasText(endTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+		Map result = tOrdersService.countKindsOrderByBIdAndTime(buildId,beginTime,endTime);
+		return new ResponseObject(true, "ok",result);
 	}
 	
 	
