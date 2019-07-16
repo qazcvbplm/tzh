@@ -132,7 +132,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                     , school.getWxAppId(), "pages/mine/payment/payment", " 您的会员帐户余额有变动！", "暂无", "-" + orders.getPayPrice(),
                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), "消费",
                     userbell.getMoney() + "", null, null,
-                    null, null, "如有疑问请在小程序内联系客服人员！"));
+                    null, null, "如有疑问请在小程序内联系客服人员"));
             return 1;
         } else {
             throw new YWException("余额不足");
@@ -235,12 +235,12 @@ public class TOrdersServiceImpl implements TOrdersService {
                 query.lambda().eq(OrderProduct::getOrderId,orderId);
                 List<OrderProduct> list = orderProductService.list(query);
                 // 微信小程序推送消息
-                Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg",
+                Message message = new Message(wxUser.getOpenId(), "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
                         school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
                         + orders.getId() + "&typ=" + orders.getTyp(),
-                        "您的订单已被商家接手!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                        list.get(0).getProductName()+"等", null, null, null, null, null,
-                        null, " 商家正火速给您备餐中，请耐心等待");
+                        "您的订单已被商家接手!",orders.getWaterNumber()+"", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                        list.get(0).getProductName()+"等", "商家正火速给您备餐中，请耐心等待", null, null, null,
+                        null, null);
                 WxGUtil.snedM(message.toJson());
                 /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null, "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg",
                         school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="

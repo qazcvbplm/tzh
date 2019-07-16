@@ -24,61 +24,61 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@Api(tags="评论模块")
+@Api(tags = "评论模块")
 @RequestMapping("ops/evaluate")
 public class EvaluateController {
 
 
     @Autowired
     private EvaluateService evaluateService;
-	@Autowired
+    @Autowired
     private OrdersService ordersService;
-	@Autowired
+    @Autowired
     private RunOrdersService runOrdersService;
-	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
-	
-	@ApiOperation(value="添加",httpMethod="POST")
-	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Evaluate evaluate,
-							  @RequestParam String userId, BindingResult result){
-		              Util.checkParams(result);
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @ApiOperation(value = "添加", httpMethod = "POST")
+    @PostMapping("add")
+    public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Evaluate evaluate,
+                              @RequestParam String userId, BindingResult result) {
+        Util.checkParams(result);
         if (ordersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-                          stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
-		              }
+            stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+        }
         if (runOrdersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-                          stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
-		            	  }
-		              return new ResponseObject(true, "添加成功");
-	}
+            stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+        }
+        return new ResponseObject(true, "添加成功");
+    }
 
 
-	@ApiOperation(value="查询",httpMethod="POST")
-	@PostMapping("find")
-	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Evaluate evaluate){
+    @ApiOperation(value = "查询", httpMethod = "POST")
+    @PostMapping("find")
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Evaluate evaluate) {
         QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().setEntity(evaluate);
         List<Evaluate> list = evaluateService.list(query);
         return new ResponseObject(true, "ok").push("total",
                 evaluateService.count(query)).push("list", list);
-	}
+    }
 
     @ApiOperation(value = "按店铺查询", httpMethod = "POST")
     @PostMapping("findbyshopid")
-    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int shopId,Base base) {
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int shopId, Base base) {
         QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>();
         query.lambda().eq(Evaluate::getShopId, shopId);
         List<Evaluate> list = evaluateService.page(new Page<>(base.getPage(), base.getSize()), query).getRecords();
         return new ResponseObject(true, "ok").push("list", list);
     }
 
-    @ApiOperation(value = "更新",httpMethod = "POST")
+    @ApiOperation(value = "更新", httpMethod = "POST")
     @PostMapping("update")
-    public ResponseObject update(HttpServletRequest request, HttpServletResponse response,@ModelAttribute @Valid Evaluate evaluate,
-                                 BindingResult result){
+    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Evaluate evaluate,
+                                 BindingResult result) {
         Util.checkParams(result);
-	    evaluateService.updateById(evaluate);
-	    return new ResponseObject(true,"ok");
+        evaluateService.updateById(evaluate);
+        return new ResponseObject(true, "ok");
     }
 }

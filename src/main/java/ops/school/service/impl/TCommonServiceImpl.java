@@ -54,7 +54,8 @@ public class TCommonServiceImpl implements TCommonService {
         // 申请提现设置isTx为0
         log.setIsTx(0);
         // 提现到账openid
-        log.setDzOpenid(dzOpenid);
+        // Todo
+        /*log.setDzOpenid(dzOpenid);*/
         boolean result = txLogService.save(log);
         if (result) {
             return 1;
@@ -69,7 +70,8 @@ public class TCommonServiceImpl implements TCommonService {
         // 通过txId查询提现记录表
         TxLog log = txLogService.getById(txId);
         // 提现指定账户
-        WxUser wxUser = wxUserService.findById(log.getDzOpenid);
+        // Todo
+        WxUser wxUser = wxUserService.findById("");
         // 满足下面条件的是配送员提现
         if (log.getType().equals("配送员提现")) {
             Sender sender = senderService.findById(log.getTxerId());

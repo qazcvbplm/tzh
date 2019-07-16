@@ -1,5 +1,6 @@
 package ops.school.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.dto.redis.SchoolAddMoneyDTO;
@@ -12,6 +13,7 @@ import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
 import ops.school.api.wx.towallet.WeChatPayUtil;
+import ops.school.api.wxutil.WxGUtil;
 import ops.school.service.TSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -51,6 +53,8 @@ public class TSenderServiceImpl implements TSenderService {
     private TxLogService txLogService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private OrderProductService orderProductService;
 
     @Override
     public List<Orders> findorderbydjs(Integer senderId, Integer page, Integer size, String status) {
@@ -81,13 +85,24 @@ public class TSenderServiceImpl implements TSenderService {
         if ((rs = ordersService.senderAccept(orders)) == 1) {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             School school = schoolService.findById(wxUser.getSchoolId());
-            wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+            QueryWrapper<OrderProduct> query = new QueryWrapper<>();
+            query.lambda().eq(OrderProduct::getOrderId,orderId);
+            List<OrderProduct> list = orderProductService.list(query);
+            Message message = new Message(wxUser.getOpenId(),
+                    "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
+                    school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
+                    + orders.getId() + "&typ=" + orders.getTyp(),
+                    "您的订单已被配送员接手！", orders.getWaterNumber()+"",orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                    list.get(0).getProductName()+"等", " 配送员正火速配送中，请耐心等待！", null, null, null,
+                    null, null);
+            WxGUtil.snedM(message.toJson());
+            /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
                     "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
                     school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
                     + orders.getId() + "&typ=" + orders.getTyp(),
                     "您的订单已被配送员接手！", sender.getName(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
                     null, null, null, null, null, null,
-                    null, " 配送员正火速配送中，请耐心等待！"));
+                    null, " 配送员正火速配送中，请耐心等待！"));*/
         }
         return rs;
     }
@@ -166,19 +181,21 @@ public class TSenderServiceImpl implements TSenderService {
         stringRedisTemplate.convertAndSend(Server.PRODUCTADD, orderId);
         if (orders.getTyp().equals("外卖订单")) {
             School school = schoolService.findById(wxUser.getSchoolId());
-            Message message = new Message(null,
-                    "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
+            QueryWrapper<OrderProduct> query = new QueryWrapper<>();
+            query.lambda().eq(OrderProduct::getOrderId,orderId);
+            List<OrderProduct> list = orderProductService.list(query);
+            Message message = new Message(wxUser.getOpenId(),
+                    "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
                     school.getWxAppId(), "pages/mine/integral/integral",
-                    null, orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    null, null, null, null, null, null,
-                    null, "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！");
+                    null, orders.getWaterNumber()+"", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                    list.get(0).getProductName()+"等", "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！", null, null, null,
+                    null,null );
             if (orders.getDestination() == 1) {
                 message.setDataFirst("您的订单已送达到寝。");
             } else {
                 message.setDataFirst("您的订单已送达楼下，请下楼自取。系统已返还" + returnPrice + "元至您粮票余额内，请注意查收！");
             }
-            wxUserService.sendWXGZHM(wxUser.getPhone(), message);
-
+            WxGUtil.snedM(message.toJson());
         }
     }
 
