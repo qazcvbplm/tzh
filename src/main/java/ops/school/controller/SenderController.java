@@ -148,14 +148,4 @@ public class SenderController {
         SenderTj result = tSenderService.statistics(senderId, beginTime, endTime);
         return new ResponseObject(true, "ok").push("result", result);
     }
-
-    @ApiOperation(value = "配送员提现审核", httpMethod = "POST")
-    @PostMapping({"sendertxaudit"})
-    public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response,@RequestParam Integer txId, @RequestParam Integer status, @RequestParam String userId, @RequestParam String senderId) {
-        int result = tCommonService.txAudit(txId, status, senderId, userId);
-        if (result == 1) {
-            return new ResponseObject(true, "提现成功");
-        }
-        return new ResponseObject(false, "提现失败");
-    }
 }
