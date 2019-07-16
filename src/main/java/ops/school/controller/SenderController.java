@@ -149,39 +149,10 @@ public class SenderController {
         return new ResponseObject(true, "ok").push("result", result);
     }
 
-    /**
-     * 配送员提现申请
-     *
-     * @param request
-     * @param response
-     * @param userId   提现指定账户（TO）
-     * @param senderId 提现原始账户（FROM）
-     * @return
-     */
-   @ApiOperation(value = "配送员提现申请", httpMethod = "POST")
-    @PostMapping({"sendertxapply"})
-   public ResponseObject sendertx(HttpServletRequest request, HttpServletResponse response, @RequestParam BigDecimal amount, @RequestParam String userId, @RequestParam String senderId) {
-       int result = tCommonService.txApply(amount,senderId,userId);
-       if (result == 1) {
-           return new ResponseObject(true, "申请提现成功");
-       }
-       return new ResponseObject(false, "申请提现失败");
-   }
-
-    /**
-     *
-     * @param request
-     * @param response
-     * @param txId  提现记录表Id
-     * @param status  提现审核状态（1.成功，2.失败）
-     * @param userId  提现指定账户（TO）
-     * @param senderId 提现原始账户（FROM）
-     * @return
-     */
-    @ApiOperation(value = "配送员提现2", httpMethod = "POST")
-    @PostMapping({"sendertx2"})
-    public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response,@RequestParam BigDecimal amount, @RequestParam Integer txId, @RequestParam Integer status, @RequestParam String userId, @RequestParam String senderId) {
-        int result = tCommonService.txAudit(amount,txId, status, senderId, userId);
+    @ApiOperation(value = "配送员提现审核", httpMethod = "POST")
+    @PostMapping({"sendertxaudit"})
+    public ResponseObject sendertx2(HttpServletRequest request, HttpServletResponse response,@RequestParam Integer txId, @RequestParam Integer status, @RequestParam String userId, @RequestParam String senderId) {
+        int result = tCommonService.txAudit(txId, status, senderId, userId);
         if (result == 1) {
             return new ResponseObject(true, "提现成功");
         }

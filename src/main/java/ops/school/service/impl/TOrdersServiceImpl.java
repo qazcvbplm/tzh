@@ -11,6 +11,7 @@ import ops.school.api.service.*;
 import ops.school.api.util.RedisUtil;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
+import ops.school.api.wxutil.WxGUtil;
 import ops.school.constants.OrderContants;
 import ops.school.enums.PublicErrorEnums;
 import ops.school.exception.Assertions;
@@ -222,12 +223,23 @@ public class TOrdersServiceImpl implements TOrdersService {
                 }
                 WxUser wxUser = wxUserService.findById(orders.getOpenId());
                 School school = schoolService.findById(wxUser.getSchoolId());
-                wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null, "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg",
+                QueryWrapper<OrderProduct> query = new QueryWrapper<>();
+                query.lambda().eq(OrderProduct::getOrderId,orderId);
+                List<OrderProduct> list = orderProductService.list(query);
+                // 微信小程序推送消息
+                Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg",
+                        school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
+                        + orders.getId() + "&typ=" + orders.getTyp(),
+                        "您的订单已被商家接手!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                        list.get(0).getProductName()+"等", null, null, null, null, null,
+                        null, " 商家正火速给您备餐中，请耐心等待");
+                WxGUtil.snedM(message.toJson());
+                /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null, "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg",
                         school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
                         + orders.getId() + "&typ=" + orders.getTyp(),
                         "您的订单已被商家接手!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
                         null, null, null, null, null, null,
-                        null, " 商家正火速给您备餐中，请耐心等待"));
+                        null, " 商家正火速给您备餐中，请耐心等待"));*/
                 return orders.getShopId();
             }
             return 0;

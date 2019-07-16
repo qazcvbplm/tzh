@@ -34,31 +34,27 @@ public class TCommonServiceImpl implements TCommonService {
     @Autowired
     private TxLogService txLogService;
 
-    /**
-     * @param sourceId 配送员/商家提现来源账户（senderId, shopId）
-     * @param userId   提现指定账户
-     * @return
-     */
     @Transactional
     @Override
-    public int txApply(BigDecimal amount, String sourceId, String userId) {
-        Pattern pt = Pattern.compile("[0-9]*");
+    public int txApply(BigDecimal amount, String senderId, String dzOpenid,Integer shopId) {
         // 提现指定账户
-        WxUser wxUser = wxUserService.findById(userId);
+        WxUser wxUser = wxUserService.findById(dzOpenid);
         TxLog log = new TxLog();
         // 满足以下提现的是商家提现
-        if (!sourceId.isEmpty() && pt.matcher(sourceId).matches()) {
+        if (shopId != 0) {
             // 商家信息
-            Shop shop = shopService.getById(Integer.valueOf(sourceId));
+            Shop shop = shopService.getById(shopId);
             log = new TxLog(shop.getId(), "商家提现", null, amount, "", shop.getSchoolId(), wxUser.getAppId());
-        } else if (!sourceId.isEmpty()) {
+        } else  {
             // 配送员提现
-            Sender sender = senderService.check(sourceId);
+            Sender sender = senderService.check(senderId);
             log = new TxLog(sender.getId(), "配送员提现", null, amount, "", sender.getSchoolId(),
                     wxUser.getAppId());
         }
         // 申请提现设置isTx为0
         log.setIsTx(0);
+        // 提现到账openid
+        log.setDzOpenid(dzOpenid);
         boolean result = txLogService.save(log);
         if (result) {
             return 1;
@@ -69,20 +65,19 @@ public class TCommonServiceImpl implements TCommonService {
 
     @Transactional
     @Override
-    public int txAudit(BigDecimal amount,Integer txId, Integer status,String sourceId, String userId) {
-        Pattern pt = Pattern.compile("[0-9]*");
-        // 提现指定账户
-        WxUser wxUser = wxUserService.findById(userId);
+    public int txAudit(Integer txId, Integer status) {
         // 通过txId查询提现记录表
         TxLog log = txLogService.getById(txId);
+        // 提现指定账户
+        WxUser wxUser = wxUserService.findById(log.getDzOpenid);
         // 满足下面条件的是配送员提现
-        if (!pt.matcher(sourceId).matches()) {
-            Sender sender = senderService.check(sourceId);
+        if (log.getType().equals("配送员提现")) {
+            Sender sender = senderService.findById(log.getTxerId());
             School school = schoolService.findById(sender.getSchoolId());
             if (status == 1) {
                 Map<String, Object> map = new HashMap();
-                map.put("phone", sourceId + "-" + sender.getPhone());
-                map.put("amount", amount);
+                map.put("phone", sender.getOpenId() + "-" + sender.getPhone());
+                map.put("amount", log.getAmount());
                 map.put("schoolId", sender.getSchoolId());
                 // 从配送员余额中扣除提现金额
                 if (wxUserBellService.pay(map) == 1) {
@@ -91,16 +86,16 @@ public class TCommonServiceImpl implements TCommonService {
                         // 审核成功(提现成功)
                         log.setIsTx(1);
                         if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
-                                school.getCertPath(), payId, "127.0.0.1", amount, wxUser.getOpenId(),
+                                school.getCertPath(), payId, "127.0.0.1", log.getAmount(), wxUser.getOpenId(),
                                 log) == 1) {
                             txLogService.updateById(log);
                             if (schoolService.sendertx(map) == 0) {
-                                LoggerUtil.log("配送员提现学校减少金额失败:" + sourceId + ":" + amount);
+                                LoggerUtil.log("配送员提现学校减少金额失败:" + sender.getOpenId() + ":" + log.getAmount());
                             }
                             return 1;
                         }
                     } catch (Exception e) {
-                        LoggerUtil.log(sourceId + ":" + amount + e.getMessage());
+                        LoggerUtil.log(sender.getOpenId() + ":" + log.getAmount() + e.getMessage());
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     }
                     return 2;
@@ -112,13 +107,13 @@ public class TCommonServiceImpl implements TCommonService {
                 txLogService.updateById(log);
                 return 2;
             }
-        } else {
+        } else if (log.getType().equals("商家提现")){
             // 商家信息
-            Shop shop = shopService.getById(Integer.valueOf(sourceId));
+            Shop shop = shopService.getById(log.getTxerId());
             School school = schoolService.findById(shop.getSchoolId());
             if (status == 1){
                 Map<String,Object> map = new HashMap<>();
-                map.put("amount",amount);
+                map.put("amount",log.getAmount());
                 map.put("shopId",shop.getId());
                 if (shopService.shoptx(map) == 1) {
                     try {
@@ -126,16 +121,16 @@ public class TCommonServiceImpl implements TCommonService {
                         // 审核成功(提现成功)
                         log.setIsTx(1);
                         if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
-                                school.getCertPath(), payId, "127.0.0.1", amount, wxUser.getOpenId(),
+                                school.getCertPath(), payId, "127.0.0.1", log.getAmount(), wxUser.getOpenId(),
                                 log) == 1) {
                             txLogService.updateById(log);
                             if (schoolService.sendertx(map) == 0) {
-                                LoggerUtil.log("配送员提现学校减少金额失败:" + sourceId + ":" + amount);
+                                LoggerUtil.log("配送员提现学校减少金额失败:" + log.getTxerId() + ":" + log.getAmount());
                             }
                             return 1;
                         }
                     } catch (Exception e) {
-                        LoggerUtil.log(sourceId + ":" + amount + e.getMessage());
+                        LoggerUtil.log(log.getTxerId() + ":" + log.getAmount() + e.getMessage());
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     }
                     return 2;
