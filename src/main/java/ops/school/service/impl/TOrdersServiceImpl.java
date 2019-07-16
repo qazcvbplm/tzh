@@ -1,8 +1,10 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
+import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
@@ -14,6 +16,7 @@ import ops.school.api.wxutil.AmountUtils;
 import ops.school.api.wxutil.WxGUtil;
 import ops.school.constants.OrderContants;
 import ops.school.enums.PublicErrorEnums;
+import ops.school.enums.ResponseViewEnums;
 import ops.school.exception.Assertions;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +54,11 @@ public class TOrdersServiceImpl implements TOrdersService {
     private OrderProductService orderProductService;
     @Autowired
     private OrdersService ordersService;
+    @Autowired
+    private OrdersMapper ordersMapper;
+
+    @Autowired
+    private RunOrdersService runOrdersService;
     @Autowired
     private FullCutService fullCutService;
     @Autowired
@@ -263,20 +271,17 @@ public class TOrdersServiceImpl implements TOrdersService {
     }
 
     @Override
-    public Map countKindsOrderByBIdAndTime(String buildId, String beginTime, String endTime) {
-        Assertions.hasText(buildId, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+    public Map countKindsOrderByBIdAndTime(Integer buildId, String beginTime, String endTime) {
+        Assertions.notNull(buildId, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.hasText(beginTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.hasText(endTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Floor floor = floorService.getById(buildId);
-        Assertions.notNull(floor,PublicErrorEnums.FLOOR_SELECT_NULL);
-        Orders order = new Orders();
-        //订单总数
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
-        queryWrapper
-                .eq("floor_id",buildId)
-                .ge("create_time",beginTime)
-                .le("create_time",endTime);
-        Integer allOrders = ordersService.count(queryWrapper);
+        //Floor floor = floorService.getById(buildId);
+        //查询楼栋
+        QueryWrapper<Floor> queryWrapperFloor = new QueryWrapper<>();
+        queryWrapperFloor.select("id");
+        queryWrapperFloor.eq("Id",buildId);
+        Floor floor = floorService.getOne(queryWrapperFloor);
+        Assertions.notNull(floor, ResponseViewEnums.FLOOR_SELECT_NULL);
         //外卖订单
         QueryWrapper<Orders> queryWrapperTakeOut = new QueryWrapper<>();
         queryWrapperTakeOut
@@ -284,20 +289,40 @@ public class TOrdersServiceImpl implements TOrdersService {
                 .eq("typ", OrderContants.orderTypeTakeOut)
                 .ge("create_time",beginTime)
                 .le("create_time",endTime);
-        Integer allOrdersTakeOut = ordersService.count(queryWrapper);
-        //跑腿订单
-        QueryWrapper<Orders> queryWrapperRunning = new QueryWrapper<>();
-        queryWrapperTakeOut
+        Integer allOrdersTakeOut = ordersService.count(queryWrapperTakeOut);
+        //堂食订单
+        QueryWrapper<Orders> queryWrapperEatHere = new QueryWrapper<>();
+        queryWrapperEatHere
                 .eq("floor_id",buildId)
-                .eq("typ", OrderContants.orderTypeRunning)
+                .eq("typ", OrderContants.queryWrapperEatHere)
                 .ge("create_time",beginTime)
                 .le("create_time",endTime);
-        Integer allOrdersRunning = ordersService.count(queryWrapper);
+        Integer allOrdersEatHere = ordersService.count(queryWrapperEatHere);
+        //跑腿订单
+        QueryWrapper<RunOrders> queryWrapperRunning = new QueryWrapper<>();
+        queryWrapperRunning
+                .eq("floor_id",buildId)
+                .eq("typ", OrderContants.orderTypeRunning)
+                .between("create_time",beginTime,endTime);
+        Integer allOrdersRunning = runOrdersService.count(queryWrapperRunning);
+        //自取订单
+        QueryWrapper<Orders> queryWrapperGetSelf = new QueryWrapper<>();
+        queryWrapperGetSelf
+                .eq("floor_id",buildId)
+                .eq("typ", OrderContants.queryWrapperGetSelf)
+                .between("create_time",beginTime,endTime);
+        Integer allOrdersGetSelf = ordersService.count(queryWrapperGetSelf);
+        //订单总数
+        Integer allOrders = allOrdersTakeOut + allOrdersEatHere + allOrdersRunning + allOrdersGetSelf;
         //营业额
+        Integer ordersAllMoney = 0;
         Map result = new HashMap();
         result.put("allOrders",allOrders);
         result.put("allOrdersTakeOut",allOrdersTakeOut);
+        result.put("allOrdersEatHere",allOrdersEatHere);
         result.put("allOrdersRunning",allOrdersRunning);
+        result.put("allOrdersGetSelf",allOrdersGetSelf);
+        result.put("ordersAllMoney",ordersAllMoney);
         return result;
     }
 

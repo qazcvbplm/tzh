@@ -9,6 +9,8 @@ public enum ResponseViewEnums implements RootEnums{
     SUCCESS("A11001","操作成功"),
     /**操作失败*/
     FAILED("A11002","操作失败"),
+    /**楼栋错误*/
+    FLOOR_SELECT_NULL("F11001","楼栋为空，更新后操作"),
     ;
 
     private String errorCode;

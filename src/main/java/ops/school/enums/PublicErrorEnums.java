@@ -17,8 +17,11 @@ public enum PublicErrorEnums implements RootEnums {
     PUBLIC_DATA_CHANGE("A11006","数据发生变更，请刷新"),
     /**参数错误*/
     PUBLIC_DO_FAILED("A11007","操作失败"),
-    /**楼栋错误*/
-    FLOOR_SELECT_NULL("F11007","楼栋为空，更新后操作"),
+    /**登陆超时*/
+    LOGIN_TIME_OUT("L11001","登陆超时，请重新登陆"),
+
+
+
     ;
 
     private String errorCode;
