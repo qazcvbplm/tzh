@@ -12,7 +12,7 @@ public interface TOrdersService {
     void addTakeout(Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @Valid Orders orders);
 
     @Transactional
-    int pay(Orders orders);
+    int pay(Orders orders,String formid);
 
     @Transactional
     int paySuccess(String orderId, String payment);

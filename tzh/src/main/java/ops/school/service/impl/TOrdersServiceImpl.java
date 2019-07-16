@@ -109,7 +109,7 @@ public class TOrdersServiceImpl implements TOrdersService {
 
     @Transactional
     @Override
-    public int pay(Orders orders) {
+    public int pay(Orders orders,String formid) {
         Shop shop = shopService.getById(orders.getShopId());
         School school = schoolService.findById(shop.getSchoolId());
         Application application = applicationService.getById(school.getAppId());
@@ -128,11 +128,21 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             WxUserBell userbell = wxUserBellService.getById(wxUser.getOpenId() + "-" + wxUser.getPhone());
-            wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk"
+            QueryWrapper<OrderProduct> query = new QueryWrapper<>();
+            query.lambda().eq(OrderProduct::getOrderId,orders.getId());
+            List<OrderProduct> list = orderProductService.list(query);
+            Message message = new Message(null, "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
+                    , formid, "pages/mine/payment/payment", " 您的会员帐户余额有变动！", orders.getWaterNumber()+"", orders.getId(),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), list.get(0).getProductName(),
+                    "如有疑问请在小程序内联系客服人员！", null, null,
+                    null, null, null);
+            WxGUtil.snedM(message.toJson());
+            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(),JSON.toJSONString(formid));
+            /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk"
                     , school.getWxAppId(), "pages/mine/payment/payment", " 您的会员帐户余额有变动！", "暂无", "-" + orders.getPayPrice(),
                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), "消费",
                     userbell.getMoney() + "", null, null,
-                    null, null, "如有疑问请在小程序内联系客服人员！"));
+                    null, null, "如有疑问请在小程序内联系客服人员！"));*/
             return 1;
         } else {
             throw new YWException("余额不足");
@@ -234,9 +244,10 @@ public class TOrdersServiceImpl implements TOrdersService {
                 QueryWrapper<OrderProduct> query = new QueryWrapper<>();
                 query.lambda().eq(OrderProduct::getOrderId,orderId);
                 List<OrderProduct> list = orderProductService.list(query);
+                String formid = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
                 // 微信小程序推送消息
-                Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg",
-                        school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
+                Message message = new Message(wxUser.getOpenId(), "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
+                        formid, "pages/order/orderDetail/orderDetail?orderId="
                         + orders.getId() + "&typ=" + orders.getTyp(),
                         "您的订单已被商家接手!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
                         list.get(0).getProductName()+"等", null, null, null, null, null,
