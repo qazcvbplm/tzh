@@ -17,6 +17,7 @@ import ops.school.api.service.ShopService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
+import ops.school.service.TCommonService;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -43,6 +45,8 @@ public class ShopController {
 	private ShopOpenTimeService shopOpenTimeService;
     @Autowired
     private TOrdersService tOrdersService;
+	@Autowired
+	private TCommonService tCommonService;
    /* @Autowired
     private AuthController auth;*/
 
@@ -163,5 +167,4 @@ public class ShopController {
 		    		 , school.getWxSecret(), "pages/index/item/menu/menu?shopid="+id,path+id+".jpg");
 		     return new ResponseObject(true, "ok").push("barcode", "https://www.chuyinkeji.cn/shopbarcode/"+id+".jpg");
 	}
-	
 }
