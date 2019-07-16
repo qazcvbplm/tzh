@@ -223,13 +223,21 @@ public class TSenderServiceImpl implements TSenderService {
         if ((rs = runOrdersService.senderAccept(orders)) == 1) {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             School school = schoolService.findById(wxUser.getSchoolId());
-            wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+            Message message = new Message(null,
+                    "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
+                    school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
+                    + orders.getId() + "&typ=" + orders.getTyp(),
+                    "您的订单已被配送员接手！", "该订单暂无编号",orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                    orders.getContent(), " 配送员正火速配送中，请耐心等待！", null, null, null,
+                    null, null);
+            WxGUtil.snedM(message.toJson());
+            /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
                     "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
                     school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
                     + orders.getId() + "&typ=" + orders.getTyp(),
                     "您的订单已被配送员接手！", sender.getName(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
                     null, null, null, null, null, null,
-                    null, " 配送员正火速配送中，请耐心等待！"));
+                    null, " 配送员正火速配送中，请耐心等待！"));*/
         }
         return rs;
     }
@@ -256,12 +264,19 @@ public class TSenderServiceImpl implements TSenderService {
             redisUtil.runCountSuccessadd(orders.getSchoolId());
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             School school = schoolService.findById(wxUser.getSchoolId());
-            wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+            Message message = new Message(null,
+                    "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
+                    school.getWxAppId(), "pages/mine/integral/integral",
+                    "您的跑腿订单已经完成!","该订单暂无编号", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                    orders.getContent(), "成功获得" + orders.getTotalPrice().intValue() + "积分，可以前往积分商城兑换哟！", null, null, null, null,
+                    null);
+            WxGUtil.snedM(message.toJson());
+            /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
                     "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
                     school.getWxAppId(), "pages/mine/integral/integral",
                     "您的跑腿订单已经完成!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
                     null, null, null, null, null, null,
-                    null, "成功获得" + orders.getTotalPrice().intValue() + "积分，可以前往积分商城兑换哟！"));
+                    null, "成功获得" + orders.getTotalPrice().intValue() + "积分，可以前往积分商城兑换哟！"));*/
 
         }
     }
