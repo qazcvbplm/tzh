@@ -7,6 +7,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import ops.school.api.auth.JWTUtil;
 import ops.school.api.util.ResultUtil;
+import ops.school.enums.PublicErrorEnums;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -41,7 +42,7 @@ public class MyInterceptor implements HandlerInterceptor {
 		    	request.setAttribute("role", json.getString("role"));
 		    	return true;
 		    }
-		 new ResultUtil().error(request, response, "1100");
+		 new ResultUtil().error(request, response, PublicErrorEnums.LOGIN_TIME_OUT.getErrorMessage());
 	        return false;
 	    }
 

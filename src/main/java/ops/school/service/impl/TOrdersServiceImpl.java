@@ -13,6 +13,7 @@ import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.constants.OrderContants;
 import ops.school.enums.PublicErrorEnums;
+import ops.school.enums.ResponseViewEnums;
 import ops.school.exception.Assertions;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -255,8 +256,14 @@ public class TOrdersServiceImpl implements TOrdersService {
         Assertions.hasText(buildId, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.hasText(beginTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.hasText(endTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Floor floor = floorService.getById(buildId);
-        Assertions.notNull(floor,PublicErrorEnums.FLOOR_SELECT_NULL);
+        //Floor floor = floorService.getById(buildId);
+        //查询楼栋
+        QueryWrapper<Floor> queryWrapperFloor = new QueryWrapper<>();
+        queryWrapperFloor.select("id");
+        queryWrapperFloor
+                .eq("Id",buildId);
+        Floor floor = floorService.getOne(queryWrapperFloor);
+        Assertions.notNull(floor, ResponseViewEnums.FLOOR_SELECT_NULL);
         Orders order = new Orders();
         //订单总数
         QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
