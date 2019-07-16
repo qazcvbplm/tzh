@@ -146,8 +146,8 @@ public class OrdersController {
 	 */
 	@ApiOperation(value="根据楼栋和时间范围查询订单等信息",httpMethod="POST")
 	@PostMapping("orders2")
-	public ResponseObject countKindsOrderByBIdAndTime(HttpServletRequest request, HttpServletResponse response,@RequestParam String buildId, @RequestParam String beginTime, @RequestParam String endTime){
-		Assertions.hasText(buildId, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+	public ResponseObject countKindsOrderByBIdAndTime(HttpServletRequest request, HttpServletResponse response,@RequestParam Integer buildId, @RequestParam String beginTime, @RequestParam String endTime){
+		Assertions.notNull(buildId, PublicErrorEnums.PULBIC_EMPTY_PARAM);
 		Assertions.hasText(beginTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
 		Assertions.hasText(endTime, PublicErrorEnums.PULBIC_EMPTY_PARAM);
 		Map result = tOrdersService.countKindsOrderByBIdAndTime(buildId,beginTime,endTime);

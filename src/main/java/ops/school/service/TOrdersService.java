@@ -25,5 +25,5 @@ public interface TOrdersService {
 
     ShopTj shopstatistics(Integer shopId, String beginTime, String endTime);
 
-    Map countKindsOrderByBIdAndTime(String buildId,String beginTime,String endTime);
+    Map countKindsOrderByBIdAndTime(Integer buildId,String beginTime,String endTime);
 }

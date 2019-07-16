@@ -11,7 +11,13 @@ public class OrderContants {
 
     public final static String orderTypeTakeOut = "外卖订单";
 
-    public final static String orderTypeRunning = "外卖订单";
+    public final static String orderTypeRunning = "跑腿订单";
+
+    public final static String queryWrapperEatHere = "堂食订单";
+
+    public final static String queryWrapperGetSelf = "自取订单";
+
+
 
 
 
