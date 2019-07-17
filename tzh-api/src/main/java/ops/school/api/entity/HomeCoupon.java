@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -24,37 +26,37 @@ public class HomeCoupon implements Serializable {
     /**
      * 优惠券id
      */
-    @NotEmpty
+    @NotNull
     private Long couponId;
 
     /**
      * 创建时间
      */
-    @NotEmpty
+    @NotNull
     private Date createTime;
 
     /**
      * 创建人id
      */
-    @NotEmpty
+    @NotNull
     private Long createId;
 
     /**
      * 优惠券开始使用时间
      */
-    @NotEmpty
+    @NotNull
     private Date beginTime;
 
     /**
      * 优惠券发放结束时间
      */
-    @NotEmpty
+    @NotNull
     private Date endTime;
 
     /**
      * 是否删除（1.已删除 0.未删除）
      */
-    @NotEmpty
+    @NotNull
     private Integer isDelete;
 
     private static final long serialVersionUID = 1L;

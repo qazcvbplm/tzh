@@ -23,31 +23,31 @@ public class WxUser implements Serializable {
     /**
      * 主键id
      */
-    @NotEmpty
+    @NotNull
     private Long id;
 
     /**
      * 微信昵称
      */
-    @NotEmpty
+    @NotNull
     private String nickName;
 
     /**
      * 微信头像
      */
-    @NotEmpty
+    @NotNull
     private String avatarUrl;
 
     /**
      * 性别
      */
-    @NotEmpty
+    @NotNull
     private String gender;
 
     /**
      * 省
      */
-    @NotEmpty
+    @NotNull
     private String province;
 
     /**
@@ -58,25 +58,25 @@ public class WxUser implements Serializable {
     /**
      * 手机号码
      */
-    @NotEmpty
+    @NotNull
     private String phone;
 
     /**
      * 来源
      */
-    @NotEmpty
+    @NotNull
     private String client;
 
     /**
      * 学校id
      */
-    @NotEmpty
+    @NotNull
     private Integer schoolId;
 
     /**
      * 主体id
      */
-    @NotEmpty
+    @NotNull
     private Integer appId;
 
     private static final long serialVersionUID = 1L;

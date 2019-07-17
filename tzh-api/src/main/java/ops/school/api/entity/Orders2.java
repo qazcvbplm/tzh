@@ -7,6 +7,8 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -25,127 +27,127 @@ public class Orders implements Serializable {
     /**
      * 主体id
      */
-    @NotEmpty
+    @NotNull
     private Integer appId;
 
     /**
      * 学校id
      */
-    @NotEmpty
+    @NotNull
     private Integer schoolId;
 
     /**
      * 楼上楼下差价
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal schoolTopDownPrice;
 
     /**
      * 店铺id
      */
-    @NotEmpty
+    @NotNull
     private Integer shopId;
 
     /**
      * 店铺名字
      */
-    @NotEmpty
+    @NotNull
     private String shopName;
 
     /**
      * 店铺图片
      */
-    @NotEmpty
+    @NotNull
     private String shopImage;
 
     /**
      * 店铺地址
      */
-    @NotEmpty
+    @NotNull
     private String shopAddress;
 
     /**
      * 店铺电话
      */
-    @NotEmpty
+    @NotNull
     private String shopPhone;
 
     /**
      * 用户id
      */
-    @NotEmpty
+    @NotNull
     private String openId;
 
     /**
      * 收货人姓名
      */
-    @NotEmpty
+    @NotNull
     private String addressName;
 
     /**
      * 收货人手机
      */
-    @NotEmpty
+    @NotNull
     private String addressPhone;
 
     /**
      * 收货人详细地址
      */
-    @NotEmpty
+    @NotNull
     private String addressDetail;
 
     /**
      * 楼栋id
      */
-    @NotEmpty
+    @NotNull
     private Integer floorId;
 
     /**
      * 订单类型
      */
-    @NotEmpty
+    @NotNull
     private String typ;
 
     /**
      * 订单状态
      */
-    @NotEmpty
+    @NotNull
     private String status;
 
     /**
      * 餐盒费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal boxPrice;
 
     /**
      * 配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendPrice;
 
     /**
      * 基础配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendBasePrice;
 
     /**
      * 额外距离配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendAddDistancePrice;
 
     /**
      * 额外件数配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendAddCountPrice;
 
     /**
      * 商品费用
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal productPrice;
 
     /**
@@ -196,7 +198,7 @@ public class Orders implements Serializable {
     /**
      * 实际付款
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal payPrice;
 
     /**
@@ -222,7 +224,7 @@ public class Orders implements Serializable {
     /**
      * 备注
      */
-    @NotEmpty
+    @NotNull
     private String remark;
 
     /**
@@ -233,7 +235,7 @@ public class Orders implements Serializable {
     /**
      * 创建时间
      */
-    @NotEmpty
+    @NotNull
     private Date createTime;
 
     /**
@@ -254,7 +256,7 @@ public class Orders implements Serializable {
     /**
      * 配送取得物品标志
      */
-    @NotEmpty
+    @NotNull
     private Integer sendGetFlag;
 
     /**
@@ -265,7 +267,7 @@ public class Orders implements Serializable {
     /**
      * 是否评论
      */
-    @NotEmpty
+    @NotNull
     private Integer evaluateFlag;
 
     /**
@@ -276,13 +278,13 @@ public class Orders implements Serializable {
     /**
      * 商家接手时间
      */
-    @NotEmpty
+    @NotNull
     private String shopAcceptTime;
 
     /**
      * 粮票金额
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal payFoodCoupon;
 
     private static final long serialVersionUID = 1L;

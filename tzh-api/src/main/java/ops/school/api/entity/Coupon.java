@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -24,55 +26,55 @@ public class Coupon implements Serializable {
     /**
      * 优惠券名称
      */
-    @NotEmpty
+    @NotNull
     private String couponName;
 
     /**
      * 优惠券描述
      */
-    @NotEmpty
+    @NotNull
     private String couponDesc;
 
     /**
      * 优惠券面额（满额使用）
      */
-    @NotEmpty
+    @NotNull
     private Integer fullAmount;
 
     /**
      * 优惠金额（减额）
      */
-    @NotEmpty
+    @NotNull
     private Integer cutAmount;
 
     /**
      * 优惠券类型（0.店铺优惠券  1.首页优惠券）
      */
-    @NotEmpty
+    @NotNull
     private Integer couponType;
 
     /**
      * 优惠券开始使用时间
      */
-    @NotEmpty
+    @NotNull
     private Date beginTime;
 
     /**
      * 优惠券有效天数
      */
-    @NotEmpty
+    @NotNull
     private Integer effectiveDays;
 
     /**
      * 创建时间
      */
-    @NotEmpty
+    @NotNull
     private Date createTime;
 
     /**
      * 创建人id
      */
-    @NotEmpty
+    @NotNull
     private Long createId;
 
     /**
@@ -88,13 +90,13 @@ public class Coupon implements Serializable {
     /**
      * 是否失效（1.失效 0.有效）
      */
-    @NotEmpty
+    @NotNull
     private Integer isInvalid;
 
     /**
      * 是否删除（1.删除 0.未删除）
      */
-    @NotEmpty
+    @NotNull
     private Integer isDelete;
 
     private static final long serialVersionUID = 1L;

@@ -2,11 +2,12 @@ package ops.school.api.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+
 
 /**
  * wx_user_bell
@@ -24,43 +25,43 @@ public class WxUserBell implements Serializable {
     /**
      * 主键id
      */
-    @NotEmpty
+    @NotNull
     private Long id;
 
     /**
      * wxuser表主键id
      */
-    @NotEmpty
+    @NotNull
     private Long wxUserId;
 
     /**
      * 积分
      */
-    @NotEmpty
+    @NotNull
     private Integer source;
 
     /**
      * 余额
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal money;
 
     /**
      * 会员标志
      */
-    @NotEmpty
+    @NotNull
     private Integer isVip;
 
     /**
      * 会员过期时间
      */
-    @NotEmpty
+    @NotNull
     private Long vipOutTime;
 
     /**
      * 粮票余额
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal foodCoupon;
 
     private static final long serialVersionUID = 1L;
