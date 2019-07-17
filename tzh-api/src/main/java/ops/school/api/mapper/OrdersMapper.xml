@@ -544,6 +544,7 @@
         WHERE id = #{id}
         AND is_delete = 0
     </update>
+    <update id="updateByPrimaryKeySelective"></update>
 
 
 </mapper>
