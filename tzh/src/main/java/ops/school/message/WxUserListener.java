@@ -5,6 +5,7 @@ import ops.school.api.dto.redis.RedisMessage;
 import ops.school.api.dto.redis.SenderAddMoneyDTO;
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.Logs;
+import ops.school.api.entity.WxUser;
 import ops.school.api.service.LogsService;
 import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
