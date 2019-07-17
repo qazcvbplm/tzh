@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * CouponDAO继承基类
@@ -63,4 +64,14 @@ public interface CouponMapper extends BaseMapper<Coupon> {
      * @Desc:   desc 通过id启用
      */
     Integer startOneById(Long id);
+
+    /**
+     * @date:
+     * @author: Lee
+     * @version:version
+     * @return: List<Coupon>
+     * @param   map
+     * @Desc:   desc 通过学校id和优惠券分类查询
+     */
+    List<Coupon> findByIndex(Map<String,Object> map);
 }
