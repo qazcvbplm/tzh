@@ -24,19 +24,19 @@ public class WxUserCoupon implements Serializable {
     /**
      * 用户id
      */
-    @NotEmpty
+    @NotNull
     private Long wxUserId;
 
     /**
      * 优惠券id
      */
-    @NotEmpty
+    @NotNull
     private Long couponId;
 
     /**
      * 优惠券领取时间
      */
-    @NotEmpty
+    @NotNull
     private Date getTime;
 
     /**
@@ -47,13 +47,13 @@ public class WxUserCoupon implements Serializable {
     /**
      * 失效时间
      */
-    @NotEmpty
+    @NotNull
     private Date failureTime;
 
     /**
      * 是否失效（0.未使用 1.已使用 2.已过期）
      */
-    @NotEmpty
+    @NotNull
     private Integer isInvalid;
 
     private static final long serialVersionUID = 1L;

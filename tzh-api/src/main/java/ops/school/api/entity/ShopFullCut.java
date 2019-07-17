@@ -24,7 +24,7 @@ public class ShopFullCut implements Serializable {
     /**
      * 店铺id
      */
-    @NotEmpty
+    @NotNull
     private Long shopId;
 
     /**
@@ -45,25 +45,25 @@ public class ShopFullCut implements Serializable {
     /**
      * 创建人ID
      */
-    @NotEmpty
+    @NotNull
     private Long createId;
 
     /**
      * 更新人ID
      */
-    @NotEmpty
+    @NotNull
     private Long updateId;
 
     /**
      * 创建时间
      */
-    @NotEmpty
+    @NotNull
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @NotEmpty
+    @NotNull
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
