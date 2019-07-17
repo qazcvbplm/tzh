@@ -35,9 +35,6 @@ public class TCommonServiceImpl implements TCommonService {
     @Autowired
     private TxLogService txLogService;
 
-    @Autowired
-    private TxLogMapper txLogMapper;
-
     @Transactional
     @Override
     public int txApply(BigDecimal amount, String senderId, String dzOpenid,Integer shopId) {
@@ -72,7 +69,6 @@ public class TCommonServiceImpl implements TCommonService {
     public int txAudit(Integer txId, Integer status) {
         // 通过txId查询提现记录表
         TxLog log = txLogService.getById(txId);
-
         // 提现指定账户
         WxUser wxUser = wxUserService.findById(log.getDzOpenid());
         // 满足下面条件的是配送员提现
