@@ -21,6 +21,12 @@ public class Coupon implements Serializable {
     private Long id;
 
     /**
+     * 学校id
+     */
+    @NotNull
+    private Long schoolId;
+
+    /**
      * 优惠券名称
      */
     @NotNull

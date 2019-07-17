@@ -1,7 +1,12 @@
 package ops.school.api.dto.project;
 
+    import com.baomidou.mybatisplus.annotation.IdType;
+    import com.baomidou.mybatisplus.annotation.TableId;
     import ops.school.api.entity.Orders;
 
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.NotNull;
+    import javax.validation.constraints.Pattern;
     import java.math.BigDecimal;
     import java.util.Date;
     import java.io.Serializable;
@@ -10,101 +15,274 @@ package ops.school.api.dto.project;
 public class OrdersDTO extends BaseDTO implements Serializable {
     
     private static final long serialVersionUID = 1L;
-    /**订单*/
+
+    /**
+     * 订单
+     */
     private String id;
-    /**主体id*/
+
+    /**
+     * 主体id
+     */
+    @NotNull
     private Integer appId;
-    /**学校id*/
+
+    /**
+     * 学校id
+     */
+    @NotNull
     private Integer schoolId;
-    /**楼上楼下差价*/
+
+    /**
+     * 楼上楼下差价
+     */
+    @NotNull
     private BigDecimal schoolTopDownPrice;
-    /**店铺id*/
+
+    /**
+     * 店铺id
+     */
+    @NotNull
     private Integer shopId;
-    /**店铺名字*/
+
+    /**
+     * 店铺名字
+     */
+    @NotBlank
     private String shopName;
-    /**店铺图片*/
+
+    /**
+     * 店铺图片
+     */
+    @NotBlank
     private String shopImage;
-    /**店铺地址*/
+
+    /**
+     * 店铺地址
+     */
+    @NotBlank
     private String shopAddress;
-    /**店铺电话*/
+
+    /**
+     * 店铺电话
+     */
+    @NotBlank
     private String shopPhone;
-    /**用户id*/
+
+    /**
+     * 用户id
+     */
+    @NotBlank
     private String openId;
-    /**收货人姓名*/
+
+    /**
+     * 收货人姓名
+     */
+    @NotBlank
     private String addressName;
-    /**收货人手机*/
+
+    /**
+     * 收货人手机
+     */
+    @NotBlank
     private String addressPhone;
-    /**收货人详细地址*/
+
+    /**
+     * 收货人详细地址
+     */
+    @NotBlank
     private String addressDetail;
-    /**楼栋id*/
+
+    /**
+     * 楼栋id
+     */
+    @NotNull
     private Integer floorId;
-    /**订单类型*/
+
+    /**
+     * 订单类型
+     */
+    @NotBlank
+    @Pattern(regexp = "外卖订单|堂食订单|跑腿订单|自取订单")
     private String typ;
-    /**订单状态*/
+
+    /**
+     * 订单状态
+     */
+    @NotBlank
     private String status;
-    /**餐盒费*/
+
+    /**
+     * 餐盒费
+     */
+    @NotNull
     private BigDecimal boxPrice;
-    /**配送费*/
+
+    /**
+     * 配送费
+     */
+    @NotNull
     private BigDecimal sendPrice;
-    /**基础配送费*/
+
+    /**
+     * 基础配送费
+     */
+    @NotNull
     private BigDecimal sendBasePrice;
-    /**额外距离配送费*/
+
+    /**
+     * 额外距离配送费
+     */
+    @NotNull
     private BigDecimal sendAddDistancePrice;
-    /**额外件数配送费*/
+
+    /**
+     * 额外件数配送费
+     */
+    @NotNull
     private BigDecimal sendAddCountPrice;
-    /**商品费用*/
+
+    /**
+     * 商品费用
+     */
+    @NotNull
     private BigDecimal productPrice;
-    /**优惠类型*/
+
+    /**
+     * 优惠类型
+     */
     private String discountType;
-    /**优惠价格*/
+
+    /**
+     * 优惠价格
+     */
     private BigDecimal discountPrice;
-    /**优惠卷主键id*/
+
+    /**
+     * 优惠卷主键id
+     */
     private Long couponId;
-    /**优惠券满足条件金额*/
+
+    /**
+     * 优惠券满足条件金额
+     */
     private BigDecimal couponFullAmount;
-    /**优惠券减去金额*/
+
+    /**
+     * 优惠券减去金额
+     */
     private BigDecimal couponUsedAmount;
-    /**店铺满减表id*/
+
+    /**
+     * 店铺满减表id
+     */
     private Long fullCutId;
-    /**店铺满减满足条件金额*/
+
+    /**
+     * 店铺满减满足条件金额
+     */
     private BigDecimal fullAmount;
-    /**店铺满减减去金额*/
+
+    /**
+     * 店铺满减减去金额
+     */
     private BigDecimal fullUsedAmount;
-    /**订单原价,菜价+配送费+餐盒费*/
+
+    /**
+     * 订单原价,菜价+配送费+餐盒费
+     */
     private BigDecimal originalPrice;
-    /**实际付款*/
+
+    /**
+     * 实际付款
+     */
+    @NotNull
     private BigDecimal payPrice;
-    /**配送员名字*/
+
+    /**
+     * 配送员名字
+     */
     private String senderName;
-    /**配送员手机*/
+
+    /**
+     * 配送员手机
+     */
     private String senderPhone;
-    /**配送员id*/
+
+    /**
+     * 配送员id
+     */
     private Integer senderId;
-    /**是否送达*/
+
+    /**
+     * 是否送达
+     */
     private Integer destination;
-    /**备注*/
+
+    /**
+     * 备注
+     */
+    @NotBlank
     private String remark;
-    /**订单相对于店铺的流水号*/
+
+    /**
+     * 订单相对于店铺的流水号
+     */
     private Integer waterNumber;
-    /**创建时间*/
+
+    /**
+     * 创建时间
+     */
+    @NotNull
     private Date createTime;
-    /**支付方式*/
+
+    /**
+     * 支付方式
+     */
     private String payment;
-    /**支付时间*/
+
+    /**
+     * 支付时间
+     */
     private String payTime;
-    /**支付时间戳*/
+
+    /**
+     * 支付时间戳
+     */
     private Long payTimeLong;
-    /**配送取得物品标志*/
+
+    /**
+     * 配送取得物品标志
+     */
+    @NotNull
     private Integer sendGetFlag;
-    /**送达时间*/
+
+    /**
+     * 送达时间
+     */
     private String endTime;
-    /**是否评论*/
+
+    /**
+     * 是否评论
+     */
+    @NotNull
     private Integer evaluateFlag;
-    /**预定送达时间*/
+
+    /**
+     * 预定送达时间
+     */
     private String reseverTime;
-    /**商家接手时间*/
+
+    /**
+     * 商家接手时间
+     */
+    @NotBlank
     private String shopAcceptTime;
-    /**粮票金额*/
+
+    /**
+     * 粮票金额
+     */
+    @NotNull
     private BigDecimal payFoodCoupon;
 
     public static long getSerialVersionUID() {
