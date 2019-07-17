@@ -2,6 +2,7 @@ package ops.school.api.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ops.school.api.dto.Test;
+import ops.school.api.entity.WxUser;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;

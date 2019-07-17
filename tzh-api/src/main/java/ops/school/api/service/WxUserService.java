@@ -2,6 +2,7 @@ package ops.school.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import ops.school.api.dto.wxgzh.Message;
+import ops.school.api.entity.WxUser;
 
 import java.util.List;
 

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ops.school.api.dao.*;
 import ops.school.api.dto.wxgzh.Message;
+import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.SchoolService;
