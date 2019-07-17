@@ -21,6 +21,7 @@
 
     <sql id="Base_Column_List" >
         id,
+        school_id,
         coupon_name,
         coupon_desc,
         full_amount,
