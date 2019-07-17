@@ -10,7 +10,6 @@ import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
 import ops.school.api.entity.ChargeLog;
 import ops.school.api.entity.School;
-import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;
 import ops.school.api.service.ChargeLogService;
 import ops.school.api.service.SchoolService;

@@ -2,7 +2,6 @@ package ops.school.message;
 
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.Orders;
-import ops.school.api.entity.WxUser;
 import ops.school.api.service.OrdersService;
 import ops.school.api.service.SenderService;
 import ops.school.api.service.WxUserService;

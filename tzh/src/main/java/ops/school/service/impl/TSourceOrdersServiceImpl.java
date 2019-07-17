@@ -2,7 +2,6 @@ package ops.school.service.impl;
 
 import ops.school.api.entity.SourceOrder;
 import ops.school.api.entity.SourceProduct;
-import ops.school.api.entity.WxUser;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.SourceOrderService;
 import ops.school.api.service.SourceProductService;

@@ -1,5 +1,9 @@
 package ops.school.api.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.GeneratedValue;
@@ -14,12 +18,12 @@ import javax.validation.constraints.NotNull;
  * @author 
  */
 @Table(name="wx_user_bell")
-public class WxUserBell implements Serializable {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class WxUserBell extends Base implements Serializable {
     /**
      * 手机号
      */
-    @Id
-    @GeneratedValue
+    @TableId(type = IdType.INPUT)
     private String phone;
 
     /**
@@ -63,6 +67,14 @@ public class WxUserBell implements Serializable {
      */
     @NotNull
     private BigDecimal foodCoupon;
+
+    public WxUserBell() {
+        super();
+    }
+
+    public WxUserBell(String phone2) {
+        this.phone = phone2;
+    }
 
     private static final long serialVersionUID = 1L;
 

@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.dto.ReplyTextMsg;
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
-import ops.school.api.entity.WxUser;
 import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.ResponseObject;
