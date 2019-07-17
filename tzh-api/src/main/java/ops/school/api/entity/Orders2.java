@@ -3,11 +3,16 @@ package ops.school.api.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import java.util.List;
 import javax.persistence.Table;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.util.BaiduUtil;
+import ops.school.api.util.Util;
 
 /**
  * orders
@@ -18,134 +23,134 @@ public class Orders implements Serializable {
     /**
      * 订单
      */
-    @Id
-    @GeneratedValue
+    @TableId(type = IdType.INPUT)
     private String id;
 
     /**
      * 主体id
      */
-    @NotEmpty
+    @NotNull
     private Integer appId;
 
     /**
      * 学校id
      */
-    @NotEmpty
+    @NotNull
     private Integer schoolId;
 
     /**
      * 楼上楼下差价
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal schoolTopDownPrice;
 
     /**
      * 店铺id
      */
-    @NotEmpty
+    @NotNull
     private Integer shopId;
 
     /**
      * 店铺名字
      */
-    @NotEmpty
+    @NotBlank
     private String shopName;
 
     /**
      * 店铺图片
      */
-    @NotEmpty
+    @NotBlank
     private String shopImage;
 
     /**
      * 店铺地址
      */
-    @NotEmpty
+    @NotBlank
     private String shopAddress;
 
     /**
      * 店铺电话
      */
-    @NotEmpty
+    @NotBlank
     private String shopPhone;
 
     /**
      * 用户id
      */
-    @NotEmpty
+    @NotBlank
     private String openId;
 
     /**
      * 收货人姓名
      */
-    @NotEmpty
+    @NotBlank
     private String addressName;
 
     /**
      * 收货人手机
      */
-    @NotEmpty
+    @NotBlank
     private String addressPhone;
 
     /**
      * 收货人详细地址
      */
-    @NotEmpty
+    @NotBlank
     private String addressDetail;
 
     /**
      * 楼栋id
      */
-    @NotEmpty
+    @NotNull
     private Integer floorId;
 
     /**
      * 订单类型
      */
-    @NotEmpty
+    @NotBlank
+    @Pattern(regexp = "外卖订单|堂食订单|跑腿订单|自取订单")
     private String typ;
 
     /**
      * 订单状态
      */
-    @NotEmpty
+    @NotBlank
     private String status;
 
     /**
      * 餐盒费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal boxPrice;
 
     /**
      * 配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendPrice;
 
     /**
      * 基础配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendBasePrice;
 
     /**
      * 额外距离配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendAddDistancePrice;
 
     /**
      * 额外件数配送费
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal sendAddCountPrice;
 
     /**
      * 商品费用
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal productPrice;
 
     /**
@@ -196,7 +201,7 @@ public class Orders implements Serializable {
     /**
      * 实际付款
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal payPrice;
 
     /**
@@ -222,7 +227,7 @@ public class Orders implements Serializable {
     /**
      * 备注
      */
-    @NotEmpty
+    @NotBlank
     private String remark;
 
     /**
@@ -233,7 +238,7 @@ public class Orders implements Serializable {
     /**
      * 创建时间
      */
-    @NotEmpty
+    @NotNull
     private Date createTime;
 
     /**
@@ -254,7 +259,7 @@ public class Orders implements Serializable {
     /**
      * 配送取得物品标志
      */
-    @NotEmpty
+    @NotNull
     private Integer sendGetFlag;
 
     /**
@@ -265,7 +270,7 @@ public class Orders implements Serializable {
     /**
      * 是否评论
      */
-    @NotEmpty
+    @NotNull
     private Integer evaluateFlag;
 
     /**
@@ -276,14 +281,18 @@ public class Orders implements Serializable {
     /**
      * 商家接手时间
      */
-    @NotEmpty
+    @NotBlank
     private String shopAcceptTime;
 
     /**
      * 粮票金额
      */
-    @NotEmpty
+    @NotNull
     private BigDecimal payFoodCoupon;
+
+    private List<OrderProduct> op;
+
+    private OrdersComplete complete;
 
     private static final long serialVersionUID = 1L;
 
@@ -845,5 +854,79 @@ public class Orders implements Serializable {
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
+    }
+    public void takeoutinit1(WxUser wxUser, School school, Shop shop, Floor floor, int totalcount, boolean isDiscount, List<FullCut> fullcut, int boxcount) {
+        this.schoolId = school.getId();
+        this.appId = school.getAppId();
+        this.schoolTopDownPrice = school.getTopDown();
+        this.shopId = shop.getId();
+        this.shopAddress = shop.getShopAddress();
+        this.shopImage = shop.getShopImage();
+        this.shopName = shop.getShopName();
+        this.shopPhone = shop.getShopPhone();
+        if (!isDiscount) {
+            for (FullCut temp : fullcut) {
+                if (this.productPrice.compareTo(new BigDecimal(temp.getFull())) != -1) {
+                    this.setDiscountType("满减优惠");
+                    this.discountPrice = new BigDecimal(temp.getCut());
+                    this.productPrice = this.productPrice.subtract(this.discountPrice);
+                    break;
+                }
+            }
+        }
+        //计算餐盒费
+        if (this.typ.equals("外卖订单") || this.typ.equals("自取订单")) {
+            this.boxPrice = shop.getBoxPrice().multiply(new BigDecimal(boxcount));
+        } else {
+            this.boxPrice = new BigDecimal(0);
+        }
+        //开始计算外卖的配送费
+        if (this.typ.equals("外卖订单")) {
+            this.sendBasePrice = shop.getSendPrice();
+            //按物品件数增加配送费
+            if (shop.getSendPriceAddByCountFlag() == 1) {
+                this.sendAddCountPrice = new BigDecimal((totalcount - 1)).multiply(shop.getSendPriceAdd());
+            } else {
+                this.sendAddCountPrice = new BigDecimal(0);
+            }
+            //判断配送距离
+            int distance = BaiduUtil.DistanceAll(floor.getLat() + "," + floor.getLng(), shop.getLat() + "," + shop.getLng());
+            if (distance > school.getSendMaxDistance()) {
+                int per = (distance / school.getSendPerOut()) + 1;
+                this.sendAddDistancePrice = new BigDecimal(per).multiply(school.getSendPerMoney());
+            } else {
+                this.sendAddDistancePrice = new BigDecimal(0);
+            }
+        } else {
+            this.sendBasePrice = new BigDecimal(0);
+            this.sendAddDistancePrice = new BigDecimal(0);
+            this.sendAddCountPrice = new BigDecimal(0);
+        }
+        //计算总的配送费
+        this.sendPrice = this.sendBasePrice.add(this.sendAddCountPrice).add(this.sendAddDistancePrice);
+        //计算总价
+        this.payPrice = this.productPrice.add(this.boxPrice).add(this.sendPrice);
+    }
+
+    public void init() {
+        synchronized (this) {
+            this.id = Util.GenerateOrderId();
+        }
+    }
+
+    public List<OrderProduct> getOp() {
+        return op;
+    }
+
+    public void setOp(List<OrderProduct> op) {
+        this.op = op;
+    }
+
+    public OrdersComplete getComplete() {
+        return complete;
+    }
+
+    public void setComplete(OrdersComplete complete) {
+        this.complete = complete;
     }
 }

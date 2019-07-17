@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Orders extends Base {
+
     @TableId(type = IdType.INPUT)
     private String id;
 
