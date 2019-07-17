@@ -1,5 +1,6 @@
 package ops.school.service.impl;
 
+import ops.school.api.dao.TxLogMapper;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
@@ -33,6 +34,9 @@ public class TCommonServiceImpl implements TCommonService {
     private ShopService shopService;
     @Autowired
     private TxLogService txLogService;
+
+    @Autowired
+    private TxLogMapper txLogMapper;
 
     @Transactional
     @Override
@@ -68,6 +72,7 @@ public class TCommonServiceImpl implements TCommonService {
     public int txAudit(Integer txId, Integer status) {
         // 通过txId查询提现记录表
         TxLog log = txLogService.getById(txId);
+
         // 提现指定账户
         WxUser wxUser = wxUserService.findById(log.getDzOpenid());
         // 满足下面条件的是配送员提现
