@@ -141,13 +141,15 @@ public class TSenderServiceImpl implements TSenderService {
         } else {
             // 放置楼下
             orders.setDestination(0);
+            // 配送费 < 楼上楼下差价
             if (orders.getSendPrice().compareTo(orders.getSchoolTopDownPrice()) == -1) {
-                orders.setPayPrice(orders.getPayPrice().subtract(orders.getSendPrice()));
+                /*orders.setPayPrice(orders.getPayPrice().subtract(orders.getSendPrice()));
+                // 配送费设为0，返还粮票为0*/
                 orders.setSendPrice(new BigDecimal(0));
                 returnPrice = orders.getSendPrice();
             } else {
-                orders.setPayPrice(orders.getPayPrice().subtract(orders.getSchoolTopDownPrice()));
-                orders.setSendPrice(orders.getSendPrice().subtract(orders.getSchoolTopDownPrice()));
+                /*orders.setPayPrice(orders.getPayPrice().subtract(orders.getSchoolTopDownPrice()));
+                orders.setSendPrice(orders.getSendPrice().subtract(orders.getSchoolTopDownPrice()));*/
                 returnPrice = orders.getSchoolTopDownPrice();
             }
             // 楼下取餐会获得楼下返还
