@@ -54,7 +54,7 @@ public class TCommonServiceImpl implements TCommonService {
         // 申请提现设置isTx为0
         log.setIsTx(0);
         // 提现到账openid
-        // log.setDzOpenid(dzOpenid);
+        log.setDzOpenid(dzOpenid);
         boolean result = txLogService.save(log);
         if (result) {
             return 1;
@@ -69,7 +69,7 @@ public class TCommonServiceImpl implements TCommonService {
         // 通过txId查询提现记录表
         TxLog log = txLogService.getById(txId);
         // 提现指定账户
-        WxUser wxUser = wxUserService.findById("");
+        WxUser wxUser = wxUserService.findById(log.getDzOpenid());
         // 满足下面条件的是配送员提现
         if (log.getType().equals("配送员提现")) {
             Sender sender = senderService.findById(log.getTxerId());
@@ -115,8 +115,7 @@ public class TCommonServiceImpl implements TCommonService {
                 Map<String,Object> map = new HashMap<>();
                 map.put("amount",log.getAmount());
                 map.put("shopId",shop.getId());
-                //shopService.shoptx(map) == 1
-                if (1==1) {
+                if (shopService.shoptx(map) == 1) {
                     try {
                         String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                         // 审核成功(提现成功)

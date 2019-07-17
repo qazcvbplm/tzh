@@ -28,6 +28,16 @@ public class TxLog {
 
     private Integer isTx;
 
+    private String dzOpenid;
+
+    public String getDzOpenid() {
+        return dzOpenid;
+    }
+
+    public void setDzOpenid(String dzOpenid) {
+        this.dzOpenid = dzOpenid;
+    }
+
     public Integer getIsTx() {
         return isTx;
     }

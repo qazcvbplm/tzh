@@ -5,6 +5,7 @@ import ops.school.api.entity.Shop;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 public interface ShopService extends IService<Shop> {
 
@@ -18,5 +19,5 @@ public interface ShopService extends IService<Shop> {
 
     int openorclose(Integer id);
 
-
+    int shoptx(Map<String,Object> map);
 }

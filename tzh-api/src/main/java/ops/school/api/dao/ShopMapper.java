@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ops.school.api.entity.Shop;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ShopMapper extends BaseMapper<Shop> {
 
@@ -14,4 +15,6 @@ public interface ShopMapper extends BaseMapper<Shop> {
     List<Shop> find(Shop shop);
 
     int count(Shop shop);
+
+    int shoptx(Map<String,Object> map);
 }

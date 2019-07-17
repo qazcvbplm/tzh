@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements ShopService {
@@ -94,6 +95,11 @@ public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements S
         update.setId(id);
         update.setOpenFlag(shop.getOpenFlag());
         return update(update);
+    }
+
+    @Override
+    public int shoptx(Map<String, Object> map) {
+        return shopMapper.shoptx(map);
     }
 
 

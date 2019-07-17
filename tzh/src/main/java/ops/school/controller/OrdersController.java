@@ -78,7 +78,7 @@ public class OrdersController {
 	@ApiOperation(value="支付订单",httpMethod="POST")
 	@PostMapping("pay")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,
-			String orderId,String payment){
+			String orderId,String payment, String formid){
 		 Orders orders=ordersService.findById(orderId);
 		 List<OrderProduct> ops=orders.getOp();
 		 List<Integer> pids=new ArrayList<>();
@@ -96,7 +96,7 @@ public class OrdersController {
 			  return new ResponseObject(true, "ok").push("msg", msg);
 		 }
 		 if(payment.equals("余额支付")){
-             if (tOrdersService.pay(orders) == 1) {
+             if (tOrdersService.pay(orders,formid) == 1) {
 				 Map<String,Object> map=new HashMap<>();
 				 map.put("schoolId", orders.getSchoolId());
 				 map.put("amount", orders.getPayPrice());
