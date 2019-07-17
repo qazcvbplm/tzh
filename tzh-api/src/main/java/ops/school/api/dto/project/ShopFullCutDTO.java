@@ -1,7 +1,10 @@
 package ops.school.api.dto.project;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.entity.ShopFullCut;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.io.Serializable;
 
@@ -13,37 +16,50 @@ public class ShopFullCutDTO extends BaseDTO implements Serializable {
      * 主键id
      */
     private Long id;
+
     /**
      * 店铺id
      */
+    @NotNull
     private Long shopId;
+
     /**
      * 满
      */
     private Integer fullAmount;
+
     /**
      * 减
      */
     private Integer cutAmount;
+
     /**
      * 是否删除 0：否 1：是
      */
     private Byte isDelete;
+
     /**
      * 创建人ID
      */
+    @NotNull
     private Long createId;
+
     /**
      * 更新人ID
      */
+    @NotNull
     private Long updateId;
+
     /**
      * 创建时间
      */
+    @NotNull
     private Date createTime;
+
     /**
      * 更新时间
      */
+    @NotNull
     private Date updateTime;
 
     public static long getSerialVersionUID() {

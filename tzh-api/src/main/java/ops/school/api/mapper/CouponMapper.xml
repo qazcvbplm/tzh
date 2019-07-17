@@ -3,6 +3,7 @@
 <mapper namespace="ops.school.api.dao.CouponMapper" >
 <resultMap id="BaseResultMap" type="ops.school.api.entity.Coupon" >
     <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="school_id" property="schoolId" jdbcType="BIGINT" />
     <result column="coupon_name" property="couponName" jdbcType="VARCHAR" />
     <result column="coupon_desc" property="couponDesc" jdbcType="VARCHAR" />
     <result column="full_amount" property="fullAmount" jdbcType="INTEGER" />
@@ -20,6 +21,7 @@
 
     <sql id="Base_Column_List" >
         id,
+        school_id,
         coupon_name,
         coupon_desc,
         full_amount,

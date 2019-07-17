@@ -1,7 +1,10 @@
 package ops.school.api.dto.project;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.entity.WxUser;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 
@@ -9,48 +12,67 @@ public class WxUserDTO extends BaseDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
-     * 主键id
-     */
-    private Long id;
-    /**
      * 微信用户唯一标识
      */
     private String openId;
+
+    /**
+     * 主键id
+     */
+    @NotNull
+    private Long id;
+
     /**
      * 微信昵称
      */
+    @NotNull
     private String nickName;
+
     /**
      * 微信头像
      */
+    @NotNull
     private String avatarUrl;
+
     /**
      * 性别
      */
+    @NotNull
     private String gender;
+
     /**
      * 省
      */
+    @NotNull
     private String province;
+
     /**
      * 城市
      */
     private String city;
+
     /**
      * 手机号码
      */
+    @NotNull
     private String phone;
+
     /**
      * 来源
      */
+    @NotNull
     private String client;
+
     /**
      * 学校id
      */
+    @NotNull
     private Integer schoolId;
+
     /**
      * 主体id
      */
+    @NotNull
     private Integer appId;
 
     public static long getSerialVersionUID() {

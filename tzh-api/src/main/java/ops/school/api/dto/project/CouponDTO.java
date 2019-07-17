@@ -1,7 +1,10 @@
 package ops.school.api.dto.project;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.entity.Coupon;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.io.Serializable;
 
@@ -13,57 +16,87 @@ public class CouponDTO extends BaseDTO implements Serializable {
      * 主键id
      */
     private Long id;
+
+    /**
+     * 学校id
+     */
+    @NotNull
+    private Long schoolId;
+
     /**
      * 优惠券名称
      */
+    @NotNull
     private String couponName;
+
     /**
      * 优惠券描述
      */
+    @NotNull
     private String couponDesc;
+
     /**
      * 优惠券面额（满额使用）
      */
+    @NotNull
     private Integer fullAmount;
+
     /**
      * 优惠金额（减额）
      */
+    @NotNull
     private Integer cutAmount;
+
     /**
      * 优惠券类型（0.店铺优惠券  1.首页优惠券）
      */
+    @NotNull
     private Integer couponType;
+
     /**
      * 优惠券开始使用时间
      */
+    @NotNull
     private Date beginTime;
+
     /**
      * 优惠券有效天数
      */
+    @NotNull
     private Integer effectiveDays;
+
     /**
      * 创建时间
      */
+    @NotNull
     private Date createTime;
+
     /**
      * 创建人id
      */
+    @NotNull
     private Long createId;
+
     /**
      * 修改时间
      */
     private Date updateTime;
+
     /**
      * 修改人id
      */
     private Long updateId;
+
     /**
      * 是否失效（1.失效 0.有效）
      */
+    @NotNull
     private Integer isInvalid;
+
     /**
      * 是否删除（1.删除 0.未删除）
      */
+    @NotNull
     private Integer isDelete;
 
     public static long getSerialVersionUID() {

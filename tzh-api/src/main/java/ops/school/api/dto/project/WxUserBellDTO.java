@@ -1,7 +1,10 @@
 package ops.school.api.dto.project;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.entity.WxUserBell;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.io.Serializable;
 
@@ -10,36 +13,50 @@ public class WxUserBellDTO extends BaseDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
-     * 主键id
-     */
-    private Long id;
-    /**
-     * wxuser表主键id
-     */
-    private Long wxUserId;
-    /**
      * 手机号
      */
     private String phone;
+
+    /**
+     * 主键id
+     */
+    @NotNull
+    private Long id;
+
+    /**
+     * wxuser表主键id
+     */
+    @NotNull
+    private Long wxUserId;
+
     /**
      * 积分
      */
+    @NotNull
     private Integer source;
+
     /**
      * 余额
      */
+    @NotNull
     private BigDecimal money;
+
     /**
      * 会员标志
      */
+    @NotNull
     private Integer isVip;
+
     /**
      * 会员过期时间
      */
+    @NotNull
     private Long vipOutTime;
+
     /**
      * 粮票余额
      */
+    @NotNull
     private BigDecimal foodCoupon;
 
     public static long getSerialVersionUID() {
