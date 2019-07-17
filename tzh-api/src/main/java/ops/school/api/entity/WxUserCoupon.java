@@ -2,11 +2,11 @@ package ops.school.api.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 
 /**
  * wx_user_coupon
@@ -17,8 +17,7 @@ public class WxUserCoupon implements Serializable {
     /**
      * 主键id
      */
-    @Id
-    @GeneratedValue
+    @TableId(type = IdType.INPUT)
     private Long id;
 
     /**
