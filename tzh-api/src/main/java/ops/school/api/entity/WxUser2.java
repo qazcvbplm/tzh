@@ -1,23 +1,22 @@
 package ops.school.api.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * wx_user
  * @author 
  */
 @Table(name="wx_user")
-public class WxUser implements Serializable {
+public class WxUser extends Base implements Serializable {
     /**
      * 微信用户唯一标识
      */
-    @Id
-    @GeneratedValue
+    @TableId(type = IdType.INPUT)
     private String openId;
 
     /**
@@ -78,6 +77,26 @@ public class WxUser implements Serializable {
      */
     @NotNull
     private Integer appId;
+
+    private WxUserBell bell;
+
+    public WxUserBell getBell() {
+        return bell;
+    }
+
+    public void setBell(WxUserBell bell) {
+        this.bell = bell;
+    }
+
+    public WxUser(String openId, String client) {
+        super();
+        this.openId = openId;
+        this.client = client;
+    }
+
+    public WxUser() {
+        super();
+    }
 
     private static final long serialVersionUID = 1L;
 
