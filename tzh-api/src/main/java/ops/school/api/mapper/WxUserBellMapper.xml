@@ -2,15 +2,59 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ops.school.api.dao.WxUserBellMapper">
     <resultMap id="BaseResultMap" type="ops.school.api.entity.WxUserBell">
-        <id column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="id" property="id" jdbcType="BIGINT" />
+        <result column="wx_user_id" property="wxUserId" jdbcType="BIGINT" />
+
         <result column="source" jdbcType="INTEGER" property="source"/>
         <result column="money" jdbcType="DECIMAL" property="money"/>
         <result column="is_vip" jdbcType="INTEGER" property="isVip"/>
         <result column="vip_out_time" jdbcType="BIGINT" property="vipOutTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    phone, source, money, is_vip, vip_out_time
-  </sql>
+
+
+    <sql id="Base_Column_List" >
+        id,
+        wx_user_id,
+        phone,
+        source,
+        money,
+        is_vip,
+        vip_out_time,
+        food_coupon
+    </sql>
+
+    <sql id="Table_Name">
+        wx_user_bell
+    </sql>
+
+    <sql id="Select_Limit_State">
+        1=1
+        <if test="id != null and id != '' ">
+            AND id = #{id}
+        </if>
+        <if test="wxUserId != null and wxUserId != '' ">
+            AND wx_user_id = #{wxUserId}
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND phone = #{phone}
+        </if>
+        <if test="source != null and source != '' ">
+            AND source = #{source}
+        </if>
+        <if test="money != null and money != '' ">
+            AND money = #{money}
+        </if>
+        <if test="isVip != null and isVip != '' ">
+            AND is_vip = #{isVip}
+        </if>
+        <if test="vipOutTime != null and vipOutTime != '' ">
+            AND vip_out_time = #{vipOutTime}
+        </if>
+        <if test="foodCoupon != null and foodCoupon != '' ">
+            AND food_coupon = #{foodCoupon}
+        </if>
+    </sql>
+
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     *
