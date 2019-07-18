@@ -2,6 +2,7 @@ package ops.school.controller;
 
 import io.swagger.annotations.Api;
 import ops.school.api.entity.Coupon;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
@@ -16,7 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Api(tags = "优惠券模块")
@@ -106,4 +109,29 @@ public class CouponController {
         }
         return new ResponseObject(false,"店铺添加优惠券失败");
     }
+
+    /**
+     * @date:   2019/7/18 18:34
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   userId
+     * @param   schoolId
+     * @param   shopId
+     * @param   couponId
+     * @Desc:   desc 根据用户id，学校id，店铺id，优惠券id，让用户获取优惠券
+     */
+    @ResponseBody
+    @RequestMapping(value = "getCoupons", method = RequestMethod.POST)
+    public ResponseObject userGetCoupons(Long userId,Long schoolId,Long shopId,Long couponId){
+        Assertions.notNull(userId,schoolId,shopId,couponId);
+        Map map = new HashMap();
+        map.put("userId",userId);
+        map.put("shopId",shopId);
+        map.put("couponId",couponId);
+        map.put("schoolId",schoolId);
+        ResponseObject responseObject = tCouponService.userGetCouponByIdMap(map);
+        return  responseObject;
+    }
+
 }

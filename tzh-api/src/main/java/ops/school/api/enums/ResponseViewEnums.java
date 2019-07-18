@@ -14,6 +14,11 @@ public enum ResponseViewEnums implements RootEnums{
 
     /**优惠券错误*/
     COUPON_HOME_NUM_ERROR("C11001","优惠券信息变更，更新后操作"),
+    COUPON_USER_GET_ERROR("C11002","领取优惠券失败，稍后再来！"),
+    COUPON_USER_GET_SUCCESS("C11003","领取优惠券成功，尽情使用吧！"),
+
+    /**微信用户错误*/
+    WX_USER_NO_EXIST("WX11001","微信用户不存在，更新后操作"),
     ;
 
     private String errorCode;

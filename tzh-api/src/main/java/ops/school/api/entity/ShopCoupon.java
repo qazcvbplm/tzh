@@ -2,6 +2,7 @@ package ops.school.api.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -50,6 +51,8 @@ public class ShopCoupon implements Serializable {
      */
     @NotNull
     private Integer isDelete;
+
+    private Coupon coupon;
 
     private static final long serialVersionUID = 1L;
 
@@ -101,53 +104,43 @@ public class ShopCoupon implements Serializable {
         this.isDelete = isDelete;
     }
 
+    public Coupon getCoupon() {
+        return coupon;
+    }
+
+    public void setCoupon(Coupon coupon) {
+        this.coupon = coupon;
+    }
+
     @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        ShopCoupon other = (ShopCoupon) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getShopId() == null ? other.getShopId() == null : this.getShopId().equals(other.getShopId()))
-            && (this.getCouponId() == null ? other.getCouponId() == null : this.getCouponId().equals(other.getCouponId()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getCreateId() == null ? other.getCreateId() == null : this.getCreateId().equals(other.getCreateId()))
-            && (this.getIsDelete() == null ? other.getIsDelete() == null : this.getIsDelete().equals(other.getIsDelete()));
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShopCoupon that = (ShopCoupon) o;
+        return id.equals(that.id) &&
+                shopId.equals(that.shopId) &&
+                couponId.equals(that.couponId) &&
+                createTime.equals(that.createTime) &&
+                createId.equals(that.createId) &&
+                isDelete.equals(that.isDelete) &&
+                Objects.equals(coupon, that.coupon);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getShopId() == null) ? 0 : getShopId().hashCode());
-        result = prime * result + ((getCouponId() == null) ? 0 : getCouponId().hashCode());
-        result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
-        result = prime * result + ((getCreateId() == null) ? 0 : getCreateId().hashCode());
-        result = prime * result + ((getIsDelete() == null) ? 0 : getIsDelete().hashCode());
-        return result;
+        return Objects.hash(id, shopId, couponId, createTime, createId, isDelete, coupon);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", shopId=").append(shopId);
-        sb.append(", couponId=").append(couponId);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", createId=").append(createId);
-        sb.append(", isDelete=").append(isDelete);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
+        return "ShopCoupon{" +
+                "id=" + id +
+                ", shopId=" + shopId +
+                ", couponId=" + couponId +
+                ", createTime=" + createTime +
+                ", createId=" + createId +
+                ", isDelete=" + isDelete +
+                ", coupon=" + coupon +
+                '}';
     }
 }

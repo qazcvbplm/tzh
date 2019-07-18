@@ -2,6 +2,7 @@ package ops.school.api.dto.project;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.entity.Coupon;
 import ops.school.api.entity.ShopCoupon;
 
 import javax.validation.constraints.NotNull;
@@ -47,6 +48,8 @@ public class ShopCouponDTO extends BaseDTO implements Serializable {
      */
     @NotNull
     private Integer isDelete;
+
+
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -99,4 +102,6 @@ public class ShopCouponDTO extends BaseDTO implements Serializable {
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
     }
+
+
 }

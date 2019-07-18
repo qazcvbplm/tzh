@@ -5,6 +5,7 @@ import ops.school.api.entity.Coupon;
 import ops.school.api.util.ResponseObject;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TCouponService {
 
@@ -25,4 +26,14 @@ public interface TCouponService {
      * @Desc:   desc 首页优惠券绑定
      */
     ResponseObject bindHomeCouponsBySIdAndIds(CouponDTO couponDTO);
+
+    /**
+     * @date:   2019/7/18 17:33
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   map
+     * @Desc:   desc 根据用户id，学校id，店铺id，优惠券id，让用户获取优惠券
+     */
+    ResponseObject userGetCouponByIdMap(Map map);
 }
