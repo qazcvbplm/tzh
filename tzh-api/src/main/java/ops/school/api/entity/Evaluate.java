@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 public class Evaluate extends Base {
     @TableId(type = IdType.AUTO)
@@ -24,15 +25,15 @@ public class Evaluate extends Base {
 
     private Integer isDelete;
 
-    private String replyTime;
+    private Date replyTime;
 
     private String replyContent;
 
-    public String getReplyTime() {
+    public Date getReplyTime() {
         return replyTime;
     }
 
-    public void setReplyTime(String replyTime) {
+    public void setReplyTime(Date replyTime) {
         this.replyTime = replyTime;
     }
 

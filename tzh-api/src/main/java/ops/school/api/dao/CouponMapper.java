@@ -74,4 +74,11 @@ public interface CouponMapper extends BaseMapper<Coupon> {
      * @Desc:   desc 通过学校id和优惠券分类查询
      */
     List<Coupon> findByIndex(Map<String,Object> map);
+
+    /**
+     *
+     * @param coupon
+     * @return
+     */
+    int insert(Coupon coupon);
 }

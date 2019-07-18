@@ -131,7 +131,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             QueryWrapper<OrderProduct> query = new QueryWrapper<>();
             query.lambda().eq(OrderProduct::getOrderId,orders.getId());
             List<OrderProduct> list = orderProductService.list(query);
-            Message message = new Message(null, "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
+            Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
                     , formid, "pages/mine/payment/payment", " 您的会员帐户余额有变动！", orders.getWaterNumber()+"", orders.getId(),
                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), list.get(0).getProductName(),
                     "如有疑问请在小程序内联系客服人员！", null, null,

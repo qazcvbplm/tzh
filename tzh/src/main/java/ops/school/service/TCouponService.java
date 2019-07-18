@@ -7,4 +7,10 @@ import java.util.List;
 public interface TCouponService {
 
     List<Coupon> findByIndex(Long schoolId, Integer couponType);
+
+    Integer count(Long schoolId, Integer couponType);
+
+    List<Coupon> findCoupons(Long schoolId, Integer couponType, int page, int size);
+
+    int insert(Coupon coupon);
 }

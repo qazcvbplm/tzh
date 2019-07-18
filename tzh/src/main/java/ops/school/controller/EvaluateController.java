@@ -75,9 +75,7 @@ public class EvaluateController {
 
     @ApiOperation(value = "更新",httpMethod = "POST")
     @PostMapping("update")
-    public ResponseObject update(HttpServletRequest request, HttpServletResponse response,@ModelAttribute @Valid Evaluate evaluate,
-                                 BindingResult result){
-        Util.checkParams(result);
+    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, Evaluate evaluate){
 	    evaluateService.updateById(evaluate);
 	    return new ResponseObject(true,"ok");
     }

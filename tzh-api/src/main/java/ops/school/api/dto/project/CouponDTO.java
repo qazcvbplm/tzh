@@ -111,6 +111,14 @@ public class CouponDTO extends BaseDTO implements Serializable {
         this.id = id;
     }
 
+    public void setSchoolId(Long schoolId) {
+        this.schoolId = schoolId;
+    }
+
+    public Long getSchoolId() {
+        return schoolId;
+    }
+
     public String getCouponName() {
         return couponName;
     }

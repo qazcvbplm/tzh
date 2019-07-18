@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * coupon
@@ -60,6 +61,7 @@ public class Coupon implements Serializable {
      * 优惠券开始使用时间
      */
     @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date beginTime;
 
     /**
@@ -71,13 +73,11 @@ public class Coupon implements Serializable {
     /**
      * 创建时间
      */
-    @NotNull
     private Date createTime;
 
     /**
      * 创建人id
      */
-    @NotNull
     private Long createId;
 
     /**
@@ -93,13 +93,11 @@ public class Coupon implements Serializable {
     /**
      * 是否失效（1.失效 0.有效）
      */
-    @NotNull
     private Integer isInvalid;
 
     /**
      * 是否删除（1.删除 0.未删除）
      */
-    @NotNull
     private Integer isDelete;
 
     private static final long serialVersionUID = 1L;
@@ -110,6 +108,14 @@ public class Coupon implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getSchoolId() {
+        return schoolId;
+    }
+
+    public void setSchoolId(Long schoolId) {
+        this.schoolId = schoolId;
     }
 
     public String getCouponName() {
