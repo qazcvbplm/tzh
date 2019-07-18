@@ -138,7 +138,7 @@
     AND is_delete = 0
 </update>
 
-<select id="findByIndex" resultMap="BaseResultMap" parameterMap="map">
+    <select id="findByIndex" resultMap="BaseResultMap" parameterType="map">
     select <include refid="Base_Column_List"/>
     from <include refid="Table_Name"/>
     where school_id = #{schoolId } and coupon_type = #{couponType}
