@@ -9,7 +9,9 @@
         <result column="full_amount" property="fullAmount" jdbcType="INTEGER"/>
         <result column="cut_amount" property="cutAmount" jdbcType="INTEGER"/>
         <result column="coupon_type" property="couponType" jdbcType="INTEGER"/>
-        <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP"/>
+        <result column="yes_show_index" property="yesShowIndex" jdbcType="INTEGER"/>
+        <result column="send_begin_time" property="sendBeginTime" jdbcType="TIMESTAMP"/>
+        <result column="send_end_time" property="sendEndTime" jdbcType="TIMESTAMP"/>
         <result column="effective_days" property="effectiveDays" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="create_id" property="createId" jdbcType="BIGINT"/>
@@ -27,7 +29,9 @@
         full_amount,
         cut_amount,
         coupon_type,
-        begin_time,
+        yes_show_index,
+        send_begin_time,
+        send_end_time,
         effective_days,
         create_time,
         create_id,
@@ -61,8 +65,14 @@
         <if test="couponType != null and couponType != '' ">
             AND coupon_type = #{couponType}
         </if>
-        <if test="beginTime != null and beginTime != '' ">
-            AND begin_time = #{beginTime}
+        <if test="yesShowIndex != null and yesShowIndex != '' ">
+            AND yes_show_index = #{yesShowIndex}
+        </if>
+        <if test="sendBeginTime != null and sendBeginTime != '' ">
+            AND send_begin_time = #{sendBeginTime}
+        </if>
+        <if test="sendEndTime != null and sendEndTime != '' ">
+            AND send_end_time = #{sendEndTime}
         </if>
         <if test="effectiveDays != null and effectiveDays != '' ">
             AND effective_days = #{effectiveDays}
@@ -143,20 +153,16 @@
         <include refid="Base_Column_List"/>
         from
         <include refid="Table_Name"/>
-        where school_id = #{schoolId } and coupon_type = #{couponType}
+        where school_id = #{schoolId } and coupon_type = #{couponType} and yes_show_index = 1
     </select>
 
     <insert id="insert" parameterType="ops.school.api.entity.Coupon">
         insert into <include refid="Table_Name"/>
         values (
         null, #{schoolId}, #{couponName}, #{couponDesc}, #{fullAmount},
-        #{cutAmount}, #{couponType}, #{beginTime}, #{effectiveDays}, now(),
+        #{cutAmount}, #{couponType},0, #{sendBeginTime},#{sendEndTime}, #{effectiveDays}, now(),
         #{createId}, null, null, 0,0
         );
     </insert>
-    <select id="findByIndex" resultMap="BaseResultMap" parameterType="map">
-    select <include refid="Base_Column_List"/>
-    from <include refid="Table_Name"/>
-    where school_id = #{schoolId } and coupon_type = #{couponType}
-</select>
+
 </mapper>

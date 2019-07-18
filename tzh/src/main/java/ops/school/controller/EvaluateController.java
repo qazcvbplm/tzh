@@ -77,6 +77,6 @@ public class EvaluateController {
     @PostMapping("update")
     public ResponseObject update(HttpServletRequest request, HttpServletResponse response, Evaluate evaluate){
 	    evaluateService.updateById(evaluate);
-	    return new ResponseObject(true,"ok");
+	    return new ResponseObject(true,"更新成功");
     }
 }

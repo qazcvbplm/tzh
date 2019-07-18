@@ -15,92 +15,87 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Table(name="coupon")
 public class Coupon implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * 主键id
      */
     @TableId(type = IdType.INPUT)
     private Long id;
-
     /**
      * 学校id
      */
     @NotNull
     private Long schoolId;
-
     /**
      * 优惠券名称
      */
     @NotNull
     private String couponName;
-
     /**
      * 优惠券描述
      */
     @NotNull
     private String couponDesc;
-
     /**
      * 优惠券面额（满额使用）
      */
     @NotNull
     private Integer fullAmount;
-
     /**
      * 优惠金额（减额）
      */
     @NotNull
     private Integer cutAmount;
-
     /**
      * 优惠券类型（0.店铺优惠券  1.首页优惠券）
      */
     @NotNull
     private Integer couponType;
-
     /**
-     * 优惠券开始使用时间
+     * 优惠券是否在首页展示（0不展示，1展示）
+     */
+    private Integer yesShowIndex;
+    /**
+     * 优惠券发放开始时间
      */
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date beginTime;
-
+    private Date sendBeginTime;
+    /**
+     * 优惠券发放结束时间
+     */
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date sendEndTime;
     /**
      * 优惠券有效天数
      */
     @NotNull
     private Integer effectiveDays;
-
     /**
      * 创建时间
      */
     private Date createTime;
-
     /**
      * 创建人id
      */
     private Long createId;
-
     /**
      * 修改时间
      */
     private Date updateTime;
-
     /**
      * 修改人id
      */
     private Long updateId;
-
     /**
      * 是否失效（1.失效 0.有效）
      */
     private Integer isInvalid;
-
     /**
      * 是否删除（1.删除 0.未删除）
      */
     private Integer isDelete;
-
-    private static final long serialVersionUID = 1L;
 
     public Long getId() {
         return id;
@@ -156,14 +151,6 @@ public class Coupon implements Serializable {
 
     public void setCouponType(Integer couponType) {
         this.couponType = couponType;
-    }
-
-    public Date getBeginTime() {
-        return beginTime;
-    }
-
-    public void setBeginTime(Date beginTime) {
-        this.beginTime = beginTime;
     }
 
     public Integer getEffectiveDays() {
@@ -222,6 +209,30 @@ public class Coupon implements Serializable {
         this.isDelete = isDelete;
     }
 
+    public Integer getYesShowIndex() {
+        return yesShowIndex;
+    }
+
+    public void setYesShowIndex(Integer yesShowIndex) {
+        this.yesShowIndex = yesShowIndex;
+    }
+
+    public Date getSendBeginTime() {
+        return sendBeginTime;
+    }
+
+    public void setSendBeginTime(Date sendBeginTime) {
+        this.sendBeginTime = sendBeginTime;
+    }
+
+    public Date getSendEndTime() {
+        return sendEndTime;
+    }
+
+    public void setSendEndTime(Date sendEndTime) {
+        this.sendEndTime = sendEndTime;
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -240,9 +251,8 @@ public class Coupon implements Serializable {
             && (this.getFullAmount() == null ? other.getFullAmount() == null : this.getFullAmount().equals(other.getFullAmount()))
             && (this.getCutAmount() == null ? other.getCutAmount() == null : this.getCutAmount().equals(other.getCutAmount()))
             && (this.getCouponType() == null ? other.getCouponType() == null : this.getCouponType().equals(other.getCouponType()))
-            && (this.getBeginTime() == null ? other.getBeginTime() == null : this.getBeginTime().equals(other.getBeginTime()))
-            && (this.getEffectiveDays() == null ? other.getEffectiveDays() == null : this.getEffectiveDays().equals(other.getEffectiveDays()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
+            && (this.getSendBeginTime() == null ? other.getSendBeginTime() == null : this.getSendBeginTime().equals(other.getSendBeginTime())) && (this.getEffectiveDays() == null ? other.getEffectiveDays() == null : this.getEffectiveDays().equals(other.getEffectiveDays())) & (this.getSendBeginTime() == null ? other.getSendBeginTime() == null : this.getSendBeginTime().equals(other.getSendBeginTime())) && (this.getEffectiveDays() == null ? other.getEffectiveDays() == null : this.getEffectiveDays().equals(other.getEffectiveDays())) && (this.getSendBeginTime() == null ? other.getSendBeginTime() == null : this.getSendBeginTime().equals(other.getSendBeginTime())) && (this.getEffectiveDays() == null ? other.getEffectiveDays() == null : this.getEffectiveDays().equals(other.getEffectiveDays()))
+                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getCreateId() == null ? other.getCreateId() == null : this.getCreateId().equals(other.getCreateId()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
             && (this.getUpdateId() == null ? other.getUpdateId() == null : this.getUpdateId().equals(other.getUpdateId()))
@@ -260,7 +270,9 @@ public class Coupon implements Serializable {
         result = prime * result + ((getFullAmount() == null) ? 0 : getFullAmount().hashCode());
         result = prime * result + ((getCutAmount() == null) ? 0 : getCutAmount().hashCode());
         result = prime * result + ((getCouponType() == null) ? 0 : getCouponType().hashCode());
-        result = prime * result + ((getBeginTime() == null) ? 0 : getBeginTime().hashCode());
+        result = prime * result + ((getYesShowIndex() == null) ? 0 : getYesShowIndex().hashCode());
+        result = prime * result + ((getSendBeginTime() == null) ? 0 : getSendBeginTime().hashCode());
+        result = prime * result + ((getSendEndTime() == null) ? 0 : getSendEndTime().hashCode());
         result = prime * result + ((getEffectiveDays() == null) ? 0 : getEffectiveDays().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getCreateId() == null) ? 0 : getCreateId().hashCode());
@@ -283,7 +295,9 @@ public class Coupon implements Serializable {
         sb.append(", fullAmount=").append(fullAmount);
         sb.append(", cutAmount=").append(cutAmount);
         sb.append(", couponType=").append(couponType);
-        sb.append(", beginTime=").append(beginTime);
+        sb.append(", yesShowIndex=").append(yesShowIndex);
+        sb.append(", beginTime=").append(sendBeginTime);
+        sb.append(", sendEndTime=").append(sendEndTime);
         sb.append(", effectiveDays=").append(effectiveDays);
         sb.append(", createTime=").append(createTime);
         sb.append(", createId=").append(createId);

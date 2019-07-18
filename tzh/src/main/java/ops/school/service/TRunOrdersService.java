@@ -7,5 +7,5 @@ public interface TRunOrdersService {
     @Transactional
     int cancel(String id);
 
-    int pay(RunOrders orders);
+    int pay(RunOrders orders,String formid);
 }

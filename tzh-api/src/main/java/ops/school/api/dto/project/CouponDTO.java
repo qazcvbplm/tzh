@@ -3,6 +3,7 @@ package ops.school.api.dto.project;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.entity.Coupon;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -54,10 +55,23 @@ public class CouponDTO extends BaseDTO implements Serializable {
     private Integer couponType;
 
     /**
-     * 优惠券开始使用时间
+     * 优惠券是否在首页展示（0不展示，1展示）
+     */
+    private Integer yesShowIndex;
+
+    /**
+     * 优惠券发放开始时间
      */
     @NotNull
-    private Date beginTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date sendBeginTime;
+
+    /**
+     * 优惠券发放结束时间
+     */
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date sendEndTime;
 
     /**
      * 优惠券有效天数
@@ -159,12 +173,12 @@ public class CouponDTO extends BaseDTO implements Serializable {
         this.couponType = couponType;
     }
 
-    public Date getBeginTime() {
-        return beginTime;
+    public Integer getYesShowIndex() {
+        return yesShowIndex;
     }
 
-    public void setBeginTime(Date beginTime) {
-        this.beginTime = beginTime;
+    public void setYesShowIndex(Integer yesShowIndex) {
+        this.yesShowIndex = yesShowIndex;
     }
 
     public Integer getEffectiveDays() {

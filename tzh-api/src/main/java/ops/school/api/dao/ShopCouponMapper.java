@@ -65,4 +65,6 @@ public interface ShopCouponMapper extends BaseMapper<ShopCoupon> {
      * @Desc:   desc 通过id启用
      */
     Integer startOneById(Long id);
+
+    int insert(ShopCoupon shopCoupon);
 }
