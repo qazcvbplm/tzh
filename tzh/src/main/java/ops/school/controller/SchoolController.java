@@ -36,8 +36,6 @@ import java.util.concurrent.TimeUnit;
 @Api(tags="学校模块")
 @RequestMapping("ops/school")
 public class SchoolController {
-
-
     @Autowired
 	private SchoolService schoolService;
 	@Autowired
@@ -66,8 +64,9 @@ public class SchoolController {
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,School school){
 		              List<School> list=schoolService.find(school);
-		              List<Coupon> couponList = tCouponService.findByIndex();
-		              return new ResponseObject(true,"ok").push("list", list);
+		              Assertions.notNull(school.getId());
+		              List<Coupon> couponList = tCouponService.findByIndex(Long.valueOf(school.getId()),CouponContants.COUPON_TYPE_HOME,null);
+		              return new ResponseObject(true,"ok").push("list", list).push("couponList",couponList);
 	}
 	
 	@ApiOperation(value="更新",httpMethod="POST")

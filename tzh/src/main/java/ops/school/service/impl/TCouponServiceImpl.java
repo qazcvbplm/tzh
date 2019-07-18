@@ -41,13 +41,14 @@ public class TCouponServiceImpl implements TCouponService {
     private HomeCouponMapper homeCouponMapper;
 
     @Override
-    public List<Coupon> findByIndex(Long schoolId, Integer couponType) {
+    public List<Coupon> findByIndex(Long schoolId, Integer couponType, Integer yesShowIndex) {
         if (schoolId == null || couponType == null){
             return null;
         }
         Map<String,Object> map = new HashMap<>();
         map.put("schoolId",schoolId);
         map.put("couponType",couponType);
+        map.put("yesShowIndex",yesShowIndex);
         return couponMapper.findByIndex(map);
     }
 
@@ -59,6 +60,8 @@ public class TCouponServiceImpl implements TCouponService {
         CouponDTO couponDTO = new CouponDTO();
         couponDTO.setCouponType(couponType);
         couponDTO.setSchoolId(schoolId);
+        couponDTO.setIsDelete(0);
+        couponDTO.setIsInvalid(0);
         return couponMapper.countLimitByDTO(couponDTO);
     }
 
@@ -70,6 +73,8 @@ public class TCouponServiceImpl implements TCouponService {
         QueryWrapper<Coupon> query = new QueryWrapper<>();
         query.lambda().eq(Coupon::getSchoolId,schoolId);
         query.lambda().eq(Coupon::getCouponType,couponType);
+        query.lambda().eq(Coupon::getIsDelete, 0);
+        query.lambda().eq(Coupon::getIsInvalid,0);
         IPage<Coupon> rs = couponService.page(new Page<>(page,size),query);
         return rs.getRecords();
     }

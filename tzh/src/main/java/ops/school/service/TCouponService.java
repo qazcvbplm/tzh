@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TCouponService {
 
-    List<Coupon> findByIndex(Long schoolId, Integer couponType);
+    List<Coupon> findByIndex(Long schoolId, Integer couponType, Integer yesShowIndex);
 
     Integer count(Long schoolId, Integer couponType);
 
