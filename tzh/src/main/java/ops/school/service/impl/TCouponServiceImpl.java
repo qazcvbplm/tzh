@@ -94,7 +94,6 @@ public class TCouponServiceImpl implements TCouponService {
         Assertions.notNull(couponDTO.getSchoolId());
         Assertions.notEmpty(couponDTO.getCouponIdS());
         Assertions.notNull(couponDTO.getCreateId(),couponDTO.getUpdateId());
-        List<Coupon> couponList = this.findByIndex(couponDTO.getSchoolId(), CouponContants.COUPON_TYPE_HOME);
         //查询数据看对不对
         List<Coupon> couponLists = couponMapper.batchFindHomeBySIdAndCIds(couponDTO);
         if (CollectionUtils.isEmpty(couponLists) || couponLists.size() != couponDTO.getCouponIdS().size()){
@@ -102,7 +101,6 @@ public class TCouponServiceImpl implements TCouponService {
         }
         //查询完批量更新优惠券首页展示
         Integer updateNum = couponMapper.batchUpdateToShowIndex(couponDTO);
-
-        return null;
+        return new ResponseObject(true,"操作成功，更新条数"+updateNum);
     }
 }

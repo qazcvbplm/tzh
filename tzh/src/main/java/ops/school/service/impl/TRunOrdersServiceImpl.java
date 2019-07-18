@@ -1,13 +1,16 @@
 package ops.school.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
+import ops.school.api.wxutil.WxGUtil;
 import ops.school.service.TRunOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +34,8 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
     private WxUserBellService wxUserBellService;
     @Autowired
     private SchoolService schoolService;
-
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Transactional
     @Override
@@ -68,7 +72,7 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
     }
 
     @Override
-    public int pay(RunOrders orders) {
+    public int pay(RunOrders orders,String formid) {
         Application application = applicationService.getById(orders.getAppId());
         if (application.getVipRunDiscountFlag() == 1) {
             orders.setTotalPrice((orders.getTotalPrice().multiply(application.getVipRunDiscount())).setScale(2, BigDecimal.ROUND_HALF_DOWN));
@@ -82,12 +86,19 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
                 throw new YWException("订单状态异常");
             }
             WxUserBell userbell = wxUserBellService.getById(user.getOpenId() + "-" + user.getPhone());
-            wxUserService.sendWXGZHM(user.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
+            Message message = new Message(user.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
+                    , formid, "pages/mine/payment/payment", " 您的会员帐户余额有变动！", "该订单暂无编号", orders.getId(),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), orders.getContent(),
+                    "如有疑问请在小程序内联系客服人员！", null, null,
+                    null, null, null);
+            WxGUtil.snedM(message.toJson());
+            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(), JSON.toJSONString(formid));
+            /*wxUserService.sendWXGZHM(user.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
                     null, null
                     + orders.getId() + "&typ=" + orders.getTyp(),
                     " 您的会员帐户余额有变动！", "暂无", "-" + orders.getTotalPrice(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
                     "消费", userbell.getMoney() + "", null, null, null,
-                    null, "如有疑问请在小程序内联系客服人员！"));
+                    null, "如有疑问请在小程序内联系客服人员！"));*/
             return 1;
         } else {
             throw new YWException("余额不足");

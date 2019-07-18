@@ -1,23 +1,26 @@
 package ops.school.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.School;
-import ops.school.api.service.OrdersService;
-import ops.school.api.service.ProductService;
-import ops.school.api.service.SchoolService;
+import ops.school.api.entity.WxUser;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.exception.Assertions;
+import ops.school.api.service.*;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
-import ops.school.api.enums.PublicErrorEnums;
-import ops.school.api.exception.Assertions;
+import ops.school.api.wxutil.WxGUtil;
 import ops.school.service.TOrdersService;
+import ops.school.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -27,10 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @Api(tags="订单模块")
@@ -47,7 +48,11 @@ public class OrdersController {
 	private ProductService productService;
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-	
+	@Autowired
+	private WxUserService wxUserService;
+	@Autowired
+	private OrderProductService orderProductService;
+
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
@@ -80,6 +85,10 @@ public class OrdersController {
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,
 			String orderId,String payment, String formid){
 		 Orders orders=ordersService.findById(orderId);
+		 WxUser wxUser = wxUserService.findById(orders.getOpenId());
+		QueryWrapper<OrderProduct> query = new QueryWrapper<>();
+		query.lambda().eq(OrderProduct::getOrderId,orders.getId());
+		List<OrderProduct> list = orderProductService.list(query);
 		 List<OrderProduct> ops=orders.getOp();
 		 List<Integer> pids=new ArrayList<>();
 		 List<Integer> counts=new ArrayList<>();
@@ -93,6 +102,16 @@ public class OrdersController {
 			  Object msg= WXpayUtil.payrequest(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
 					  "椰子-w", orders.getId(),orders.getPayPrice().multiply(new BigDecimal(100)).intValue()+"", orders.getOpenId(),
 					  request.getRemoteAddr(), "", OrdersNotify.URL+"notify/takeout");
+			  Map<String,Object> map = MapUtil.objectToMap(msg,true);
+			  if(map.get("return_code").equals("SUCCESS")){
+				  Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
+						  , formid, "pages/mine/payment/payment", " 微信支付成功！", orders.getWaterNumber()+"", orders.getId(),
+						  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), list.get(0).getProductName(),
+						  "如有疑问请在小程序内联系客服人员！", null, null,
+						  null, null, null);
+				  WxGUtil.snedM(message.toJson());
+				  stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(),JSON.toJSONString(formid));
+			  }
 			  return new ResponseObject(true, "ok").push("msg", msg);
 		 }
 		 if(payment.equals("余额支付")){

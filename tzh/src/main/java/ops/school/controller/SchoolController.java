@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.Application;
+import ops.school.api.entity.Coupon;
 import ops.school.api.entity.School;
 import ops.school.api.service.ApplicationService;
 import ops.school.api.service.CouponService;
@@ -13,6 +14,7 @@ import ops.school.api.service.SchoolService;
 import ops.school.api.util.BaiduUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.constants.CouponContants;
 import ops.school.constants.NumContants;
 import ops.school.api.exception.Assertions;
 import ops.school.service.TCouponService;
@@ -62,8 +64,9 @@ public class SchoolController {
 	
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
-	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,School school){
+	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,School school){
 		              List<School> list=schoolService.find(school);
+		              List<Coupon> couponList = tCouponService.findByIndex();
 		              return new ResponseObject(true,"ok").push("list", list);
 	}
 	
@@ -177,9 +180,8 @@ public class SchoolController {
 		Assertions.notEmpty(couponDTO.getCouponIdS());
 		couponDTO.setCreateId(NumContants.Long_NUM_0);
 		couponDTO.setUpdateId(NumContants.Long_NUM_0);
+		couponDTO.setYesShowIndex(CouponContants.COUPON_YES_SHOW_INDEX);
 		ResponseObject responseObject = tCouponService.bindHomeCouponsBySIdAndIds(couponDTO);
 		return responseObject;
-
 	}
-	
 }

@@ -6,6 +6,7 @@ import ops.school.api.service.CouponService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.service.TCouponService;
+import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -15,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -27,6 +27,8 @@ public class CouponController {
     private TCouponService tCouponService;
     @Autowired
     private CouponService couponService;
+    @Autowired
+    private TShopCouponService tShopCouponService;
 
     /**
      * 学校首页优惠券查询
@@ -83,8 +85,25 @@ public class CouponController {
      */
     @ResponseBody
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ResponseObject delete(Coupon coupon){
+    public ResponseObject update(Coupon coupon){
         couponService.updateById(coupon);
         return new ResponseObject(true,"更新成功");
+    }
+
+    /**
+     * 店铺绑定优惠券
+     * @author Lee
+     * @param couponId 优惠券id
+     * @param shopIds 需要绑定的店铺id（字符串,拼接）
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "bindShop", method = RequestMethod.POST)
+    public ResponseObject bindShop(@RequestParam String couponId, @RequestParam String shopIds){
+        int rs = tShopCouponService.bindShopCoupon(couponId,shopIds);
+        if(rs == 1){
+            return new ResponseObject(true,"店铺添加优惠券成功");
+        }
+        return new ResponseObject(false,"店铺添加优惠券失败");
     }
 }

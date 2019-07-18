@@ -45,7 +45,9 @@ public class TCommonServiceImpl implements TCommonService {
         if (shopId != 0) {
             // 商家信息
             Shop shop = shopService.getById(shopId);
-            log = new TxLog(shop.getId(), "商家提现", null, amount, "", shop.getSchoolId(), wxUser.getAppId());
+            if (shop.getTxAmount().compareTo(amount) == 1){
+                log = new TxLog(shop.getId(), "商家提现", null, amount, "", shop.getSchoolId(), wxUser.getAppId());
+            }
         } else  {
             // 配送员提现
             Sender sender = senderService.check(senderId);
