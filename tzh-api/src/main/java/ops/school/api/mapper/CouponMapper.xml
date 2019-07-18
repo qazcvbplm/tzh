@@ -167,8 +167,13 @@
         <include refid="Base_Column_List"/>
         from
         <include refid="Table_Name"/>
-        where school_id = #{schoolId } and coupon_type = #{couponType}
-        and yes_show_index = #{yesShowIndex} and is_delete = 0 and is_invalid = 0
+        <where>
+            school_id = #{schoolId } and coupon_type = #{couponType}
+            and is_delete = 0 and is_invalid = 0
+            <if test="yesShowIndex != null and yesShowIndex != '' ">
+                AND yes_show_index = #{yesShowIndex}
+            </if>
+        </where>
     </select>
 
     <insert id="insert" parameterType="ops.school.api.entity.Coupon">
@@ -189,5 +194,9 @@
         <foreach collection="couponIdS" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+    <select id="find" resultMap="BaseResultMap" parameterType="map">
+
+
     </select>
 </mapper>
