@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -38,7 +39,8 @@ public class CouponController {
     @RequestMapping(value = "findByIndex", method = RequestMethod.POST)
     public ResponseObject find(@RequestParam String schoolId, @RequestParam Integer couponType) {
 
-        return new ResponseObject(true, "查询成功").push("list", tCouponService.findByIndex(Long.valueOf(schoolId), couponType));
+        List<Coupon> couponList = tCouponService.findByIndex(Long.valueOf(schoolId), couponType);
+        return new ResponseObject(true, "查询成功").push("list",couponList);
     }
 
     /**

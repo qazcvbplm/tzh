@@ -60,4 +60,15 @@ public interface HomeCouponMapper extends BaseMapper<HomeCoupon> {
      * @Desc:   desc 通过id启用
      */
     Integer startOneById(Long id);
+
+    /**
+     * @date:   2019/7/18 15:09
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.HomeCoupon>
+     * @param   schoolId
+     * @param   couponIdS
+     * @Desc:   desc 根据学校id和优惠券id查询首页展示的优惠券
+     */
+    List<HomeCoupon> batchFindAllBySIdAndCIds(Long schoolId, List<Long> couponIdS);
 }

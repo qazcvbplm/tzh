@@ -1,4 +1,4 @@
-package ops.school.enums;
+package ops.school.api.enums;
 
 /**
  * @author CreateByFang on Time:2019/7/15 16:45

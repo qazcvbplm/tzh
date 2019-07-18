@@ -7,6 +7,7 @@ import ops.school.api.entity.Coupon;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.io.Serializable;
+import java.util.List;
 
 
 public class CouponDTO extends BaseDTO implements Serializable {
@@ -98,6 +99,8 @@ public class CouponDTO extends BaseDTO implements Serializable {
      */
     @NotNull
     private Integer isDelete;
+
+    private List<Long> couponIdS;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -221,5 +224,13 @@ public class CouponDTO extends BaseDTO implements Serializable {
 
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public List<Long> getCouponIdS() {
+        return couponIdS;
+    }
+
+    public void setCouponIdS(List<Long> couponIdS) {
+        this.couponIdS = couponIdS;
     }
 }

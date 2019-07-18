@@ -137,6 +137,12 @@
         WHERE id = #{id}
         AND is_delete = 0
     </update>
+    查询完批量更新优惠券首页展示
+    <update id="batchUpdateToShowIndex">
+        UPDATE <include refid="Table_Name"/>
+        SET
+
+    </update>
 
     <select id="findByIndex" resultMap="BaseResultMap" parameterType="map">
         select
@@ -159,4 +165,15 @@
     from <include refid="Table_Name"/>
     where school_id = #{schoolId } and coupon_type = #{couponType}
 </select>
+
+    <!--CreatBy Fang Time:2019/7/18 15:39 |  根据学校id，优惠卷ids，优惠券开启首页展示状态查询优惠券-->
+    <select id="batchFindHomeBySIdAndCIds" resultType="ops.school.api.entity.Coupon">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE school_id = #{schoolId}
+        AND id IN 
+        <foreach collection="couponIdS" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

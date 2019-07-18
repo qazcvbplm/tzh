@@ -21,6 +21,12 @@ public class HomeCoupon implements Serializable {
     private Long id;
 
     /**
+     * 学校id
+     */
+    @NotNull
+    private Long schoolId;
+
+    /**
      * 优惠券id
      */
     @NotNull

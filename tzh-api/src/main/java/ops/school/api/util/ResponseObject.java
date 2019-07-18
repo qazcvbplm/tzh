@@ -2,6 +2,7 @@ package ops.school.api.util;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import ops.school.api.enums.RootEnums;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,12 @@ public class ResponseObject {
         super();
         this.code = code;
         this.msg = msg;
+    }
+
+    public ResponseObject(boolean success, RootEnums enums) {
+        super();
+        this.code = success;
+        this.msg = enums.getErrorMessage();
     }
 
 
