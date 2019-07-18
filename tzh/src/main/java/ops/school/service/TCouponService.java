@@ -28,6 +28,16 @@ public interface TCouponService {
     ResponseObject bindHomeCouponsBySIdAndIds(CouponDTO couponDTO);
 
     /**
+     * @date:   2019/7/18 17:40
+     * @author: Lee
+     * @version:version
+     * @return: java.util.List
+     * @param
+     * @Desc:   desc 查询所有未失效和未删除的优惠券中已失效的优惠券
+     */
+    List<Coupon> findInvalidCoupon();
+
+    /**
      * @date:   2019/7/18 17:33
      * @author: QinDaoFang
      * @version:version

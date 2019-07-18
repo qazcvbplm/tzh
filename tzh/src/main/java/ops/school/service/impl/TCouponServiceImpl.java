@@ -117,6 +117,11 @@ public class TCouponServiceImpl implements TCouponService {
         return new ResponseObject(true,"操作成功，更新条数"+updateNum);
     }
 
+    @Override
+    public List<Coupon> findInvalidCoupon() {
+        return couponMapper.findInvalidCoupon();
+    }
+
     /**
      * @date:   2019/7/18 17:33
      * @author: QinDaoFang
