@@ -42,6 +42,8 @@ public class TCouponServiceImpl implements TCouponService {
         CouponDTO couponDTO = new CouponDTO();
         couponDTO.setCouponType(couponType);
         couponDTO.setSchoolId(schoolId);
+        couponDTO.setIsDelete(0);
+        couponDTO.setIsInvalid(0);
         return couponMapper.countLimitByDTO(couponDTO);
     }
 
@@ -53,6 +55,8 @@ public class TCouponServiceImpl implements TCouponService {
         QueryWrapper<Coupon> query = new QueryWrapper<>();
         query.lambda().eq(Coupon::getSchoolId,schoolId);
         query.lambda().eq(Coupon::getCouponType,couponType);
+        query.lambda().eq(Coupon::getIsDelete, 0);
+        query.lambda().eq(Coupon::getIsInvalid,0);
         IPage<Coupon> rs = couponService.page(new Page<>(page,size),query);
         return rs.getRecords();
     }

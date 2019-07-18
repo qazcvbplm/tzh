@@ -234,33 +234,6 @@ public class Coupon implements Serializable {
     }
 
     @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        Coupon other = (Coupon) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getCouponName() == null ? other.getCouponName() == null : this.getCouponName().equals(other.getCouponName()))
-            && (this.getCouponDesc() == null ? other.getCouponDesc() == null : this.getCouponDesc().equals(other.getCouponDesc()))
-            && (this.getFullAmount() == null ? other.getFullAmount() == null : this.getFullAmount().equals(other.getFullAmount()))
-            && (this.getCutAmount() == null ? other.getCutAmount() == null : this.getCutAmount().equals(other.getCutAmount()))
-            && (this.getCouponType() == null ? other.getCouponType() == null : this.getCouponType().equals(other.getCouponType()))
-            && (this.getSendBeginTime() == null ? other.getSendBeginTime() == null : this.getSendBeginTime().equals(other.getSendBeginTime())) && (this.getEffectiveDays() == null ? other.getEffectiveDays() == null : this.getEffectiveDays().equals(other.getEffectiveDays())) & (this.getSendBeginTime() == null ? other.getSendBeginTime() == null : this.getSendBeginTime().equals(other.getSendBeginTime())) && (this.getEffectiveDays() == null ? other.getEffectiveDays() == null : this.getEffectiveDays().equals(other.getEffectiveDays())) && (this.getSendBeginTime() == null ? other.getSendBeginTime() == null : this.getSendBeginTime().equals(other.getSendBeginTime())) && (this.getEffectiveDays() == null ? other.getEffectiveDays() == null : this.getEffectiveDays().equals(other.getEffectiveDays()))
-                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getCreateId() == null ? other.getCreateId() == null : this.getCreateId().equals(other.getCreateId()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
-            && (this.getUpdateId() == null ? other.getUpdateId() == null : this.getUpdateId().equals(other.getUpdateId()))
-            && (this.getIsInvalid() == null ? other.getIsInvalid() == null : this.getIsInvalid().equals(other.getIsInvalid()))
-            && (this.getIsDelete() == null ? other.getIsDelete() == null : this.getIsDelete().equals(other.getIsDelete()));
-    }
-
-    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

@@ -181,6 +181,22 @@ public class CouponDTO extends BaseDTO implements Serializable {
         this.yesShowIndex = yesShowIndex;
     }
 
+    public Date getSendBeginTime() {
+        return sendBeginTime;
+    }
+
+    public void setSendBeginTime(Date sendBeginTime) {
+        this.sendBeginTime = sendBeginTime;
+    }
+
+    public Date getSendEndTime() {
+        return sendEndTime;
+    }
+
+    public void setSendEndTime(Date sendEndTime) {
+        this.sendEndTime = sendEndTime;
+    }
+
     public Integer getEffectiveDays() {
         return effectiveDays;
     }

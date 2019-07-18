@@ -173,4 +173,13 @@ public class Task {
             }
         }
     }
+
+    /**
+     * 判断学校优惠券是否失效
+     * 每天10,14,15,22
+     */
+    @Scheduled(cron = "")
+    public void couponInvalid(){
+
+    }
 }
