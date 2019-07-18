@@ -154,7 +154,7 @@
         from
         <include refid="Table_Name"/>
         where school_id = #{schoolId } and coupon_type = #{couponType}
-        and yes_show_index = 1 and is_delete = 0 and is_invalid = 0
+        and yes_show_index = #{yesShowIndex} and is_delete = 0 and is_invalid = 0
     </select>
 
     <insert id="insert" parameterType="ops.school.api.entity.Coupon">
