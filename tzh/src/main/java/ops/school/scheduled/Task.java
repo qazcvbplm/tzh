@@ -12,6 +12,8 @@ import ops.school.api.util.RedisUtil;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
 import ops.school.controller.SignController;
+import ops.school.service.TCouponService;
+import ops.school.service.TWxUserCouponService;
 import ops.school.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -40,6 +42,12 @@ public class Task {
     private RedisUtil cache;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private TCouponService tCouponService;
+    @Autowired
+    private CouponService couponService;
+    @Autowired
+    private TWxUserCouponService tWxUserCouponService;
 
     //0 0 10,14,16 * * ?   每天上午10点，下午2点，4点
     @Scheduled(cron = "0 0 2 * * ?")
@@ -181,5 +189,30 @@ public class Task {
     @Scheduled(cron = "0 0 10,14,18,22 * * ?")
     public void couponInvalid(){
 
+        List<Coupon> couponList = tCouponService.findInvalidCoupon();
+        if (couponList.size() != 0){
+            for (Coupon coupon:couponList) {
+                coupon.setIsInvalid(1);
+                couponService.updateById(coupon);
+            }
+        }
+    }
+
+    /**
+     * 判断用户优惠券是否失效
+     * 每天上午8点,下午10点,14点,16点，晚上22点执行一次
+     */
+    @Scheduled(cron = "0 0 8,10,14,16,22 * * ?")
+    public void wxUserCouponInvalid(){
+
+        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findInvalidUserCoupon();
+        System.out.println("失效优惠券长度为："+wxUserCoupons.size());
+        if (wxUserCoupons.size() != 0){
+            for (WxUserCoupon userCoupon:wxUserCoupons) {
+                userCoupon.setIsInvalid(2);
+                tWxUserCouponService.updateIsInvalid(userCoupon.getId());
+                System.out.println("修改状态为失效");
+            }
+        }
     }
 }

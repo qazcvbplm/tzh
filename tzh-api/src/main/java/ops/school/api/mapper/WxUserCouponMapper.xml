@@ -101,4 +101,18 @@
     AND is_delete = 0
 </update>
 
+    <!--查询所有用户的未使用的失效优惠券-->
+    <select id="findInvalidUserCoupon" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from <include refid="Table_Name"/>
+        where is_invalid = 0
+        and failure_time <![CDATA[ < ]]> now()
+    </select>
+
+    <!--修改用户优惠券is_invalid状态-->
+    <update id="update" parameterType="ops.school.api.entity.WxUserCoupon">
+        UPDATE <include refid="Table_Name"/>
+        set is_invalid = #{isInvalid}
+        where id = #{id}
+    </update>
 </mapper>

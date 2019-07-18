@@ -76,7 +76,8 @@ public interface CouponMapper extends BaseMapper<Coupon> {
     List<Coupon> findByIndex(Map<String,Object> map);
 
     /**
-     *
+     * @date:
+     * @author: Lee
      * @param coupon
      * @return
      */
@@ -101,4 +102,14 @@ public interface CouponMapper extends BaseMapper<Coupon> {
      * @Desc:   desc 查询完批量更新优惠券首页展示
      */
     Integer batchUpdateToShowIndex(CouponDTO couponDTO);
+
+    /**
+     * @date:   2019/7/18 17:39
+     * @author: Lee
+     * @version:version
+     * @return: java.util.List
+     * @param
+     * @Desc:   desc 查询所有未失效和未删除的优惠券中已失效的优惠券
+     */
+    List<Coupon> findInvalidCoupon();
 }

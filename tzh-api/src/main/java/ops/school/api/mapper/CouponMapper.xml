@@ -195,8 +195,10 @@
             #{item}
         </foreach>
     </select>
-    <select id="find" resultMap="BaseResultMap" parameterType="map">
-
-
+    <!--查询所有未失效和未删除的优惠券中已失效的优惠券-->
+    <select id="findInvalidCoupon" resultMap="BaseResultMap" parameterType="map">
+        select * from `coupon`
+        where is_delete = 0 and is_invalid = 0
+        and send_end_time <![CDATA[ < ]]> now()
     </select>
 </mapper>
