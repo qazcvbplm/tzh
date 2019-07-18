@@ -11,14 +11,14 @@ import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.School;
 import ops.school.api.entity.WxUser;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.*;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
 import ops.school.api.wxutil.WxGUtil;
-import ops.school.enums.PublicErrorEnums;
-import ops.school.exception.Assertions;
 import ops.school.service.TOrdersService;
 import ops.school.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ public class OrdersController {
 	private WxUserService wxUserService;
 	@Autowired
 	private OrderProductService orderProductService;
-	
+
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,

@@ -4,13 +4,20 @@ import com.github.qcloudsms.httpclient.HTTPException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
+import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.Application;
+import ops.school.api.entity.Coupon;
 import ops.school.api.entity.School;
 import ops.school.api.service.ApplicationService;
+import ops.school.api.service.CouponService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.util.BaiduUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.constants.CouponContants;
+import ops.school.constants.NumContants;
+import ops.school.api.exception.Assertions;
+import ops.school.service.TCouponService;
 import ops.school.service.TSchoolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,8 +36,6 @@ import java.util.concurrent.TimeUnit;
 @Api(tags="学校模块")
 @RequestMapping("ops/school")
 public class SchoolController {
-
-
     @Autowired
 	private SchoolService schoolService;
 	@Autowired
@@ -39,6 +44,9 @@ public class SchoolController {
 	private TSchoolService tSchoolService;
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
+
+	@Autowired
+	private TCouponService tCouponService;
 
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
@@ -54,9 +62,11 @@ public class SchoolController {
 	
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
-	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,School school){
+	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,School school){
 		              List<School> list=schoolService.find(school);
-		              return new ResponseObject(true,"ok").push("list", list);
+		              Assertions.notNull(school.getId());
+		              List<Coupon> couponList = tCouponService.findByIndex(Long.valueOf(school.getId()),CouponContants.COUPON_TYPE_HOME,null);
+		              return new ResponseObject(true,"ok").push("list", list).push("couponList",couponList);
 	}
 	
 	@ApiOperation(value="更新",httpMethod="POST")
@@ -152,6 +162,25 @@ public class SchoolController {
 					}
 		          return new ResponseObject(true, "验证吗3分钟有效哦！亲");
    }
-	
-	
+
+   /**
+    * @date:   2019/7/18 14:16
+    * @author: QinDaoFang
+    * @version:version
+    * @return: ops.school.api.util.ResponseObject
+    * @param   couponDTO 包括schoolid，ids，createid
+    * @Desc:   desc 首页优惠券绑定
+    */
+	@ApiOperation(value="首页优惠券绑定",httpMethod="POST")
+	@RequestMapping(value = "bindCoupons",method = RequestMethod.POST)
+	public ResponseObject bindHomeCoupons(CouponDTO couponDTO) {
+		Assertions.notNull(couponDTO);
+		Assertions.notNull(couponDTO.getSchoolId());
+		Assertions.notEmpty(couponDTO.getCouponIdS());
+		couponDTO.setCreateId(NumContants.Long_NUM_0);
+		couponDTO.setUpdateId(NumContants.Long_NUM_0);
+		couponDTO.setYesShowIndex(CouponContants.COUPON_YES_SHOW_INDEX);
+		ResponseObject responseObject = tCouponService.bindHomeCouponsBySIdAndIds(couponDTO);
+		return responseObject;
+	}
 }

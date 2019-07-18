@@ -81,4 +81,24 @@ public interface CouponMapper extends BaseMapper<Coupon> {
      * @return
      */
     int insert(Coupon coupon);
+
+    /**
+     * @date:   2019/7/18 15:38
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.Coupon>
+     * @param   couponDTO
+     * @Desc:   desc 根据学校id，优惠卷ids，查询优惠券
+     */
+    List<Coupon> batchFindHomeBySIdAndCIds(CouponDTO couponDTO);
+
+    /**
+     * @date:   2019/7/18 15:53
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   couponDTO 包含学校id，优惠券ids，更新后展示状态
+     * @Desc:   desc 查询完批量更新优惠券首页展示
+     */
+    Integer batchUpdateToShowIndex(CouponDTO couponDTO);
 }

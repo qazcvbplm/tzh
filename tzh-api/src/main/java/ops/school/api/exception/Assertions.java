@@ -1,7 +1,7 @@
-package ops.school.exception;
+package ops.school.api.exception;
 
-import ops.school.enums.PublicErrorEnums;
-import ops.school.enums.RootEnums;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.RootEnums;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;

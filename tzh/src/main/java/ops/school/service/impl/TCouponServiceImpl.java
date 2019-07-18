@@ -4,12 +4,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ops.school.api.dao.CouponMapper;
+import ops.school.api.dao.HomeCouponMapper;
+import ops.school.api.dao.SchoolMapper;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.Coupon;
+import ops.school.api.entity.HomeCoupon;
+import ops.school.api.entity.School;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
+import ops.school.api.util.ResponseObject;
+import ops.school.constants.CouponContants;
+import ops.school.constants.NumContants;
 import ops.school.service.TCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +33,12 @@ public class TCouponServiceImpl implements TCouponService {
     private CouponMapper couponMapper;
     @Autowired
     private CouponService couponService;
+
+    @Autowired
+    private SchoolMapper schoolMapper;
+
+    @Autowired
+    private HomeCouponMapper homeCouponMapper;
 
     @Override
     public List<Coupon> findByIndex(Long schoolId, Integer couponType, Integer yesShowIndex) {
@@ -66,5 +83,29 @@ public class TCouponServiceImpl implements TCouponService {
     public int insert(Coupon coupon) {
         couponMapper.insert(coupon);
         return 0;
+    }
+
+    /**
+     * @date:   2019/7/18 14:16
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   couponDTO 包括schoolid，ids，createid
+     * @Desc:   desc 首页优惠券绑定
+     */
+    @Override
+    public ResponseObject bindHomeCouponsBySIdAndIds(CouponDTO couponDTO) {
+        Assertions.notNull(couponDTO);
+        Assertions.notNull(couponDTO.getSchoolId());
+        Assertions.notEmpty(couponDTO.getCouponIdS());
+        Assertions.notNull(couponDTO.getCreateId(),couponDTO.getUpdateId());
+        //查询数据看对不对
+        List<Coupon> couponLists = couponMapper.batchFindHomeBySIdAndCIds(couponDTO);
+        if (CollectionUtils.isEmpty(couponLists) || couponLists.size() != couponDTO.getCouponIdS().size()){
+            return new ResponseObject(false, ResponseViewEnums.COUPON_HOME_NUM_ERROR);
+        }
+        //查询完批量更新优惠券首页展示
+        Integer updateNum = couponMapper.batchUpdateToShowIndex(couponDTO);
+        return new ResponseObject(true,"操作成功，更新条数"+updateNum);
     }
 }

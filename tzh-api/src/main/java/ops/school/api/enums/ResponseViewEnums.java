@@ -1,4 +1,4 @@
-package ops.school.enums;
+package ops.school.api.enums;
 
 /**
  * @author CreateByFang on Time:2019/7/15 16:45
@@ -11,6 +11,9 @@ public enum ResponseViewEnums implements RootEnums{
     FAILED("A11002","操作失败"),
     /**楼栋错误*/
     FLOOR_SELECT_NULL("F11001","楼栋为空，更新后操作"),
+
+    /**优惠券错误*/
+    COUPON_HOME_NUM_ERROR("C11001","优惠券信息变更，更新后操作"),
     ;
 
     private String errorCode;
