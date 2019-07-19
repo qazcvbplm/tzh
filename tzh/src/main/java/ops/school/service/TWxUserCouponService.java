@@ -24,5 +24,5 @@ public interface TWxUserCouponService {
      * @param
      * @Desc:   desc 修改用户优惠券is_invalid状态
      */
-    int updateIsInvalid(Long id);
+    int updateIsInvalid(WxUserCoupon userCoupon);
 }

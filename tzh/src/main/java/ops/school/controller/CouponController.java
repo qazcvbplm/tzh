@@ -44,7 +44,7 @@ public class CouponController {
     @RequestMapping(value = "findByIndex", method = RequestMethod.POST)
     public ResponseObject find(@RequestParam String schoolId, @RequestParam Integer couponType) {
 
-        List<Coupon> list = tCouponService.findByIndex(Long.valueOf(schoolId), couponType,1);
+        List<Coupon> list = tCouponService.findByIndex(Long.valueOf(schoolId),1);
         return new ResponseObject(true, "查询成功").push("list", list);
     }
 

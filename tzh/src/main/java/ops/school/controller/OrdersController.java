@@ -58,9 +58,11 @@ public class OrdersController {
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
 							  Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @ModelAttribute @Valid Orders orders, BindingResult result){
 		              Util.checkParams(result);
+		              // 判断订单备注是否有表情内容
 		              if(orders.getRemark()!=null&&EmojiManager.isEmoji(orders.getRemark())){
 		            	  orders.setRemark(EmojiParser.removeAllEmojis(orders.getRemark()));
 		              }
+		              // 为订单生成一个25位的随机id
 		              orders.init();
 		              if((productIds.length==attributeIndex.length)&&(productIds.length==counts.length)){
 		            	  if(productIds.length>0){

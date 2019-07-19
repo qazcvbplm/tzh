@@ -864,6 +864,7 @@ public class Orders extends Base implements Serializable {
         this.shopImage = shop.getShopImage();
         this.shopName = shop.getShopName();
         this.shopPhone = shop.getShopPhone();
+        /*计算满减优惠时，满减使用错误*/
         if (!isDiscount) {
             for (FullCut temp : fullcut) {
                 if (this.productPrice.compareTo(new BigDecimal(temp.getFull())) != -1) {
@@ -889,7 +890,7 @@ public class Orders extends Base implements Serializable {
             } else {
                 this.sendAddCountPrice = new BigDecimal(0);
             }
-            //判断配送距离
+            //判断配送距离增加配送费
             int distance = BaiduUtil.DistanceAll(floor.getLat() + "," + floor.getLng(), shop.getLat() + "," + shop.getLng());
             if (distance > school.getSendMaxDistance()) {
                 int per = (distance / school.getSendPerOut()) + 1;
@@ -904,7 +905,7 @@ public class Orders extends Base implements Serializable {
         }
         //计算总的配送费
         this.sendPrice = this.sendBasePrice.add(this.sendAddCountPrice).add(this.sendAddDistancePrice);
-        //计算总价
+        //计算总价（实付款金额）
         this.payPrice = this.productPrice.add(this.boxPrice).add(this.sendPrice);
     }
 

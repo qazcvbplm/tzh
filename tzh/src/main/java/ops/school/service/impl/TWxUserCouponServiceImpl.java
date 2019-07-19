@@ -23,8 +23,7 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
     }
 
     @Override
-    public int updateIsInvalid(Long id) {
-        WxUserCoupon wxUserCoupon = wxUserCouponService.getById(id);
+    public int updateIsInvalid(WxUserCoupon wxUserCoupon) {
         if (wxUserCoupon != null){
             int rs = wxUserCouponMapper.update(wxUserCoupon);
             if (rs == 1){

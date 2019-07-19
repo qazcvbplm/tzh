@@ -37,9 +37,6 @@ public class TCouponServiceImpl implements TCouponService {
     private SchoolMapper schoolMapper;
 
     @Autowired
-    private HomeCouponMapper homeCouponMapper;
-
-    @Autowired
     private WxUserCouponMapper wxUserCouponMapper;
 
     @Autowired
@@ -49,13 +46,12 @@ public class TCouponServiceImpl implements TCouponService {
     private WxUserMapper wxUserMapper;
 
     @Override
-    public List<Coupon> findByIndex(Long schoolId, Integer couponType, Integer yesShowIndex) {
-        if (schoolId == null || couponType == null){
+    public List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex) {
+        if (schoolId == null || yesShowIndex == null){
             return null;
         }
         Map<String,Object> map = new HashMap<>();
         map.put("schoolId",schoolId);
-        map.put("couponType",couponType);
         map.put("yesShowIndex",yesShowIndex);
         return couponMapper.findByIndex(map);
     }
