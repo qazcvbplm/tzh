@@ -1,15 +1,20 @@
 package ops.school.service;
 
 import ops.school.api.dto.ShopTj;
+import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Orders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 public interface TOrdersService {
     @Transactional
     void addTakeout(Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @Valid Orders orders);
+
+    @Transactional
+    int addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders);
 
     @Transactional
     int pay(Orders orders,String formid);
