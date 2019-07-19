@@ -65,7 +65,7 @@ public class SchoolController {
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,School school){
 		              List<School> list=schoolService.find(school);
 		              Assertions.notNull(school.getId());
-		              List<Coupon> couponList = tCouponService.findByIndex(Long.valueOf(school.getId()),CouponContants.COUPON_TYPE_HOME,null);
+		              List<Coupon> couponList = tCouponService.findByIndex(Long.valueOf(school.getId()),null);
 		              return new ResponseObject(true,"ok").push("list", list).push("couponList",couponList);
 	}
 	
