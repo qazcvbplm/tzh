@@ -65,4 +65,6 @@ public interface ShopFullCutMapper extends BaseMapper<ShopFullCut> {
      * @Desc:   desc 通过id启用
      */
     Integer startOneById(Long id);
+
+    List<ShopFullCut> findShopFullCut(Integer shopId);
 }

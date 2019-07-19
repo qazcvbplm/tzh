@@ -161,7 +161,13 @@ public class Assertions {
         noNullElements(array, "[Assertion failed] - this array must not contain any null elements");
     }
 
-    public static void notEmpty(Collection<?> collection, ResponseViewEnums message) {
+    public static void notEmpty(Collection<?> collection, RootEnums enums) {
+        if (CollectionUtils.isEmpty(collection)) {
+            throw new IllegalArgumentException(enums.getErrorMessage());
+        }
+    }
+
+    public static void notEmpty(Collection<?> collection, String message) {
         if (CollectionUtils.isEmpty(collection)) {
             throw new IllegalArgumentException(message);
         }

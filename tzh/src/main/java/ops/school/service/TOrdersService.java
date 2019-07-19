@@ -25,7 +25,7 @@ public interface TOrdersService {
      * @param   orders
      * @Desc:   desc 用户提交订单
      */
-    ResponseObject addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders);
+    ResponseObject addOrder2(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders);
 
     @Transactional
     int pay(Orders orders,String formid);
