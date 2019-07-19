@@ -14,7 +14,7 @@ import ops.school.api.util.Util;
 import ops.school.controller.SignController;
 import ops.school.service.TCouponService;
 import ops.school.service.TWxUserCouponService;
-import ops.school.util.TimeUtil;
+import ops.school.api.util.TimeUtilS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -132,7 +132,7 @@ public class Task {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String curTime = df.format(current);
             // 获取订单支付时间
-            long differTime = TimeUtil.dateDiff(temp.getPayTime(), curTime);
+            long differTime = TimeUtilS.dateDiff(temp.getPayTime(), curTime);
             if (differTime > 10) {
                 if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SHOP" + school.getPhone()) == null) {
                     try {
@@ -167,7 +167,7 @@ public class Task {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String curTime = df.format(currentTime);
                 // 获取商家接手时间
-                long differTime = TimeUtil.dateDiff(order.getShopAcceptTime(), curTime);
+                long differTime = TimeUtilS.dateDiff(order.getShopAcceptTime(), curTime);
                 if (differTime > 10) {
                     if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SENDER" + school.getPhone()) == null) {
                         try {

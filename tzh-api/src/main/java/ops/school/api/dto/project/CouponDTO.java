@@ -114,7 +114,7 @@ public class CouponDTO extends BaseDTO implements Serializable {
     @NotNull
     private Integer isDelete;
 
-    private List<Long> couponIdS;
+    private List<Coupon> couponList;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -256,11 +256,11 @@ public class CouponDTO extends BaseDTO implements Serializable {
         this.isDelete = isDelete;
     }
 
-    public List<Long> getCouponIdS() {
-        return couponIdS;
+    public List<Coupon> getCouponList() {
+        return couponList;
     }
 
-    public void setCouponIdS(List<Long> couponIdS) {
-        this.couponIdS = couponIdS;
+    public void setCouponList(List<Coupon> couponList) {
+        this.couponList = couponList;
     }
 }

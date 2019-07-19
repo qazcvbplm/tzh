@@ -21,6 +21,62 @@
         </association>
     </resultMap>
 
+
+
+    <sql id="Base_Column_List" >
+        id,
+        open_id,
+        nick_name,
+        avatar_url,
+        gender,
+        province,
+        city,
+        phone,
+        client,
+        school_id,
+        app_id
+    </sql>
+
+    <sql id="Table_Name">
+        wx_user
+    </sql>
+
+    <sql id="Select_Limit_State">
+        <if test="id != null and id != '' ">
+            AND id = #{id}
+        </if>
+        <if test="openId != null and openId != '' ">
+            AND open_id = #{openId}
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND nick_name = #{nickName}
+        </if>
+        <if test="avatarUrl != null and avatarUrl != '' ">
+            AND avatar_url = #{avatarUrl}
+        </if>
+        <if test="gender != null and gender != '' ">
+            AND gender = #{gender}
+        </if>
+        <if test="province != null and province != '' ">
+            AND province = #{province}
+        </if>
+        <if test="city != null and city != '' ">
+            AND city = #{city}
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND phone = #{phone}
+        </if>
+        <if test="client != null and client != '' ">
+            AND client = #{client}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND school_id = #{schoolId}
+        </if>
+        <if test="appId != null and appId != '' ">
+            AND app_id = #{appId}
+        </if>
+    </sql>
+
     <select id="findGzh" parameterType="string" resultMap="BaseResultMap">
   select * from wx_user where phone=#{phone} and client='微信公众号' limit 10
   </select>
@@ -108,4 +164,11 @@
     <select id="findByPhone" parameterType="string" resultType="int">
    select count(*) from wx_user where phone=#{phone}
   </select>
+
+    <!--CreatBy Fang Time:2019/7/19 10:40 |  根据用户id查询用户-->
+    <select id="selectOneByUserId" resultType="ops.school.api.entity.WxUser">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE id = #{userId}
+    </select>
 </mapper>

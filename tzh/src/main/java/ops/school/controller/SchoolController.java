@@ -173,10 +173,9 @@ public class SchoolController {
     */
 	@ApiOperation(value="首页优惠券绑定",httpMethod="POST")
 	@RequestMapping(value = "bindCoupons",method = RequestMethod.POST)
-	public ResponseObject bindHomeCoupons(CouponDTO couponDTO) {
+	public ResponseObject bindHomeCoupons(@RequestBody CouponDTO couponDTO) {
 		Assertions.notNull(couponDTO);
-		Assertions.notNull(couponDTO.getSchoolId());
-		Assertions.notEmpty(couponDTO.getCouponIdS());
+		Assertions.notEmpty(couponDTO.getCouponList());
 		couponDTO.setCreateId(NumContants.Long_NUM_0);
 		couponDTO.setUpdateId(NumContants.Long_NUM_0);
 		couponDTO.setYesShowIndex(CouponContants.COUPON_YES_SHOW_INDEX);

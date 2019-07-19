@@ -154,12 +154,13 @@
         yes_show_index = #{yesShowIndex},
         update_id = #{updateId},
         update_time = now()
-        WHERE school_id = #{schoolId}
+        WHERE
+        is_delete = 0
+        AND is_invalid= 0
         AND id IN
-        <foreach collection="couponIdS" index="index" item="item" open="(" separator="," close=")">
-            #{item}
+        <foreach collection="couponList" index="index" item="item" open="(" separator="," close=")">
+            #{item.id}
         </foreach>
-
     </update>
 
     <select id="findByIndex" resultMap="BaseResultMap" parameterType="map">
@@ -189,11 +190,14 @@
     <select id="batchFindHomeBySIdAndCIds" resultType="ops.school.api.entity.Coupon">
         SELECT <include refid="Base_Column_List"/>
         FROM <include refid="Table_Name"/>
-        WHERE school_id = #{schoolId}
+        WHERE
+        is_delete = 0
+        AND is_invalid = 0
         AND id IN
-        <foreach collection="couponIdS" index="index" item="item" open="(" separator="," close=")">
-            #{item}
+        <foreach collection="couponList" index="index" item="item" open="(" separator="," close=")">
+            #{item.id}
         </foreach>
+
     </select>
     <!--查询所有未失效和未删除的优惠券中已失效的优惠券-->
     <select id="findInvalidCoupon" resultMap="BaseResultMap" parameterType="map">

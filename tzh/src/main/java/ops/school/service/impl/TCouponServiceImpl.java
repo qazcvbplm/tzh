@@ -1,5 +1,6 @@
 package ops.school.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,6 +13,7 @@ import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
 import ops.school.api.util.ResponseObject;
+import ops.school.api.util.TimeUtilS;
 import ops.school.constants.CouponContants;
 import ops.school.constants.NumContants;
 import ops.school.service.TCouponService;
@@ -32,12 +34,6 @@ public class TCouponServiceImpl implements TCouponService {
     private CouponMapper couponMapper;
     @Autowired
     private CouponService couponService;
-
-    @Autowired
-    private SchoolMapper schoolMapper;
-
-    @Autowired
-    private HomeCouponMapper homeCouponMapper;
 
     @Autowired
     private WxUserCouponMapper wxUserCouponMapper;
@@ -104,12 +100,11 @@ public class TCouponServiceImpl implements TCouponService {
     @Override
     public ResponseObject bindHomeCouponsBySIdAndIds(CouponDTO couponDTO) {
         Assertions.notNull(couponDTO);
-        Assertions.notNull(couponDTO.getSchoolId());
-        Assertions.notEmpty(couponDTO.getCouponIdS());
+        //Assertions.notEmpty(couponDTO.getCouponList());
         Assertions.notNull(couponDTO.getCreateId(),couponDTO.getUpdateId());
-        //查询数据看对不对
+        // 查询数据看对不对
         List<Coupon> couponLists = couponMapper.batchFindHomeBySIdAndCIds(couponDTO);
-        if (CollectionUtils.isEmpty(couponLists) || couponLists.size() != couponDTO.getCouponIdS().size()){
+        if (CollectionUtils.isEmpty(couponLists) || couponLists.size() != couponDTO.getCouponList().size()){
             return new ResponseObject(false, ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         }
         //查询完批量更新优惠券首页展示
@@ -134,18 +129,18 @@ public class TCouponServiceImpl implements TCouponService {
     public ResponseObject userGetCouponByIdMap(Map map) {
         Assertions.notNull(map,map.get("userId"),map.get("schoolId"),map.get("shopId"),map.get("couponId"));
         //查询用户是否存在 todo 可能导致查询速度慢
-        WxUser wxUser = wxUserMapper.selectById((Long)map.get("userId"));
+        WxUser wxUser = wxUserMapper.selectOneByUserId((Long)map.get("userId"));
         Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST);
         //根据id查询有效的优惠券
         ShopCoupon shopCoupon = tShopCouponService.findPoweredCouponBySIdAndSId((Long) map.get("schoolId"),(Long)map.get("shopId"),(Long)map.get("couponId"));
         Assertions.notNull(shopCoupon,ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         WxUserCoupon wxUserCoupon = new WxUserCoupon();
-        wxUserCoupon.setCouponId(shopCoupon.getCouponId());
+        wxUserCoupon.setCouponId(shopCoupon.getCoupon().getId());
         wxUserCoupon.setGetTime(new Date());
         wxUserCoupon.setIsInvalid(NumContants.DB_TABLE_IS_INVALID_NOT_USED);
         wxUserCoupon.setWxUserId(wxUser.getId());
-        //加上过期时间 todo 工具类
-        Date failureTime = new Date();
+        //加上过期时间
+        Date failureTime = TimeUtilS.getNextDay(new Date(),shopCoupon.getCoupon().getEffectiveDays());
         wxUserCoupon.setFailureTime(failureTime);
         Integer addNum = wxUserCouponMapper.insert(wxUserCoupon);
         if (addNum == null || addNum < 1){

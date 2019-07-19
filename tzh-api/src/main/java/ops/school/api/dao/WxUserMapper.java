@@ -29,4 +29,14 @@ public interface WxUserMapper extends BaseMapper<WxUser> {
 
     @Select("select wx_user.*,wx_user_bell.* from wx_user left join wx_user_bell on wx_user_bell.phone=concat(wx_user.open_id,'-',wx_user.phone) limit 10")
     List<Test> test();
+
+    /**
+     * @date:   2019/7/19 10:40
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.WxUser
+     * @param   userId
+     * @Desc:   desc 根据用户id查询用户
+     */
+    WxUser selectOneByUserId(Long userId);
 }

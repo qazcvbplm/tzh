@@ -70,5 +70,5 @@ public interface HomeCouponMapper extends BaseMapper<HomeCoupon> {
      * @param   couponIdS
      * @Desc:   desc 根据学校id和优惠券id查询首页展示的优惠券
      */
-    List<HomeCoupon> batchFindAllBySIdAndCIds(Long schoolId, List<Long> couponIdS);
+    // List<HomeCoupon> batchFindAllBySIdAndCIds(Long schoolId, List<Long> couponIdS);
 }
