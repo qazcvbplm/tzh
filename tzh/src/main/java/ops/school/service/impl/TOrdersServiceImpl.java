@@ -83,6 +83,11 @@ public class TOrdersServiceImpl implements TOrdersService {
             totalcount += counts[i];
             pt = productService.getById(productIds[i]);
             pa = productAttributeService.getById(attributeIndex[i]);
+            // Todo
+            // 商品表里有discount字段，需要判断discount是否小于1，小于1即开启
+            if (pt.getDiscount().compareTo(new BigDecimal(1)) == -1){
+
+            }
             OrderProduct op = new OrderProduct(productIds[i], pt.getProductName(), pt.getProductImage(), counts[i],
                     pt.getDiscount(), orders.getId(), pa.getName(), pa.getPrice());
             orderProductService.save(op);

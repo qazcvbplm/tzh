@@ -855,6 +855,7 @@ public class Orders extends Base implements Serializable {
         sb.append("]");
         return sb.toString();
     }
+    // totalCount 为订单中商品总件数，boxcount 餐盒数，
     public void takeoutinit1(WxUser wxUser, School school, Shop shop, Floor floor, int totalcount, boolean isDiscount, List<FullCut> fullcut, int boxcount) {
         this.schoolId = school.getId();
         this.appId = school.getAppId();
