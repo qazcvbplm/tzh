@@ -110,5 +110,13 @@
     WHERE id = #{id}
     AND is_delete = 0
 </update>
-
+<select id="findShopFullCut" parameterType="Integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    where shop_id = #{shopId}
+    and is_delete = 0
+    order by full_amount desc
+</select>
 </mapper>
