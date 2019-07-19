@@ -124,8 +124,8 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+            <!--            <version>5.0.7.RELEASE</version>-->
         </dependency>
-
     </dependencies>
     <build>
         <resources>
