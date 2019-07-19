@@ -5,7 +5,7 @@ package ops.school.constants;
  * @date:   2019/7/15 19:05
  * @desc:
  */
-public class NumContants {
+public class NumConstants {
 
     public final static Integer INTEGER_NUM_0 = 0;
     public final static Integer INTEGER_NUM_1 = 1;

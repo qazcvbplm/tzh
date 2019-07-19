@@ -56,8 +56,7 @@ public class OrdersController {
 
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, List<ProductOrderDTO> productOrderDTOS,
-							  Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @ModelAttribute @Valid Orders orders, BindingResult result){
+	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @ModelAttribute @Valid Orders orders, BindingResult result){
 		              Util.checkParams(result);
 		              // 判断订单备注是否有表情内容
 		              if(orders.getRemark()!=null&&EmojiManager.isEmoji(orders.getRemark())){
@@ -73,6 +72,34 @@ public class OrdersController {
 		            	  }
 		              }
 		              return null;
+	}
+
+	/**
+	 * @date:   2019/7/19 18:15
+	 * @author: QinDaoFang
+	 * @version:version
+	 * @return: ops.school.api.util.ResponseObject
+	 * @param   request
+	 * @param   response
+	 * @param   productOrderDTOS
+	 * @param   orders
+	 * @param   result
+	 * @Desc:   desc 用户提交订单
+	 */
+	@ApiOperation(value="添加",httpMethod="POST")
+	@RequestMapping(value = "commit",method = RequestMethod.POST)
+	public ResponseObject commitOrder(HttpServletRequest request,
+                                      HttpServletResponse response,
+                                      List<ProductOrderDTO> productOrderDTOS,
+                                      @ModelAttribute @Valid Orders orders,
+                                      BindingResult result){
+		Util.checkParams(result);
+		//判断微信用户登陆
+		String openId = request.getAttribute("Id").toString();
+		Assertions.hasText(openId,PublicErrorEnums.LOGIN_TIME_OUT);
+		orders.setOpenId(openId);
+		ResponseObject responseObject = tOrdersService.addOrder(productOrderDTOS,orders);
+		return responseObject;
 	}
 	
 	@ApiOperation(value="查询",httpMethod="POST")

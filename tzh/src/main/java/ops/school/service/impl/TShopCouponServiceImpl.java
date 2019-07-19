@@ -1,23 +1,19 @@
 package ops.school.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import ops.school.api.dao.ShopCouponMapper;
-import ops.school.api.dto.project.ShopCouponDTO;
 import ops.school.api.entity.Coupon;
 import ops.school.api.entity.ShopCoupon;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
-import ops.school.constants.CouponContants;
-import ops.school.constants.NumContants;
+import ops.school.constants.CouponConstants;
+import ops.school.constants.NumConstants;
 import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.function.Predicate;
 
 @Service
 public class TShopCouponServiceImpl implements TShopCouponService {
@@ -62,15 +58,15 @@ public class TShopCouponServiceImpl implements TShopCouponService {
         queryWrapperCoupon
                 .eq("school_id",schoolId)
                 .eq("id",couponId)
-                .eq("is_delete", NumContants.DB_TABLE_IS_DELETE_NO)
-                .eq("is_invalid",NumContants.DB_TABLE_IS_INVALID_YES)
+                .eq("is_delete", NumConstants.DB_TABLE_IS_DELETE_NO)
+                .eq("is_invalid", NumConstants.DB_TABLE_IS_INVALID_YES)
                 .lt("send_begin_time",new Date(System.currentTimeMillis()))
                 .ge("send_end_time",new Date(System.currentTimeMillis()))
                 .select("id","school_id","coupon_name","coupon_desc","full_amount","cut_amount","coupon_type","yes_show_index","send_begin_time","send_end_time","effective_days","create_time","create_id  ","update_time","update_id","is_invalid","is_delete");
         Coupon coupon = couponService.getOne(queryWrapperCoupon);
         Assertions.notNull(coupon, ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         //如果是平台优惠券不需要绑定店铺直接返回
-        if (coupon.getCouponType().intValue() == CouponContants.COUPON_TYPE_PLATE){
+        if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_PLATE){
             ShopCoupon shopCoupon2 = new ShopCoupon();
             shopCoupon2.setCoupon(coupon);
             return shopCoupon2;
@@ -80,7 +76,7 @@ public class TShopCouponServiceImpl implements TShopCouponService {
         queryWrapperShopCoupon
                 .eq("shop_id",shopId)
                 .eq("coupon_id",couponId)
-                .eq("is_delete", NumContants.DB_TABLE_IS_DELETE_NO)
+                .eq("is_delete", NumConstants.DB_TABLE_IS_DELETE_NO)
                 .select("id","shop_id","coupon_id","create_time","create_id","is_delete");
         ShopCoupon shopCoupon = shopCouponMapper.selectOne(queryWrapperShopCoupon);
         Assertions.notNull(shopCoupon,ResponseViewEnums.COUPON_USER_GET_NEED_SHOP);

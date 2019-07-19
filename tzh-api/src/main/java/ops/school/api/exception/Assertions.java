@@ -1,6 +1,7 @@
 package ops.school.api.exception;
 
 import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.enums.RootEnums;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -160,7 +161,7 @@ public class Assertions {
         noNullElements(array, "[Assertion failed] - this array must not contain any null elements");
     }
 
-    public static void notEmpty(Collection<?> collection, String message) {
+    public static void notEmpty(Collection<?> collection, ResponseViewEnums message) {
         if (CollectionUtils.isEmpty(collection)) {
             throw new IllegalArgumentException(message);
         }

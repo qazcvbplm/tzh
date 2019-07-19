@@ -7,7 +7,7 @@ package ops.school.constants;
  * 14:44
  * #优惠券配置类
  */
-public class CouponContants {
+public class CouponConstants {
 
     /**
      * 优惠券类型是首页展示的

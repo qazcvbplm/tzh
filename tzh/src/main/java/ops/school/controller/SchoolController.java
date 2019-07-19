@@ -9,13 +9,12 @@ import ops.school.api.entity.Application;
 import ops.school.api.entity.Coupon;
 import ops.school.api.entity.School;
 import ops.school.api.service.ApplicationService;
-import ops.school.api.service.CouponService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.util.BaiduUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
-import ops.school.constants.CouponContants;
-import ops.school.constants.NumContants;
+import ops.school.constants.CouponConstants;
+import ops.school.constants.NumConstants;
 import ops.school.api.exception.Assertions;
 import ops.school.service.TCouponService;
 import ops.school.service.TSchoolService;
@@ -176,9 +175,9 @@ public class SchoolController {
 	public ResponseObject bindHomeCoupons(@RequestBody CouponDTO couponDTO) {
 		Assertions.notNull(couponDTO);
 		Assertions.notEmpty(couponDTO.getCouponList());
-		couponDTO.setCreateId(NumContants.Long_NUM_0);
-		couponDTO.setUpdateId(NumContants.Long_NUM_0);
-		couponDTO.setYesShowIndex(CouponContants.COUPON_YES_SHOW_INDEX);
+		couponDTO.setCreateId(NumConstants.Long_NUM_0);
+		couponDTO.setUpdateId(NumConstants.Long_NUM_0);
+		couponDTO.setYesShowIndex(CouponConstants.COUPON_YES_SHOW_INDEX);
 		ResponseObject responseObject = tCouponService.bindHomeCouponsBySIdAndIds(couponDTO);
 		return responseObject;
 	}

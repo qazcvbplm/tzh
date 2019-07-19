@@ -7,7 +7,7 @@ package ops.school.constants;
  * 19:04
  * #
  */
-public class OrderContants {
+public class OrderConstants {
 
     public final static String orderTypeTakeOut = "外卖订单";
 

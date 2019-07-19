@@ -10,7 +10,7 @@ public enum ResponseViewEnums implements RootEnums{
     /**操作失败*/
     FAILED("A11002","操作失败"),
     /**楼栋错误*/
-    FLOOR_SELECT_NULL("F11001","楼栋为空，更新后操作"),
+    FLOOR_SELECT_NULL("F11001","楼栋数据变更，更新后操作"),
 
     /**优惠券错误*/
     COUPON_HOME_NUM_ERROR("C11001","优惠券信息变更，更新后操作"),
@@ -20,6 +20,13 @@ public enum ResponseViewEnums implements RootEnums{
 
     /**微信用户错误*/
     WX_USER_NO_EXIST("WX11001","微信用户不存在，更新后操作"),
+
+    /**订单错误*/
+    ORDER_DONT_HAVE_PRODUCT("O11001","订单中不存在商品，请点单后下单"),
+    ORDER_SAVE_ERROR("O11001","订单下单失败，请稍后重新下单"),
+
+    /**学校信息错误*/
+    SCHOOL_HAD_CHANGE("SC11001","学校信息发生变化，请联系后台管理"),
     ;
 
     private String errorCode;

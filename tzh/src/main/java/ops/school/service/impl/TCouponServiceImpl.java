@@ -1,21 +1,17 @@
 package ops.school.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ops.school.api.dao.*;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.*;
-import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.TimeUtilS;
-import ops.school.constants.CouponContants;
-import ops.school.constants.NumContants;
+import ops.school.constants.NumConstants;
 import ops.school.service.TCouponService;
 import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,7 +132,7 @@ public class TCouponServiceImpl implements TCouponService {
         WxUserCoupon wxUserCoupon = new WxUserCoupon();
         wxUserCoupon.setCouponId(shopCoupon.getCoupon().getId());
         wxUserCoupon.setGetTime(new Date());
-        wxUserCoupon.setIsInvalid(NumContants.DB_TABLE_IS_INVALID_NOT_USED);
+        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NOT_USED);
         wxUserCoupon.setWxUserId(wxUser.getId());
         //加上过期时间
         Date failureTime = TimeUtilS.getNextDay(new Date(),shopCoupon.getCoupon().getEffectiveDays());

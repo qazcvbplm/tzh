@@ -8,33 +8,44 @@ import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
+import ops.school.api.util.CheckUtils;
+import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.RedisUtil;
+import ops.school.api.util.ResponseObject;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.api.wxutil.WxGUtil;
-import ops.school.constants.OrderContants;
+import ops.school.constants.CouponConstants;
+import ops.school.constants.NumConstants;
+import ops.school.constants.OrderConstants;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
+import ops.school.constants.ProductConstants;
+import ops.school.service.TCouponService;
 import ops.school.service.TOrdersService;
+import ops.school.service.TWxUserCouponService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class TOrdersServiceImpl implements TOrdersService {
+
+    private final static Logger logger = LoggerFactory.getLogger(TOrdersServiceImpl.class);
 
     @Autowired
     private ApplicationService applicationService;
@@ -67,6 +78,12 @@ public class TOrdersServiceImpl implements TOrdersService {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private RedisUtil cache;
+
+    @Autowired
+    private TWxUserCouponService tWxUserCouponService;
+
+    @Autowired
+    private TCouponService tCouponService;
 
     @Transactional
     @Override
@@ -116,9 +133,109 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersService.save(orders);
     }
 
+/*
     @Override
     public int addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
         return 0;
+    }
+*/
+
+
+    /**
+     * @date:   2019/7/19 18:16
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   productOrderDTOS
+     * @param   orders
+     * @Desc:   desc 用户提交订单
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public ResponseObject addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
+        //判断商品为空
+        Assertions.notEmpty(productOrderDTOS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+        //判断用户有
+        WxUser wxUser = wxUserService.getById(orders.getOpenId());
+        Assertions.notNull(wxUser,PublicErrorEnums.LOGIN_TIME_OUT);
+        //判断学校是否是有，并且是当前学校
+        School school = schoolService.findById(wxUser.getSchoolId());
+        Assertions.notNull(school,ResponseViewEnums.COUPON_HOME_NUM_ERROR);
+        //判断店铺有，暂时不做ok
+        Shop shop = shopService.getById(productService.getById(productIds[0]).getShopId());
+        //楼栋判断
+        Floor floor = floorService.getById(orders.getFloorId());
+        Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
+        //判断商品有并且库存够，批量id查询
+        List<Long> productIdS = PublicUtilS.getValueList(productOrderDTOS,"productId");
+        Map porductParamMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
+        Assertions.notEmpty(productIdS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+        List<Product> productSelectList = (List<Product>) productService.listByIds(productIdS);
+        //检查库存
+        Boolean throwErrorNoStockYes = false;
+        String noStockProdctNames = "";
+        for (Product product : productSelectList) {
+            //如果参数查询的product的id在参数map中（一定在），并且商品开启库存
+            if (porductParamMap.get(product.getId()) != null && product.getStockFlag().intValue() == ProductConstants.PRODUCT_STOCK_FLAG_YES){
+                //那么比较库存够不够
+                if (product.getStock() < (Integer)porductParamMap.get(product.getId())){
+                    throwErrorNoStockYes = true;
+                    noStockProdctNames += product.getProductName();
+                }
+            }
+        }
+        if (throwErrorNoStockYes){
+            DisplayException.throwMessage(noStockProdctNames+"卖完啦！");
+        }
+        // 判断订单备注是否有表情内容
+        String remarkOrder = CheckUtils.checkEmoji(orders.getRemark());
+        if (remarkOrder != null){
+            orders.setRemark(remarkOrder);
+        }
+        /**
+         * 支付金额计算逻辑
+         */
+        List<OrderProduct> orderProductSaveList = new ArrayList<>();
+        //用于扣库存，在计算金额就要减去库存
+        List<Product> productDisStockList = new ArrayList<>();
+        //保存订单逻辑
+        boolean saveOrderSuccess = ordersService.save(orders);
+        if (!saveOrderSuccess){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_SAVE_ERROR);
+        }
+        //保存订单商品逻辑，不行就要自己写接口
+        boolean saveOPSuccess = orderProductService.saveBatch(orderProductSaveList);
+        if(!saveOPSuccess){
+            logger.error("订单商品保存失败，商品信息：" + PublicUtilS.getCollectionToString(orderProductSaveList));
+        }
+        //下单完成后扣库存
+        boolean disProductStockSuccess = productService.saveBatch(productDisStockList);
+        if (!disProductStockSuccess){
+            // 这里想的扣库存失败还是可以下单
+            logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+        }
+        //下单后领优惠券
+        // 根据店铺查询优惠券 todo
+        Map userGetCouponMap = new HashMap();
+        userGetCouponMap.put("userId",wxUser.getId());
+        //todo shopid
+        userGetCouponMap.put("shopId",orders.getShopId());
+        userGetCouponMap.put("couponId",orders.getCouponId());
+        userGetCouponMap.put("schoolId",school.getId());
+        ResponseObject responseObject = tCouponService.userGetCouponByIdMap(userGetCouponMap);
+        //如果获取失败计日志
+        if (!responseObject.isCode()){
+            logger.error("下单后用户获取店铺优惠券失败，优惠券id及信息："+ JSON.toJSONString(userGetCouponMap));
+        }
+        //用户优惠券失效逻辑
+        WxUserCoupon wxUserCoupon = new WxUserCoupon();
+        wxUserCoupon.setId(orders.getCouponId());
+        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_YES);
+        int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
+        if (updateUserCouponNum != NumConstants.INT_NUM_1){
+            logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+        }
+        return new ResponseObject(true,"创建订单成功！");
     }
 
     @Transactional
@@ -311,7 +428,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         QueryWrapper<Orders> queryWrapperTakeOut = new QueryWrapper<>();
         queryWrapperTakeOut
                 .eq("floor_id",buildId)
-                .eq("typ", OrderContants.orderTypeTakeOut)
+                .eq("typ", OrderConstants.orderTypeTakeOut)
                 .ge("create_time",beginTime)
                 .le("create_time",endTime);
         Integer allOrdersTakeOut = ordersService.count(queryWrapperTakeOut);
@@ -319,7 +436,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         QueryWrapper<Orders> queryWrapperEatHere = new QueryWrapper<>();
         queryWrapperEatHere
                 .eq("floor_id",buildId)
-                .eq("typ", OrderContants.queryWrapperEatHere)
+                .eq("typ", OrderConstants.queryWrapperEatHere)
                 .ge("create_time",beginTime)
                 .le("create_time",endTime);
         Integer allOrdersEatHere = ordersService.count(queryWrapperEatHere);
@@ -327,14 +444,14 @@ public class TOrdersServiceImpl implements TOrdersService {
         QueryWrapper<RunOrders> queryWrapperRunning = new QueryWrapper<>();
         queryWrapperRunning
                 .eq("floor_id",buildId)
-                .eq("typ", OrderContants.orderTypeRunning)
+                .eq("typ", OrderConstants.orderTypeRunning)
                 .between("create_time",beginTime,endTime);
         Integer allOrdersRunning = runOrdersService.count(queryWrapperRunning);
         //自取订单
         QueryWrapper<Orders> queryWrapperGetSelf = new QueryWrapper<>();
         queryWrapperGetSelf
                 .eq("floor_id",buildId)
-                .eq("typ", OrderContants.queryWrapperGetSelf)
+                .eq("typ", OrderConstants.queryWrapperGetSelf)
                 .between("create_time",beginTime,endTime);
         Integer allOrdersGetSelf = ordersService.count(queryWrapperGetSelf);
         //订单总数
