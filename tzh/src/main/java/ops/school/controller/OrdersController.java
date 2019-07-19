@@ -6,6 +6,7 @@ import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
@@ -55,7 +56,7 @@ public class OrdersController {
 
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
+	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, List<ProductOrderDTO> productOrderDTOS,
 							  Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @ModelAttribute @Valid Orders orders, BindingResult result){
 		              Util.checkParams(result);
 		              // 判断订单备注是否有表情内容

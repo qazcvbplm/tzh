@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dto.ShopTj;
+import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
@@ -78,16 +79,24 @@ public class TOrdersServiceImpl implements TOrdersService {
         ProductAttribute pa;
         int totalcount = 0;
         int boxcount = 0;
-        boolean isDiscount = false;
         for (int i = 0; i < productIds.length; i++) {
             totalcount += counts[i];
+            BigDecimal discountPrice = new BigDecimal(0);
+            // 商品信息
             pt = productService.getById(productIds[i]);
+            // 商品规格信息
             pa = productAttributeService.getById(attributeIndex[i]);
             // Todo
+            // 计算商品折扣
             // 商品表里有discount字段，需要判断discount是否小于1，小于1即开启
             if (pt.getDiscount().compareTo(new BigDecimal(1)) == -1){
+                orders.setDiscountType("商品折扣");
+                // 优惠金额(1-折扣) * 规格价格
+                discountPrice = pa.getPrice().multiply(new BigDecimal(1).subtract(pt.getDiscount()));
+                orders.setDiscountPrice(discountPrice);
+            } /*else if(){
 
-            }
+            }*/
             OrderProduct op = new OrderProduct(productIds[i], pt.getProductName(), pt.getProductImage(), counts[i],
                     pt.getDiscount(), orders.getId(), pa.getName(), pa.getPrice());
             orderProductService.save(op);
@@ -99,16 +108,17 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             // 计算商品折扣
             if (pa.getIsDiscount() == 1) {
-                isDiscount = true;
                 orders.setDiscountType("商品折扣");
-                BigDecimal DiscountPrice = (pa.getPrice().subtract(op.getAttributePrice()))
-                        .multiply(new BigDecimal(counts[i]));
-                orders.setDiscountPrice(orders.getDiscountPrice().add(DiscountPrice));
             }
         }
-        orders.takeoutinit1(wxUser, school, shop, floor, totalcount, isDiscount, fullCutService.findByShopId(shop.getId()),
+        orders.takeoutinit1(wxUser, school, shop, floor, totalcount, false, fullCutService.findByShopId(shop.getId()),
                 boxcount);
         ordersService.save(orders);
+    }
+
+    @Override
+    public int addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
+        return 0;
     }
 
     @Transactional
