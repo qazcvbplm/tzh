@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface TCouponService {
 
-    List<Coupon> findByIndex(Long schoolId, Integer couponType, Integer yesShowIndex);
+    List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex);
 
     Integer count(Long schoolId, Integer couponType);
 

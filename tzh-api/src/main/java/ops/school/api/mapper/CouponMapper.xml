@@ -169,7 +169,7 @@
         from
         <include refid="Table_Name"/>
         <where>
-            school_id = #{schoolId } and coupon_type = #{couponType}
+            school_id = #{schoolId } and coupon_type IN (1,2)
             and is_delete = 0 and is_invalid = 0
             <if test="yesShowIndex != null and yesShowIndex != '' ">
                 AND yes_show_index = #{yesShowIndex}

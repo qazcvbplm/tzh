@@ -206,12 +206,10 @@ public class Task {
     public void wxUserCouponInvalid(){
 
         List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findInvalidUserCoupon();
-        System.out.println("失效优惠券长度为："+wxUserCoupons.size());
         if (wxUserCoupons.size() != 0){
             for (WxUserCoupon userCoupon:wxUserCoupons) {
                 userCoupon.setIsInvalid(2);
-                tWxUserCouponService.updateIsInvalid(userCoupon.getId());
-                System.out.println("修改状态为失效");
+                tWxUserCouponService.updateIsInvalid(userCoupon);
             }
         }
     }
