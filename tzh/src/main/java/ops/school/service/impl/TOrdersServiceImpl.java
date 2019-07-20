@@ -484,11 +484,13 @@ public class TOrdersServiceImpl implements TOrdersService {
         if(!saveOPSuccess){
             logger.error("订单商品保存失败，商品信息：" + PublicUtilS.getCollectionToString(orderProductSaveList));
         }
-        //下单完成后扣库存 todo
-        boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-        if (!disProductStockSuccess){
-            // 这里想的扣库存失败还是可以下单
-            logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+        //下单完成后扣库存
+        if (needToDisProductStockYes){
+            boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+            if (!disProductStockSuccess){
+                // 这里想的扣库存失败还是可以下单
+                logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+            }
         }
         //下单后领优惠券 新页面新接口
         //用户优惠券失效逻辑
