@@ -306,16 +306,15 @@ public class TOrdersServiceImpl implements TOrdersService {
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
         //判断商品有并且库存够，批量id查询
         List<Long> productSelectIdS = PublicUtilS.getValueList(productOrderDTOS,"productId");
-        Map paramProductIdCountMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
         Assertions.notEmpty(productSelectIdS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
         List<Product> productSelectList = (List<Product>) productService.listByIds(productSelectIdS);
-        // Map selectProductByIdsMap = PublicUtilS.listForMap(productSelectList,"id","stock");
         //假如前端传3个商品，查出来两个，有一个就没有，报错
         if (productSelectList.size() < productOrderDTOS.size()){
             //报错 商品信息变化
             DisplayException.throwMessageWithEnum(ResponseViewEnums.PRODUCT_HAD_CHANGE);
         }
         //检查库存
+        Map paramProductIdCountMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
         Boolean throwErrorNoStockYes = false;
         String noStockProdctNames = "";
         for (Product product : productSelectList) {
