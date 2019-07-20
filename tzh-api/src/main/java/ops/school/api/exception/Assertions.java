@@ -66,7 +66,7 @@ public class Assertions {
      * @param object
      * @param errorEnums
      */
-    public static void notNull(Object object, PublicErrorEnums errorEnums) {
+    public static void notNull(Object object, RootEnums errorEnums) {
         if (object == null) {
             throw new IllegalArgumentException(errorEnums.getErrorMessage());
         }

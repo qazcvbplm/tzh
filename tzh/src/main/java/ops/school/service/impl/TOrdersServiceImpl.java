@@ -144,29 +144,29 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Transactional
     public int addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
         // 订单内所有商品的规格价格之和
-        BigDecimal originalPrice = new BigDecimal(0);
+        BigDecimal originalPrice = BigDecimal.ZERO;
         // 订单内所有商品的商品折扣之后的价格之后（如果没有商品折扣，则与规格价格之和相等）
-        BigDecimal afterDiscountPrice = new BigDecimal(0);
+        BigDecimal afterDiscountPrice = BigDecimal.ZERO;
         // 订单优惠价格（商品折扣或满减之后价格）
-        BigDecimal discountPrice = new BigDecimal(0);
+        BigDecimal discountPrice = BigDecimal.ZERO;
         // 餐盒费
-        BigDecimal boxPrice = new BigDecimal(0);
+        BigDecimal boxPrice = BigDecimal.ZERO;
         // 配送费
-        BigDecimal sendPrice = new BigDecimal(0);
+        BigDecimal sendPrice = BigDecimal.ZERO;
         // 额外距离配送费
-        BigDecimal sendAddDistancePrice = new BigDecimal(0);
+        BigDecimal sendAddDistancePrice = BigDecimal.ZERO;
         // 额外件数配送费
-        BigDecimal sendAddCountPrice = new BigDecimal(0);
+        BigDecimal sendAddCountPrice = BigDecimal.ZERO;
         // 店铺满减总金额
-        BigDecimal fullAmount = new BigDecimal(0);
+        BigDecimal fullAmount = BigDecimal.ZERO;
         // 店铺满减可使用金额
-        BigDecimal fullUsedAmount = new BigDecimal(0);
+        BigDecimal fullUsedAmount = BigDecimal.ZERO;
         // 优惠券满减额度
-        BigDecimal couponFullAmount = new BigDecimal(0);
+        BigDecimal couponFullAmount = BigDecimal.ZERO;
         // 优惠券使用额度
-        BigDecimal couponUsedAmount = new BigDecimal(0);
+        BigDecimal couponUsedAmount = BigDecimal.ZERO;
         // 订单实付金额
-        BigDecimal payPrice = new BigDecimal(0);
+        BigDecimal payPrice = BigDecimal.ZERO;
         // 优惠折扣是否使用
         Boolean isDiscount = false;
         // 订单内商品总数
@@ -284,7 +284,7 @@ public class TOrdersServiceImpl implements TOrdersService {
      * @version:version
      * @return: ops.school.api.util.ResponseObject
      * @param   productOrderDTOS
-     * @param   orders
+     * @param   orders 包含微信用户openid，学校id，店铺id，楼栋id，每个商品名称
      * @Desc:   desc 用户提交订单
      */
     @Transactional(rollbackFor = Exception.class)
@@ -294,28 +294,39 @@ public class TOrdersServiceImpl implements TOrdersService {
         Assertions.notEmpty(productOrderDTOS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
         //判断用户有
         WxUser wxUser = wxUserService.getById(orders.getOpenId());
-        Assertions.notNull(wxUser,PublicErrorEnums.LOGIN_TIME_OUT);
+        Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST);
         //判断学校是否是有，并且是当前学校
         School school = schoolService.findById(wxUser.getSchoolId());
-        Assertions.notNull(school,ResponseViewEnums.COUPON_HOME_NUM_ERROR);
-        //判断店铺有，暂时不做ok todo
+        Assertions.notNull(school,ResponseViewEnums.SCHOOL_HAD_CHANGE);
+        //判断店铺有，暂时不做ok
         Shop shop = shopService.getById(orders.getShopId());
+        Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
         //楼栋判断
         Floor floor = floorService.getById(orders.getFloorId());
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
         //判断商品有并且库存够，批量id查询
-        List<Long> productIdS = PublicUtilS.getValueList(productOrderDTOS,"productId");
-        Map porductParamMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
-        Assertions.notEmpty(productIdS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
-        List<Product> productSelectList = (List<Product>) productService.listByIds(productIdS);
+        List<Long> productSelectIdS = PublicUtilS.getValueList(productOrderDTOS,"productId");
+        Map paramProductIdCountMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
+        Assertions.notEmpty(productSelectIdS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+        List<Product> productSelectList = (List<Product>) productService.listByIds(productSelectIdS);
+        // Map selectProductByIdsMap = PublicUtilS.listForMap(productSelectList,"id","stock");
+        //假如前端传3个商品，查出来两个，有一个就没有，报错
+        if (productSelectList.size() < productOrderDTOS.size()){
+            //报错 商品信息变化
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.PRODUCT_HAD_CHANGE);
+        }
         //检查库存
         Boolean throwErrorNoStockYes = false;
         String noStockProdctNames = "";
         for (Product product : productSelectList) {
-            //如果参数查询的product的id在参数map中（一定在），并且商品开启库存
-            if (porductParamMap.get(product.getId()) != null && product.getStockFlag().intValue() == ProductConstants.PRODUCT_STOCK_FLAG_YES){
+            //假如前端传3个商品，查出来两个，有一个就没有，报错
+            if (paramProductIdCountMap.get(product.getId()) == null){
+                throwErrorNoStockYes = true;
+                noStockProdctNames += product.getProductName();
+                //如果参数查询的product的id在参数map中（一定在），并且商品开启库存
+            }else if (product.getStockFlag().intValue() == ProductConstants.PRODUCT_STOCK_FLAG_YES){
                 //那么比较库存够不够
-                if (product.getStock() < (Integer)porductParamMap.get(product.getId())){
+                if (product.getStock() < (Integer)paramProductIdCountMap.get(product.getId())){
                     throwErrorNoStockYes = true;
                     noStockProdctNames += product.getProductName();
                 }
@@ -329,6 +340,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (remarkOrder != null){
             orders.setRemark(remarkOrder);
         }
+        //生成订单id
+        String generatorOrderId = "";
         /**
          * 支付金额计算逻辑
          */
@@ -346,7 +359,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             logger.error("订单商品保存失败，商品信息：" + PublicUtilS.getCollectionToString(orderProductSaveList));
         }
         //下单完成后扣库存
-        boolean disProductStockSuccess = productService.saveBatch(productDisStockList);
+        boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
         if (!disProductStockSuccess){
             // 这里想的扣库存失败还是可以下单
             logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
@@ -367,7 +380,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         //用户优惠券失效逻辑
         WxUserCoupon wxUserCoupon = new WxUserCoupon();
         wxUserCoupon.setId(orders.getCouponId());
-        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_YES);
+        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NO);
         int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
         if (updateUserCouponNum != NumConstants.INT_NUM_1){
             logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());

@@ -8,6 +8,11 @@ public class ProductOrderDTO {
 
     private Integer count;
 
+    /**
+     * 商品名称，前端传，后端好报错
+     */
+    private String productName;
+
     public Integer getProductId() {
         return productId;
     }
@@ -30,5 +35,13 @@ public class ProductOrderDTO {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }
