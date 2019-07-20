@@ -86,6 +86,34 @@ public class PublicUtilS {
     }
 
 
+    /**
+     * 根据字段名将list转为map
+     */
+    @SuppressWarnings("unchecked")
+    public static <K, V, E> Map<K, V> listForMapValueE(List<E> list, String keyProp) {
+
+        Map<K, V> map = new LinkedHashMap<>();
+
+        if (CollectionUtils.isNotEmpty(list)) {
+
+            list.removeAll(Collections.singleton(null));
+
+            for (E object : list) {
+
+                K key = (K) PROBE.getObject(object, keyProp);
+                V value = (V) object;
+                if (value != null) {
+                    map.put(key, value);
+                }
+
+            }
+
+        }
+
+        return map;
+    }
+
+
     /***
      * @desc: desc集合set去重
      * @date: 2019/05/28 09:26

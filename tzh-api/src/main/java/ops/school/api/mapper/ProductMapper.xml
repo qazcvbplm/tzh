@@ -22,6 +22,70 @@
             <result column="price" jdbcType="DECIMAL" property="price"/>
         </collection>
     </resultMap>
+
+
+    <resultMap id="ResultProductAndAttributeMap" type="ops.school.api.dto.project.ProductAndAttributeDTO">
+        <id column="Id" jdbcType="INTEGER" property="id"/>
+        <result column="product.product_name"  property="productName"/>
+        <result column="product.product_image"  property="productImage"/>
+        <result column="product.discount"  property="discount"/>
+        <result column="product.box_price_flag"  property="boxPriceFlag"/>
+        <result column="product.product_category_id"  property="productCategoryId"/>
+        <result column="product.shop_id"  property="shopId"/>
+        <result column="product.school_id"  property="schoolId"/>
+        <result column="product.sale"  property="sale"/>
+        <result column="product.is_show"  property="isShow"/>
+        <result column="product.is_delete"  property="isDelete"/>
+        <result column="product.stock"  property="stock"/>
+        <result column="product.stock_flag"  property="stockFlag"/>
+        <!--CreatBy Fang Time:2019/7/20 16:39 |  -->
+        <result column="product_attribute.id"  property="attributeId"/>
+        <result column="product_attribute.name"  property="attributeName"/>
+        <result column="product_attribute.price"  property="attributePrice"/>
+        <result column="product_attribute.is_delete"  property="attributeIsDelete"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        Id,
+        product_name,
+        product_image,
+        discount,
+        box_price_flag,
+        product_category_id,
+        shop_id,
+        school_id,
+        sale,
+        is_show,
+        is_delete,
+        stock,
+        stock_flag
+    </sql>
+
+    <sql id="Pro_Attribute_Column_List" >
+        product.Id,
+        product.product_name,
+        product.product_image,
+        product.discount,
+        product.box_price_flag,
+        product.product_category_id,
+        product.shop_id,
+        product.school_id,
+        product.sale,
+        product.is_show,
+        product.is_delete,
+        product.stock,
+        product.stock_flag,
+        product_attribute.id,
+        product_attribute.name,
+        product_attribute.price,
+        product_attribute.is_delete
+    </sql>
+
+    <sql id="Table_Name">
+        product
+    </sql>
+
     <update id="sale" parameterType="map">
   update  product set sale=sale+#{count} where id=#{id}
   </update>
@@ -69,6 +133,24 @@
     from product
     where Id = #{id,jdbcType=INTEGER}
   </select>
+    
+    <!--CreatBy Fang Time:2019/7/20 16:33 |  根据商品id和商品规格id批量查询商品及规格-->
+    <select id="batchFindProdAttributeByIdS" resultType="ops.school.api.dto.project.ProductAndAttributeDTO">
+        SELECT <include refid="Pro_Attribute_Column_List"/>
+        FROM product,product_attribute
+        WHERE product.id IN
+        <foreach collection="map" index="key" item="value"  open="(" separator="," close=")">
+            #{key}
+        </foreach>
+        AND product_attribute.product_id IN
+        <foreach collection="map" index="key" item="value"  open="(" separator="," close=")">
+            #{value}
+        </foreach>
+        AND product.id = product_attribute.product_id
+        AND product.is_show = 1
+        AND product.is_delete = 0
+        AND product_attribute.is_delete = 0
+    </select>
 
     <update id="updateByPrimaryKeySelective" parameterType="ops.school.api.entity.Product">
         update product

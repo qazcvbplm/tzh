@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dto.ShopTj;
+import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
@@ -356,12 +357,12 @@ public class TOrdersServiceImpl implements TOrdersService {
         Floor floor = floorService.getById(orders.getFloorId());
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
         //判断商品有并且库存够，批量id查询
-        List<Long> productSelectIdS = PublicUtilS.getValueList(productOrderDTOS,"productId");
-        //todo new ArrayList<Product>(Collection);
+        Map pIdAndAIdMap = PublicUtilS.listForMap(productOrderDTOS,"productId","attributeId");
         //根据商品id和商品规格id批量查询商品及规格
-        List<Product> productSelectList = (List<Product>)  productService.listByIds(productSelectIdS);
+        List<ProductAndAttributeDTO> productAndAttributeS = productService.batchFindProdAttributeByIdS(pIdAndAIdMap);
+        Map proAttributeSelectMap =  PublicUtilS.listForMapValueE(productAndAttributeS,"id");
         //假如前端传3个商品，查出来两个，有一个就没有，报错
-        if (productSelectList.size() < productOrderDTOS.size()){
+        if (productAndAttributeS.size() < productOrderDTOS.size()){
             //报错 商品信息变化
             DisplayException.throwMessageWithEnum(ResponseViewEnums.PRODUCT_HAD_CHANGE);
         }
@@ -436,10 +437,20 @@ public class TOrdersServiceImpl implements TOrdersService {
         List<Product> productDisStockList = new ArrayList<>();
         // 用于扣库存 临时存储product
         Product updateStockTempProduct = null;
+        ProductAndAttributeDTO productAndAttributeDTOTemp = null;
         for (ProductOrderDTO productOrder:productOrderDTOS) {
             /**
              * 商品校验逻辑
              */
+            productAndAttributeDTOTemp = (ProductAndAttributeDTO)proAttributeSelectMap.get(productOrder.getProductId());
+            product = productAndAttributeDTOTemp.getProduct();
+            productAttribute = productAndAttributeDTOTemp.getProductAttribute();
+            Assertions.notNull(product,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+            Assertions.notNull(productAttribute,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+            //如果 商品id 属性id 计数不能空或者计数不能0 商品不能空
+            if (productOrder.getProductId() == null || productOrder.getAttributeId() == null || productOrder.getCount() == null || productOrder.getCount() == 0){
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_PARAM_ERROR);
+            }
             //假如前端传3个商品，查出来两个，有一个就没有，报错
             if (paramProductIdCountMap.get(product.getId()) == null){
                 throwErrorNoStockYes = true;
@@ -466,15 +477,6 @@ public class TOrdersServiceImpl implements TOrdersService {
             /**
              * 商品校验逻辑
              */
-            // 商品规格id
-            Integer attributeId = productOrder.getAttributeId();
-            if (attributeId != null && attributeId != 0){
-                productAttribute = productAttributeService.getById(attributeId);
-            }
-            Integer productId = productOrder.getProductId();
-            if (productId != null && attributeId != 0){
-                product = productService.getById(productId);
-            }
             // 订单内同一商品的数量
             Integer count = productOrder.getCount();
             /**

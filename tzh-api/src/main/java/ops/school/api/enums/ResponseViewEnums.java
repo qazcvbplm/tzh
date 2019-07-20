@@ -28,6 +28,7 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------5-订单错误-----------*/
     ORDER_DONT_HAVE_PRODUCT("1250001","订单中不存在商品，请点单后下单"),
     ORDER_SAVE_ERROR("1250002","订单下单失败，请稍后重新下单"),
+    ORDER_PARAM_ERROR("1250002","订单信息错误，请稍后重新下单或者请联系后台管理"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),

@@ -183,6 +183,12 @@ public class Assertions {
         }
     }
 
+    public static void notEmpty(Map<?, ?> map, RootEnums enums) {
+        if (CollectionUtils.isEmpty(map)) {
+            throw new IllegalArgumentException(enums.getErrorMessage());
+        }
+    }
+
     public static void notEmpty(Map<?, ?> map) {
         notEmpty(map, "[Assertion failed] - this map must not be empty; it must contain at least one entry");
     }

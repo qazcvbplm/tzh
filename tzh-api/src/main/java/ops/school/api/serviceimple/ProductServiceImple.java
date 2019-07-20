@@ -4,7 +4,11 @@ package ops.school.api.serviceimple;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ops.school.api.dao.ProductAttributeMapper;
 import ops.school.api.dao.ProductMapper;
+import ops.school.api.dto.project.ProductAndAttributeDTO;
+import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Product;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,5 +71,18 @@ public class ProductServiceImple extends ServiceImpl<ProductMapper, Product> imp
         return 1;
     }
 
-
+    /**
+     * @date:   2019/7/20 16:31
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.dto.project.ProductAndAttributeDTO>
+     * @param   pIdAndAIdMap
+     * @Desc:   desc 根据商品id和商品规格id批量查询商品及规格
+     */
+    @Override
+    public List<ProductAndAttributeDTO> batchFindProdAttributeByIdS(Map<Long,Long> pIdAndAIdMap) {
+        Assertions.notEmpty(pIdAndAIdMap, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        List<ProductAndAttributeDTO> productAndAttributes = productMapper.batchFindProdAttributeByIdS(pIdAndAIdMap);
+        return productAndAttributes;
+    }
 }
