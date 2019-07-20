@@ -11,11 +11,7 @@ import ops.school.api.entity.*;
 import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
-import ops.school.api.util.CheckUtils;
-import ops.school.api.util.PublicUtilS;
-import ops.school.api.util.BaiduUtil;
-import ops.school.api.util.RedisUtil;
-import ops.school.api.util.ResponseObject;
+import ops.school.api.util.*;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.api.wxutil.WxGUtil;
@@ -36,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import springfox.documentation.spring.web.json.Json;
 
 import javax.validation.Valid;
@@ -352,7 +349,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         //判断学校是否是有，并且是当前学校
         School school = schoolService.findById(wxUser.getSchoolId());
         Assertions.notNull(school,ResponseViewEnums.SCHOOL_HAD_CHANGE);
-        //判断店铺有，暂时不做ok
+        //判断店铺有，暂时不做
         Shop shop = shopService.getById(orders.getShopId());
         Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
         //楼栋判断
@@ -360,33 +357,13 @@ public class TOrdersServiceImpl implements TOrdersService {
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
         //判断商品有并且库存够，批量id查询
         List<Long> productSelectIdS = PublicUtilS.getValueList(productOrderDTOS,"productId");
-        //todo
-        List<Product> productSelectList = (List<Product>) productService.listByIds(productSelectIdS);
+        //todo new ArrayList<Product>(Collection);
+        //根据商品id和商品规格id批量查询商品及规格
+        List<Product> productSelectList = (List<Product>)  productService.listByIds(productSelectIdS);
         //假如前端传3个商品，查出来两个，有一个就没有，报错
         if (productSelectList.size() < productOrderDTOS.size()){
             //报错 商品信息变化
             DisplayException.throwMessageWithEnum(ResponseViewEnums.PRODUCT_HAD_CHANGE);
-        }
-        //检查库存
-        Map paramProductIdCountMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
-        Boolean throwErrorNoStockYes = false;
-        String noStockProdctNames = "";
-        for (Product product : productSelectList) {
-            //假如前端传3个商品，查出来两个，有一个就没有，报错
-            if (paramProductIdCountMap.get(product.getId()) == null){
-                throwErrorNoStockYes = true;
-                noStockProdctNames += product.getProductName();
-                //如果参数查询的product的id在参数map中（一定在），并且商品开启库存
-            }else if (product.getStockFlag().intValue() == ProductConstants.PRODUCT_STOCK_FLAG_YES){
-                //那么比较库存够不够
-                if (product.getStock() < (Integer)paramProductIdCountMap.get(product.getId())){
-                    throwErrorNoStockYes = true;
-                    noStockProdctNames += product.getProductName();
-                }
-            }
-        }
-        if (throwErrorNoStockYes){
-            DisplayException.throwMessage(noStockProdctNames+"卖完啦！");
         }
         // 判断订单备注是否有表情内容
         String remarkOrder = CheckUtils.checkEmoji(orders.getRemark());
@@ -394,11 +371,13 @@ public class TOrdersServiceImpl implements TOrdersService {
             orders.setRemark(remarkOrder);
         }
         //生成订单id
-        String generatorOrderId = "";
+        String generatorOrderId = Util.GenerateOrderId();
+        if (generatorOrderId == null || generatorOrderId.isEmpty()){
+            DisplayException.throwMessageWithEnum(PublicErrorEnums.CALL_THE_BACK_WORKER);
+        }
         /**
          * 支付金额计算逻辑
          */
-
         /**
          * 变量
          */
@@ -436,18 +415,57 @@ public class TOrdersServiceImpl implements TOrdersService {
         Product product = null;
         //用于保存orderProduct
         List<OrderProduct> orderProductSaveList = new ArrayList<>();
-        //用于扣库存，在计算金额就要减去库存
-        List<Product> productDisStockList = new ArrayList<>();
         /**
          * 变量
          */
-
         // 新建一个Orders实体类
         Orders ordersSaveTemp = new Orders();
         //订单id
         ordersSaveTemp.setId(generatorOrderId);
         OrderProduct orderProduct = new OrderProduct();
+        //校验商品
+        //检查库存
+        Map paramProductIdCountMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
+        // 标识商品信息是否错误（库存不够），是否需要抛异常
+        Boolean throwErrorNoStockYes = false;
+        // 标识商品信息库存是否需要去修改），是否需要抛异常
+        Boolean needToDisProductStockYes = false;
+        // 库存不够抛异常的信息
+        String noStockProdctNames = "";
+        //用于扣库存，在计算金额就要减去库存
+        List<Product> productDisStockList = new ArrayList<>();
+        // 用于扣库存 临时存储product
+        Product updateStockTempProduct = null;
         for (ProductOrderDTO productOrder:productOrderDTOS) {
+            /**
+             * 商品校验逻辑
+             */
+            //假如前端传3个商品，查出来两个，有一个就没有，报错
+            if (paramProductIdCountMap.get(product.getId()) == null){
+                throwErrorNoStockYes = true;
+                noStockProdctNames += product.getProductName();
+                //跳出循环，这个商品就不做逻辑处理
+                continue;
+                //如果参数查询的product的id在参数map中（一定在），并且商品开启库存
+            }else if (product.getStockFlag().intValue() == ProductConstants.PRODUCT_STOCK_FLAG_YES){
+                needToDisProductStockYes = true;
+                //那么比较库存够不够，不够
+                if (product.getStock() < (Integer)paramProductIdCountMap.get(product.getId())){
+                    throwErrorNoStockYes = true;
+                    noStockProdctNames += product.getProductName();
+                    //跳出循环，这个商品就不做逻辑处理
+                    continue;
+                }else {
+                    // 库存够，需要取修改库存
+                    updateStockTempProduct = product;
+                    updateStockTempProduct.setStock(product.getStock() - (Integer)paramProductIdCountMap.get(product.getId()));
+                    //添加到list
+                    productDisStockList.add(updateStockTempProduct);
+                }
+            }
+            /**
+             * 商品校验逻辑
+             */
             // 商品规格id
             Integer attributeId = productOrder.getAttributeId();
             if (attributeId != null && attributeId != 0){
@@ -495,6 +513,10 @@ public class TOrdersServiceImpl implements TOrdersService {
                     orderProductSaveList.add(orderProduct);
                 }
             }
+        }
+        //校验商品完成判断是否需要抛异常
+        if (throwErrorNoStockYes){
+            DisplayException.throwMessage(noStockProdctNames+"卖完啦！");
         }
         // 餐盒费之和
         if (orders.getTyp().equals("外卖订单") || orders.getTyp().equals("自取订单")){

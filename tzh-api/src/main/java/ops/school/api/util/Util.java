@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Util {
 
@@ -141,6 +142,29 @@ public class Util {
         return time;
     }
 
+    /**
+     * 生成随机订单号
+     *
+     * @return
+     */
+    public static String GenerateOrderIdByLock() {
+        ReentrantLock lock = new ReentrantLock();
+        String time = null;
+        try {
+            lock.lock();
+            time = sdf.format(new Date());
+            String timeM = System.currentTimeMillis() + "";
+            for (int i = 0; i < 10; i++) {
+                int z = (int) (Math.random() * timeM.length());
+                time += timeM.charAt(z);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            lock.unlock();
+        }
+        return time;
+    }
 
     /**
      * 对参数进行验证

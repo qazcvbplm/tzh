@@ -23,6 +23,8 @@ public enum PublicErrorEnums implements RootEnums {
     PUBLIC_DO_FAILED("1010007","操作失败"),
     /**登陆超时*/
     LOGIN_TIME_OUT("1010008","登陆超时，请重新登陆"),
+    /**登陆超时*/
+    CALL_THE_BACK_WORKER("1010009","服务器被外星人攻击了，请联系管理员"),
 
 
 
