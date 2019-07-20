@@ -263,7 +263,9 @@ public class TOrdersServiceImpl implements TOrdersService {
                     for (ShopFullCut shopFullCut:shopFullCuts) {
                         if (originalPrice.compareTo(new BigDecimal(shopFullCut.getFullAmount())) == 1){
                             // 店铺满减之后的优惠价格
-                            afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount()));
+                            if (afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount())).compareTo(new BigDecimal(0)) == 1){
+                                afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount()));
+                            }
                             fullAmount.add(new BigDecimal(shopFullCut.getFullAmount()));
                             fullUsedAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
                             // 店铺满减表id
@@ -280,14 +282,14 @@ public class TOrdersServiceImpl implements TOrdersService {
                  if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
                      Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
                      if (coupon != null && coupon.getIsInvalid() == 0 && coupon.getSendEndTime().getTime() >= currentTime){
-                         if (afterDiscountPrice.add(boxPrice).compareTo(new BigDecimal(coupon.getFullAmount())) == 1){
+                         if (afterDiscountPrice.add(boxPrice).compareTo(new BigDecimal(coupon.getFullAmount())) == 1 && afterDiscountPrice.subtract(new BigDecimal(coupon.getCutAmount())).compareTo(new BigDecimal(0)) == 1){
                             payPrice.add(afterDiscountPrice).subtract(new BigDecimal(coupon.getCutAmount()));
                          }
                      }
                  }
             }
             // 减去粮票
-            if (orders.getPayFoodCoupon() != null && orders.getPayFoodCoupon() != new BigDecimal(0)){
+            if (orders.getPayFoodCoupon() != null && orders.getPayFoodCoupon() != new BigDecimal(0) && payPrice.subtract(orders.getPayFoodCoupon()).compareTo(new BigDecimal(0)) == 1){
                 payPrice.subtract(orders.getPayFoodCoupon());
             }
             orders1.setDiscountPrice(discountPrice);
