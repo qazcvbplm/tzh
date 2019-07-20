@@ -178,6 +178,6 @@ public class WxUserController {
     public ResponseObject findWxUserCoupons(@RequestParam String wxUserId){
 
         List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId));
-        return new ResponseObject(true,"查询成功");
+        return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
     }
 }
