@@ -84,4 +84,14 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @Desc:   desc 修改用户优惠券is_invalid状态
      */
     int update(WxUserCoupon userCoupon);
+
+    /**
+     * @date:
+     * @author: Lee
+     * @version:version
+     * @return: java.util.List
+     * @param wxUserId 用户id
+     * @Desc:   desc 查询用户所有优惠券
+     */
+    List<WxUserCoupon> findUserCoupon(Long wxUserId);
 }

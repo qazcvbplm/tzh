@@ -115,4 +115,11 @@
         set is_invalid = #{isInvalid}
         where id = #{id}
     </update>
+
+    <select id="findUserCoupon" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from <include refid="Table_Name"/>
+	    where wx_user_id = #{wxUserId}
+	    and is_invalid = 0
+    </select>
 </mapper>
