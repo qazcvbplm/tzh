@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -681,180 +682,123 @@ public class Orders extends Base implements Serializable {
     }
 
     @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        Orders other = (Orders) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getAppId() == null ? other.getAppId() == null : this.getAppId().equals(other.getAppId()))
-            && (this.getSchoolId() == null ? other.getSchoolId() == null : this.getSchoolId().equals(other.getSchoolId()))
-            && (this.getSchoolTopDownPrice() == null ? other.getSchoolTopDownPrice() == null : this.getSchoolTopDownPrice().equals(other.getSchoolTopDownPrice()))
-            && (this.getShopId() == null ? other.getShopId() == null : this.getShopId().equals(other.getShopId()))
-            && (this.getShopName() == null ? other.getShopName() == null : this.getShopName().equals(other.getShopName()))
-            && (this.getShopImage() == null ? other.getShopImage() == null : this.getShopImage().equals(other.getShopImage()))
-            && (this.getShopAddress() == null ? other.getShopAddress() == null : this.getShopAddress().equals(other.getShopAddress()))
-            && (this.getShopPhone() == null ? other.getShopPhone() == null : this.getShopPhone().equals(other.getShopPhone()))
-            && (this.getOpenId() == null ? other.getOpenId() == null : this.getOpenId().equals(other.getOpenId()))
-            && (this.getAddressName() == null ? other.getAddressName() == null : this.getAddressName().equals(other.getAddressName()))
-            && (this.getAddressPhone() == null ? other.getAddressPhone() == null : this.getAddressPhone().equals(other.getAddressPhone()))
-            && (this.getAddressDetail() == null ? other.getAddressDetail() == null : this.getAddressDetail().equals(other.getAddressDetail()))
-            && (this.getFloorId() == null ? other.getFloorId() == null : this.getFloorId().equals(other.getFloorId()))
-            && (this.getTyp() == null ? other.getTyp() == null : this.getTyp().equals(other.getTyp()))
-            && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-            && (this.getBoxPrice() == null ? other.getBoxPrice() == null : this.getBoxPrice().equals(other.getBoxPrice()))
-            && (this.getSendPrice() == null ? other.getSendPrice() == null : this.getSendPrice().equals(other.getSendPrice()))
-            && (this.getSendBasePrice() == null ? other.getSendBasePrice() == null : this.getSendBasePrice().equals(other.getSendBasePrice()))
-            && (this.getSendAddDistancePrice() == null ? other.getSendAddDistancePrice() == null : this.getSendAddDistancePrice().equals(other.getSendAddDistancePrice()))
-            && (this.getSendAddCountPrice() == null ? other.getSendAddCountPrice() == null : this.getSendAddCountPrice().equals(other.getSendAddCountPrice()))
-            && (this.getProductPrice() == null ? other.getProductPrice() == null : this.getProductPrice().equals(other.getProductPrice()))
-            && (this.getDiscountType() == null ? other.getDiscountType() == null : this.getDiscountType().equals(other.getDiscountType()))
-            && (this.getDiscountPrice() == null ? other.getDiscountPrice() == null : this.getDiscountPrice().equals(other.getDiscountPrice()))
-            && (this.getCouponId() == null ? other.getCouponId() == null : this.getCouponId().equals(other.getCouponId()))
-            && (this.getCouponFullAmount() == null ? other.getCouponFullAmount() == null : this.getCouponFullAmount().equals(other.getCouponFullAmount()))
-            && (this.getCouponUsedAmount() == null ? other.getCouponUsedAmount() == null : this.getCouponUsedAmount().equals(other.getCouponUsedAmount()))
-            && (this.getFullCutId() == null ? other.getFullCutId() == null : this.getFullCutId().equals(other.getFullCutId()))
-            && (this.getFullAmount() == null ? other.getFullAmount() == null : this.getFullAmount().equals(other.getFullAmount()))
-            && (this.getFullUsedAmount() == null ? other.getFullUsedAmount() == null : this.getFullUsedAmount().equals(other.getFullUsedAmount()))
-            && (this.getOriginalPrice() == null ? other.getOriginalPrice() == null : this.getOriginalPrice().equals(other.getOriginalPrice()))
-            && (this.getPayPrice() == null ? other.getPayPrice() == null : this.getPayPrice().equals(other.getPayPrice()))
-            && (this.getSenderName() == null ? other.getSenderName() == null : this.getSenderName().equals(other.getSenderName()))
-            && (this.getSenderPhone() == null ? other.getSenderPhone() == null : this.getSenderPhone().equals(other.getSenderPhone()))
-            && (this.getSenderId() == null ? other.getSenderId() == null : this.getSenderId().equals(other.getSenderId()))
-            && (this.getDestination() == null ? other.getDestination() == null : this.getDestination().equals(other.getDestination()))
-            && (this.getRemark() == null ? other.getRemark() == null : this.getRemark().equals(other.getRemark()))
-            && (this.getWaterNumber() == null ? other.getWaterNumber() == null : this.getWaterNumber().equals(other.getWaterNumber()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getPayment() == null ? other.getPayment() == null : this.getPayment().equals(other.getPayment()))
-            && (this.getPayTime() == null ? other.getPayTime() == null : this.getPayTime().equals(other.getPayTime()))
-            && (this.getPayTimeLong() == null ? other.getPayTimeLong() == null : this.getPayTimeLong().equals(other.getPayTimeLong()))
-            && (this.getSendGetFlag() == null ? other.getSendGetFlag() == null : this.getSendGetFlag().equals(other.getSendGetFlag()))
-            && (this.getEndTime() == null ? other.getEndTime() == null : this.getEndTime().equals(other.getEndTime()))
-            && (this.getEvaluateFlag() == null ? other.getEvaluateFlag() == null : this.getEvaluateFlag().equals(other.getEvaluateFlag()))
-            && (this.getReseverTime() == null ? other.getReseverTime() == null : this.getReseverTime().equals(other.getReseverTime()))
-            && (this.getShopAcceptTime() == null ? other.getShopAcceptTime() == null : this.getShopAcceptTime().equals(other.getShopAcceptTime()))
-            && (this.getPayFoodCoupon() == null ? other.getPayFoodCoupon() == null : this.getPayFoodCoupon().equals(other.getPayFoodCoupon()));
+    public boolean equals(Object o) {
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
+        Orders orders = (Orders) o;
+        return Objects.equals(id, orders.id) &&
+                Objects.equals(appId, orders.appId) &&
+                Objects.equals(schoolId, orders.schoolId) &&
+                Objects.equals(schoolTopDownPrice, orders.schoolTopDownPrice) &&
+                Objects.equals(shopId, orders.shopId) &&
+                Objects.equals(shopName, orders.shopName) &&
+                Objects.equals(shopImage, orders.shopImage) &&
+                Objects.equals(shopAddress, orders.shopAddress) &&
+                Objects.equals(shopPhone, orders.shopPhone) &&
+                Objects.equals(openId, orders.openId) &&
+                Objects.equals(addressName, orders.addressName) &&
+                Objects.equals(addressPhone, orders.addressPhone) &&
+                Objects.equals(addressDetail, orders.addressDetail) &&
+                Objects.equals(floorId, orders.floorId) &&
+                Objects.equals(typ, orders.typ) &&
+                Objects.equals(status, orders.status) &&
+                Objects.equals(boxPrice, orders.boxPrice) &&
+                Objects.equals(sendPrice, orders.sendPrice) &&
+                Objects.equals(sendBasePrice, orders.sendBasePrice) &&
+                Objects.equals(sendAddDistancePrice, orders.sendAddDistancePrice) &&
+                Objects.equals(sendAddCountPrice, orders.sendAddCountPrice) &&
+                Objects.equals(productPrice, orders.productPrice) &&
+                Objects.equals(discountType, orders.discountType) &&
+                Objects.equals(discountPrice, orders.discountPrice) &&
+                Objects.equals(couponId, orders.couponId) &&
+                Objects.equals(couponFullAmount, orders.couponFullAmount) &&
+                Objects.equals(couponUsedAmount, orders.couponUsedAmount) &&
+                Objects.equals(fullCutId, orders.fullCutId) &&
+                Objects.equals(fullAmount, orders.fullAmount) &&
+                Objects.equals(fullUsedAmount, orders.fullUsedAmount) &&
+                Objects.equals(originalPrice, orders.originalPrice) &&
+                Objects.equals(payPrice, orders.payPrice) &&
+                Objects.equals(senderName, orders.senderName) &&
+                Objects.equals(senderPhone, orders.senderPhone) &&
+                Objects.equals(senderId, orders.senderId) &&
+                Objects.equals(destination, orders.destination) &&
+                Objects.equals(remark, orders.remark) &&
+                Objects.equals(waterNumber, orders.waterNumber) &&
+                Objects.equals(createTime, orders.createTime) &&
+                Objects.equals(payment, orders.payment) &&
+                Objects.equals(payTime, orders.payTime) &&
+                Objects.equals(payTimeLong, orders.payTimeLong) &&
+                Objects.equals(sendGetFlag, orders.sendGetFlag) &&
+                Objects.equals(endTime, orders.endTime) &&
+                Objects.equals(evaluateFlag, orders.evaluateFlag) &&
+                Objects.equals(reseverTime, orders.reseverTime) &&
+                Objects.equals(shopAcceptTime, orders.shopAcceptTime) &&
+                Objects.equals(payFoodCoupon, orders.payFoodCoupon) &&
+                Objects.equals(op, orders.op) &&
+                Objects.equals(complete, orders.complete);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getAppId() == null) ? 0 : getAppId().hashCode());
-        result = prime * result + ((getSchoolId() == null) ? 0 : getSchoolId().hashCode());
-        result = prime * result + ((getSchoolTopDownPrice() == null) ? 0 : getSchoolTopDownPrice().hashCode());
-        result = prime * result + ((getShopId() == null) ? 0 : getShopId().hashCode());
-        result = prime * result + ((getShopName() == null) ? 0 : getShopName().hashCode());
-        result = prime * result + ((getShopImage() == null) ? 0 : getShopImage().hashCode());
-        result = prime * result + ((getShopAddress() == null) ? 0 : getShopAddress().hashCode());
-        result = prime * result + ((getShopPhone() == null) ? 0 : getShopPhone().hashCode());
-        result = prime * result + ((getOpenId() == null) ? 0 : getOpenId().hashCode());
-        result = prime * result + ((getAddressName() == null) ? 0 : getAddressName().hashCode());
-        result = prime * result + ((getAddressPhone() == null) ? 0 : getAddressPhone().hashCode());
-        result = prime * result + ((getAddressDetail() == null) ? 0 : getAddressDetail().hashCode());
-        result = prime * result + ((getFloorId() == null) ? 0 : getFloorId().hashCode());
-        result = prime * result + ((getTyp() == null) ? 0 : getTyp().hashCode());
-        result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
-        result = prime * result + ((getBoxPrice() == null) ? 0 : getBoxPrice().hashCode());
-        result = prime * result + ((getSendPrice() == null) ? 0 : getSendPrice().hashCode());
-        result = prime * result + ((getSendBasePrice() == null) ? 0 : getSendBasePrice().hashCode());
-        result = prime * result + ((getSendAddDistancePrice() == null) ? 0 : getSendAddDistancePrice().hashCode());
-        result = prime * result + ((getSendAddCountPrice() == null) ? 0 : getSendAddCountPrice().hashCode());
-        result = prime * result + ((getProductPrice() == null) ? 0 : getProductPrice().hashCode());
-        result = prime * result + ((getDiscountType() == null) ? 0 : getDiscountType().hashCode());
-        result = prime * result + ((getDiscountPrice() == null) ? 0 : getDiscountPrice().hashCode());
-        result = prime * result + ((getCouponId() == null) ? 0 : getCouponId().hashCode());
-        result = prime * result + ((getCouponFullAmount() == null) ? 0 : getCouponFullAmount().hashCode());
-        result = prime * result + ((getCouponUsedAmount() == null) ? 0 : getCouponUsedAmount().hashCode());
-        result = prime * result + ((getFullCutId() == null) ? 0 : getFullCutId().hashCode());
-        result = prime * result + ((getFullAmount() == null) ? 0 : getFullAmount().hashCode());
-        result = prime * result + ((getFullUsedAmount() == null) ? 0 : getFullUsedAmount().hashCode());
-        result = prime * result + ((getOriginalPrice() == null) ? 0 : getOriginalPrice().hashCode());
-        result = prime * result + ((getPayPrice() == null) ? 0 : getPayPrice().hashCode());
-        result = prime * result + ((getSenderName() == null) ? 0 : getSenderName().hashCode());
-        result = prime * result + ((getSenderPhone() == null) ? 0 : getSenderPhone().hashCode());
-        result = prime * result + ((getSenderId() == null) ? 0 : getSenderId().hashCode());
-        result = prime * result + ((getDestination() == null) ? 0 : getDestination().hashCode());
-        result = prime * result + ((getRemark() == null) ? 0 : getRemark().hashCode());
-        result = prime * result + ((getWaterNumber() == null) ? 0 : getWaterNumber().hashCode());
-        result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
-        result = prime * result + ((getPayment() == null) ? 0 : getPayment().hashCode());
-        result = prime * result + ((getPayTime() == null) ? 0 : getPayTime().hashCode());
-        result = prime * result + ((getPayTimeLong() == null) ? 0 : getPayTimeLong().hashCode());
-        result = prime * result + ((getSendGetFlag() == null) ? 0 : getSendGetFlag().hashCode());
-        result = prime * result + ((getEndTime() == null) ? 0 : getEndTime().hashCode());
-        result = prime * result + ((getEvaluateFlag() == null) ? 0 : getEvaluateFlag().hashCode());
-        result = prime * result + ((getReseverTime() == null) ? 0 : getReseverTime().hashCode());
-        result = prime * result + ((getShopAcceptTime() == null) ? 0 : getShopAcceptTime().hashCode());
-        result = prime * result + ((getPayFoodCoupon() == null) ? 0 : getPayFoodCoupon().hashCode());
-        return result;
+        return Objects.hash(id, appId, schoolId, schoolTopDownPrice, shopId, shopName, shopImage, shopAddress, shopPhone, openId, addressName, addressPhone, addressDetail, floorId, typ, status, boxPrice, sendPrice, sendBasePrice, sendAddDistancePrice, sendAddCountPrice, productPrice, discountType, discountPrice, couponId, couponFullAmount, couponUsedAmount, fullCutId, fullAmount, fullUsedAmount, originalPrice, payPrice, senderName, senderPhone, senderId, destination, remark, waterNumber, createTime, payment, payTime, payTimeLong, sendGetFlag, endTime, evaluateFlag, reseverTime, shopAcceptTime, payFoodCoupon, op, complete);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", appId=").append(appId);
-        sb.append(", schoolId=").append(schoolId);
-        sb.append(", schoolTopDownPrice=").append(schoolTopDownPrice);
-        sb.append(", shopId=").append(shopId);
-        sb.append(", shopName=").append(shopName);
-        sb.append(", shopImage=").append(shopImage);
-        sb.append(", shopAddress=").append(shopAddress);
-        sb.append(", shopPhone=").append(shopPhone);
-        sb.append(", openId=").append(openId);
-        sb.append(", addressName=").append(addressName);
-        sb.append(", addressPhone=").append(addressPhone);
-        sb.append(", addressDetail=").append(addressDetail);
-        sb.append(", floorId=").append(floorId);
-        sb.append(", typ=").append(typ);
-        sb.append(", status=").append(status);
-        sb.append(", boxPrice=").append(boxPrice);
-        sb.append(", sendPrice=").append(sendPrice);
-        sb.append(", sendBasePrice=").append(sendBasePrice);
-        sb.append(", sendAddDistancePrice=").append(sendAddDistancePrice);
-        sb.append(", sendAddCountPrice=").append(sendAddCountPrice);
-        sb.append(", productPrice=").append(productPrice);
-        sb.append(", discountType=").append(discountType);
-        sb.append(", discountPrice=").append(discountPrice);
-        sb.append(", couponId=").append(couponId);
-        sb.append(", couponFullAmount=").append(couponFullAmount);
-        sb.append(", couponUsedAmount=").append(couponUsedAmount);
-        sb.append(", fullCutId=").append(fullCutId);
-        sb.append(", fullAmount=").append(fullAmount);
-        sb.append(", fullUsedAmount=").append(fullUsedAmount);
-        sb.append(", originalPrice=").append(originalPrice);
-        sb.append(", payPrice=").append(payPrice);
-        sb.append(", senderName=").append(senderName);
-        sb.append(", senderPhone=").append(senderPhone);
-        sb.append(", senderId=").append(senderId);
-        sb.append(", destination=").append(destination);
-        sb.append(", remark=").append(remark);
-        sb.append(", waterNumber=").append(waterNumber);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", payment=").append(payment);
-        sb.append(", payTime=").append(payTime);
-        sb.append(", payTimeLong=").append(payTimeLong);
-        sb.append(", sendGetFlag=").append(sendGetFlag);
-        sb.append(", endTime=").append(endTime);
-        sb.append(", evaluateFlag=").append(evaluateFlag);
-        sb.append(", reseverTime=").append(reseverTime);
-        sb.append(", shopAcceptTime=").append(shopAcceptTime);
-        sb.append(", payFoodCoupon=").append(payFoodCoupon);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
+        return "Orders{" +
+                "id='" + id + '\'' +
+                ", appId=" + appId +
+                ", schoolId=" + schoolId +
+                ", schoolTopDownPrice=" + schoolTopDownPrice +
+                ", shopId=" + shopId +
+                ", shopName='" + shopName + '\'' +
+                ", shopImage='" + shopImage + '\'' +
+                ", shopAddress='" + shopAddress + '\'' +
+                ", shopPhone='" + shopPhone + '\'' +
+                ", openId='" + openId + '\'' +
+                ", addressName='" + addressName + '\'' +
+                ", addressPhone='" + addressPhone + '\'' +
+                ", addressDetail='" + addressDetail + '\'' +
+                ", floorId=" + floorId +
+                ", typ='" + typ + '\'' +
+                ", status='" + status + '\'' +
+                ", boxPrice=" + boxPrice +
+                ", sendPrice=" + sendPrice +
+                ", sendBasePrice=" + sendBasePrice +
+                ", sendAddDistancePrice=" + sendAddDistancePrice +
+                ", sendAddCountPrice=" + sendAddCountPrice +
+                ", productPrice=" + productPrice +
+                ", discountType='" + discountType + '\'' +
+                ", discountPrice=" + discountPrice +
+                ", couponId=" + couponId +
+                ", couponFullAmount=" + couponFullAmount +
+                ", couponUsedAmount=" + couponUsedAmount +
+                ", fullCutId=" + fullCutId +
+                ", fullAmount=" + fullAmount +
+                ", fullUsedAmount=" + fullUsedAmount +
+                ", originalPrice=" + originalPrice +
+                ", payPrice=" + payPrice +
+                ", senderName='" + senderName + '\'' +
+                ", senderPhone='" + senderPhone + '\'' +
+                ", senderId=" + senderId +
+                ", destination=" + destination +
+                ", remark='" + remark + '\'' +
+                ", waterNumber=" + waterNumber +
+                ", createTime=" + createTime +
+                ", payment='" + payment + '\'' +
+                ", payTime='" + payTime + '\'' +
+                ", payTimeLong=" + payTimeLong +
+                ", sendGetFlag=" + sendGetFlag +
+                ", endTime='" + endTime + '\'' +
+                ", evaluateFlag=" + evaluateFlag +
+                ", reseverTime='" + reseverTime + '\'' +
+                ", shopAcceptTime='" + shopAcceptTime + '\'' +
+                ", payFoodCoupon=" + payFoodCoupon +
+                ", op=" + op +
+                ", complete=" + complete +
+                '}';
     }
+
     // totalCount 为订单中商品总件数，boxcount 餐盒数，
     public void takeoutinit1(WxUser wxUser, School school, Shop shop, Floor floor, int totalcount, boolean isDiscount, List<FullCut> fullcut, int boxcount) {
         this.schoolId = school.getId();

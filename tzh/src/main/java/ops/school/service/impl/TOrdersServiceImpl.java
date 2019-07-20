@@ -147,7 +147,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal originalPrice = BigDecimal.ZERO;
         // 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和（如果没有商品折扣，则与规格价格之和相等）
         BigDecimal afterDiscountPrice = BigDecimal.ZERO;
-        // 订单优惠价格（商品折扣或满减之后价格）
+        // 订单优惠了的价格 100元7折或者满100减30，这个是30
         BigDecimal discountPrice = BigDecimal.ZERO;
         // 餐盒费
         BigDecimal boxPrice = BigDecimal.ZERO;
@@ -157,7 +157,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal sendAddDistancePrice = BigDecimal.ZERO;
         // 额外件数配送费
         BigDecimal sendAddCountPrice = BigDecimal.ZERO;
-        // 店铺满减总金额
+        // 店铺满减条件总金额
         BigDecimal fullAmount = BigDecimal.ZERO;
         // 店铺满减可使用金额
         BigDecimal fullUsedAmount = BigDecimal.ZERO;
@@ -178,9 +178,9 @@ public class TOrdersServiceImpl implements TOrdersService {
         Shop shop = null;
         School school = null;
         // 新建一个Orders实体类
-        Orders orders1 = new Orders();
+        Orders ordersSaveTemp = new Orders();
         OrderProduct orderProduct = new OrderProduct();
-        List<OrderProduct> orderproductList = new ArrayList<>();
+        List<OrderProduct> orderProductSaveList = new ArrayList<>();
         Floor floor = floorService.getById(orders.getFloorId());
         if (productOrderDTOS.size() != 0){
             for (ProductOrderDTO productOrder:productOrderDTOS) {
@@ -205,7 +205,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                     if (product != null){
                         // 如果商品折扣小于1，即商品有折扣
                         if (product.getDiscount().compareTo(new BigDecimal(1)) == -1){
-                            orders1.setDiscountType("商品折扣");
+                            ordersSaveTemp.setDiscountType("商品折扣");
                             // 优惠折扣已使用，店铺满减无法再使用
                             isDiscount = true;
                             // 使用商品折扣时的优惠价格
@@ -229,7 +229,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                         orderProduct.setProductCount(count);
                         orderProduct.setProductDiscount(discountPrice);
                         orderProduct.setTotalPrice(productAttribute.getPrice().subtract(discountPrice));
-                        orderproductList.add(orderProduct);
+                        orderProductSaveList.add(orderProduct);
                     }
                 }
             }
@@ -269,7 +269,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                             fullAmount.add(new BigDecimal(shopFullCut.getFullAmount()));
                             fullUsedAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
                             // 店铺满减表id
-                            orders1.setFullCutId(shopFullCut.getId());
+                            ordersSaveTemp.setFullCutId(shopFullCut.getId());
                             break;
                         }
                     }
@@ -292,37 +292,37 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (orders.getPayFoodCoupon() != null && orders.getPayFoodCoupon() != new BigDecimal(0) && payPrice.subtract(orders.getPayFoodCoupon()).compareTo(new BigDecimal(0)) == 1){
                 payPrice.subtract(orders.getPayFoodCoupon());
             }
-            orders1.setDiscountPrice(discountPrice);
-            orders1.setAddressDetail(orders.getAddressDetail());
-            orders1.setAddressName(orders.getAddressName());
-            orders1.setAddressPhone(orders.getAddressPhone());
-            orders1.setAppId(school.getAppId());
-            orders1.setBoxPrice(boxPrice);
-            orders1.setCouponFullAmount(couponFullAmount);
-            orders1.setCouponId(orders.getCouponId());
-            orders1.setCouponUsedAmount(couponUsedAmount);
-            orders1.setFloorId(orders.getFloorId());
-            orders1.setFullAmount(fullAmount);
-            orders1.setFullUsedAmount(fullUsedAmount);
-            orders1.setOpenId(orders.getOpenId());
-            orders1.setOriginalPrice(originalPrice);
-            orders1.setPayFoodCoupon(orders.getPayFoodCoupon());
-            orders1.setPayPrice(payPrice);
-            orders1.setSendAddCountPrice(sendAddCountPrice);
-            orders1.setSendAddDistancePrice(sendAddDistancePrice);
-            orders1.setSendBasePrice(shop.getSendPrice());
-            orders1.setSchoolId(school.getId());
-            orders1.setSchoolTopDownPrice(school.getTopDown());
-            orders1.setSendPrice(sendPrice);
-            orders1.setTyp(orders.getTyp());
-            orders1.setProductPrice(payPrice.subtract(sendPrice).subtract(boxPrice));
-            orders1.setRemark(orders.getRemark());
-            orders1.setReseverTime(orders.getReseverTime());
-            orders1.setShopId(shop.getId());
-            orders1.setShopAddress(shop.getShopAddress());
-            orders1.setShopImage(shop.getShopImage());
-            orders1.setShopName(shop.getShopName());
-            orders1.setShopPhone(shop.getShopPhone());
+            ordersSaveTemp.setDiscountPrice(discountPrice);
+            ordersSaveTemp.setAddressDetail(orders.getAddressDetail());
+            ordersSaveTemp.setAddressName(orders.getAddressName());
+            ordersSaveTemp.setAddressPhone(orders.getAddressPhone());
+            ordersSaveTemp.setAppId(school.getAppId());
+            ordersSaveTemp.setBoxPrice(boxPrice);
+            ordersSaveTemp.setCouponFullAmount(couponFullAmount);
+            ordersSaveTemp.setCouponId(orders.getCouponId());
+            ordersSaveTemp.setCouponUsedAmount(couponUsedAmount);
+            ordersSaveTemp.setFloorId(orders.getFloorId());
+            ordersSaveTemp.setFullAmount(fullAmount);
+            ordersSaveTemp.setFullUsedAmount(fullUsedAmount);
+            ordersSaveTemp.setOpenId(orders.getOpenId());
+            ordersSaveTemp.setOriginalPrice(originalPrice);
+            ordersSaveTemp.setPayFoodCoupon(orders.getPayFoodCoupon());
+            ordersSaveTemp.setPayPrice(payPrice);
+            ordersSaveTemp.setSendAddCountPrice(sendAddCountPrice);
+            ordersSaveTemp.setSendAddDistancePrice(sendAddDistancePrice);
+            ordersSaveTemp.setSendBasePrice(shop.getSendPrice());
+            ordersSaveTemp.setSchoolId(school.getId());
+            ordersSaveTemp.setSchoolTopDownPrice(school.getTopDown());
+            ordersSaveTemp.setSendPrice(sendPrice);
+            ordersSaveTemp.setTyp(orders.getTyp());
+            ordersSaveTemp.setProductPrice(payPrice.subtract(sendPrice).subtract(boxPrice));
+            ordersSaveTemp.setRemark(orders.getRemark());
+            ordersSaveTemp.setReseverTime(orders.getReseverTime());
+            ordersSaveTemp.setShopId(shop.getId());
+            ordersSaveTemp.setShopAddress(shop.getShopAddress());
+            ordersSaveTemp.setShopImage(shop.getShopImage());
+            ordersSaveTemp.setShopName(shop.getShopName());
+            ordersSaveTemp.setShopPhone(shop.getShopPhone());
 
 
         }
@@ -338,7 +338,7 @@ public class TOrdersServiceImpl implements TOrdersService {
      * @version:version
      * @return: ops.school.api.util.ResponseObject
      * @param   productOrderDTOS
-     * @param   orders 包含微信用户openid，学校id，店铺id，楼栋id，每个商品名称
+     * @param   orders 包含微信用户openid，学校id，店铺id，楼栋id，
      * @Desc:   desc 用户提交订单
      */
     @Transactional(rollbackFor = Exception.class)
@@ -360,7 +360,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
         //判断商品有并且库存够，批量id查询
         List<Long> productSelectIdS = PublicUtilS.getValueList(productOrderDTOS,"productId");
-        Assertions.notEmpty(productSelectIdS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+        //todo
         List<Product> productSelectList = (List<Product>) productService.listByIds(productSelectIdS);
         //假如前端传3个商品，查出来两个，有一个就没有，报错
         if (productSelectList.size() < productOrderDTOS.size()){
@@ -398,11 +398,204 @@ public class TOrdersServiceImpl implements TOrdersService {
         /**
          * 支付金额计算逻辑
          */
+
+        /**
+         * 变量
+         */
+        // 订单内所有商品的规格价格+配送费+餐盒费之和
+        BigDecimal originalPrice = BigDecimal.ZERO;
+        // 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和（如果没有商品折扣，则与规格价格之和相等）
+        BigDecimal afterDiscountPrice = BigDecimal.ZERO;
+        // 订单优惠了的价格 100元7折或者满100减30，这个是30
+        BigDecimal discountPrice = BigDecimal.ZERO;
+        // 餐盒费
+        BigDecimal boxPrice = BigDecimal.ZERO;
+        // 配送费
+        BigDecimal sendPrice = BigDecimal.ZERO;
+        // 额外距离配送费
+        BigDecimal sendAddDistancePrice = BigDecimal.ZERO;
+        // 额外件数配送费
+        BigDecimal sendAddCountPrice = BigDecimal.ZERO;
+        // 店铺满减总金额
+        BigDecimal fullAmount = BigDecimal.ZERO;
+        // 店铺满减可使用金额
+        BigDecimal fullUsedAmount = BigDecimal.ZERO;
+        // 优惠券满减额度
+        BigDecimal couponFullAmount = BigDecimal.ZERO;
+        // 优惠券使用额度
+        BigDecimal couponUsedAmount = BigDecimal.ZERO;
+        // 订单实付金额
+        BigDecimal payPrice = BigDecimal.ZERO;
+        // 优惠折扣是否使用
+        Boolean isDiscount = false;
+        // 订单内商品总数
+        int totalcount = 0;
+        // 餐盒总数（用于计算餐盒费的数量）
+        int boxcount = 0;
+        ProductAttribute productAttribute = null;
+        Product product = null;
+        //用于保存orderProduct
         List<OrderProduct> orderProductSaveList = new ArrayList<>();
         //用于扣库存，在计算金额就要减去库存
         List<Product> productDisStockList = new ArrayList<>();
+        /**
+         * 变量
+         */
+
+        // 新建一个Orders实体类
+        Orders ordersSaveTemp = new Orders();
+        //订单id
+        ordersSaveTemp.setId(generatorOrderId);
+        OrderProduct orderProduct = new OrderProduct();
+        for (ProductOrderDTO productOrder:productOrderDTOS) {
+            // 商品规格id
+            Integer attributeId = productOrder.getAttributeId();
+            if (attributeId != null && attributeId != 0){
+                productAttribute = productAttributeService.getById(attributeId);
+            }
+            Integer productId = productOrder.getProductId();
+            if (productId != null && attributeId != 0){
+                product = productService.getById(productId);
+            }
+            // 订单内同一商品的数量
+            Integer count = productOrder.getCount();
+            /**
+             * 计算订单内所有商品商品规格价格+配送费+餐盒费之和
+             * 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和
+             */
+            if (productAttribute != null && count != 0){
+                originalPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
+                afterDiscountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
+                if (product != null){
+                    // 如果商品折扣小于1，即商品有折扣
+                    if (product.getDiscount().compareTo(new BigDecimal(1)) == -1){
+                        ordersSaveTemp.setDiscountType("商品折扣");
+                        // 优惠折扣已使用，店铺满减无法再使用
+                        isDiscount = true;
+                        // 使用商品折扣时的优惠价格
+                        discountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(1).subtract(product.getDiscount())));
+                        // 商品折扣之后的价格(原价-商品折扣价)
+                        afterDiscountPrice.subtract(discountPrice);
+                    }
+                    // 商品总数累加
+                    totalcount += count;
+                    // 餐盒数累加
+                    if (product.getBoxPriceFlag() == 1){
+                        boxcount += count;
+                    }
+                    orderProduct.setOrderId(generatorOrderId);
+                    orderProduct.setAttributeName(productAttribute.getName());
+                    orderProduct.setAttributePrice(productAttribute.getPrice());
+                    orderProduct.setProductId(product.getId());
+                    orderProduct.setProductName(product.getProductName());
+                    orderProduct.setProductImage(product.getProductImage());
+                    orderProduct.setProductCount(count);
+                    orderProduct.setProductDiscount(discountPrice);
+                    orderProduct.setTotalPrice(productAttribute.getPrice().subtract(discountPrice));
+                    orderProductSaveList.add(orderProduct);
+                }
+            }
+        }
+        // 餐盒费之和
+        if (orders.getTyp().equals("外卖订单") || orders.getTyp().equals("自取订单")){
+            boxPrice.add(shop.getBoxPrice().multiply(new BigDecimal(boxcount)));
+        }
+        // 配送费-->按物品件数增加配送费
+        if (orders.getTyp().equals("外卖订单")){
+            if (shop.getSendPriceAddByCountFlag() == 1) {
+                sendAddCountPrice.add(new BigDecimal((totalcount - 1)).multiply(shop.getSendPriceAdd()));
+            }
+            // 配送费-->判断配送距离增加配送费
+            int distance = BaiduUtil.DistanceAll(floor.getLat() + "," + floor.getLng(), shop.getLat() + "," + shop.getLng());
+            if (distance > school.getSendMaxDistance()) {
+                int per = (distance / school.getSendPerOut()) + 1;
+                sendAddDistancePrice = new BigDecimal(per).multiply(school.getSendPerMoney());
+            }
+            // 最终配送费-->基础配送费+额外距离配送费+额外件数配送费
+            sendPrice.add(shop.getSendPrice()).add(sendAddCountPrice).add(sendAddDistancePrice);
+        }
+        // 订单原价-->原菜价+配送费+餐盒费
+        originalPrice.add(sendPrice).add(boxPrice);
+        // 订单折扣之后的价格-->折后菜价+配送费+餐盒费
+        afterDiscountPrice.add(sendPrice).add(boxPrice);
+        // 如果商品折扣未使用-->店铺满减
+        if (!isDiscount){
+            // 查询商家所有满减规则（从最大满减额度开始）
+            List<ShopFullCut> shopFullCuts = tShopFullCutService.findShopFullCut(orders.getShopId());
+            if (shopFullCuts.size() != 0){
+                for (ShopFullCut shopFullCut:shopFullCuts) {
+                    //todo
+                    if (originalPrice.compareTo(new BigDecimal(shopFullCut.getFullAmount())) == 1){
+                        // 店铺满减之后的优惠价格
+                        if (afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount())).compareTo(new BigDecimal(0)) == 1){
+                            afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount()));
+                        }
+                        fullAmount.add(new BigDecimal(shopFullCut.getFullAmount()));
+                        fullUsedAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+                        // 店铺满减表id
+                        ordersSaveTemp.setFullCutId(shopFullCut.getId());
+                        break;
+                    }
+                }
+            }
+        }
+        //优惠券
+        if (orders.getCouponId() != null && orders.getCouponId() != 0){
+            WxUserCoupon wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+            Long currentTime = System.currentTimeMillis();
+            // 用户优惠券失效 >= 当前时间
+            if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
+                Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
+                if (coupon != null && coupon.getIsInvalid() == 0 && coupon.getSendEndTime().getTime() >= currentTime){
+                    if (afterDiscountPrice.add(boxPrice).compareTo(new BigDecimal(coupon.getFullAmount())) == 1 && afterDiscountPrice.subtract(new BigDecimal(coupon.getCutAmount())).compareTo(new BigDecimal(0)) == 1){
+                        payPrice.add(afterDiscountPrice).subtract(new BigDecimal(coupon.getCutAmount()));
+                    }
+                }
+            }
+        }
+        // 减去粮票
+        //todo
+        if (orders.getPayFoodCoupon() != null && orders.getPayFoodCoupon() != new BigDecimal(0) && payPrice.subtract(orders.getPayFoodCoupon()).compareTo(new BigDecimal(0)) == 1){
+            payPrice.subtract(orders.getPayFoodCoupon());
+        }
+        ordersSaveTemp.setDiscountPrice(discountPrice);
+        ordersSaveTemp.setAddressDetail(orders.getAddressDetail());
+        ordersSaveTemp.setAddressName(orders.getAddressName());
+        ordersSaveTemp.setAddressPhone(orders.getAddressPhone());
+        ordersSaveTemp.setAppId(school.getAppId());
+        ordersSaveTemp.setBoxPrice(boxPrice);
+        ordersSaveTemp.setCouponFullAmount(couponFullAmount);
+        ordersSaveTemp.setCouponId(orders.getCouponId());
+        ordersSaveTemp.setCouponUsedAmount(couponUsedAmount);
+        ordersSaveTemp.setFloorId(orders.getFloorId());
+        ordersSaveTemp.setFullAmount(fullAmount);
+        ordersSaveTemp.setFullUsedAmount(fullUsedAmount);
+        ordersSaveTemp.setOpenId(orders.getOpenId());
+        ordersSaveTemp.setOriginalPrice(originalPrice);
+        ordersSaveTemp.setPayFoodCoupon(orders.getPayFoodCoupon());
+        //todo
+        ordersSaveTemp.setPayPrice(payPrice);
+        ordersSaveTemp.setSendAddCountPrice(sendAddCountPrice);
+        ordersSaveTemp.setSendAddDistancePrice(sendAddDistancePrice);
+        ordersSaveTemp.setSendBasePrice(shop.getSendPrice());
+        ordersSaveTemp.setSchoolId(school.getId());
+        ordersSaveTemp.setSchoolTopDownPrice(school.getTopDown());
+        ordersSaveTemp.setSendPrice(sendPrice);
+        ordersSaveTemp.setTyp(orders.getTyp());
+        ordersSaveTemp.setProductPrice(payPrice.subtract(sendPrice).subtract(boxPrice));
+        ordersSaveTemp.setRemark(orders.getRemark());
+        ordersSaveTemp.setReseverTime(orders.getReseverTime());
+        ordersSaveTemp.setShopId(shop.getId());
+        ordersSaveTemp.setShopAddress(shop.getShopAddress());
+        ordersSaveTemp.setShopImage(shop.getShopImage());
+        ordersSaveTemp.setShopName(shop.getShopName());
+        ordersSaveTemp.setShopPhone(shop.getShopPhone());
+        /**
+         * 支付金额计算逻辑
+         */
+
         //保存订单逻辑
-        boolean saveOrderSuccess = ordersService.save(orders);
+        boolean saveOrderSuccess = ordersService.save(ordersSaveTemp);
         if (!saveOrderSuccess){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_SAVE_ERROR);
         }
@@ -411,7 +604,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         if(!saveOPSuccess){
             logger.error("订单商品保存失败，商品信息：" + PublicUtilS.getCollectionToString(orderProductSaveList));
         }
-        //下单完成后扣库存
+        //下单完成后扣库存 todo
         boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
         if (!disProductStockSuccess){
             // 这里想的扣库存失败还是可以下单
