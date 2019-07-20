@@ -143,9 +143,9 @@ public class TOrdersServiceImpl implements TOrdersService {
 
     @Transactional
     public int addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
-        // 订单内所有商品的规格价格之和
+        // 订单内所有商品的规格价格+配送费+餐盒费之和
         BigDecimal originalPrice = new BigDecimal(0);
-        // 订单内所有商品的商品折扣之后的价格之后（如果没有商品折扣，则与规格价格之和相等）
+        // 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和（如果没有商品折扣，则与规格价格之和相等）
         BigDecimal afterDiscountPrice = new BigDecimal(0);
         // 订单优惠价格（商品折扣或满减之后价格）
         BigDecimal discountPrice = new BigDecimal(0);
@@ -177,6 +177,10 @@ public class TOrdersServiceImpl implements TOrdersService {
         Product product = null;
         Shop shop = null;
         School school = null;
+        // 新建一个Orders实体类
+        Orders orders1 = new Orders();
+        OrderProduct orderProduct = new OrderProduct();
+        List<OrderProduct> orderproductList = new ArrayList<>();
         Floor floor = floorService.getById(orders.getFloorId());
         if (productOrderDTOS.size() != 0){
             for (ProductOrderDTO productOrder:productOrderDTOS) {
@@ -192,8 +196,8 @@ public class TOrdersServiceImpl implements TOrdersService {
                 // 订单内同一商品的数量
                 Integer count = productOrder.getCount();
                 /**
-                 * 计算订单内所有商品商品规格价格之和
-                 * 订单内所有商品的商品折扣之后的价格之后
+                 * 计算订单内所有商品商品规格价格+配送费+餐盒费之和
+                 * 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和
                  */
                 if (productAttribute != null && count != 0){
                     originalPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
@@ -201,7 +205,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                     if (product != null){
                         // 如果商品折扣小于1，即商品有折扣
                         if (product.getDiscount().compareTo(new BigDecimal(1)) == -1){
-                            orders.setDiscountType("商品折扣");
+                            orders1.setDiscountType("商品折扣");
                             // 优惠折扣已使用，店铺满减无法再使用
                             isDiscount = true;
                             // 使用商品折扣时的优惠价格
@@ -217,6 +221,15 @@ public class TOrdersServiceImpl implements TOrdersService {
                         }
                         shop = shopService.getById(product.getShopId());
                         school = schoolService.findById(shop.getSchoolId());
+                        orderProduct.setAttributeName(productAttribute.getName());
+                        orderProduct.setAttributePrice(productAttribute.getPrice());
+                        orderProduct.setProductId(product.getId());
+                        orderProduct.setProductName(product.getProductName());
+                        orderProduct.setProductImage(product.getProductImage());
+                        orderProduct.setProductCount(count);
+                        orderProduct.setProductDiscount(discountPrice);
+                        orderProduct.setTotalPrice(productAttribute.getPrice().subtract(discountPrice));
+                        orderproductList.add(orderProduct);
                     }
                 }
             }
@@ -238,6 +251,10 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             // 最终配送费-->基础配送费+额外距离配送费+额外件数配送费
             sendPrice.add(shop.getSendPrice()).add(sendAddCountPrice).add(sendAddDistancePrice);
+            // 订单原价-->原菜价+配送费+餐盒费
+            originalPrice.add(sendPrice).add(boxPrice);
+            // 订单折扣之后的价格-->
+            afterDiscountPrice.add(sendPrice).add(boxPrice);
             // 如果商品折扣未使用-->店铺满减
             if (!isDiscount){
                 // 查询商家所有满减规则（从最大满减额度开始）
@@ -249,6 +266,8 @@ public class TOrdersServiceImpl implements TOrdersService {
                             afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount()));
                             fullAmount.add(new BigDecimal(shopFullCut.getFullAmount()));
                             fullUsedAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+                            // 店铺满减表id
+                            orders1.setFullCutId(shopFullCut.getId());
                             break;
                         }
                     }
@@ -271,6 +290,39 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (orders.getPayFoodCoupon() != null && orders.getPayFoodCoupon() != new BigDecimal(0)){
                 payPrice.subtract(orders.getPayFoodCoupon());
             }
+            orders1.setDiscountPrice(discountPrice);
+            orders1.setAddressDetail(orders.getAddressDetail());
+            orders1.setAddressName(orders.getAddressName());
+            orders1.setAddressPhone(orders.getAddressPhone());
+            orders1.setAppId(school.getAppId());
+            orders1.setBoxPrice(boxPrice);
+            orders1.setCouponFullAmount(couponFullAmount);
+            orders1.setCouponId(orders.getCouponId());
+            orders1.setCouponUsedAmount(couponUsedAmount);
+            orders1.setFloorId(orders.getFloorId());
+            orders1.setFullAmount(fullAmount);
+            orders1.setFullUsedAmount(fullUsedAmount);
+            orders1.setOpenId(orders.getOpenId());
+            orders1.setOriginalPrice(originalPrice);
+            orders1.setPayFoodCoupon(orders.getPayFoodCoupon());
+            orders1.setPayPrice(payPrice);
+            orders1.setSendAddCountPrice(sendAddCountPrice);
+            orders1.setSendAddDistancePrice(sendAddDistancePrice);
+            orders1.setSendBasePrice(shop.getSendPrice());
+            orders1.setSchoolId(school.getId());
+            orders1.setSchoolTopDownPrice(school.getTopDown());
+            orders1.setSendPrice(sendPrice);
+            orders1.setTyp(orders.getTyp());
+            orders1.setProductPrice(payPrice.subtract(sendPrice).subtract(boxPrice));
+            orders1.setRemark(orders.getRemark());
+            orders1.setReseverTime(orders.getReseverTime());
+            orders1.setShopId(shop.getId());
+            orders1.setShopAddress(shop.getShopAddress());
+            orders1.setShopImage(shop.getShopImage());
+            orders1.setShopName(shop.getShopName());
+            orders1.setShopPhone(shop.getShopPhone());
+
+
         }
 
         return 0;
