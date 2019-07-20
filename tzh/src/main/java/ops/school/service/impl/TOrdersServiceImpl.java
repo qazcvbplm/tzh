@@ -144,12 +144,8 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Transactional
     public int addOrder(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
         // 订单内所有商品的规格价格+配送费+餐盒费之和
-        BigDecimal originalPrice = new BigDecimal(0);
-        // 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和（如果没有商品折扣，则与规格价格之和相等）
-        BigDecimal afterDiscountPrice = new BigDecimal(0);
-        // 订单内所有商品的规格价格之和
         BigDecimal originalPrice = BigDecimal.ZERO;
-        // 订单内所有商品的商品折扣之后的价格之后（如果没有商品折扣，则与规格价格之和相等）
+        // 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和（如果没有商品折扣，则与规格价格之和相等）
         BigDecimal afterDiscountPrice = BigDecimal.ZERO;
         // 订单优惠价格（商品折扣或满减之后价格）
         BigDecimal discountPrice = BigDecimal.ZERO;
