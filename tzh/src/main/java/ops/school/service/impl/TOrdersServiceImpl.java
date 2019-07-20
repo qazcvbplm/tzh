@@ -490,19 +490,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             // 这里想的扣库存失败还是可以下单
             logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
         }
-        //下单后领优惠券
-        // 根据店铺查询优惠券 todo
-        Map userGetCouponMap = new HashMap();
-        userGetCouponMap.put("userId",wxUser.getId());
-        //todo shopid
-        userGetCouponMap.put("shopId",orders.getShopId());
-        userGetCouponMap.put("couponId",orders.getCouponId());
-        userGetCouponMap.put("schoolId",school.getId());
-        ResponseObject responseObject = tCouponService.userGetCouponByIdMap(userGetCouponMap);
-        //如果获取失败计日志
-        if (!responseObject.isCode()){
-            logger.error("下单后用户获取店铺优惠券失败，优惠券id及信息："+ JSON.toJSONString(userGetCouponMap));
-        }
+        //下单后领优惠券 新页面新接口
         //用户优惠券失效逻辑
         WxUserCoupon wxUserCoupon = new WxUserCoupon();
         wxUserCoupon.setId(orders.getCouponId());
