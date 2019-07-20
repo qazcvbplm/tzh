@@ -14,8 +14,6 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
 
     @Autowired
     private WxUserCouponMapper wxUserCouponMapper;
-    @Autowired
-    private WxUserCouponService wxUserCouponService;
 
     @Override
     public List<WxUserCoupon> findInvalidUserCoupon() {
@@ -31,5 +29,10 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
             }
         }
         return 0;
+    }
+
+    @Override
+    public List<WxUserCoupon> findUserCoupon(Long wxUserId) {
+        return wxUserCouponMapper.findUserCoupon(wxUserId);
     }
 }

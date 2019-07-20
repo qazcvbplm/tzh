@@ -558,6 +558,16 @@ public class TOrdersServiceImpl implements TOrdersService {
                             payPrice.add(beforeCouponPrice).subtract(new BigDecimal(coupon.getCutAmount()));
                         }
                         // 否则 payPrice = BigDecimal.ZERO
+                        // 优惠券用完之后修改状态为已使用
+                        wxUserCoupon.setIsInvalid(1);
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        try {
+                            // 优惠券使用时间
+                            wxUserCoupon.setUseTime(df.parse(df.format(new Date())));
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        tWxUserCouponService.updateIsInvalid(wxUserCoupon);
                     }
                 }
             }

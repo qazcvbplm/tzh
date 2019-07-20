@@ -8,10 +8,7 @@ import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
-import ops.school.api.entity.ChargeLog;
-import ops.school.api.entity.School;
-import ops.school.api.entity.WxUser;
-import ops.school.api.entity.WxUserBell;
+import ops.school.api.entity.*;
 import ops.school.api.service.ChargeLogService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
@@ -20,6 +17,7 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
 import ops.school.api.wxutil.WxGUtil;
+import ops.school.service.TWxUserCouponService;
 import ops.school.service.TWxUserService;
 import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +48,8 @@ public class WxUserController {
     private ChargeLogService chargeLogService;
     @Autowired
     private RedisUtil cache;
+    @Autowired
+    private TWxUserCouponService tWxUserCouponService;
 
 
     @ApiOperation(value = "微信用户登录", httpMethod = "POST")
@@ -174,4 +174,10 @@ public class WxUserController {
         return new ResponseObject(true, "ok").push("msg", res.getRecords());
     }
 
+    @RequestMapping(value = "findWxUserCoupons", method = RequestMethod.POST)
+    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId){
+
+        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId));
+        return new ResponseObject(true,"查询成功");
+    }
 }
