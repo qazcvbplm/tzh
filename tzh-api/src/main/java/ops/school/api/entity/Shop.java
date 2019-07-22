@@ -1,6 +1,7 @@
 package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import javax.validation.constraints.NotBlank;
@@ -75,8 +76,10 @@ public class Shop {
 
     private Long sort;
 
+    @TableField(exist = false)
     private BigDecimal minDiscount;
 
+    @TableField(exist = false)
     private List<FullCut> fullCut;
 
     private Integer couponId;
