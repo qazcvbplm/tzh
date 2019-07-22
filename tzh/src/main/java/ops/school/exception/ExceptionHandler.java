@@ -1,6 +1,7 @@
 package ops.school.exception;
 
 
+import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ResponseObject;
@@ -35,6 +36,26 @@ public class ExceptionHandler {
     	else{
             return new ResponseObject(false, "服务器被外星人攻击了！");
     	}
+    }
+
+
+    @ResponseBody
+    @org.springframework.web.bind.annotation.ExceptionHandler(DisplayException.class)
+    public ResponseObject errorHandlerDisPlay(Exception ex) {
+       /* stringWriter = new StringWriter();
+        ex.printStackTrace(new PrintWriter(stringWriter));*/
+        StackTraceElement[] trace = ex.getStackTrace();
+        StringBuilder out = new StringBuilder();
+        for (StackTraceElement s : trace) {
+            out.append("\tat " + s + "\r\n");
+        }
+        LoggerUtil.log(out.toString());
+        if (ex instanceof DisplayException) {
+            return new ResponseObject(false, ex.getMessage());
+        }
+        else{
+            return new ResponseObject(false, "服务器被外星人攻击了！");
+        }
     }
     
 }
