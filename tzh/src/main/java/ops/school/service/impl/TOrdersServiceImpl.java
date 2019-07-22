@@ -198,6 +198,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal afterDiscountPrice = BigDecimal.ZERO;
         // 优惠券使用时的金额折后价格+餐盒费
         BigDecimal beforeCouponPrice = BigDecimal.ZERO;
+        // 所有菜的原菜价
+        BigDecimal productPrice = BigDecimal.ZERO;
         // 订单优惠了的价格 100元7折或者满100减30，这个是30
         BigDecimal discountPrice = BigDecimal.ZERO;
         // 餐盒费
@@ -298,6 +300,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (productAttribute != null && count != 0){
                 originalPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
                 afterDiscountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
+                productPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
                 if (product != null){
                     // 如果商品折扣小于1，即商品有折扣
                     if (product.getDiscount().compareTo(new BigDecimal(1)) == -1){
@@ -462,7 +465,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersSaveTemp.setSchoolTopDownPrice(school.getTopDown());
         ordersSaveTemp.setSendPrice(sendPrice);
         ordersSaveTemp.setTyp(orders.getTyp());
-        ordersSaveTemp.setProductPrice(payPrice.subtract(sendPrice).subtract(boxPrice));
+        ordersSaveTemp.setProductPrice(productPrice);
         ordersSaveTemp.setRemark(orders.getRemark());
         ordersSaveTemp.setReseverTime(orders.getReseverTime());
         ordersSaveTemp.setShopId(shop.getId());

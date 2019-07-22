@@ -7,6 +7,7 @@ import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
+import ops.school.constants.NumConstants;
 import ops.school.service.TWxUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,23 @@ public class TWxUserServiceImpl implements TWxUserService {
     @Override
     public WxUserBell getbell(String openId) {
         WxUser wxUser = wxUserService.findById(openId);
-        return wxUserBellService.getById(wxUser.getOpenId() + "-" + wxUser.getPhone());
+        WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId() + "-" + wxUser.getPhone());
+//        if (wxUserBell == null){
+//            wxUserBell.setMoney(BigDecimal.ZERO);
+//            wxUserBell.setFoodCoupon(BigDecimal.ZERO);
+//            wxUserBell.setSource(NumConstants.INT_NUM_0);
+//            return wxUserBell;
+//        }
+//        if (wxUserBell.getMoney() == null){
+//            wxUserBell.setMoney(BigDecimal.ZERO);
+//        }
+//        if (wxUserBell.getFoodCoupon() == null){
+//            wxUserBell.setFoodCoupon(BigDecimal.ZERO);
+//        }
+//        if (wxUserBell.getSource() == null){
+//            wxUserBell.setSource(NumConstants.INT_NUM_0);
+//        }
+        return wxUserBell;
     }
 
     @Override

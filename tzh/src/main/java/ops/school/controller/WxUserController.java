@@ -174,10 +174,29 @@ public class WxUserController {
         return new ResponseObject(true, "ok").push("msg", res.getRecords());
     }
 
-    @RequestMapping(value = "findWxUserCoupons", method = RequestMethod.POST)
-    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId){
+    /**
+     * @author Lee
+     * @desc 查询用户所有优惠券
+     * @param wxUserId 用户id
+     * @return
+     */
+    @RequestMapping(value = "findAllUserCoupons", method = RequestMethod.POST)
+    public ResponseObject findAllUserCoupons(@RequestParam String wxUserId){
 
-        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId));
+        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findAllUserCoupons(Long.valueOf(wxUserId));
+        return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
+    }
+    /**
+     * @author Lee
+     * 根据店铺查询用户所有可用的优惠券
+     * @param wxUserId 用户id
+     * @param shopId 店铺id
+     * @return
+     */
+    @RequestMapping(value = "findWxUserCoupons", method = RequestMethod.POST)
+    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId, @RequestParam String shopId){
+
+        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId),Long.valueOf(shopId));
         return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
     }
 }

@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * WxUserCouponDAO继承基类
@@ -90,8 +91,18 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @author: Lee
      * @version:version
      * @return: java.util.List
-     * @param wxUserId 用户id
-     * @Desc:   desc 查询用户所有优惠券
+     * @param map map集合  wxUserId 和 shopId
+     * @Desc:   desc 根据店铺查询用户所有可用的优惠券
      */
-    List<WxUserCoupon> findUserCoupon(Long wxUserId);
+    List<WxUserCoupon> findUserCoupon(Map<String,Object> map);
+
+    /**
+     * @date:
+     * @author: Lee
+     * @version:version
+     * @return: java.util.List
+     * @param   wxUserId 用户id
+     * @Desc:   desc 根据用户id查询用户所有优惠券
+     */
+    List<WxUserCoupon> findAllUserCoupons(Long wxUserId);
 }

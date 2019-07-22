@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ops.school.api.dao.SchoolMapper;
 import ops.school.api.entity.School;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.SchoolService;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
@@ -41,13 +42,20 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
             case "wxuser":
                 school.setQuery("id,name");
                 break;
-            case "ops":
+            case "school":
                 school.setQuery("*");
                 break;
             default:
                 return null;
         }
-        return schoolMapper.find(school);
+//        Assertions.notNull(school,school.getQueryType());
+//        if ("one".equals(school.getQueryType())){
+//            return schoolMapper.findOneBySCId(school);
+//        }else if ("wxuser".equals(school.getQueryType())){
+//            return schoolMapper.find(school);
+//        }
+        List<School> schoolList = schoolMapper.find(school);
+        return schoolList;
     }
 
 

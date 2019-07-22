@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -60,15 +59,17 @@ public class ShopController {
 
 	@ApiOperation(value="查询",httpMethod="POST")
 	@RequestMapping("find")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop, PageQueryDTO pageQueryDTO){
+	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop){
     	shop.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
 		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
-		IPage<Shop> iPage = shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
+		IPage<Shop> iPage = shopService.page(new Page<>(shop.getPage(), shop.getSize()), query);
 		Integer countNum = shopService.count(query);
 		List<Shop> shopList = shopService.find(shop);
-		return new ResponseObject(true, "ok")
-				.push("list",shopList)
-				.push("total",iPage.getTotal());
+        return new ResponseObject(true, "ok")
+        .push("list",shopList)
+        .push("total",shopService.count(new QueryWrapper<Shop>().setEntity(shop)));
+//	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop) {
+
 
 //		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
 //		return new ResponseObject(true, "ok")
@@ -77,7 +78,9 @@ public class ShopController {
 //
 //		ResponseObject responseObject = shopService.findShopWithFullCutOBTime(shop,pageQueryDTO);
 //		return responseObject;
-	}
+//				.push("list", shopService.find(shop))
+//				.push("total", shopService.count(new QueryWrapper<Shop>().setEntity(shop)));
+}
 	
 	@ApiOperation(value="更新",httpMethod="POST")
 	@PostMapping("update")
