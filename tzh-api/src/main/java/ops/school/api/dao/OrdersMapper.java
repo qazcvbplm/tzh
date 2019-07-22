@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.Sender;
 import ops.school.api.entity.Shop;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface OrdersMapper extends BaseMapper<Orders> {
 
     int shopAcceptOrderById(Orders update);
 
-    List<Orders> findByShop(Shop s);
+    List<Orders> findByShop(@Param("s") Shop s, @Param("page")int page,@Param("size") int size);
 
     int waterNumber(Orders update);
 
@@ -57,7 +58,7 @@ public interface OrdersMapper extends BaseMapper<Orders> {
 
     List<Orders> shopsta(Map<String, Object> map);
 
-    List<Orders> findByShopYJS(Shop s);
+    List<Orders> findByShopYJS(@Param("s") Shop s, @Param("page")int page,@Param("size") int size);
 
     List<Orders> findAllDjs();
 }

@@ -52,9 +52,7 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
     public List<Orders> findByShop(int shopId, int page, int size) {
         Shop s = new Shop();
         s.setId(shopId);
-        s.setPage(page);
-        s.setSize(size);
-        return ordersMapper.findByShop(s);
+        return ordersMapper.findByShop(s,page,size);
     }
 
     @Override
@@ -74,9 +72,7 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
     public List<Orders> findByShopYJS(int shopId, int page, int size) {
         Shop s = new Shop();
         s.setId(shopId);
-        s.setPage(page);
-        s.setSize(size);
-        return ordersMapper.findByShopYJS(s);
+        return ordersMapper.findByShopYJS(s,page,size);
     }
 
     @Override

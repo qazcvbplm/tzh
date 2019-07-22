@@ -1,15 +1,13 @@
 package ops.school.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
 import ops.school.api.dto.ShopTj;
-import ops.school.api.entity.FullCut;
-import ops.school.api.entity.School;
-import ops.school.api.entity.Shop;
-import ops.school.api.entity.ShopOpenTime;
+import ops.school.api.entity.*;
 import ops.school.api.service.FullCutService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.ShopOpenTimeService;
@@ -61,11 +59,13 @@ public class ShopController {
 
 	@ApiOperation(value="查询",httpMethod="POST")
 	@RequestMapping("find")
-	public ResponseObject add(HttpServletRequest request,HttpServletResponse response,Shop shop){
+	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop, PageQueryDTO pageQueryDTO){
 		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
+		IPage<Shop> shopIPage = shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
+		Integer countNum = shopService.count(query);
 		return new ResponseObject(true, "ok")
-				.push("list", shopService.page(new Page<>(shop.getPage(), shop.getSize()), query))
-				.push("total", shopService.count(query));
+				.push("list",shopIPage)
+				.push("total",countNum);
 	}
 	
 	@ApiOperation(value="更新",httpMethod="POST")

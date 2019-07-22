@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Shop extends Base {
+public class Shop {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
@@ -66,23 +66,21 @@ public class Shop extends Base {
     @NotNull
     private BigDecimal discountRate;
 
-    private Integer shopTxFlage;
-
     private BigDecimal txAmount;
 
     private BigDecimal allTxAmount;
-
 
 
     private Integer isDelete;
 
     private Long sort;
 
-    private List<FullCut> fullCut;
-
     private BigDecimal minDiscount;
 
+    private List<FullCut> fullCut;
+
     private Integer couponId;
+
 
     public BigDecimal getTxAmount() {
         return txAmount;
@@ -100,13 +98,6 @@ public class Shop extends Base {
         this.allTxAmount = allTxAmount;
     }
 
-    public Integer getShopTxFlage() {
-        return shopTxFlage;
-    }
-
-    public void setShopTxFlage(Integer shopTxFlage) {
-        this.shopTxFlage = shopTxFlage;
-    }
 
     public Integer getCouponId() {
         return couponId;
@@ -385,7 +376,7 @@ public class Shop extends Base {
     @Override
     public String toString() {
         return "Shop [id=" + id + ", schoolId=" + schoolId + ", shopName=" + shopName + ","
-                + " shopPhone=" + shopPhone + " shopCategoryId=" + this.shopCategoryId + "]" + this.getPage() + "," + this.getSize();
+                + " shopPhone=" + shopPhone + " shopCategoryId=" + this.shopCategoryId + "]";
     }
 
 
