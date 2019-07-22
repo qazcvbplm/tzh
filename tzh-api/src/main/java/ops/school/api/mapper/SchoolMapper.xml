@@ -92,6 +92,14 @@
     where Id = #{id,jdbcType=INTEGER}
   </select>
 
+
+    <select id="findOneBySCId" resultType="ops.school.api.entity.School">
+        select
+        *
+        from school
+        where Id = #{id,jdbcType=INTEGER}
+    </select>
+
     <update id="updateByPrimaryKeySelective" parameterType="ops.school.api.entity.School">
         update school
         <set>

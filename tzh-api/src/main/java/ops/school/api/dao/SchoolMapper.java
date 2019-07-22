@@ -27,4 +27,14 @@ public interface SchoolMapper extends BaseMapper<School> {
     int charge(Map<String, Object> map);
 
     int chargeUse(Map<String, Object> map);
+
+    /**
+     * @date:   2019/7/22 17:19
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.School
+     * @param   school
+     * @Desc:   desc 根据学校id查询单个
+     */
+    School findOneBySCId(School school);
 }

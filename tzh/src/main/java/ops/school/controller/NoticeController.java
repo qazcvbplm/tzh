@@ -7,6 +7,7 @@ import ops.school.api.entity.Notice;
 import ops.school.api.service.NoticeService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.constants.NumConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -41,8 +42,11 @@ public class NoticeController {
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Notice notice){
+		notice.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
 		List<Notice> list = noticeService.list(new QueryWrapper<Notice>().setEntity(notice));
-		              return new ResponseObject(true, "ok").push("list", list);
+		return new ResponseObject(true, "ok")
+				.push("list", list)
+				.push("total",list.size());
 	}
 	
 	@ApiOperation(value="更新",httpMethod="POST")
