@@ -1,10 +1,14 @@
 package ops.school.api.serviceimple;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ops.school.api.dao.ShopMapper;
+import ops.school.api.entity.PageQueryDTO;
 import ops.school.api.entity.Shop;
+import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.ShopService;
+import ops.school.api.util.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,5 +106,19 @@ public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements S
         return shopMapper.shoptx(map);
     }
 
-
+    /**
+     * @date:   2019/7/22 15:20
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   shop
+     * @param   pageQueryDTO
+     * @Desc:   desc 分页查询店铺，查询满减，根据开店时间倒叙排（关闭的店铺在最后面）
+     */
+    @Override
+    public ResponseObject findShopWithFullCutOBTime(Shop shop, PageQueryDTO pageQueryDTO) {
+        Assertions.notNull(shop,shop.getSchoolId());
+        List<Shop> shopList = shopMapper.findShopWithFullCutOBTime(shop,pageQueryDTO);
+        return new ResponseObject(true,"ok").push("list",shopList);
+    }
 }

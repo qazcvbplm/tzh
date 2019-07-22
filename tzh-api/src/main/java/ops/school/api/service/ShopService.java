@@ -1,7 +1,9 @@
 package ops.school.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import ops.school.api.entity.PageQueryDTO;
 import ops.school.api.entity.Shop;
+import ops.school.api.util.ResponseObject;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,4 +22,15 @@ public interface ShopService extends IService<Shop> {
     int openorclose(Integer id);
 
     int shoptx(Map<String,Object> map);
+
+    /**
+     * @date:   2019/7/22 15:18
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   shop
+     * @param   pageQueryDTO
+     * @Desc:   desc 分页查询店铺，查询满减，根据开店时间倒叙排（关闭的店铺在最后面）
+     */
+    ResponseObject findShopWithFullCutOBTime(Shop shop, PageQueryDTO pageQueryDTO);
 }

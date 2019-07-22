@@ -67,9 +67,12 @@ public class Shop {
     @NotNull
     private BigDecimal discountRate;
 
+    private Integer shopTxFlag;
+
     private BigDecimal txAmount;
 
     private BigDecimal allTxAmount;
+
 
 
     private Integer isDelete;
@@ -77,13 +80,12 @@ public class Shop {
     private Long sort;
 
     @TableField(exist = false)
-    private BigDecimal minDiscount;
-
-    @TableField(exist = false)
     private List<FullCut> fullCut;
 
-    private Integer couponId;
+    @TableField(exist = false)
+    private BigDecimal minDiscount;
 
+    private Integer couponId;
 
     public BigDecimal getTxAmount() {
         return txAmount;
@@ -101,6 +103,13 @@ public class Shop {
         this.allTxAmount = allTxAmount;
     }
 
+    public Integer getshopTxFlag() {
+        return shopTxFlag;
+    }
+
+    public void setshopTxFlag(Integer shopTxFlag) {
+        this.shopTxFlag = shopTxFlag;
+    }
 
     public Integer getCouponId() {
         return couponId;
@@ -376,11 +385,18 @@ public class Shop {
         this.sort = sort;
     }
 
+//    @Override
+//    public String toString() {
+//        return "Shop [id=" + id + ", schoolId=" + schoolId + ", shopName=" + shopName + ","
+//                + " shopPhone=" + shopPhone + " shopCategoryId=" + this.shopCategoryId + "]" + this.getPage() + "," + this.getSize();
+//    }
+
     @Override
     public String toString() {
         return "Shop [id=" + id + ", schoolId=" + schoolId + ", shopName=" + shopName + ","
                 + " shopPhone=" + shopPhone + " shopCategoryId=" + this.shopCategoryId + "]";
     }
+
 
 
 }
