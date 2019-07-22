@@ -61,10 +61,11 @@ public class ShopController {
 	@RequestMapping("find")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop, PageQueryDTO pageQueryDTO){
 		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
-		IPage<Shop> shopIPage = shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
+		IPage<Shop> iPage = shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
 		Integer countNum = shopService.count(query);
+		List<Shop> list =iPage.getRecords();
 		return new ResponseObject(true, "ok")
-				.push("list",shopIPage)
+				.push("list",list)
 				.push("total",countNum);
 	}
 	
