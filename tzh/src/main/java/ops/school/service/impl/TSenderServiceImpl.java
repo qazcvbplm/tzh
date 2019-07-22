@@ -188,33 +188,10 @@ public class TSenderServiceImpl implements TSenderService {
         School school = schoolService.findById(orders.getSchoolId());
         // 对订单进行结算
         OrdersComplete ordersComplete = new OrdersComplete();
-        // 平台抽学校百分比
+        // 平台抽负责人百分比
         ordersComplete.setAppGetSchoolRate(school.getRate());
-        // 学校抽成店铺百分比
+        // 负责人抽成店铺百分比
         ordersComplete.setSchoolGetShopRate(shop.getRate());
-        // 学校抽成配送员百分比
-        // 如果配送员为空
-        if (orders.getSenderId() == 0 || orders.getSenderId() == null){
-            ordersComplete.setSchoolGetSenderRate(BigDecimal.ZERO);
-        } else {
-            ordersComplete.setSchoolGetSenderRate(sender.getRate());
-        }
-        // 微信平台所得为0.6% --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  0.006
-        BigDecimal wx = orders.getPayPrice().multiply(new BigDecimal(0.006));
-        // 总平台获得比例对应金额 --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  比例
-        BigDecimal total = orders.getPayPrice().multiply(school.getRate());
-        // 超级后天所得 --> total - wx
-        ordersComplete.setAppGetTotal(total.subtract(wx));
-        // 配送员所得
-        // 如果时楼上送达 --> 配送费 * （1-学校抽成）
-        if (end){
-            ordersComplete.setSenderGetTotal(orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate())));
-        } else {
-            // 楼下送达，要返还楼上楼下差价 --> （配送费-楼下返还） * （1-学校抽成）
-            ordersComplete.setSenderGetTotal((orders.getSendPrice().subtract(orders.getSchoolTopDownPrice()))
-                    .multiply(new BigDecimal(1).subtract(sender.getRate())));
-        }
-        // 店铺所得
         // 用户优惠券
         WxUserCoupon wxUserCoupon = new WxUserCoupon();
         Coupon coupon = new Coupon();
@@ -226,20 +203,115 @@ public class TSenderServiceImpl implements TSenderService {
         BigDecimal fullCutAmount = BigDecimal.ZERO;
         // 商品折扣金额
         BigDecimal discountAmount = BigDecimal.ZERO;
+        // (餐盒费＋菜价 - 优惠券 - 满减额 - 折扣额）
+        BigDecimal tempPrice = BigDecimal.ZERO;
+        // 配送员所得金额
+        BigDecimal senderGetTotal = BigDecimal.ZERO;
+        // 负责人抽取配送员金额
+        BigDecimal schoolGetSender = BigDecimal.ZERO;
+        // 负责人抽取店铺金额
+        BigDecimal schoolGetshop = BigDecimal.ZERO;
+        // 负责人所得
+        BigDecimal schoolGetTotal = BigDecimal.ZERO;
+        // 负责人承担比例金额之和
+        BigDecimal schoolUnderTakeAmount = BigDecimal.ZERO;
+        // 楼下返还金额
+        BigDecimal downStairs = BigDecimal.ZERO;
+        // 负责人抽成配送员百分比
+        // 如果配送员为空
+        if (orders.getSenderId() == 0 || orders.getSenderId() == null){
+            ordersComplete.setSchoolGetSenderRate(BigDecimal.ZERO);
+            /**
+             * 配送员所得
+             */
+            ordersComplete.setSenderGetTotal(senderGetTotal);
+            /**
+             * 负责人抽取配送员金额
+             */
+            ordersComplete.setSchoolGetSender(schoolGetSender);
+        } else {
+            ordersComplete.setSchoolGetSenderRate(sender.getRate());
+            // 配送员所得
+            // 如果时楼上送达 --> 配送费 * （1-学校抽成）
+            if (end){
+                /**
+                 * 配送员所得
+                 */
+                ordersComplete.setSenderGetTotal(orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate())));
+                /**
+                 * 负责人抽取配送员所得
+                 */
+                schoolGetSender.add(orders.getSendPrice().multiply(sender.getRate()));
+                ordersComplete.setSchoolGetSender(schoolGetSender);
+            } else {
+                // 楼下送达，要返还楼上楼下差价 --> （配送费-楼下返还） * （1-学校抽成）
+                // 楼下返还金额
+                downStairs.add(orders.getSchoolTopDownPrice());
+                /**
+                 * 配送员所得
+                 */
+                ordersComplete.setSenderGetTotal((orders.getSendPrice().subtract(downStairs))
+                        .multiply(new BigDecimal(1).subtract(sender.getRate())));
+                /**
+                 * 负责人抽取配送员所得
+                 */
+                schoolGetSender.add((orders.getSendPrice().subtract(downStairs))
+                        .multiply(sender.getRate()));
+                ordersComplete.setSchoolGetSender(schoolGetSender);
+            }
+        }
+        // 微信平台所得为0.6% --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  0.006
+        /**
+         * 微信平台所得
+         */
+        BigDecimal wx = orders.getPayPrice().multiply(new BigDecimal(0.006));
+        // 总平台获得比例对应金额 --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  比例
+        BigDecimal total = orders.getPayPrice().multiply(school.getRate());
+        // 超级后台所得 --> total - wx
+        /**
+         * 超级后台所得
+         */
+        ordersComplete.setAppGetTotal(total.subtract(wx));
         // 如果使用了优惠券
         if (orders.getCouponId() != 0 || orders.getCouponId() != null){
             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
             coupon = couponService.getById(wxUserCoupon.getCouponId());
             // 优惠券优惠金额
             couponAmount.add(new BigDecimal(coupon.getCutAmount()));
-            if (orders.getFullCutId() != null || orders.getFullCutId() != 0){
-                shopFullCut = shopFullCutService.getById(orders.getFullCutId());
-                fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
-            }
+        } else if (orders.getFullCutId() != null || orders.getFullCutId() != 0){
+            shopFullCut = shopFullCutService.getById(orders.getFullCutId());
+            // 店铺满减优惠金额
+            fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+        } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1){
+            // 商品折扣金额
+            discountAmount.add(orders.getDiscountPrice());
         }
-        OrdersComplete oc = new OrdersComplete(orders, schoolService.findById(orders.getSchoolId()),
-                shopService.getById(orders.getShopId()), sender);
-        orderCompleteService.save(oc);
+        tempPrice.add(orders.getBoxPrice().add(orders.getProductPrice())
+                .subtract(couponAmount).subtract(fullCutAmount).subtract(discountAmount));
+        /**
+         * 负责人抽取店铺金额
+         */
+        schoolGetshop.add(tempPrice.multiply(shop.getRate()));
+        ordersComplete.setSchoolGetShop(schoolGetshop);
+        /**
+         * 负责人承担比例金额
+         */
+        schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
+                .add(couponAmount.multiply(shop.getCouponRate()))
+                .add(discountAmount.multiply(shop.getDiscountRate()));
+        /**
+         * 店铺所得
+         */
+        ordersComplete.setShopGetTotal(tempPrice
+                .multiply(new BigDecimal(1).subtract(shop.getRate()))
+                .add(schoolUnderTakeAmount));
+        /**
+         * 负责人所得
+         */
+        schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(total)
+                .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
+        ordersComplete.setShopGetTotal(schoolGetTotal);
+        orderCompleteService.save(ordersComplete);
         redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
         stringRedisTemplate.convertAndSend(Server.PRODUCTADD, orderId);
         String formid = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
