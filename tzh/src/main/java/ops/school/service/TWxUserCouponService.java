@@ -31,8 +31,18 @@ public interface TWxUserCouponService {
      * @author: Lee
      * @version:version
      * @return: java.util.List
-     * @param wxUserId 用户id
-     * @Desc:   desc 查询用户所有优惠券
+     * @param wxUserId 用户id shopId 店铺id
+     * @Desc:   desc 根据店铺查询用户所有可用的优惠券
      */
-    List<WxUserCoupon> findUserCoupon(Long wxUserId);
+    List<WxUserCoupon> findUserCoupon(Long wxUserId, Long shopId);
+
+    /**
+     * @date:
+     * @author: Lee
+     * @version:version
+     * @return: java.util.List
+     * @param   wxUserId 用户id
+     * @Desc:   desc 根据用户id查询用户所有优惠券
+     */
+    List<WxUserCoupon> findAllUserCoupons(Long wxUserId);
 }

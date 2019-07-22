@@ -119,7 +119,7 @@ public class CouponController {
      * @param   schoolId
      * @param   shopId
      * @param   couponId
-     * @Desc:   desc 根据用户id，学校id，店铺id，优惠券id，让用户获取优惠券
+     * @Desc:   desc 根据用户id，学校id，店铺id，用户优惠券id，让用户获取优惠券
      */
     @ResponseBody
     @RequestMapping(value = "getCoupons", method = RequestMethod.POST)

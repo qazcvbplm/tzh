@@ -56,6 +56,12 @@ public class TSenderServiceImpl implements TSenderService {
     private RedisUtil redisUtil;
     @Autowired
     private OrderProductService orderProductService;
+    @Autowired
+    private WxUserCouponService wxUserCouponService;
+    @Autowired
+    private ShopFullCutService shopFullCutService;
+    @Autowired
+    private CouponService couponService;
 
     @Override
     public List<Orders> findorderbydjs(Integer senderId, Integer page, Integer size, String status) {
@@ -176,7 +182,61 @@ public class TSenderServiceImpl implements TSenderService {
                 return;
             }
         }
+        // 店铺
+        Shop shop = shopService.getById(orders.getShopId());
+        // 学校
+        School school = schoolService.findById(orders.getSchoolId());
         // 对订单进行结算
+        OrdersComplete ordersComplete = new OrdersComplete();
+        // 平台抽学校百分比
+        ordersComplete.setAppGetSchoolRate(school.getRate());
+        // 学校抽成店铺百分比
+        ordersComplete.setSchoolGetShopRate(shop.getRate());
+        // 学校抽成配送员百分比
+        // 如果配送员为空
+        if (orders.getSenderId() == 0 || orders.getSenderId() == null){
+            ordersComplete.setSchoolGetSenderRate(BigDecimal.ZERO);
+        } else {
+            ordersComplete.setSchoolGetSenderRate(sender.getRate());
+        }
+        // 微信平台所得为0.6% --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  0.006
+        BigDecimal wx = orders.getPayPrice().multiply(new BigDecimal(0.006));
+        // 总平台获得比例对应金额 --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  比例
+        BigDecimal total = orders.getPayPrice().multiply(school.getRate());
+        // 超级后天所得 --> total - wx
+        ordersComplete.setAppGetTotal(total.subtract(wx));
+        // 配送员所得
+        // 如果时楼上送达 --> 配送费 * （1-学校抽成）
+        if (end){
+            ordersComplete.setSenderGetTotal(orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate())));
+        } else {
+            // 楼下送达，要返还楼上楼下差价 --> （配送费-楼下返还） * （1-学校抽成）
+            ordersComplete.setSenderGetTotal((orders.getSendPrice().subtract(orders.getSchoolTopDownPrice()))
+                    .multiply(new BigDecimal(1).subtract(sender.getRate())));
+        }
+        // 店铺所得
+        // 用户优惠券
+        WxUserCoupon wxUserCoupon = new WxUserCoupon();
+        Coupon coupon = new Coupon();
+        // 店铺满减
+        ShopFullCut shopFullCut = new ShopFullCut();
+        // 优惠券金额
+        BigDecimal couponAmount = BigDecimal.ZERO;
+        // 店铺满减金额
+        BigDecimal fullCutAmount = BigDecimal.ZERO;
+        // 商品折扣金额
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        // 如果使用了优惠券
+        if (orders.getCouponId() != 0 || orders.getCouponId() != null){
+            wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+            coupon = couponService.getById(wxUserCoupon.getCouponId());
+            // 优惠券优惠金额
+            couponAmount.add(new BigDecimal(coupon.getCutAmount()));
+            if (orders.getFullCutId() != null || orders.getFullCutId() != 0){
+                shopFullCut = shopFullCutService.getById(orders.getFullCutId());
+                fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+            }
+        }
         OrdersComplete oc = new OrdersComplete(orders, schoolService.findById(orders.getSchoolId()),
                 shopService.getById(orders.getShopId()), sender);
         orderCompleteService.save(oc);

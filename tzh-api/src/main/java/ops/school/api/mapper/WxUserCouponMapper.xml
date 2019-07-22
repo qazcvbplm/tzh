@@ -5,6 +5,8 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="wx_user_id" property="wxUserId" jdbcType="BIGINT" />
     <result column="coupon_id" property="couponId" jdbcType="BIGINT" />
+    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+    <result column="coupon_type" property="couponType" jdbcType="INTEGER" />
     <result column="get_time" property="getTime" jdbcType="TIMESTAMP" />
     <result column="use_time" property="useTime" jdbcType="TIMESTAMP" />
     <result column="failure_time" property="failureTime" jdbcType="TIMESTAMP" />
@@ -15,6 +17,8 @@
         id,
         wx_user_id,
         coupon_id,
+        shop_id,
+        coupon_type,
         get_time,
         use_time,
         failure_time,
@@ -116,10 +120,32 @@
         where id = #{id}
     </update>
 
-    <select id="findUserCoupon" parameterType="Long" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/>
-        from <include refid="Table_Name"/>
-	    where wx_user_id = #{wxUserId}
-	    and is_invalid = 0
+    <!--根据店铺查询用户所有可用的优惠券-->
+    <select id="findUserCoupon" parameterType="map" resultType="java.util.HashMap">
+        select cp.*,
+        uc.id as userCouponId,
+        uc.coupon_type as couponType,
+        uc.failure_time as failureTime
+        from `wx_user_coupon` as uc
+        left join `coupon` as cp
+        on uc.coupon_id = cp.id
+        where uc.shop_id = #{shopId} or uc.coupon_type = 2
+        and uc.wx_user_id = #{wxUserId}
+        and uc.is_invalid = 0
+        and cp.is_invalid = 0
+        order by uc.failure_time desc
     </select>
+
+    <!--根据用户id查询用户所有优惠券-->
+    <select id="findAllUserCoupons" parameterType="Long" resultType="java.util.HashMap">
+        select cp.*, uc.*
+        from `wx_user_coupon` as uc
+        left join `coupon` as cp
+        on uc.coupon_id = cp.id
+        where uc.wx_user_id = #{wxUserId}
+	    and uc.is_invalid = 0
+	    and cp.is_invalid = 0
+	    order by uc.failure_time desc
+    </select>
+
 </mapper>

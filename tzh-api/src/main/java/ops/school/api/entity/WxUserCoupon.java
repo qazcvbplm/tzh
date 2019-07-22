@@ -2,6 +2,7 @@ package ops.school.api.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -31,6 +32,16 @@ public class WxUserCoupon implements Serializable {
      */
     @NotNull
     private Long couponId;
+
+    /**
+     * 店铺id
+     */
+    private Long shopId;
+
+    /**
+     * 优惠券类型
+     */
+    private Integer couponType;
 
     /**
      * 优惠券领取时间
@@ -113,56 +124,56 @@ public class WxUserCoupon implements Serializable {
         this.isInvalid = isInvalid;
     }
 
+
+    public Long getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(Long shopId) {
+        this.shopId = shopId;
+    }
+
+    public Integer getCouponType() {
+        return couponType;
+    }
+
+    public void setCouponType(Integer couponType) {
+        this.couponType = couponType;
+    }
+
     @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        WxUserCoupon other = (WxUserCoupon) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getWxUserId() == null ? other.getWxUserId() == null : this.getWxUserId().equals(other.getWxUserId()))
-            && (this.getCouponId() == null ? other.getCouponId() == null : this.getCouponId().equals(other.getCouponId()))
-            && (this.getGetTime() == null ? other.getGetTime() == null : this.getGetTime().equals(other.getGetTime()))
-            && (this.getUseTime() == null ? other.getUseTime() == null : this.getUseTime().equals(other.getUseTime()))
-            && (this.getFailureTime() == null ? other.getFailureTime() == null : this.getFailureTime().equals(other.getFailureTime()))
-            && (this.getIsInvalid() == null ? other.getIsInvalid() == null : this.getIsInvalid().equals(other.getIsInvalid()));
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WxUserCoupon that = (WxUserCoupon) o;
+        return id.equals(that.id) &&
+                wxUserId.equals(that.wxUserId) &&
+                couponId.equals(that.couponId) &&
+                Objects.equals(shopId, that.shopId) &&
+                couponType.equals(that.couponType) &&
+                getTime.equals(that.getTime) &&
+                Objects.equals(useTime, that.useTime) &&
+                failureTime.equals(that.failureTime) &&
+                isInvalid.equals(that.isInvalid);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getWxUserId() == null) ? 0 : getWxUserId().hashCode());
-        result = prime * result + ((getCouponId() == null) ? 0 : getCouponId().hashCode());
-        result = prime * result + ((getGetTime() == null) ? 0 : getGetTime().hashCode());
-        result = prime * result + ((getUseTime() == null) ? 0 : getUseTime().hashCode());
-        result = prime * result + ((getFailureTime() == null) ? 0 : getFailureTime().hashCode());
-        result = prime * result + ((getIsInvalid() == null) ? 0 : getIsInvalid().hashCode());
-        return result;
+        return Objects.hash(id, wxUserId, couponId, shopId, couponType, getTime, useTime, failureTime, isInvalid);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", wxUserId=").append(wxUserId);
-        sb.append(", couponId=").append(couponId);
-        sb.append(", getTime=").append(getTime);
-        sb.append(", useTime=").append(useTime);
-        sb.append(", failureTime=").append(failureTime);
-        sb.append(", isInvalid=").append(isInvalid);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
+        return "WxUserCoupon{" +
+                "id=" + id +
+                ", wxUserId=" + wxUserId +
+                ", couponId=" + couponId +
+                ", shopId=" + shopId +
+                ", couponType=" + couponType +
+                ", getTime=" + getTime +
+                ", useTime=" + useTime +
+                ", failureTime=" + failureTime +
+                ", isInvalid=" + isInvalid +
+                '}';
     }
 }
