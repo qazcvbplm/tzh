@@ -15,6 +15,7 @@ import ops.school.api.service.ShopService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
+import ops.school.constants.NumConstants;
 import ops.school.service.TCommonService;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,13 +61,20 @@ public class ShopController {
 	@ApiOperation(value="查询",httpMethod="POST")
 	@RequestMapping("find")
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop, PageQueryDTO pageQueryDTO){
+//    	shop.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
+//		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
+//		IPage<Shop> iPage = shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
+//		Integer countNum = shopService.count(query);
+//		List<Shop> list =iPage.getRecords();
+//		return new ResponseObject(true, "ok")
+//				.push("list",list)
+//				.push("total",countNum);
+
 		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
-		IPage<Shop> iPage = shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
-		Integer countNum = shopService.count(query);
-		List<Shop> list =iPage.getRecords();
 		return new ResponseObject(true, "ok")
-				.push("list",list)
-				.push("total",countNum);
+				.push("list", shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query))
+				.push("total", shopService.count(query));
+
 	}
 	
 	@ApiOperation(value="更新",httpMethod="POST")

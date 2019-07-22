@@ -79,7 +79,6 @@ public class Shop {
     @TableField(exist = false)
     private BigDecimal minDiscount;
 
-    @TableField(exist = false)
     private List<FullCut> fullCut;
 
     private Integer couponId;
