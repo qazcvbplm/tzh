@@ -166,21 +166,21 @@ public class TOrdersServiceImpl implements TOrdersService {
         //楼栋判断
         Floor floor = floorService.getById(orders.getFloorId());
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
-        //判断商品有并且库存够，批量id查询
-        Map pIdAndAIdMap = PublicUtilS.listForMap(productOrderDTOS,"productId","attributeId");
-        //根据商品id和商品规格id批量查询商品及规格
-        List<ProductAndAttributeDTO> productAndAttributeS = productService.batchFindProdAttributeByIdS(pIdAndAIdMap);
-        Map proAttributeSelectMap =  PublicUtilS.listForMapValueE(productAndAttributeS,"id");
-        //假如前端传3个商品，查出来两个，有一个就没有，报错
-        if (productAndAttributeS.size() < productOrderDTOS.size()){
-            //报错 商品信息变化
-            DisplayException.throwMessageWithEnum(ResponseViewEnums.PRODUCT_HAD_CHANGE);
-        }
-        // 判断订单备注是否有表情内容
-        String remarkOrder = CheckUtils.checkEmoji(orders.getRemark());
-        if (remarkOrder != null){
-            orders.setRemark(remarkOrder);
-        }
+//        //判断商品有并且库存够，批量id查询
+//        Map pIdAndAIdMap = PublicUtilS.listForMap(productOrderDTOS,"productId","attributeId");
+//        //根据商品id和商品规格id批量查询商品及规格
+//        List<ProductAndAttributeDTO> productAndAttributeS = productService.batchFindProdAttributeByIdS(pIdAndAIdMap);
+//        Map proAttributeSelectMap =  PublicUtilS.listForMapValueE(productAndAttributeS,"id");
+//        //假如前端传3个商品，查出来两个，有一个就没有，报错
+//        if (productAndAttributeS.size() < productOrderDTOS.size()){
+//            //报错 商品信息变化
+//            DisplayException.throwMessageWithEnum(ResponseViewEnums.PRODUCT_HAD_CHANGE);
+//        }
+//        // 判断订单备注是否有表情内容
+//        String remarkOrder = CheckUtils.checkEmoji(orders.getRemark());
+//        if (remarkOrder != null){
+//            orders.setRemark(remarkOrder);
+//        }
         //生成订单id
         String generatorOrderId = Util.GenerateOrderId();
         if (generatorOrderId == null || generatorOrderId.isEmpty()){
@@ -256,15 +256,15 @@ public class TOrdersServiceImpl implements TOrdersService {
             /**
              * 商品校验逻辑
              */
-            productAndAttributeDTOTemp = (ProductAndAttributeDTO)proAttributeSelectMap.get(productOrder.getProductId());
-            product = productAndAttributeDTOTemp.getProduct();
-            productAttribute = productAndAttributeDTOTemp.getProductAttribute();
-            Assertions.notNull(product,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
-            Assertions.notNull(productAttribute,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
-            //如果 商品id 属性id 计数不能空或者计数不能0 商品不能空
-            if (productOrder.getProductId() == null || productOrder.getAttributeId() == null || productOrder.getCount() == null || productOrder.getCount() == 0){
-                DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_PARAM_ERROR);
-            }
+//            productAndAttributeDTOTemp = (ProductAndAttributeDTO)proAttributeSelectMap.get(productOrder.getProductId());
+//            product = productAndAttributeDTOTemp.getProduct();
+//            productAttribute = productAndAttributeDTOTemp.getProductAttribute();
+//            Assertions.notNull(product,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+//            Assertions.notNull(productAttribute,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+//            //如果 商品id 属性id 计数不能空或者计数不能0 商品不能空
+//            if (productOrder.getProductId() == null || productOrder.getAttributeId() == null || productOrder.getCount() == null || productOrder.getCount() == 0){
+//                DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_PARAM_ERROR);
+//            }
             //假如前端传3个商品，查出来两个，有一个就没有，报错
             if (paramProductIdCountMap.get(product.getId()) == null){
                 throwErrorNoStockYes = true;

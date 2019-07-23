@@ -1,14 +1,10 @@
-import com.alibaba.fastjson.JSON;
-import com.github.qcloudsms.httpclient.HTTPException;
 import ops.school.App;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Orders;
 import ops.school.api.service.TxLogService;
 import ops.school.api.util.ResponseObject;
-import ops.school.api.util.Util;
 import ops.school.service.TOrdersService;
-import ops.school.util.WxPhoneUtil;
-import org.json.JSONException;
+import ops.school.util.Base64Util;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +12,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,33 +43,33 @@ public class Test {
     }*/
 //
 //    @org.junit.Test
-//    public void addOrderTest(){
-//        List<ProductOrderDTO> productOrderDTOS = new ArrayList<>();
-//        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
-//        ProductOrderDTO productOrderDTO1 = new ProductOrderDTO();
-//        productOrderDTO.setProductId(6);
-//        productOrderDTO.setAttributeId(8);
-//        productOrderDTO.setCount(2);
-//        productOrderDTOS.add(productOrderDTO);
-//        productOrderDTO1.setCount(1);
-//        productOrderDTO1.setProductId(7);
-//        productOrderDTO1.setAttributeId(16);
-//        productOrderDTOS.add(productOrderDTO1);
-//        Orders orders = new Orders();
-//        orders.setShopId(10);
-//        orders.setOpenId("o_JLm5eY7Pokd1i4hAQ70CxiYgNQ");
-//        orders.setTyp("外卖订单");
-//        orders.setFloorId(1);
-//        orders.setRemark("多放辣椒！");
-//        Integer cId = 2;
-//        orders.setCouponId(Long.parseLong(cId.toString()));
-//        orders.setSendPrice(new BigDecimal(1));
-//        orders.setBoxPrice(new BigDecimal(3));
-//        orders.setPayPrice(new BigDecimal(33));
-//        orders.setReseverTime("2019-7-23 12:40:12");
-//        ResponseObject re =  tOrdersService.addOrder2(productOrderDTOS,orders);
-//        System.out.println(re.toString());
-//    }
+    public void addOrderTest(){
+        List<ProductOrderDTO> productOrderDTOS = new ArrayList<>();
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        ProductOrderDTO productOrderDTO1 = new ProductOrderDTO();
+        productOrderDTO.setProductId(6);
+        productOrderDTO.setAttributeId(8);
+        productOrderDTO.setCount(2);
+        productOrderDTOS.add(productOrderDTO);
+        productOrderDTO1.setCount(1);
+        productOrderDTO1.setProductId(7);
+        productOrderDTO1.setAttributeId(16);
+        productOrderDTOS.add(productOrderDTO1);
+        Orders orders = new Orders();
+        orders.setShopId(10);
+        orders.setOpenId("o_JLm5eY7Pokd1i4hAQ70CxiYgNQ");
+        orders.setTyp("外卖订单");
+        orders.setFloorId(1);
+        orders.setRemark("多放辣椒！");
+        Integer cId = 2;
+        orders.setCouponId(Long.parseLong(cId.toString()));
+        orders.setSendPrice(new BigDecimal(1));
+        orders.setBoxPrice(new BigDecimal(3));
+        orders.setPayPrice(new BigDecimal(33));
+        orders.setReseverTime("2019-7-23 12:40:12");
+        ResponseObject re =  tOrdersService.addOrder2(productOrderDTOS,orders);
+        System.out.println(re.toString());
+    }
 
     @org.junit.Test
     public void wxPhoneTest(){
@@ -82,7 +77,7 @@ public class Test {
         String ivData =  "krBvaIeGo2xZ/hZxTvd5kw==";
         String sessionKey =  "uj1qPKSsok54+RRe1q6k7A==";
         try {
-            String rs = WxPhoneUtil.getPhoneNumberBeanS5(encrypData,sessionKey,ivData);
+            String rs = Base64Util.getPhoneNumberBeanS5(encrypData,sessionKey,ivData);
             System.out.println(rs);
         } catch (Exception e){
             e.printStackTrace();

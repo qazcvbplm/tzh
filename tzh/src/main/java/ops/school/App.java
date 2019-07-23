@@ -44,7 +44,7 @@ public class App {
 	   return new DruidDataSource();
 	}
 
-	 @Bean
+//	 @Bean
 	 public String ordersRedisConfig() {
 		List<Orders> orders= ordersService.findAllDjs();
 		for(Orders temp:orders){
