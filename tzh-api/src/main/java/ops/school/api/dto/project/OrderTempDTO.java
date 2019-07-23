@@ -1,6 +1,7 @@
 package ops.school.api.dto.project;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class OrderTempDTO {
 
@@ -50,5 +51,20 @@ public class OrderTempDTO {
 
     public void setPayPrice(BigDecimal payPrice) {
         this.payPrice = payPrice;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderTempDTO that = (OrderTempDTO) o;
+        return sendPrice.equals(that.sendPrice) &&
+                boxPrice.equals(that.boxPrice) &&
+                payPrice.equals(that.payPrice);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sendPrice, boxPrice, payPrice);
     }
 }

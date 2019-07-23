@@ -78,6 +78,11 @@ public class WxUser extends Base implements Serializable {
     @NotNull
     private Integer appId;
 
+    /**
+     * 公众号openid
+     */
+    private String gzhOpenId;
+
     private WxUserBell bell;
 
     public WxUserBell getBell() {
@@ -99,6 +104,14 @@ public class WxUser extends Base implements Serializable {
     }
 
     private static final long serialVersionUID = 1L;
+
+    public String getGzhOpenId() {
+        return gzhOpenId;
+    }
+
+    public void setGzhOpenId(String gzhOpenId) {
+        this.gzhOpenId = gzhOpenId;
+    }
 
     public String getOpenId() {
         return openId;
