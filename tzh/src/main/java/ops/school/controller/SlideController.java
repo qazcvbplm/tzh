@@ -53,6 +53,7 @@ public class SlideController {
             } else {
                 QueryWrapper<Slide> query = new QueryWrapper<Slide>();
                 query.lambda().eq(Slide::getSchoolId, schoolId).orderByDesc(Slide::getSort);
+                query.eq("is_delete",0);
                 list = slideService.list(query);
                 stringRedisTemplate.boundHashOps("SLIDE_LIST").put(schoolId + "", JSON.toJSONString(list));
             }

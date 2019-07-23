@@ -62,12 +62,12 @@ public class ShopController {
 	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop){
     	shop.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
 		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
-		IPage<Shop> iPage = shopService.page(new Page<>(shop.getPage(), shop.getSize()), query);
+//		IPage<Shop> iPage = shopService.page(new Page<>(shop.getPage(), shop.getSize()), query);
 		Integer countNum = shopService.count(query);
 		List<Shop> shopList = shopService.find(shop);
         return new ResponseObject(true, "ok")
         .push("list",shopList)
-        .push("total",shopService.count(new QueryWrapper<Shop>().setEntity(shop)));
+        .push("total",countNum);
 //	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop) {
 
 

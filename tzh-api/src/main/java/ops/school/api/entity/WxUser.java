@@ -1,6 +1,7 @@
 package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
@@ -83,6 +84,7 @@ public class WxUser extends Base implements Serializable {
      */
     private String gzhOpenId;
 
+    @TableField(exist = false)
     private WxUserBell bell;
 
     public WxUserBell getBell() {

@@ -75,10 +75,11 @@ public class WxUserController {
             String token = JWTUtil.sign(openid, "wx", "wxuser");
             user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
             WxUserBell wxUserBell = tWxUserService.getbell(openid);
-            if (wxUserBell == null){
-                user.setBell(new WxUserBell(NumConstants.INT_NUM_0,BigDecimal.ZERO,BigDecimal.ZERO));
-            }
-            user.setBell(wxUserBell);
+            //todo 去掉login请求bell
+//            if (wxUserBell == null){
+//                user.setBell(new WxUserBell(NumConstants.INT_NUM_0,BigDecimal.ZERO,BigDecimal.ZERO));
+//            }
+            // user.setBell(wxUserBell);
             // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
             cache.userCountadd(sid);
             return new ResponseObject(true, "ok").push("token", token).push("user", user).push("sessionKey",sessionKey);
