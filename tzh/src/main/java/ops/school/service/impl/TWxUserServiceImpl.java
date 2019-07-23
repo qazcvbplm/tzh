@@ -50,21 +50,22 @@ public class TWxUserServiceImpl implements TWxUserService {
     public WxUserBell getbell(String openId) {
         WxUser wxUser = wxUserService.findById(openId);
         WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId() + "-" + wxUser.getPhone());
-//        if (wxUserBell == null){
-//            wxUserBell.setMoney(BigDecimal.ZERO);
-//            wxUserBell.setFoodCoupon(BigDecimal.ZERO);
-//            wxUserBell.setSource(NumConstants.INT_NUM_0);
-//            return wxUserBell;
-//        }
-//        if (wxUserBell.getMoney() == null){
-//            wxUserBell.setMoney(BigDecimal.ZERO);
-//        }
-//        if (wxUserBell.getFoodCoupon() == null){
-//            wxUserBell.setFoodCoupon(BigDecimal.ZERO);
-//        }
-//        if (wxUserBell.getSource() == null){
-//            wxUserBell.setSource(NumConstants.INT_NUM_0);
-//        }
+        if (wxUserBell == null){
+            wxUserBell = new WxUserBell();
+            wxUserBell.setMoney(BigDecimal.ZERO);
+            wxUserBell.setFoodCoupon(BigDecimal.ZERO);
+            wxUserBell.setSource(NumConstants.INT_NUM_0);
+            return wxUserBell;
+        }
+        if (wxUserBell.getMoney() == null){
+            wxUserBell.setMoney(BigDecimal.ZERO);
+        }
+        if (wxUserBell.getFoodCoupon() == null){
+            wxUserBell.setFoodCoupon(BigDecimal.ZERO);
+        }
+        if (wxUserBell.getSource() == null){
+            wxUserBell.setSource(NumConstants.INT_NUM_0);
+        }
         return wxUserBell;
     }
 

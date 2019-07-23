@@ -17,6 +17,7 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
 import ops.school.api.wxutil.WxGUtil;
+import ops.school.constants.NumConstants;
 import ops.school.service.TWxUserCouponService;
 import ops.school.service.TWxUserService;
 import ops.school.util.PageUtil;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -68,7 +70,11 @@ public class WxUserController {
             openid = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
             String token = JWTUtil.sign(openid, "wx", "wxuser");
             user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
-            user.setBell(tWxUserService.getbell(openid));
+            WxUserBell wxUserBell = tWxUserService.getbell(openid);
+            if (wxUserBell == null){
+                user.setBell(new WxUserBell(NumConstants.INT_NUM_0,BigDecimal.ZERO,BigDecimal.ZERO));
+            }
+            user.setBell(wxUserBell);
             // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
             cache.userCountadd(sid);
             return new ResponseObject(true, "ok").push("token", token).push("user", user);

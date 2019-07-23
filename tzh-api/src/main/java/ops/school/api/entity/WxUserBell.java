@@ -64,6 +64,13 @@ public class WxUserBell extends Base implements Serializable {
     @NotNull
     private BigDecimal foodCoupon;
 
+
+    public WxUserBell(@NotNull Integer source, @NotNull BigDecimal money, @NotNull BigDecimal foodCoupon) {
+        this.source = source;
+        this.money = money;
+        this.foodCoupon = foodCoupon;
+    }
+
     public WxUserBell() {
         super();
     }
