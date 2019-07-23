@@ -1,6 +1,7 @@
 package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import javax.validation.constraints.NotBlank;
@@ -32,6 +33,7 @@ public class Product extends Base {
 
     private Integer isDelete;
 
+    @TableField(exist = false)
     private List<ProductAttribute> attribute;
 
     private Integer stock;

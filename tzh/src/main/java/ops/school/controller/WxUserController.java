@@ -1,5 +1,6 @@
 package ops.school.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.qcloudsms.httpclient.HTTPException;
@@ -20,6 +21,7 @@ import ops.school.api.wxutil.WxGUtil;
 import ops.school.constants.NumConstants;
 import ops.school.service.TWxUserCouponService;
 import ops.school.service.TWxUserService;
+import ops.school.util.Base64Util;
 import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -223,5 +225,26 @@ public class WxUserController {
 
         List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId),Long.valueOf(shopId));
         return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
+    }
+
+    /**
+     * 对加密手机号进行解密
+     * @param decryptData 敏感参数
+     * @param sessionKey session_key
+     * @param ivData iv
+     * @return
+     */
+    @RequestMapping(value = "decryptPhone",method = RequestMethod.POST)
+    public ResponseObject decryptPhone(@RequestParam String decryptData,@RequestParam String sessionKey,
+                                       @RequestParam String ivData){
+        String phoneNumber = null;
+        try {
+            phoneNumber = Base64Util.getPhoneNumberBeanS5(decryptData,sessionKey,ivData);
+//            stringRedisTemplate.boundHashOps("phone").put("", JSON.toJSONString(phoneNumber));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return new ResponseObject(true,"ok");
     }
 }
