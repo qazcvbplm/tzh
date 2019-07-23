@@ -7,6 +7,7 @@ import ops.school.api.service.TxLogService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.service.TOrdersService;
+import ops.school.util.WxPhoneUtil;
 import org.json.JSONException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,5 +74,19 @@ public class Test {
         orders.setReseverTime("2019-7-23 12:40:12");
         ResponseObject re =  tOrdersService.addOrder2(productOrderDTOS,orders);
         System.out.println(re.toString());
+    }
+
+    @org.junit.Test
+    public void wxPhoneTest(){
+        String encrypData = "fHloH7K49+cmOUigiEpeb5umMRV/0w/FQF7ohstRChO2Z79lv4pjubUTv24Ldukx3sF4Fz7zLWFjsjBcm8eGp9gOOvuFN7VqYrlZmhkamZCU09KQ+qSe3X7kWIyhKTVMMbxWVwPIdC0GZGtQlhOhrf0oQmbUtqByw1QRtLST5UBLPGxKtnISyZZ/Dh7/66uOHX1Sko7TZTFwv3fdUPhYKA==";
+        String ivData =  "krBvaIeGo2xZ/hZxTvd5kw==";
+        String sessionKey =  "3LL836kTRzaJ5llVmRN6w==";
+        try {
+            String rs = WxPhoneUtil.getPhoneNumberBeanS5(encrypData,sessionKey,ivData);
+            System.out.println(rs);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

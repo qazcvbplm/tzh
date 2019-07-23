@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -65,9 +66,12 @@ public class WxUserController {
         }
         School school = schoolService.findById(sid);
         String openid = null;
+        String sessionKey = null;
         WxUser user = null;
         if (school != null) {
-            openid = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
+            Map<String,Object> map = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
+            openid = (String) map.get("openid");
+            sessionKey = (String) map.get("session_key");
             String token = JWTUtil.sign(openid, "wx", "wxuser");
             user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
             WxUserBell wxUserBell = tWxUserService.getbell(openid);
@@ -78,12 +82,26 @@ public class WxUserController {
             // user.setBell(wxUserBell);
             // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
             cache.userCountadd(sid);
-            return new ResponseObject(true, "ok").push("token", token).push("user", user);
+            return new ResponseObject(true, "ok").push("token", token).push("user", user).push("sessionKey",sessionKey);
         } else {
             return new ResponseObject(false, "请选择学校");
         }
     }
 
+    @ApiOperation(value = "获取微信用户session_key",httpMethod = "POST")
+    @PostMapping("getSessionKey")
+    public ResponseObject getSessionKey(String code, String schoolId){
+        Integer sid;
+        try {
+            sid = Integer.parseInt(schoolId);
+        } catch (Exception e) {
+            return null;
+        }
+        School school = schoolService.findById(sid);
+        Map<String,Object> map = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
+        System.out.println(map);
+        return new ResponseObject(true,"ok").push("map",map);
+    }
 
     @ApiOperation(value = "获取钱包信息", httpMethod = "POST")
     @GetMapping("wx/get/bell")
