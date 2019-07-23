@@ -74,8 +74,6 @@ public class Shop {
 
     private BigDecimal allTxAmount;
 
-
-
     private Integer isDelete;
 
     private Long sort;
@@ -84,8 +82,6 @@ public class Shop {
     private BigDecimal minDiscount;
     @TableField(exist = false)
     private List<FullCut> fullCut;
-
-    private Integer couponId;
 
     @TableField(exist = false)
     private Integer page;
@@ -183,14 +179,6 @@ public class Shop {
 
     public void setshopTxFlag(Integer shopTxFlag) {
         this.shopTxFlag = shopTxFlag;
-    }
-
-    public Integer getCouponId() {
-        return couponId;
-    }
-
-    public void setCouponId(Integer couponId) {
-        this.couponId = couponId;
     }
 
     public Integer getTsModelFlag() {

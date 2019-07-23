@@ -107,7 +107,6 @@
         shop.full_minus_rate,
         shop.coupon_rate,
         shop.discount_rate,
-        shop.coupon_id,
         shop.shop_tx_flag,
         shop.tx_amount,
         shop.all_tx_amount

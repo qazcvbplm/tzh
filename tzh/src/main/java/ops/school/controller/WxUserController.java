@@ -90,7 +90,7 @@ public class WxUserController {
 
     @ApiOperation(value = "获取微信用户session_key",httpMethod = "POST")
     @PostMapping("getSessionKey")
-    public ResponseObject getSessionKey(String code, String schoolId){
+    public ResponseObject getSessionKey(HttpServletRequest request, HttpServletResponse response, String code, String schoolId){
         Integer sid;
         try {
             sid = Integer.parseInt(schoolId);

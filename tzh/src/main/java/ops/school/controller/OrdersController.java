@@ -54,11 +54,13 @@ public class OrdersController {
 	@Autowired
 	private OrderProductService orderProductService;
 
+
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, List<ProductOrderDTO> productOrderDTOS, @ModelAttribute @Valid Orders orders, BindingResult result){
-		  Util.checkParams(result);
+	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,@RequestBody Orders orders){
+//		  Util.checkParams(result);
 		  // 判断订单备注是否有表情内容
+		List<ProductOrderDTO> productOrderDTOS = orders.getProductOrderDTOS();
 		  if(orders.getRemark()!=null&&EmojiManager.isEmoji(orders.getRemark())){
 			  orders.setRemark(EmojiParser.removeAllEmojis(orders.getRemark()));
 		  }
