@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class WXUtil {
@@ -28,15 +30,18 @@ public class WXUtil {
      *
      * @param code 客户端获取code
      */
-    public static String wxlogin(String appid, String secert, String code) {
+    public static Map<String,Object> wxlogin(String appid, String secert, String code) {
         StringBuffer sb = new StringBuffer();
         String nurl = sb.append(openidurl).append(appid).append("&secret=").append(secert).append("&js_code=").
                 append(code).append("&grant_type=authorization_code").toString();
         String RequestOpenidResult = HttpRequest.sendGet(nurl, "");
         JSONObject RequestOpenidjson = JSON.parseObject(RequestOpenidResult, JSONObject.class);
+        Map<String,Object> map = new HashMap<>();
         if (RequestOpenidjson.get("errcode") == null) {
+            map.put("openid",RequestOpenidjson.getString("openid"));
+            map.put("sessionKey",RequestOpenidjson.getString("session_key"));
             // 正确获取openid
-            return RequestOpenidjson.getString("openid");
+            return map;
         } else {
             throw new YWException(RequestOpenidjson.getString("errmsg"));
         }
