@@ -41,8 +41,8 @@ public class Test {
 //            e.printStackTrace();
 //        }
     }*/
-//
-//    @org.junit.Test
+
+    @org.junit.Test
     public void addOrderTest(){
         List<ProductOrderDTO> productOrderDTOS = new ArrayList<>();
         ProductOrderDTO productOrderDTO = new ProductOrderDTO();

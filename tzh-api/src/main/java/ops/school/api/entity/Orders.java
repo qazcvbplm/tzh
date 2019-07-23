@@ -11,7 +11,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.util.BaiduUtil;
 import ops.school.api.util.Util;
 
@@ -294,6 +296,9 @@ public class Orders extends Base implements Serializable {
     private List<OrderProduct> op;
 
     private OrdersComplete complete;
+
+    @TableField(exist = false)
+    List<ProductOrderDTO> productOrderDTOS;
 
     private static final long serialVersionUID = 1L;
 
@@ -877,5 +882,14 @@ public class Orders extends Base implements Serializable {
     }
     public Orders() {
         super();
+    }
+
+
+    public List<ProductOrderDTO> getProductOrderDTOS() {
+        return productOrderDTOS;
+    }
+
+    public void setProductOrderDTOS(List<ProductOrderDTO> productOrderDTOS) {
+        this.productOrderDTOS = productOrderDTOS;
     }
 }
