@@ -1,12 +1,15 @@
 package ops.school.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.Base;
 import ops.school.api.entity.Evaluate;
+import ops.school.api.entity.Shop;
 import ops.school.api.service.EvaluateService;
 import ops.school.api.service.OrdersService;
 import ops.school.api.service.RunOrdersService;
@@ -59,9 +62,12 @@ public class EvaluateController {
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Evaluate evaluate){
         QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().setEntity(evaluate);
-        List<Evaluate> list = evaluateService.list(query);
-        return new ResponseObject(true, "ok").push("total",
-                evaluateService.count(query)).push("list", list);
+//        List<Evaluate> list = evaluateService.list(query);
+        IPage<Evaluate> iPage = evaluateService.page(new Page<>(evaluate.getPage(), evaluate.getSize()), query);
+        //Integer count = evaluateService.count(query);
+        return new ResponseObject(true, "ok")
+                .push("total",iPage.getTotal())
+                .push("list", iPage.getRecords());
 	}
 
     @ApiOperation(value = "按店铺查询", httpMethod = "POST")
