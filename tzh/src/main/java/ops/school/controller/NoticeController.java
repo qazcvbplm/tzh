@@ -43,7 +43,7 @@ public class NoticeController {
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Notice notice){
 		notice.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
-		List<Notice> list = noticeService.list(new QueryWrapper<Notice>().setEntity(notice));
+		List<Notice> list = noticeService.list(new QueryWrapper<Notice>().setEntity(notice).orderByDesc("create_time"));
 		return new ResponseObject(true, "ok")
 				.push("list", list)
 				.push("total",list.size());

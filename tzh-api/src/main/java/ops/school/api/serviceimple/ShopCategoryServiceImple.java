@@ -18,7 +18,7 @@ public class ShopCategoryServiceImple extends ServiceImpl<ShopCategoryMapper, Sh
     @Override
     public void add(ShopCategory shopCategory) {
         shopCategory.setSort(System.currentTimeMillis());
-        this.add(shopCategory);
+        this.shopCategoryMapper.insert(shopCategory);
     }
 
     @Override

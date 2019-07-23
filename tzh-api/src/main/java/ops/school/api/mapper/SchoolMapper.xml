@@ -2,33 +2,74 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ops.school.api.dao.SchoolMapper">
     <resultMap id="BaseResultMap" type="ops.school.api.entity.School">
-        <id column="Id" jdbcType="INTEGER" property="id"/>
-        <result column="app_id" jdbcType="INTEGER" property="appId"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="phone" jdbcType="VARCHAR" property="phone"/>
-        <result column="login_name" jdbcType="VARCHAR" property="loginName"/>
-        <result column="login_pass_word" jdbcType="VARCHAR" property="loginPassWord"/>
-        <result column="rate" jdbcType="DECIMAL" property="rate"/>
-        <result column="money" jdbcType="DECIMAL" property="money"/>
-        <result column="sort" jdbcType="BIGINT" property="sort"/>
-        <result column="sender_money" jdbcType="DECIMAL" property="senderMoney"/>
-        <result column="top_down" jdbcType="DECIMAL" property="topDown"/>
-        <result column="send_max_distance" jdbcType="INTEGER" property="sendMaxDistance"/>
-        <result column="send_per_out" jdbcType="INTEGER" property="sendPerOut"/>
-        <result column="send_per_money" jdbcType="DECIMAL" property="sendPerMoney"/>
-        <result column="wx_app_id" jdbcType="VARCHAR" property="wxAppId"/>
-        <result column="wx_secret" jdbcType="VARCHAR" property="wxSecret"/>
-        <result column="mch_id" jdbcType="VARCHAR" property="mchId"/>
-        <result column="wx_pay_id" jdbcType="VARCHAR" property="wxPayId"/>
-        <result column="cert_path" jdbcType="VARCHAR" property="certPath"/>
-        <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
-        <result column="enable_takeout" jdbcType="INTEGER" property="enableTakeout"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="sender_all_tx" jdbcType="DECIMAL" property="senderAllTx"/>
-        <result column="user_charge" jdbcType="DECIMAL" property="userCharge"/>
-        <result column="user_charge_send" jdbcType="DECIMAL" property="userChargeSend"/>
-        <result column="user_bell_all" jdbcType="DECIMAL" property="userBellAll"/>
+        <id column="Id" property="id" jdbcType="INTEGER" />
+        <result column="app_id" property="appId" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="login_name" property="loginName" jdbcType="VARCHAR" />
+        <result column="login_pass_word" property="loginPassWord" jdbcType="VARCHAR" />
+        <result column="rate" property="rate" jdbcType="DECIMAL" />
+        <result column="money" property="money" jdbcType="DECIMAL" />
+        <result column="sort" property="sort" jdbcType="BIGINT" />
+        <result column="sender_money" property="senderMoney" jdbcType="DECIMAL" />
+        <result column="send_max_distance" property="sendMaxDistance" jdbcType="INTEGER" />
+        <result column="send_per_out" property="sendPerOut" jdbcType="INTEGER" />
+        <result column="send_per_money" property="sendPerMoney" jdbcType="DECIMAL" />
+        <result column="wx_app_id" property="wxAppId" jdbcType="VARCHAR" />
+        <result column="wx_secret" property="wxSecret" jdbcType="VARCHAR" />
+        <result column="mch_id" property="mchId" jdbcType="VARCHAR" />
+        <result column="wx_pay_id" property="wxPayId" jdbcType="VARCHAR" />
+        <result column="cert_path" property="certPath" jdbcType="VARCHAR" />
+        <result column="top_down" property="topDown" jdbcType="DECIMAL" />
+        <result column="is_delete" property="isDelete" jdbcType="BIT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="enable_takeout" property="enableTakeout" jdbcType="INTEGER" />
+        <result column="enable_coupon" property="enableCoupon" jdbcType="INTEGER" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="sender_all_tx" property="senderAllTx" jdbcType="DECIMAL" />
+        <result column="user_charge" property="userCharge" jdbcType="DECIMAL" />
+        <result column="user_bell_all" property="userBellAll" jdbcType="DECIMAL" />
+        <result column="user_charge_send" property="userChargeSend" jdbcType="DECIMAL" />
+        <result column="page_layout" property="pageLayout" jdbcType="TINYINT" />
+        <result column="small_min_amount" property="smallMinAmount" jdbcType="DECIMAL" />
+        <result column="middle_min_amount" property="middleMinAmount" jdbcType="DECIMAL" />
+        <result column="large_min_amount" property="largeMinAmount" jdbcType="DECIMAL" />
+        <result column="extra_large_min_amount" property="extraLargeMinAmount" jdbcType="DECIMAL" />
     </resultMap>
+
+    <sql id="Base_Column_List" >
+        Id,
+        app_id,
+        name,
+        login_name,
+        login_pass_word,
+        rate,
+        money,
+        sort,
+        sender_money,
+        send_max_distance,
+        send_per_out,
+        send_per_money,
+        wx_app_id,
+        wx_secret,
+        mch_id,
+        wx_pay_id,
+        cert_path,
+        top_down,
+        is_delete,
+        create_time,
+        enable_takeout,
+        enable_coupon,
+        phone,
+        sender_all_tx,
+        user_charge,
+        user_bell_all,
+        user_charge_send,
+        page_layout,
+        small_min_amount,
+        middle_min_amount,
+        large_min_amount,
+        extra_large_min_amount
+    </sql>
 
     <update id="charge" parameterType="map">
    update school set user_charge=user_charge+#{charge},
@@ -103,6 +144,7 @@
     <update id="updateByPrimaryKeySelective" parameterType="ops.school.api.entity.School">
         update school
         <set>
+            page_layout = #{pageLayout},
             <if test="name != null">
                 name = #{name,jdbcType=VARCHAR},
             </if>
@@ -154,6 +196,33 @@
             <if test="phone!= null">
                 phone = #{phone},
             </if>
+
+
+            <if test="senderAllTx != null ">
+                 sender_all_tx = #{senderAllTx},
+            </if>
+            <if test="userCharge != null">
+                 user_charge = #{userCharge},
+            </if>
+            <if test="userBellAll != null">
+                 user_bell_all = #{userBellAll},
+            </if>
+            <if test="userChargeSend != null ">
+                 user_charge_send = #{userChargeSend},
+            </if>
+            <if test="smallMinAmount != null">
+                 small_min_amount = #{smallMinAmount},
+            </if>
+<!--            <if test="middleMinAmount != null">-->
+<!--                 middle_min_amount = #{middleMinAmount},-->
+<!--            </if>-->
+            <if test="largeMinAmount != null">
+                large_min_amount = #{largeMinAmount},
+            </if>
+            <if test="extraLargeMinAmount != null">
+                 extra_large_min_amount = #{extraLargeMinAmount},
+            </if>
+            middle_min_amount = #{middleMinAmount}
         </set>
         where Id = #{id,jdbcType=INTEGER}
     </update>

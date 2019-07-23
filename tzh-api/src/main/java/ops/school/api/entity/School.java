@@ -56,6 +56,8 @@ public class School extends Base implements Serializable {
     @NotNull
     private Integer enableTakeout;
 
+    private Integer enableCoupon;
+
     private BigDecimal senderAllTx;
 
     private BigDecimal userCharge;
@@ -321,5 +323,13 @@ public class School extends Base implements Serializable {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getEnableCoupon() {
+        return enableCoupon;
+    }
+
+    public void setEnableCoupon(Integer enableCoupon) {
+        this.enableCoupon = enableCoupon;
     }
 }
