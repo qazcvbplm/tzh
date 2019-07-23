@@ -99,18 +99,17 @@ public class ApplicationController {
 					return re.Msg2Xml();
 				}
 			}
-			
 		}
 		if(MsgType.equals("event")){
 			if(Event.equals("subscribe")){
 				ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text",
-						"老了老弟！为了与您的用户信息匹配来给您发放奖励和订单物流推送，请先绑定与小程序一致的手机号。回复绑定＋手机号获取验证码，例：绑定13788889999（勿加空格和额外字符）");
+						"来了老弟！为了与您的用户信息匹配，请先绑定与小程序一致的手机号。回复绑定＋手机号获取验证码，例：绑定13788889999（勿加空格和额外字符）");
 				return re.Msg2Xml();
 			}
 			if(Event.equals("CLICK")){
 				if(map.get("EventKey").equals("我要绑定")){
 					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text",
-							"来老了老弟！为了与您的用户信息匹配来给您发放奖励和订单物流推送，请先绑定与小程序一致的手机号。回复绑定＋手机号获取验证码，例：绑定13788889999（勿加空格和额外字符）");
+							"来了老弟！为了与您的用户信息匹配，请先绑定与小程序一致的手机号。回复绑定＋手机号获取验证码，例：绑定13788889999（勿加空格和额外字符）");
 					return re.Msg2Xml();
 				}
 				if(map.get("EventKey").equals("商家APP")){
@@ -126,7 +125,7 @@ public class ApplicationController {
 			}
 			if(Event.equals("unsubscribe")){
 				if(user.getPhone()!=null){
-					
+
 				}
 			}
 		}
@@ -138,7 +137,7 @@ public class ApplicationController {
 			 WxUser user=wxUserService.login(openId,0,0,"微信公众号");
 			 return user;
 	}
-	
+
 	
 	
 	@GetMapping("version")

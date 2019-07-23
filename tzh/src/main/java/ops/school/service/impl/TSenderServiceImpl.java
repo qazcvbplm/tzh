@@ -312,16 +312,17 @@ public class TSenderServiceImpl implements TSenderService {
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
         ordersComplete.setShopGetTotal(schoolGetTotal);
         orderCompleteService.save(ordersComplete);
+
         redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
         stringRedisTemplate.convertAndSend(Server.PRODUCTADD, orderId);
-        String formid = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+        String formId = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
         if (orders.getTyp().equals("外卖订单")) {
             QueryWrapper<OrderProduct> query = new QueryWrapper<>();
             query.lambda().eq(OrderProduct::getOrderId,orderId);
             OrderProduct orderProduct = orderProductService.getOne(query);
             Message message = new Message(wxUser.getOpenId(),
                     "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
-                    formid, "pages/mine/integral/integral",
+                    formId, "pages/mine/integral/integral",
                     null, orders.getWaterNumber()+"",orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),orderProduct.getProductName()
                     , "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！", null, null, null,
                     null,null);

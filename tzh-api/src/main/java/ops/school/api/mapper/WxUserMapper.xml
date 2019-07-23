@@ -14,6 +14,7 @@
         <result column="total" jdbcType="INTEGER" property="total"/>
         <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
         <result column="app_id" jdbcType="INTEGER" property="appId"/>
+        <result column="gzh_open_id" jdbcType="VARCHAR" property="gzhOpenId"/>
         <association property="bell" javaType="ops.school.api.entity.WxUserBell">
             <result column="source" jdbcType="INTEGER" property="source"/>
             <result column="money" jdbcType="DECIMAL" property="money"/>
@@ -34,7 +35,8 @@
         phone,
         client,
         school_id,
-        app_id
+        app_id,
+        gzh_open_id
     </sql>
 
     <sql id="Table_Name">
@@ -74,6 +76,9 @@
         </if>
         <if test="appId != null and appId != '' ">
             AND app_id = #{appId}
+        </if>
+        <if test="gzhOpenId != null and gzhOpenId != '' ">
+            AND gzh_open_id = #{gzhOpenId}
         </if>
     </sql>
 
@@ -156,6 +161,9 @@
             </if>
             <if test="schoolId!= null">
                 school_id = #{schoolId,jdbcType=INTEGER},
+            </if>
+            <if test="gzhOpenId!= null">
+                gzh_open_id = #{gzhOpenId,jdbcType=INTEGER},
             </if>
         </set>
         where open_id = #{openId,jdbcType=VARCHAR}
