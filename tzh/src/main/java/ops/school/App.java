@@ -44,11 +44,13 @@ public class App {
 	   return new DruidDataSource();
 	}
 
-	 @Bean
+//	 @Bean
 	 public String ordersRedisConfig() {
 		List<Orders> orders= ordersService.findAllDjs();
 		for(Orders temp:orders){
-			stringRedisTemplate.boundHashOps("SHOP_DJS"+temp.getShopId()).put(temp.getId(), JSON.toJSONString(temp));
+			String key = "SHOP_DJS"+temp.getShopId();
+			String value = JSON.toJSONString(temp);
+			stringRedisTemplate.boundHashOps(key).put(temp.getId(),value);
 		}
 	    return "ok";
 	 }

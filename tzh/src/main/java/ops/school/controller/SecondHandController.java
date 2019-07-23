@@ -10,6 +10,7 @@ import ops.school.api.entity.SecondHand;
 import ops.school.api.service.SecondHandService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.constants.NumConstants;
 import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -44,6 +45,7 @@ public class SecondHandController {
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
 public ResponseObject find(HttpServletRequest request, HttpServletResponse response, SecondHand secondHand, PageQueryDTO pageQueryDTO){
+		secondHand.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
 		QueryWrapper<SecondHand> query = new QueryWrapper<SecondHand>().setEntity(secondHand);
 		Integer countNum = secondHandService.count(query);
 		IPage<SecondHand> iPage = secondHandService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);

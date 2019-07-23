@@ -69,7 +69,7 @@ public class Base implements Serializable {
 
     @Transient
     public Integer getSize() {
-        return size + this.page;
+        return size;
     }
 
     public void setSize(Integer size) {
