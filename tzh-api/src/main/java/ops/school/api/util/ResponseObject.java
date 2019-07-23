@@ -17,7 +17,7 @@ public class ResponseObject {
 
 
     @ApiModelProperty(notes = "业务是否成功标志")
-    private boolean code;
+    private Boolean code;
     @ApiModelProperty(notes = "业务具体结果")
     private String msg;
     @ApiModelProperty(notes = "数据包")
@@ -29,7 +29,7 @@ public class ResponseObject {
     }
 
 
-    public ResponseObject(boolean code, String msg, Map<String, Object> params) {
+    public ResponseObject(Boolean code, String msg, Map<String, Object> params) {
         super();
         this.code = code;
         this.msg = msg;
@@ -37,13 +37,13 @@ public class ResponseObject {
     }
 
 
-    public ResponseObject(boolean code, String msg) {
+    public ResponseObject(Boolean code, String msg) {
         super();
         this.code = code;
         this.msg = msg;
     }
 
-    public ResponseObject(boolean success, RootEnums enums) {
+    public ResponseObject(Boolean success, RootEnums enums) {
         super();
         this.code = success;
         this.msg = enums.getErrorMessage();
@@ -54,7 +54,7 @@ public class ResponseObject {
         return code;
     }
 
-    public void setCode(boolean code) {
+    public void setCode(Boolean code) {
         this.code = code;
     }
 

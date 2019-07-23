@@ -86,7 +86,10 @@ public class SchoolController {
 			School school=schoolService.login(loginName,Util.EnCode(loginPass));
 			if(school!=null){
 				token= JWTUtil.sign(school.getId()+"", school.getLoginName(), "ops");
-				return new ResponseObject(true,"ok").push("token", token).push("school", school).push("type", "ops");
+				return new ResponseObject(true,"ok")
+						.push("token", token)
+						.push("school", school)
+						.push("type", "ops");
 			}else{
 				return new ResponseObject(false, "账号或密码错误");
 			}

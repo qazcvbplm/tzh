@@ -16,6 +16,7 @@ import ops.school.api.service.RunOrdersService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.config.RedisConfig;
+import ops.school.constants.NumConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -61,6 +62,7 @@ public class EvaluateController {
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Evaluate evaluate){
+	    evaluate.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
         QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().setEntity(evaluate);
 //        List<Evaluate> list = evaluateService.list(query);
         IPage<Evaluate> iPage = evaluateService.page(new Page<>(evaluate.getPage(), evaluate.getSize()), query);
