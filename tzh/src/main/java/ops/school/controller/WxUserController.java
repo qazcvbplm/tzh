@@ -71,7 +71,7 @@ public class WxUserController {
         if (school != null) {
             Map<String,Object> map = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
             openid = (String) map.get("openid");
-            sessionKey = (String) map.get("session_key");
+            sessionKey = (String) map.get("sessionKey");
             String token = JWTUtil.sign(openid, "wx", "wxuser");
             user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
             WxUserBell wxUserBell = tWxUserService.getbell(openid);

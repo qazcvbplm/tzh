@@ -154,8 +154,6 @@ public class TOrdersServiceImpl implements TOrdersService {
     public ResponseObject addOrder2(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
         //判断商品为空
         Assertions.notEmpty(productOrderDTOS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
-        System.out.println("实体类长度为："+productOrderDTOS.size());
-        System.out.println(orders.toString());
         //判断用户有
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
         Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST);
