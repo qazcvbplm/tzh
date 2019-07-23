@@ -1,13 +1,12 @@
 package ops.school.api.util;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import com.ibatis.common.beans.Probe;
 import com.ibatis.common.beans.ProbeFactory;
 import ops.school.api.entity.Shop;
-import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -74,7 +73,12 @@ public class PublicUtilS {
 
             for (E object : list) {
 
-                K key = (K) PROBE.getObject(object, keyProp);
+                K key = null;
+                try {
+                    key = (K) ReflectUtilS.getValue(object, keyProp);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 V value = (V) ((StringUtils.isEmpty(valueProp))?(object):(PROBE.getObject(object, valueProp)));
                 if (value != null) {
                     map.put(key, value);
@@ -123,6 +127,7 @@ public class PublicUtilS {
      * @return:
      * @author: Fang
      */
+    @SuppressWarnings("unchecked")
     public static <T> void removeDuplicate(List<T> list) {
         HashSet<T> set = new HashSet<T>(list.size());
         List<T> result = new ArrayList<T>(list.size());
@@ -139,6 +144,7 @@ public class PublicUtilS {
     /**
      * java通过UUID生成16位唯一订单号
      */
+    @SuppressWarnings("unchecked")
     public static String get16OrderIdByUUId() {
         int first = new Random(10).nextInt(8) + 1;
         System.out.println(first);
@@ -162,6 +168,7 @@ public class PublicUtilS {
      * @param propertyName
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static <E> List<Object> GetPropertyList(List<E> list,String propertyName) {
         List<Object> valueList = new ArrayList<Object>();
         for (Object o : list) {
@@ -183,6 +190,7 @@ public class PublicUtilS {
      * @param valueProp map中的value值，为null时，取对象本身
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static <E> Map<Object,Object> ListforMap(List<E> list, String keyProp, String valueProp) {
         Map<Object,Object> map = new HashMap<Object,Object>();
 

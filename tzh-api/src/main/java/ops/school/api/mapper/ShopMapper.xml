@@ -128,7 +128,7 @@
     </select>
     <select id="find" resultMap="BaseResultMap" parameterType="ops.school.api.entity.Shop">
         select
-        <include refid="fd"></include>,
+        <include refid="Base_Column_List"/>,
         <!-- (select min(discount) from product where shop_id=shop.id and is_delete=0 and is_show=1 and discount!=1) as min_discount, -->
         if(shop.open_flag=1,
         (select count(*) from shop_open_time where shop_id = shop.id and DATE_FORMAT(now(),'%H:%i') between start_time
