@@ -130,10 +130,10 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (pt.getBoxPriceFlag() == 1) {
                 boxcount += counts[i];
             }
-            // 计算商品折扣
-            if (pa.getIsDiscount() == 1) {
-                orders.setDiscountType("商品折扣");
-            }
+//            // 计算商品折扣
+//            if (pa.getIsDiscount() == 1) {
+//                orders.setDiscountType("商品折扣");
+//            }
         }
         orders.takeoutinit1(wxUser, school, shop, floor, totalcount, false, fullCutService.findByShopId(shop.getId()),
                 boxcount);
@@ -166,7 +166,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         //楼栋判断
         Floor floor = floorService.getById(orders.getFloorId());
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
-//        //判断商品有并且库存够，批量id查询
+//        //判断商品有并且库存够，批量id查询！
 //        Map pIdAndAIdMap = PublicUtilS.ListforMap(productOrderDTOS,"productId","attributeId");
 //        //根据商品id和商品规格id批量查询商品及规格
 //        List<ProductAndAttributeDTO> productAndAttributeS = productService.batchFindProdAttributeByIdS(pIdAndAIdMap);
@@ -257,10 +257,10 @@ public class TOrdersServiceImpl implements TOrdersService {
              * 商品校验逻辑
              */
 //            productAndAttributeDTOTemp = (ProductAndAttributeDTO)proAttributeSelectMap.get(productOrder.getProductId());
-            product = productAndAttributeDTOTemp.getProduct();
-            productAttribute = productAndAttributeDTOTemp.getProductAttribute();
-            Assertions.notNull(product,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
-            Assertions.notNull(productAttribute,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+//            product = productAndAttributeDTOTemp.getProduct();
+//            productAttribute = productAndAttributeDTOTemp.getProductAttribute();
+//            Assertions.notNull(product,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+//            Assertions.notNull(productAttribute,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
             //如果 商品id 属性id 计数不能空或者计数不能0 商品不能空
             if (productOrder.getProductId() == null || productOrder.getAttributeId() == null || productOrder.getCount() == null || productOrder.getCount() == 0){
                 DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_PARAM_ERROR);
@@ -293,14 +293,16 @@ public class TOrdersServiceImpl implements TOrdersService {
              */
             // 订单内同一商品的数量
             Integer count = productOrder.getCount();
+            product = productService.getById(productOrder.getProductId());
+            productAttribute = productAttributeService.getById(productOrder.getAttributeId());
             /**
              * 计算订单内所有商品商品规格价格+配送费+餐盒费之和
              * 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和
              */
             if (productAttribute != null && count != 0){
-                originalPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
-                afterDiscountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
-                productPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
+                originalPrice = originalPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
+                afterDiscountPrice = afterDiscountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
+                productPrice = productPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
                 if (product != null){
                     // 如果商品折扣小于1，即商品有折扣
                     if (product.getDiscount().compareTo(new BigDecimal(1)) == -1){
@@ -308,9 +310,9 @@ public class TOrdersServiceImpl implements TOrdersService {
                         // 优惠折扣已使用，店铺满减无法再使用
                         isDiscount = true;
                         // 使用商品折扣时的优惠价格
-                        discountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(1).subtract(product.getDiscount())));
+                        discountPrice = discountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(1).subtract(product.getDiscount())));
                         // 商品折扣之后的价格(原价-商品折扣价)
-                        afterDiscountPrice.subtract(discountPrice);
+                        afterDiscountPrice = afterDiscountPrice.subtract(discountPrice);
                     }
                     // 商品总数累加
                     totalcount += count;
@@ -337,12 +339,12 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         // 餐盒费之和
         if (orders.getTyp().equals("外卖订单") || orders.getTyp().equals("自取订单")){
-            boxPrice.add(shop.getBoxPrice().multiply(new BigDecimal(boxcount)));
+            boxPrice = boxPrice.add(shop.getBoxPrice().multiply(new BigDecimal(boxcount)));
         }
         // 配送费-->按物品件数增加配送费
         if (orders.getTyp().equals("外卖订单")){
             if (shop.getSendPriceAddByCountFlag() == 1) {
-                sendAddCountPrice.add(new BigDecimal((totalcount - 1)).multiply(shop.getSendPriceAdd()));
+                sendAddCountPrice = sendAddCountPrice.add(new BigDecimal((totalcount - 1)).multiply(shop.getSendPriceAdd()));
             }
             // 配送费-->判断配送距离增加配送费
             int distance = BaiduUtil.DistanceAll(floor.getLat() + "," + floor.getLng(), shop.getLat() + "," + shop.getLng());
@@ -351,7 +353,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                 sendAddDistancePrice = new BigDecimal(per).multiply(school.getSendPerMoney());
             }
             // 最终配送费-->基础配送费+额外距离配送费+额外件数配送费
-            sendPrice.add(shop.getSendPrice()).add(sendAddCountPrice).add(sendAddDistancePrice);
+            sendPrice = sendPrice.add(shop.getSendPrice()).add(sendAddCountPrice).add(sendAddDistancePrice);
         }
         // 如果商品折扣未使用-->店铺满减
         if (!isDiscount){
@@ -364,12 +366,12 @@ public class TOrdersServiceImpl implements TOrdersService {
                         // 店铺满减之后的优惠价格 --> 如果原菜价 >= 折扣价格时
                         if (originalPrice.subtract(new BigDecimal(shopFullCut.getCutAmount())).compareTo(BigDecimal.ZERO) != -1){
                             // 满减之后的折后价格
-                            afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount()));
+                            afterDiscountPrice = afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount()));
                         } else {
                             afterDiscountPrice = BigDecimal.ZERO;
                         }
-                        fullAmount.add(new BigDecimal(shopFullCut.getFullAmount()));
-                        fullUsedAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+                        fullAmount = fullAmount.add(new BigDecimal(shopFullCut.getFullAmount()));
+                        fullUsedAmount = fullUsedAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
                         // 店铺满减表id
                         ordersSaveTemp.setFullCutId(shopFullCut.getId());
                         break;
@@ -378,7 +380,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
         }
         // 折后价格+餐盒费-->优惠券使用时的价格
-        beforeCouponPrice.add(afterDiscountPrice).add(boxPrice);
+        beforeCouponPrice = beforeCouponPrice.add(afterDiscountPrice).add(boxPrice);
         //优惠券
         if (orders.getCouponId() != null && orders.getCouponId() != 0){
             WxUserCoupon wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
@@ -391,7 +393,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                     if (beforeCouponPrice.compareTo(new BigDecimal(coupon.getFullAmount())) != -1){
                         //  并且 折后价格+餐盒费 >= 优惠券满减金额时
                         if (beforeCouponPrice.subtract(new BigDecimal(coupon.getCutAmount())).compareTo(BigDecimal.ZERO) != -1){
-                            payPrice.add(beforeCouponPrice).subtract(new BigDecimal(coupon.getCutAmount()));
+                            payPrice = payPrice.add(beforeCouponPrice).subtract(new BigDecimal(coupon.getCutAmount()));
                         }
                         // 否则 payPrice = BigDecimal.ZERO
                         // 优惠券用完之后修改状态为已使用
@@ -409,17 +411,17 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
         }
         // 订单原价-->原菜价+配送费+餐盒费
-        originalPrice.add(sendPrice).add(boxPrice);
+        originalPrice = originalPrice.add(sendPrice).add(boxPrice);
         // 订单折扣之后的价格-->折后菜价+配送费+餐盒费
-        afterDiscountPrice.add(sendPrice).add(boxPrice);
+        afterDiscountPrice = afterDiscountPrice.add(sendPrice).add(boxPrice);
         // 折后价格-优惠券+餐盒费+配送费
-        payPrice.add(sendPrice);
+        payPrice = payPrice.add(sendPrice);
         // 减去粮票
         QueryWrapper<WxUserBell> query = new QueryWrapper<>();
         query.lambda().eq(WxUserBell::getPhone,wxUser.getOpenId()+"-"+wxUser.getPhone());
         WxUserBell wxUserBell = wxUserBellService.getOne(query);
         if (wxUserBell != null){
-            if (wxUserBell.getFoodCoupon().compareTo(BigDecimal.ZERO) != -1){
+            if (wxUserBell.getFoodCoupon().compareTo(BigDecimal.ZERO) == 1){
                 // 折后价格-优惠券+餐盒费+配送费 >= 粮票
                 if (payPrice.subtract(wxUserBell.getFoodCoupon()).compareTo(BigDecimal.ZERO) == -1){
                     // 支付价格（除粮票外）小于 粮票--> 支付价格为  0
@@ -428,7 +430,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                     wxUserBell.setFoodCoupon(wxUserBell.getFoodCoupon().subtract(payPrice));
                 } else {
                     // 最终的实付款  --> 订单原菜价（原菜价+配送费+餐盒费）-粮票-优惠券-满减/折扣
-                    payPrice.subtract(wxUserBell.getFoodCoupon());
+                    payPrice = payPrice.subtract(wxUserBell.getFoodCoupon());
                     wxUserBell.setFoodCoupon(BigDecimal.ZERO);
                 }
                 // 修改用户粮票余额

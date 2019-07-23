@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.math.BigDecimal;
 
-public class ProductAttribute extends Base {
+public class ProductAttribute {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
@@ -16,17 +16,6 @@ public class ProductAttribute extends Base {
     private BigDecimal price;
 
     private Integer isDelete;
-
-    private Integer isDiscount;
-
-
-    public Integer getIsDiscount() {
-        return isDiscount;
-    }
-
-    public void setIsDiscount(Integer isDiscount) {
-        this.isDiscount = isDiscount;
-    }
 
     public ProductAttribute(Integer productId, String name, BigDecimal price) {
         super();
