@@ -24,13 +24,11 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
 
     @Override
     public int updateIsInvalid(WxUserCoupon wxUserCoupon) {
-        if (wxUserCoupon != null){
-            int rs = wxUserCouponMapper.update(wxUserCoupon);
-            if (rs == 1){
-                return 1;
-            }
+        if (wxUserCoupon == null || wxUserCoupon.getId() == null || wxUserCoupon.getIsInvalid() == null){
+            return -1;
         }
-        return 0;
+        int rs = wxUserCouponMapper.update(wxUserCoupon);
+        return rs;
     }
 
     @Override

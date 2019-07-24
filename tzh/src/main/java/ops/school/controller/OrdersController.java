@@ -57,17 +57,11 @@ public class OrdersController {
 
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,@RequestBody Orders orders){
-//		  Util.checkParams(result);
-		  // 判断订单备注是否有表情内容
+	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @RequestBody Orders orders) {
+		// Util.checkParams(result);
 		List<ProductOrderDTO> productOrderDTOS = orders.getProductOrderDTOS();
-		  if(orders.getRemark()!=null&&EmojiManager.isEmoji(orders.getRemark())){
-			  orders.setRemark(EmojiParser.removeAllEmojis(orders.getRemark()));
-		  }
-		  // 为订单生成一个25位的随机id
-		  orders.init();
-		  tOrdersService.addOrder2(productOrderDTOS,orders);
-		  return new ResponseObject(true,orders.getId());
+		ResponseObject responseObject = tOrdersService.addOrder2(productOrderDTOS, orders);
+		return responseObject;
 	}
 	
 	@ApiOperation(value="查询",httpMethod="POST")

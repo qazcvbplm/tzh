@@ -293,8 +293,6 @@ public class TOrdersServiceImpl implements TOrdersService {
              */
             // 订单内同一商品的数量
             Integer count = productOrder.getCount();
-            product = productService.getById(productOrder.getProductId());
-            productAttribute = productAttributeService.getById(productOrder.getAttributeId());
             /**
              * 计算订单内所有商品商品规格价格+配送费+餐盒费之和
              * 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和
@@ -381,12 +379,14 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         // 折后价格+餐盒费-->优惠券使用时的价格
         beforeCouponPrice = beforeCouponPrice.add(afterDiscountPrice).add(boxPrice);
-        //优惠券
+        //优惠券id是wx的wxCouponId
+        WxUserCoupon wxUserCoupon = null;
         if (orders.getCouponId() != null && orders.getCouponId() != 0){
-            WxUserCoupon wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
             Long currentTime = System.currentTimeMillis();
             // 用户优惠券失效 >= 当前时间
             if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
+                //注释
                 Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
                 if (coupon != null && coupon.getIsInvalid() == 0 && coupon.getSendEndTime().getTime() >= currentTime){
                     // 折后价格+餐盒费 >= 优惠券满减使用条件
@@ -405,7 +405,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                         } catch (Exception e){
                             e.printStackTrace();
                         }
-                        tWxUserCouponService.updateIsInvalid(wxUserCoupon);
+                        // tWxUserCouponService.updateIsInvalid(wxUserCoupon);
                     }
                 }
             }
@@ -442,7 +442,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 后端计算的数据对象
         OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice,boxPrice,payPrice);
         if (!tempDTO.equals(orderTempDTO)){
-             DisplayException.throwMessage("订单金额有问题，请负责人进行核实!");
+             // DisplayException.throwMessage("订单金额有问题，请负责人进行核实!");
         }
         ordersSaveTemp.setDiscountPrice(discountPrice);
         ordersSaveTemp.setAddressDetail(orders.getAddressDetail());
@@ -498,15 +498,17 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
         }
         //下单后领优惠券 新页面新接口
-        //用户优惠券失效逻辑
-        WxUserCoupon wxUserCoupon = new WxUserCoupon();
-        wxUserCoupon.setId(orders.getCouponId());
-        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NO);
-        int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
-        if (updateUserCouponNum != NumConstants.INT_NUM_1){
-            logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+        //用户优惠券失效逻辑,如果用户的优惠券是生效的IsInvalid=0
+        if (wxUserCoupon != null){
+            wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NO);
+            int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
+            if (updateUserCouponNum != NumConstants.INT_NUM_1){
+                logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+            }
         }
-        return new ResponseObject(true,"创建订单成功！");
+        Map resultMap = new HashMap();
+        resultMap.put("orderId",generatorOrderId);
+        return new ResponseObject(true,"创建订单成功！",resultMap);
     }
 
     @Transactional
