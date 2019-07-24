@@ -6,6 +6,7 @@ import ops.school.api.dao.*;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.SchoolService;
@@ -49,16 +50,19 @@ public class WxUserServiceImple extends ServiceImpl<WxUserMapper, WxUser> implem
         return wxUser;
     }
 
+    //todo 加了微信id的操作
     @Transactional
     @Override
     public WxUser update(WxUser wxUser) {
+        Assertions.notNull(wxUser,wxUser.getId(), ResponseViewEnums.WX_USER_BELL_NEED_ID);
         if (wxUser.getPhone() != null) {
             if (wxUserBellMapper.findByPhone(wxUser.getOpenId() + "-" + wxUser.getPhone()) == 0) {
-                wxUserBellMapper.insert(new WxUserBell(wxUser.getOpenId() + "-" + wxUser.getPhone()));
+                wxUserBellMapper.insert(new WxUserBell(wxUser.getOpenId() + "-" + wxUser.getPhone(),wxUser.getId()));
             } else {
                 throw new YWException("手机号码已被注册");
             }
         }
+        wxUser.setId(null);
         boolean rs = this.updateById(wxUser);
         if (SpringUtil.redisCache() && rs) {
             stringRedisTemplate.boundHashOps("WX_USER_LIST").delete(wxUser.getOpenId());
