@@ -1,6 +1,5 @@
 package ops.school.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.qcloudsms.httpclient.HTTPException;
@@ -18,10 +17,8 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
 import ops.school.api.wxutil.WxGUtil;
-import ops.school.constants.NumConstants;
 import ops.school.service.TWxUserCouponService;
 import ops.school.service.TWxUserService;
-import ops.school.util.Base64Util;
 import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -30,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -122,7 +118,6 @@ public class WxUserController {
         } else {
             return new ResponseObject(true, "ok").push("gz", WxGUtil.checkGz(wxGUser.getOpenId()));
         }
-
     }
 
 
@@ -232,19 +227,14 @@ public class WxUserController {
      * @param decryptData 敏感参数
      * @param sessionKey session_key
      * @param ivData iv
+     * @param openid 用户openid
      * @return
      */
     @RequestMapping(value = "decryptPhone",method = RequestMethod.POST)
     public ResponseObject decryptPhone(@RequestParam String decryptData,@RequestParam String sessionKey,
-                                       @RequestParam String ivData){
-        String phoneNumber = null;
-        try {
-            phoneNumber = Base64Util.getPhoneNumberBeanS5(decryptData,sessionKey,ivData);
-//            stringRedisTemplate.boundHashOps("phone").put("", JSON.toJSONString(phoneNumber));
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
+                                       @RequestParam String ivData,@RequestParam String openid){
+        // 对手机号码进行解密，并存进数据库
+        tWxUserService.decryptPhone(decryptData, sessionKey, ivData, openid);
         return new ResponseObject(true,"ok");
     }
 }

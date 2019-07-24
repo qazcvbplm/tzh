@@ -73,9 +73,9 @@ public class Test {
 
     @org.junit.Test
     public void wxPhoneTest(){
-        String encrypData = "fHloH7K49+cmOUigiEpeb5umMRV/0w/FQF7ohstRChO2Z79lv4pjubUTv24Ldukx3sF4Fz7zLWFjsjBcm8eGp9gOOvuFN7VqYrlZmhkamZCU09KQ+qSe3X7kWIyhKTVMMbxWVwPIdC0GZGtQlhOhrf0oQmbUtqByw1QRtLST5UBLPGxKtnISyZZ/Dh7/66uOHX1Sko7TZTFwv3fdUPhYKA==";
-        String ivData =  "krBvaIeGo2xZ/hZxTvd5kw==";
-        String sessionKey =  "uj1qPKSsok54+RRe1q6k7A==";
+        String encrypData = "5GrGvJFACGg3YKNUcO2TbvQbjCyOkWnz9f0qPaAWtNLMKF872LSL5zle8kQf0b5IcWAwaRdgsGkSk4BdALn93BbueQNnuIiYZA6yz4J81FhTL/ZWtuquOuuI+Sm/N+YWd8AkECqBskGoE0eIAqFuTB+Z892mdmngukR+SDDMg0ff36AUxOJROZPbY7YKxmxvwD/RNhlyjWNqJmlO+O7Q4A==";
+        String ivData =  "bB1fP2EQoNDV3gYMPP3QCg==";
+        String sessionKey =  "s9aZmQNEK5MDivm85/5uDg==";
         try {
             String rs = Base64Util.getPhoneNumberBeanS5(encrypData,sessionKey,ivData);
             System.out.println(rs);

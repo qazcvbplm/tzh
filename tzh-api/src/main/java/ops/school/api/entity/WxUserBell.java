@@ -79,6 +79,11 @@ public class WxUserBell extends Base implements Serializable {
         this.phone = phone2;
     }
 
+    public WxUserBell(String phone,Long wxUserId) {
+        this.phone = phone;
+        this.wxUserId = wxUserId;
+    }
+
     private static final long serialVersionUID = 1L;
 
     public String getPhone() {
