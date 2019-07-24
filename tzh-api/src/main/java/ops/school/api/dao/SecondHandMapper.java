@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ops.school.api.entity.SecondHand;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SecondHandMapper extends BaseMapper<SecondHand> {
 
@@ -18,4 +19,6 @@ public interface SecondHandMapper extends BaseMapper<SecondHand> {
     List<SecondHand> find(SecondHand secondHand);
 
     int count(SecondHand secondHand);
+
+    List<SecondHand> findFuzzy(Map<String,Object> map);
 }

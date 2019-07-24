@@ -77,8 +77,10 @@ public class TxLogController {
 			return new ResponseObject(true, "申请提现成功");
 		} else if (result == 2){
 			return new ResponseObject(false, "商家暂未开启提现功能");
+		} else if (result == 3){
+			return new ResponseObject(false, "用户还有审核中记录，暂无法继续提现");
 		}
-		return new ResponseObject(false, "申请提现失败");
+		return new ResponseObject(true, "申请提现失败");
 	}
 
 	/**
@@ -94,6 +96,6 @@ public class TxLogController {
 		if (rs == 1) {
 			return new ResponseObject(true, "提现成功");
 		}
-		return new ResponseObject(false,"提现失败");
+		return new ResponseObject(true,"提现失败");
 	}
 }

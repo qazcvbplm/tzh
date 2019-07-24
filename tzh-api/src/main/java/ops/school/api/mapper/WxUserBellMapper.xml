@@ -4,7 +4,7 @@
     <resultMap id="BaseResultMap" type="ops.school.api.entity.WxUserBell">
         <result column="id" property="id" jdbcType="BIGINT" />
         <result column="wx_user_id" property="wxUserId" jdbcType="BIGINT" />
-
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="source" jdbcType="INTEGER" property="source"/>
         <result column="money" jdbcType="DECIMAL" property="money"/>
         <result column="is_vip" jdbcType="INTEGER" property="isVip"/>
@@ -86,5 +86,11 @@
     <update id="updatePhone" parameterType="map" >
         update wx_user_bell set phone = #{updatePhone}
         where phone=#{phone}
+    </update>
+
+    <update id="txUpdate" parameterType="map">
+        update wx_user_bell set
+        money = #{amount}
+        where phone = #{phone}
     </update>
 </mapper>

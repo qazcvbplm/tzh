@@ -1,6 +1,7 @@
 package ops.school.service.impl;
 
 import ops.school.api.dao.TxLogMapper;
+import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
@@ -34,6 +35,10 @@ public class TCommonServiceImpl implements TCommonService {
     private ShopService shopService;
     @Autowired
     private TxLogService txLogService;
+    @Autowired
+    private WxUserBellMapper wxUserBellMapper;
+    @Autowired
+    private TxLogMapper txLogMapper;
 
     @Transactional
     @Override
@@ -41,19 +46,30 @@ public class TCommonServiceImpl implements TCommonService {
         // 提现指定账户
         WxUser wxUser = wxUserService.findById(dzOpenid);
         TxLog log = new TxLog();
+        Map<String,Object> map = new HashMap<>();
         // 满足以下提现的是商家提现
         if (shopId != 0) {
             // 商家信息
+            map.put("txerId",shopId);
+            map.put("type","商家提现");
+            if (txLogMapper.findTxLogs(map) > 0){
+                return 3;
+            }
             Shop shop = shopService.getById(shopId);
             if(shop.getshopTxFlag() == 0){
                 return 2;
             }
-            if (shop.getTxAmount().compareTo(amount) == 1){
+            if (shop.getTxAmount().compareTo(amount) != -1){
                 log = new TxLog(shop.getId(), "商家提现", null, amount, "", shop.getSchoolId(), wxUser.getAppId());
             }
         } else  {
             // 配送员提现
             Sender sender = senderService.check(senderId);
+            map.put("txerId",sender.getId());
+            map.put("type","商家提现");
+            if (txLogMapper.findTxLogs(map) > 0){
+                return 3;
+            }
             log = new TxLog(sender.getId(), "配送员提现", null, amount, "", sender.getSchoolId(),
                     wxUser.getAppId());
         }
@@ -82,10 +98,15 @@ public class TCommonServiceImpl implements TCommonService {
             School school = schoolService.findById(sender.getSchoolId());
             if (status == 1) {
                 Map<String, Object> map = new HashMap();
+                WxUserBell wxUserBell = wxUserBellMapper.selectByPrimaryKey(sender.getOpenId() + "-" + sender.getPhone());
+                BigDecimal amount = wxUserBell.getMoney().subtract(log.getAmount());
+                if (amount.compareTo(BigDecimal.ZERO) == -1){
+                    throw new YWException("余额不足");
+                }
                 map.put("phone", sender.getOpenId() + "-" + sender.getPhone());
-                map.put("amount", log.getAmount());
+                map.put("amount", amount);
                 map.put("schoolId", sender.getSchoolId());
-                int re = wxUserBellService.pay(map);
+                int re = wxUserBellMapper.txUpdate(map);
                 // 从配送员余额中扣除提现金额
                 if (re == 1) {
                     try {
@@ -107,7 +128,6 @@ public class TCommonServiceImpl implements TCommonService {
                     }
                     return 2;
                 }
-                throw new YWException("余额不足");
             } else if (status == 2) {
                 // 审核失败（提现失败）
                 log.setIsTx(2);

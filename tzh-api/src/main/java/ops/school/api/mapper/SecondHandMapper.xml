@@ -17,13 +17,14 @@
         <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
         <result column="image" jdbcType="VARCHAR" property="image"/>
         <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="school_name" jdbcType="VARCHAR" property="schoolName"/>
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="ops.school.api.entity.SecondHand">
         <result column="text" jdbcType="LONGVARCHAR" property="text"/>
     </resultMap>
     <sql id="Base_Column_List">
     Id, title, nick_name, avatar_url, open_id, content, is_show, is_delete, price, wx_number, 
-    phone, category, school_id, image
+    phone, category, school_id, image,create_time,school_name
   </sql>
     <sql id="Blob_Column_List">
     text
@@ -162,5 +163,17 @@
         <if test="page!=null and size!=null">
             limit #{page},#{size}
         </if>
+    </select>
+    
+    <select id="findFuzzy" parameterType="map" resultMap="BaseResultMap">
+        select * from `second_hand`
+        <where>
+            and is_show = 1
+            and is_delete = 0
+            <if test="title != null">
+                and title like concat('%',#{title},'%')
+            </if>
+        </where>
+        limit #{page},#{size}
     </select>
 </mapper>
