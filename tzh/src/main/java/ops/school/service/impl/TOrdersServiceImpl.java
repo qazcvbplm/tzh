@@ -152,6 +152,7 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ResponseObject addOrder2(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
+//        Long startOrderTime = System.currentTimeMillis();
         //判断商品为空
         Assertions.notEmpty(productOrderDTOS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
         //判断用户有
@@ -508,6 +509,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         Map resultMap = new HashMap();
         resultMap.put("orderId",generatorOrderId);
+//        Long endOrderTime = System.currentTimeMillis();
+//        System.out.println(endOrderTime - startOrderTime);
         return new ResponseObject(true,"创建订单成功！",resultMap);
     }
 
