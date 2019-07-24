@@ -121,7 +121,7 @@ public class WxUserController {
     }
 
 
-    @ApiOperation(value = "微信用户更新", httpMethod = "POST")
+    @ApiOperation(value = "微信用户更新(必传id)", httpMethod = "POST")
     @PostMapping("wx/update")
     public ResponseObject update(HttpServletRequest request, HttpServletResponse response, @ModelAttribute WxUser wxUser) {
         wxUser.setOpenId(request.getAttribute("Id").toString());
