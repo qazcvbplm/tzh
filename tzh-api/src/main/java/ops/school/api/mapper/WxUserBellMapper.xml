@@ -9,6 +9,7 @@
         <result column="money" jdbcType="DECIMAL" property="money"/>
         <result column="is_vip" jdbcType="INTEGER" property="isVip"/>
         <result column="vip_out_time" jdbcType="BIGINT" property="vipOutTime"/>
+        <result column="food_coupon" jdbcType="DECIMAL" property="foodCoupon"/>
     </resultMap>
 
 

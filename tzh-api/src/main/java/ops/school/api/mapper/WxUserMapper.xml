@@ -16,13 +16,14 @@
         <result column="app_id" jdbcType="INTEGER" property="appId"/>
         <result column="gzh_open_id" jdbcType="VARCHAR" property="gzhOpenId"/>
         <association property="bell" javaType="ops.school.api.entity.WxUserBell">
+            <result column="id" property="id" jdbcType="BIGINT" />
             <result column="source" jdbcType="INTEGER" property="source"/>
             <result column="money" jdbcType="DECIMAL" property="money"/>
             <result column="is_vip" jdbcType="INTEGER" property="isVip"/>
+            <result column="vip_out_time" jdbcType="BIGINT" property="vipOutTime"/>
+            <result column="food_coupon" jdbcType="DECIMAL" property="foodCoupon"/>
         </association>
     </resultMap>
-
-
 
     <sql id="Base_Column_List" >
         id,
@@ -37,6 +38,30 @@
         school_id,
         app_id,
         gzh_open_id
+    </sql>
+
+    <sql id="User_Bell_List" >
+        wx_user.id,
+        wx_user.open_id,
+        wx_user.nick_name,
+        wx_user.avatar_url,
+        wx_user.gender,
+        wx_user.province,
+        wx_user.city,
+        wx_user.phone,
+        wx_user.client,
+        wx_user.school_id,
+        wx_user.app_id,
+        wx_user.gzh_open_id,
+
+        wx_user_bell.id,
+        wx_user_bell.wx_user_id,
+        wx_user_bell.phone,
+        wx_user_bell.source,
+        wx_user_bell.money,
+        wx_user_bell.is_vip,
+        wx_user_bell.vip_out_time,
+        wx_user_bell.food_coupon
     </sql>
 
     <sql id="Table_Name">
@@ -178,5 +203,13 @@
         SELECT <include refid="Base_Column_List"/>
         FROM <include refid="Table_Name"/>
         WHERE id = #{userId}
+    </select>
+
+    <!--CreatBy Fang Time:2019/7/24 16:08 |  根据用户的openid和phone查找用户和用户余额-->
+    <select id="findUserAndBell" resultMap="BaseResultMap">
+        SELECT <include refid="User_Bell_List"/>
+        FROM wx_user,wx_user_bell
+        WHERE wx_user.open_id = #{openId}
+        AND wx_user.phone = #{phone}
     </select>
 </mapper>

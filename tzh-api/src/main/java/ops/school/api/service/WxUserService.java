@@ -27,5 +27,14 @@ public interface WxUserService extends IService<WxUser> {
 
     WxUser findByschoolAndPhone(WxUser query);
 
-
+    /**
+     * @date:   2019/7/24 15:54
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.WxUser
+     * @param   openId
+     * @param   wxUserPhone
+     * @Desc:   desc 根据用户的openid和phone查找用户和用户余额
+     */
+    WxUser findUserAndBellOrCache(String openId, String wxUserPhone);
 }

@@ -15,6 +15,7 @@ public enum PublicErrorEnums implements RootEnums {
     FAILED("1010002","操作失败"),
     /**参数为空*/
     PULBIC_EMPTY_PARAM("1010003","参数为空"),
+
     /**参数错误*/
     PULBIC_ERROR_PARAM("1010004","参数错误"),
     PUBLIC_DATA_ERROR("1010005","数据为空"),
@@ -25,6 +26,7 @@ public enum PublicErrorEnums implements RootEnums {
     LOGIN_TIME_OUT("1010008","登陆超时，请重新登陆"),
     /**登陆超时*/
     CALL_THE_BACK_WORKER("1010009","服务器被外星人攻击了，请联系管理员"),
+    PULBIC_EMPTY_PARAM_TEXT("1010010","参数字符串为空"),
 
 
 

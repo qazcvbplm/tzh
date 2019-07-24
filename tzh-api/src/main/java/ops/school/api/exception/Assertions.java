@@ -68,7 +68,7 @@ public class Assertions {
      */
     public static void notNull(Object object, RootEnums errorEnums) {
         if (object == null) {
-            throw new IllegalArgumentException(errorEnums.getErrorMessage());
+            throw new DisplayException(errorEnums.getErrorMessage());
         }
     }
 
@@ -98,7 +98,7 @@ public class Assertions {
 
     public static void hasLength(String text, RootEnums enums) {
         if (!StringUtils.hasLength(text)) {
-            throw new IllegalArgumentException(enums.getErrorMessage());
+            throw new DisplayException(enums.getErrorMessage());
         }
     }
 
@@ -116,9 +116,23 @@ public class Assertions {
         hasText(text, "[Assertion failed] - this String argument must have text; it must not be null, empty, or blank");
     }
 
+//    public static void hasText(String... text) {
+//        String paramNames = "";
+//        Integer sum = 0;
+//        for (int i = 0; i < text.length -1; i++) {
+//            if (!StringUtils.hasText(text[i])){
+//                paramNames += "\n 第"+(i+1)+"个参数为空 \n";
+//                sum++;
+//            }
+//        }
+//        if (sum > 0){
+//            throw new IllegalArgumentException(PublicErrorEnums.PULBIC_EMPTY_PARAM_TEXT.getErrorMessage()+"{" + paramNames +"}");
+//        }
+//    }
+
     public static void hasText(String text, RootEnums enums) {
         if (!StringUtils.hasText(text)) {
-            throw new IllegalArgumentException(enums.getErrorMessage());
+            throw new DisplayException(enums.getErrorMessage());
         }
     }
 

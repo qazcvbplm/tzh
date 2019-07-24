@@ -39,4 +39,15 @@ public interface WxUserMapper extends BaseMapper<WxUser> {
      * @Desc:   desc 根据用户id查询用户
      */
     WxUser selectOneByUserId(Long userId);
+
+    /**
+     * @date:   2019/7/24 16:08
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.WxUser
+     * @param   openId
+     * @param   wxUserPhone
+     * @Desc:   desc 根据用户的openid和phone查找用户和用户余额
+     */
+    WxUser findUserAndBell(String openId, String wxUserPhone);
 }

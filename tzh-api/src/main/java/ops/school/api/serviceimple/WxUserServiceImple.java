@@ -6,6 +6,7 @@ import ops.school.api.dao.*;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;
+import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
@@ -128,5 +129,30 @@ public class WxUserServiceImple extends ServiceImpl<WxUserMapper, WxUser> implem
         return wxUserMapper.findByschoolAndPhone(query);
     }
 
-
+    /**
+     * @date:   2019/7/24 15:55
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.WxUser
+     * @param   openId
+     * @param   wxUserPhone
+     * @Desc:   desc 根据用户的openid和phone查找用户和用户余额
+     */
+    @Override
+    public WxUser findUserAndBellOrCache(String openId, String wxUserPhone) {
+        Assertions.hasText(openId);
+        Assertions.hasText(wxUserPhone);
+        if (SpringUtil.redisCache()) {
+            String rs = stringRedisTemplate.opsForValue().get("WX_USER_OPENID_" + openId);
+            if (rs != null) {
+                return JSON.parseObject(rs, WxUser.class);
+            } else {
+                WxUser wxUser = wxUserMapper.selectByPrimaryKey(openId);
+                stringRedisTemplate.boundHashOps("WX_USER_LIST").put(openId, JSON.toJSONString(wxUser));
+                return wxUser;
+            }
+        }
+        WxUser wxUser = wxUserMapper.findUserAndBell(openId,wxUserPhone);
+        return wxUserMapper.selectById(openId);
+    }
 }

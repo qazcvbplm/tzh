@@ -84,6 +84,13 @@ public class Orders extends Base implements Serializable {
     private String openId;
 
     /**
+     * 用户电话
+     */
+    @NotBlank
+    @TableField(exist = false)
+    private String wxUserPhone;
+
+    /**
      * 收货人姓名
      */
     @NotBlank
@@ -891,5 +898,13 @@ public class Orders extends Base implements Serializable {
 
     public void setProductOrderDTOS(List<ProductOrderDTO> productOrderDTOS) {
         this.productOrderDTOS = productOrderDTOS;
+    }
+
+    public String getWxUserPhone() {
+        return wxUserPhone;
+    }
+
+    public void setWxUserPhone(String wxUserPhone) {
+        this.wxUserPhone = wxUserPhone;
     }
 }

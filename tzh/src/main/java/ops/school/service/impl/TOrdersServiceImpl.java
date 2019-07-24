@@ -157,6 +157,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         Assertions.notEmpty(productOrderDTOS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
         //判断用户有
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
+        //根据用户的openid和phone查找用户和用户余额 todo
+        // WxUser wxUser1 = wxUserService.findUserAndBellOrCache(orders.getOpenId(),orders.getWxUserPhone());
         Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST);
         //判断学校是否是有，并且是当前学校
         School school = schoolService.findById(wxUser.getSchoolId());
@@ -434,7 +436,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                     payPrice = payPrice.subtract(wxUserBell.getFoodCoupon());
                     wxUserBell.setFoodCoupon(BigDecimal.ZERO);
                 }
-                // 修改用户粮票余额
+                // 修改用户粮票余额 todo 不判断么
                 wxUserBellService.updateById(wxUserBell);
             }
         }
