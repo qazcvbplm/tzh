@@ -15,7 +15,7 @@ public class CheckUtils {
 
 
     public static String checkEmoji(String checkString){
-        if (StringUtils.hasText(checkString)){
+        if (!StringUtils.hasText(checkString)){
             return null;
         }
         if(EmojiManager.isEmoji(checkString)){

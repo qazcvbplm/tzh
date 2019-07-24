@@ -442,7 +442,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 后端计算的数据对象
         OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice,boxPrice,payPrice);
         if (!tempDTO.equals(orderTempDTO)){
-            DisplayException.throwMessage("订单金额有问题，请负责人进行核实!");
+             DisplayException.throwMessage("订单金额有问题，请负责人进行核实!");
         }
         ordersSaveTemp.setDiscountPrice(discountPrice);
         ordersSaveTemp.setAddressDetail(orders.getAddressDetail());

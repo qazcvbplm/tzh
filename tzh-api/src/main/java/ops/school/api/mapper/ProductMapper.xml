@@ -26,23 +26,23 @@
 
     <resultMap id="ResultProductAndAttributeMap" type="ops.school.api.dto.project.ProductAndAttributeDTO">
         <id column="Id" jdbcType="INTEGER" property="id"/>
-        <result column="product.product_name"  property="productName"/>
-        <result column="product.product_image"  property="productImage"/>
-        <result column="product.discount"  property="discount"/>
-        <result column="product.box_price_flag"  property="boxPriceFlag"/>
-        <result column="product.product_category_id"  property="productCategoryId"/>
-        <result column="product.shop_id"  property="shopId"/>
-        <result column="product.school_id"  property="schoolId"/>
-        <result column="product.sale"  property="sale"/>
-        <result column="product.is_show"  property="isShow"/>
-        <result column="product.is_delete"  property="isDelete"/>
-        <result column="product.stock"  property="stock"/>
-        <result column="product.stock_flag"  property="stockFlag"/>
+        <result column="product_name"  property="productName"/>
+        <result column="product_image"  property="productImage"/>
+        <result column="discount"  property="discount"/>
+        <result column="box_price_flag"  property="boxPriceFlag"/>
+        <result column="product_category_id"  property="productCategoryId"/>
+        <result column="shop_id"  property="shopId"/>
+        <result column="school_id"  property="schoolId"/>
+        <result column="sale"  property="sale"/>
+        <result column="is_show"  property="isShow"/>
+        <result column="is_delete"  property="isDelete"/>
+        <result column="stock"  property="stock"/>
+        <result column="stock_flag"  property="stockFlag"/>
         <!--CreatBy Fang Time:2019/7/20 16:39 |  -->
-        <result column="product_attribute.id"  property="attributeId"/>
-        <result column="product_attribute.name"  property="attributeName"/>
-        <result column="product_attribute.price"  property="attributePrice"/>
-        <result column="product_attribute.is_delete"  property="attributeIsDelete"/>
+        <result column="attributeId"  property="attributeId"/>
+        <result column="attributeName"  property="attributeName"/>
+        <result column="attributePrice"  property="attributePrice"/>
+        <result column="attributeIsDelete"  property="attributeIsDelete"/>
 
     </resultMap>
 
@@ -62,6 +62,14 @@
         stock_flag
     </sql>
 
+    <sql id="Attribute_Column_List" >
+        Id,
+        product_id,
+        name,
+        price,
+        is_delete
+    </sql>
+
     <sql id="Pro_Attribute_Column_List" >
         product.Id,
         product.product_name,
@@ -76,10 +84,11 @@
         product.is_delete,
         product.stock,
         product.stock_flag,
-        product_attribute.id,
-        product_attribute.name,
-        product_attribute.price,
-        product_attribute.is_delete
+
+        product_attribute.id as attributeId,
+        product_attribute.name as attributeName,
+        product_attribute.price as attributePrice,
+        product_attribute.is_delete as attributeIsDelete
     </sql>
 
     <sql id="Table_Name">
@@ -134,22 +143,28 @@
     where Id = #{id,jdbcType=INTEGER}
   </select>
     
-    <!--CreatBy Fang Time:2019/7/20 16:33 |  根据商品id和商品规格id批量查询商品及规格-->
-    <select id="batchFindProdAttributeByIdS" resultType="ops.school.api.dto.project.ProductAndAttributeDTO">
+    <!--CreatBy Fang Time:2019/7/20 16:33 |  根据商品id和商品规格id批量查询商品及规格 map<pid,aid>-->
+    <select id="batchFindProdAttributeByIdS" resultMap="ResultProductAndAttributeMap">
         SELECT <include refid="Pro_Attribute_Column_List"/>
-        FROM product,product_attribute
-        WHERE product.id IN
+        FROM product,
+        (
+            SELECT <include refid="Attribute_Column_List"/>
+            FROM product_attribute
+            WHERE
+            product_attribute.is_delete = 0
+            AND product_attribute.id IN
+            <foreach collection="map" index="key" item="value"  open="(" separator="," close=")">
+                #{value}
+            </foreach>
+        ) as product_attribute
+        WHERE product.id = product_attribute.product_id
+        AND product.id IN
         <foreach collection="map" index="key" item="value"  open="(" separator="," close=")">
             #{key}
         </foreach>
-        AND product_attribute.product_id IN
-        <foreach collection="map" index="key" item="value"  open="(" separator="," close=")">
-            #{value}
-        </foreach>
-        AND product.id = product_attribute.product_id
         AND product.is_show = 1
         AND product.is_delete = 0
-        AND product_attribute.is_delete = 0
+
     </select>
 
     <update id="updateByPrimaryKeySelective" parameterType="ops.school.api.entity.Product">

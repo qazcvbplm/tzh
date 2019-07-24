@@ -39,7 +39,7 @@ public interface ProductMapper extends BaseMapper<Product> {
      * @version:version
      * @return: java.util.List<ops.school.api.dto.project.ProductAndAttributeDTO>
      * @param   pIdAndAIdMap
-     * @Desc:   desc 根据商品id和商品规格id批量查询商品及规格
+     * @Desc:   desc 根据商品id和商品规格id批量查询商品及规格 map<pid,aid>
      */
     List<ProductAndAttributeDTO> batchFindProdAttributeByIdS(@Param("map") Map<Long,Long> pIdAndAIdMap);
 }

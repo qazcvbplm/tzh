@@ -23,8 +23,6 @@ import javax.sql.DataSource;
 @MapperScan("ops.school.api.dao")
 public class App {
 	
-
-	
 	public static void main(String[] args) {
 		SpringApplication.run(App.class, args);
 	}
@@ -45,5 +43,4 @@ public class App {
 		return new SpringUtil();
 	}
 
-	
 }
