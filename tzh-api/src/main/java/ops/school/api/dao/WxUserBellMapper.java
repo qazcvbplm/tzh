@@ -34,4 +34,6 @@ public interface WxUserBellMapper extends BaseMapper<WxUserBell> {
     @Update("update wx_user_bell set food_coupon = food_coupon-#{amount} where phone=#{id} and food_coupon>=#{amount}")
     Integer useFoodCoupon(@Param("id") String id, @Param("amount") BigDecimal amount);
 
+    int updatePhone(Map<String,Object> map);
+
 }

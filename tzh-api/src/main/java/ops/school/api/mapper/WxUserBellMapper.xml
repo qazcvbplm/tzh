@@ -82,4 +82,9 @@
     <select id="findByPhone" parameterType="string" resultType="int">
    select count(*) from wx_user_bell where phone=#{phone}
   </select>
+
+    <update id="updatePhone" parameterType="map" >
+        update wx_user_bell set phone = #{updatePhone}
+        where phone=#{phone}
+    </update>
 </mapper>

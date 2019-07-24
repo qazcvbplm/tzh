@@ -10,5 +10,8 @@
         <result column="result" jdbcType="VARCHAR" property="result"/>
         <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
         <result column="app_id" jdbcType="INTEGER" property="appId"/>
+        <result column="ishow" jdbcType="INTEGER" property="ishow"/>
+        <result column="is_tx" jdbcType="INTEGER" property="isTx"/>
+        <result column="dz_openid" jdbcType="VARCHAR" property="dzOpenid"/>
     </resultMap>
 </mapper>

@@ -12,4 +12,6 @@ public interface TWxUserService {
 
     @Transactional
     void chargeSuccess(String orderId, String openId, String attach);
+
+    int decryptPhone(String decryptData,String sessionKey, String ivData, String openid);
 }

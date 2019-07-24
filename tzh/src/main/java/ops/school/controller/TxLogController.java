@@ -34,7 +34,7 @@ public class TxLogController {
 			return new ResponseObject(false, "");
 		}
 		QueryWrapper<TxLog> query=new QueryWrapper<>();
-        query.select("id", "txer_id", "type", "create_time", "amount");
+        query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid");
 		if(schoolId!=null)
 			query.lambda().eq(TxLog::getSchoolId, schoolId);
 		if(appId!=null)
@@ -54,7 +54,7 @@ public class TxLogController {
 		query.lambda().eq(TxLog::getTxerId, id);
 		query.lambda().eq(TxLog::getType, "配送员提现");
 		query.lambda().eq(TxLog::getIshow, "0");
-		query.select("id", "txer_id", "type", "create_time", "amount");
+		query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid");
 		query.lambda().orderByDesc(TxLog::getCreateTime);
         IPage<TxLog> rs = txLogService.page(new Page<>(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
@@ -75,6 +75,8 @@ public class TxLogController {
 		int result = tCommonService.txApply(amount,senderid,dzOpenid,shopid);
 		if (result == 1) {
 			return new ResponseObject(true, "申请提现成功");
+		} else if (result == 2){
+			return new ResponseObject(false, "商家暂未开启提现功能");
 		}
 		return new ResponseObject(false, "申请提现失败");
 	}

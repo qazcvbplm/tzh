@@ -45,6 +45,9 @@ public class TCommonServiceImpl implements TCommonService {
         if (shopId != 0) {
             // 商家信息
             Shop shop = shopService.getById(shopId);
+            if(shop.getshopTxFlag() == 0){
+                return 2;
+            }
             if (shop.getTxAmount().compareTo(amount) == 1){
                 log = new TxLog(shop.getId(), "商家提现", null, amount, "", shop.getSchoolId(), wxUser.getAppId());
             }
@@ -82,8 +85,9 @@ public class TCommonServiceImpl implements TCommonService {
                 map.put("phone", sender.getOpenId() + "-" + sender.getPhone());
                 map.put("amount", log.getAmount());
                 map.put("schoolId", sender.getSchoolId());
+                int re = wxUserBellService.pay(map);
                 // 从配送员余额中扣除提现金额
-                if (wxUserBellService.pay(map) == 1) {
+                if (re == 1) {
                     try {
                         String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                         // 审核成功(提现成功)
