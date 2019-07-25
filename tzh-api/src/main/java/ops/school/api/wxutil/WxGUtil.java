@@ -10,7 +10,7 @@ public class WxGUtil {
     private static String token = "";
     private static long tokenTime = 0;
     private static final long tokenTimeRefreshTime = 7200 * 1000;
-    private static String msurl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=";
+    private static String msurl = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=";
     private static String gz = "https://api.weixin.qq.com/cgi-bin/user/info";
 
     /**
@@ -36,11 +36,11 @@ public class WxGUtil {
      * touser 用户openid
      * template_id 模板id
      * form_id  表单id  或者支付id
-     * keyword 关键字 1,2,3,4,5,6,7.。。。
+     * keyword 关键字 1,2,3,4,5,6,7.
      */
     public static void snedM(JSONObject output) {
         //发送模板消息
-        String access_token = getAccessToken("wx5b97919ccae6d986", "21ffc5cd23e1efa82bb26ee79af691ac");
+        String access_token = getAccessToken("wx0c193b30f0f8ac93", "ac9f6f2c3c36abc883601ff35bb613aa");
         String rs = PayUtil.httpRequest(msurl + access_token, "POST", output.toString());
         LoggerUtil.log(rs);
     }

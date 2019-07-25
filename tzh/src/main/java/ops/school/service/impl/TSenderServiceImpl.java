@@ -1,6 +1,7 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dto.SenderTj;
@@ -16,6 +17,7 @@ import ops.school.api.util.RedisUtil;
 import ops.school.api.wx.towallet.WeChatPayUtil;
 import ops.school.api.wxutil.WxGUtil;
 import ops.school.service.TSenderService;
+import ops.school.util.WxMessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -91,24 +93,8 @@ public class TSenderServiceImpl implements TSenderService {
         int rs = 0;
         if ((rs = ordersService.senderAccept(orders)) == 1) {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
-            QueryWrapper<OrderProduct> query = new QueryWrapper<>();
-            query.lambda().eq(OrderProduct::getOrderId,orderId);
-            OrderProduct orderProduct = orderProductService.getOne(query);
-            String formid = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-            Message message = new Message(wxUser.getOpenId(),
-                    "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
-                    formid, "pages/order/orderDetail/orderDetail?orderId="
-                    + orders.getId() + "&typ=" + orders.getTyp(),
-                    "您的订单已被配送员接手！",orders.getWaterNumber()+"", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    orderProduct.getProductName(), "配送员正火速配送中，请耐心等待！", null, null, null, null);
-            WxGUtil.snedM(message.toJson());
-            /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
-                    "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
-                    school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
-                    + orders.getId() + "&typ=" + orders.getTyp(),
-                    "您的订单已被配送员接手！", sender.getName(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    null, null, null, null, null, null,
-                    null, " 配送员正火速配送中，请耐心等待！"));*/
+            List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+            WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
         }
         return rs;
     }
@@ -181,155 +167,13 @@ public class TSenderServiceImpl implements TSenderService {
                 return;
             }
         }
-        // 店铺
-        Shop shop = shopService.getById(orders.getShopId());
-        // 学校
-        School school = schoolService.findById(orders.getSchoolId());
-        // 对订单进行结算
-        OrdersComplete ordersComplete = new OrdersComplete();
-        // 平台抽负责人百分比
-        ordersComplete.setAppGetSchoolRate(school.getRate());
-        // 负责人抽成店铺百分比
-        ordersComplete.setSchoolGetShopRate(shop.getRate());
-        // 用户优惠券
-        WxUserCoupon wxUserCoupon = new WxUserCoupon();
-        Coupon coupon = new Coupon();
-        // 店铺满减
-        ShopFullCut shopFullCut = new ShopFullCut();
-        // 优惠券金额
-        BigDecimal couponAmount = BigDecimal.ZERO;
-        // 店铺满减金额
-        BigDecimal fullCutAmount = BigDecimal.ZERO;
-        // 商品折扣金额
-        BigDecimal discountAmount = BigDecimal.ZERO;
-        // (餐盒费＋菜价 - 优惠券 - 满减额 - 折扣额）
-        BigDecimal tempPrice = BigDecimal.ZERO;
-        // 配送员所得金额
-        BigDecimal senderGetTotal = BigDecimal.ZERO;
-        // 负责人抽取配送员金额
-        BigDecimal schoolGetSender = BigDecimal.ZERO;
-        // 负责人抽取店铺金额
-        BigDecimal schoolGetshop = BigDecimal.ZERO;
-        // 负责人所得
-        BigDecimal schoolGetTotal = BigDecimal.ZERO;
-        // 负责人承担比例金额之和
-        BigDecimal schoolUnderTakeAmount = BigDecimal.ZERO;
-        // 楼下返还金额
-        BigDecimal downStairs = BigDecimal.ZERO;
-        // 负责人抽成配送员百分比
-        // 如果配送员为空
-        if (orders.getSenderId() == 0 || orders.getSenderId() == null){
-            ordersComplete.setSchoolGetSenderRate(BigDecimal.ZERO);
-            /**
-             * 配送员所得
-             */
-            ordersComplete.setSenderGetTotal(senderGetTotal);
-            /**
-             * 负责人抽取配送员金额
-             */
-            ordersComplete.setSchoolGetSender(schoolGetSender);
-        } else {
-            ordersComplete.setSchoolGetSenderRate(sender.getRate());
-            // 配送员所得
-            // 如果时楼上送达 --> 配送费 * （1-学校抽成）
-            if (end){
-                /**
-                 * 配送员所得
-                 */
-                ordersComplete.setSenderGetTotal(orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate())));
-                /**
-                 * 负责人抽取配送员所得
-                 */
-                schoolGetSender.add(orders.getSendPrice().multiply(sender.getRate()));
-                ordersComplete.setSchoolGetSender(schoolGetSender);
-            } else {
-                // 楼下送达，要返还楼上楼下差价 --> （配送费-楼下返还） * （1-学校抽成）
-                // 楼下返还金额
-                downStairs.add(orders.getSchoolTopDownPrice());
-                /**
-                 * 配送员所得
-                 */
-                ordersComplete.setSenderGetTotal((orders.getSendPrice().subtract(downStairs))
-                        .multiply(new BigDecimal(1).subtract(sender.getRate())));
-                /**
-                 * 负责人抽取配送员所得
-                 */
-                schoolGetSender.add((orders.getSendPrice().subtract(downStairs))
-                        .multiply(sender.getRate()));
-                ordersComplete.setSchoolGetSender(schoolGetSender);
-            }
-        }
-        // 微信平台所得为0.6% --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  0.006
-        /**
-         * 微信平台所得
-         */
-        BigDecimal wx = orders.getPayPrice().multiply(new BigDecimal(0.006));
-        // 总平台获得比例对应金额 --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  比例
-        BigDecimal total = orders.getPayPrice().multiply(school.getRate());
-        // 超级后台所得 --> total - wx
-        /**
-         * 超级后台所得
-         */
-        ordersComplete.setAppGetTotal(total.subtract(wx));
-        // 如果使用了优惠券
-        if (orders.getCouponId() != 0 || orders.getCouponId() != null){
-            wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
-            coupon = couponService.getById(wxUserCoupon.getCouponId());
-            // 优惠券优惠金额
-            couponAmount.add(new BigDecimal(coupon.getCutAmount()));
-        } else if (orders.getFullCutId() != null || orders.getFullCutId() != 0){
-            shopFullCut = shopFullCutService.getById(orders.getFullCutId());
-            // 店铺满减优惠金额
-            fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
-        } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1){
-            // 商品折扣金额
-            discountAmount.add(orders.getDiscountPrice());
-        }
-        tempPrice.add(orders.getBoxPrice().add(orders.getProductPrice())
-                .subtract(couponAmount).subtract(fullCutAmount).subtract(discountAmount));
-        /**
-         * 负责人抽取店铺金额
-         */
-        schoolGetshop.add(tempPrice.multiply(shop.getRate()));
-        ordersComplete.setSchoolGetShop(schoolGetshop);
-        /**
-         * 负责人承担比例金额
-         */
-        schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
-                .add(couponAmount.multiply(shop.getCouponRate()))
-                .add(discountAmount.multiply(shop.getDiscountRate()));
-        /**
-         * 店铺所得
-         */
-        ordersComplete.setShopGetTotal(tempPrice
-                .multiply(new BigDecimal(1).subtract(shop.getRate()))
-                .add(schoolUnderTakeAmount));
-        /**
-         * 负责人所得
-         */
-        schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(total)
-                .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
-        ordersComplete.setShopGetTotal(schoolGetTotal);
-        orderCompleteService.save(ordersComplete);
         redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
         stringRedisTemplate.convertAndSend(Server.PRODUCTADD, orderId);
-        String formId = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+        List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
         if (orders.getTyp().equals("外卖订单")) {
-            QueryWrapper<OrderProduct> query = new QueryWrapper<>();
-            query.lambda().eq(OrderProduct::getOrderId,orderId);
-            OrderProduct orderProduct = orderProductService.getOne(query);
-            Message message = new Message(wxUser.getOpenId(),
-                    "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
-                    formId, "pages/mine/integral/integral",
-                    null, orders.getWaterNumber()+"",orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),orderProduct.getProductName()
-                    , "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！", null, null, null,
-                    null);
-            if (orders.getDestination() == 1) {
-//                message.setDataFirst("您的订单已送达到寝。");
-            } else {
-//                message.setDataFirst("您的订单已送达楼下，请下楼自取。系统已返还" + returnPrice + "元至您粮票余额内，请注意查收！");
-            }
-            WxGUtil.snedM(message.toJson());
+            WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(2));
+            // 删除redis缓存
+            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
         }
     }
 
@@ -356,21 +200,8 @@ public class TSenderServiceImpl implements TSenderService {
         int rs = 0;
         if ((rs = runOrdersService.senderAccept(orders)) == 1) {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
-            String formid = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-            Message message = new Message(wxUser.getOpenId(),
-                    "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o",
-                    formid, "pages/order/orderDetail/orderDetail?orderId="
-                    + orders.getId() + "&typ=" + orders.getTyp(),
-                    "您的订单已被配送员接手！","该订单暂无编号", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    orders.getContent(), " 配送员正火速配送中，请耐心等待！", null, null, null, null);
-            WxGUtil.snedM(message.toJson());
-            /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
-                    "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
-                    school.getWxAppId(), "pages/order/orderDetail/orderDetail?orderId="
-                    + orders.getId() + "&typ=" + orders.getTyp(),
-                    "您的订单已被配送员接手！", sender.getName(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    null, null, null, null, null, null,
-                    null, " 配送员正火速配送中，请耐心等待！"));*/
+            List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+            WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
         }
         return rs;
     }
@@ -396,21 +227,12 @@ public class TSenderServiceImpl implements TSenderService {
             );
             redisUtil.runCountSuccessadd(orders.getSchoolId());
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
-            String formid = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-            Message message = new Message(wxUser.getOpenId(),
-                    "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
-                    formid, "pages/mine/integral/integral",
-                    "您的跑腿订单已经完成!","该订单暂无编号", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    orders.getContent(), "成功获得" + orders.getTotalPrice().intValue() + "积分，可以前往积分商城兑换哟！", null, null, null,
-                    null);
-            WxGUtil.snedM(message.toJson());
-           /* wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
-                    "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
-                    school.getWxAppId(), "pages/mine/integral/integral",
-                    "您的跑腿订单已经完成!", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    null, null, null, null, null, null,
-                    null, "成功获得" + orders.getTotalPrice().intValue() + "积分，可以前往积分商城兑换哟！"));
-*/
+            // 从Redis里面获取
+            List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+            // 发送微信信息模板
+            WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
+            // 删除redis缓存
+            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
         }
     }
 

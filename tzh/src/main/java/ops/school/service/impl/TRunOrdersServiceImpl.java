@@ -86,13 +86,8 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
                 throw new YWException("订单状态异常");
             }
             WxUserBell userbell = wxUserBellService.getById(user.getOpenId() + "-" + user.getPhone());
-            Message message = new Message(user.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
-                    , formid, "pages/mine/payment/payment", " 您的会员帐户余额有变动！", "该订单暂无编号", orders.getId(),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), orders.getContent(),
-                    "如有疑问请在小程序内联系客服人员！", null, null,
-                    null, null);
-            WxGUtil.snedM(message.toJson());
-            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(), JSON.toJSONString(formid));
+            String[] formIds = formid.split(",");
+            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(), JSON.toJSONString(formIds));
             /*wxUserService.sendWXGZHM(user.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
                     null, null
                     + orders.getId() + "&typ=" + orders.getTyp(),
