@@ -1,10 +1,8 @@
 package ops.school.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import ops.school.api.config.Server;
 import ops.school.api.dao.WxUserBellMapper;
-import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
@@ -19,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -141,9 +137,8 @@ public class TWxUserServiceImpl implements TWxUserService {
                 throw new YWException("手机号码解密失败");
             }
             // json串转换成map集合
-            Gson gson = new Gson();
-            Map<String,Object> map = new HashMap<>();
-            map = gson.fromJson(jsonString,map.getClass());
+            Map<String, Object> map;
+            map = JSON.parseObject(jsonString, HashMap.class);
             phoneNumber = (String) map.get("phoneNumber");
             if (wxUser != null){
                 // 如果手机号为空时，则需要添加手机号，并且生成wx_user_bell记录

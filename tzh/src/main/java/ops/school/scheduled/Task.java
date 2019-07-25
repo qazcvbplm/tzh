@@ -50,14 +50,11 @@ public class Task {
     public void task() {
         //订单流水号重置
         stringRedisTemplate.delete("SHOP_WATER_NUMBER");
+        cache.clear();
         ordersService.remove(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "待付款"));
         runOrdersService.remove(new QueryWrapper<RunOrders>().lambda().eq(RunOrders::getStatus, "待付款"));
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void clearCache() {
-        cache.clear();
-    }
 
     public String getYesterdayByCalendar() {
         Calendar calendar = Calendar.getInstance();
