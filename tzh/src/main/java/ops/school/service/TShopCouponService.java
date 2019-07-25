@@ -3,7 +3,21 @@ package ops.school.service;
 import ops.school.api.dto.project.ShopCouponDTO;
 import ops.school.api.entity.ShopCoupon;
 
+import java.util.List;
+
 public interface TShopCouponService {
+
+
+    /**
+     * @date:   2019/7/25 20:52
+     * @author: QinDaoFang
+     * @version:version
+     * @return: int
+     * @param   shopCouponList
+     * @Desc:   desc 绑定优惠券
+     */
+    int bindShopCoupon(List<ShopCoupon> shopCouponList);
+
 
     int bindShopCoupon(String couponId, String shopIds);
 

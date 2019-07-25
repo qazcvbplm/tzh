@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,10 @@ public class CouponController {
     @ResponseBody
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public ResponseObject add(HttpServletRequest request, Coupon coupon){
+        Assertions.notNull(coupon,coupon.getSchoolId());
+        coupon.setCreateId(coupon.getSchoolId());
+        coupon.setCreateTime(new Date());
+        coupon.setUpdateTime(new Date());
         tCouponService.insert(coupon);
         return new ResponseObject(true,"添加成功");
     }
@@ -111,7 +116,7 @@ public class CouponController {
     @ApiOperation(value="店铺绑定优惠券",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "bindShop", method = RequestMethod.POST)
-    public ResponseObject bindShop(@RequestParam String couponId, @RequestParam String shopIds){
+    public ResponseObject bindShop(@RequestParam String couponId, @RequestParam String shopIds) {
         int rs = tShopCouponService.bindShopCoupon(couponId,shopIds);
         if(rs == 1){
             return new ResponseObject(true,"店铺添加优惠券成功");

@@ -2,10 +2,12 @@ package ops.school.api.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -96,6 +98,9 @@ public class Coupon extends Base implements Serializable {
      * 是否删除（1.删除 0.未删除）
      */
     private Integer isDelete;
+
+    @TableField(exist = false)
+    private String shopIds;
 
     public Long getId() {
         return id;
@@ -231,6 +236,14 @@ public class Coupon extends Base implements Serializable {
 
     public void setSendEndTime(Date sendEndTime) {
         this.sendEndTime = sendEndTime;
+    }
+
+    public String getShopIds() {
+        return shopIds;
+    }
+
+    public void setShopIds(String shopIds) {
+        this.shopIds = shopIds;
     }
 
     @Override

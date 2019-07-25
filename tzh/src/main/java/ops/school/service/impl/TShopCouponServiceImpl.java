@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class TShopCouponServiceImpl implements TShopCouponService {
@@ -22,6 +23,22 @@ public class TShopCouponServiceImpl implements TShopCouponService {
     private ShopCouponMapper shopCouponMapper;
     @Autowired
     private CouponService couponService;
+
+
+    /**
+     * @date:   2019/7/25 20:46
+     * @author: QinDaoFang
+     * @version:version
+     * @return: int
+     * @param   shopCouponList
+     * @Desc:   desc
+     */
+    @Override
+    public int bindShopCoupon(List<ShopCoupon> shopCouponList) {
+        Assertions.notEmpty(shopCouponList);
+        Integer saveNum = shopCouponMapper.batchInsert(shopCouponList);
+        return saveNum;
+    }
 
     @Override
     public int bindShopCoupon(String couponId, String shopIds) {
