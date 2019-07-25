@@ -51,6 +51,9 @@
         <result column="send_get_flag" jdbcType="INTEGER" property="sendGetFlag"/>
         <result column="end_time" jdbcType="VARCHAR" property="endTime"/>
         <result column="resever_time" jdbcType="VARCHAR" property="reseverTime"/>
+        <result column="shop_accept_time" jdbcType="VARCHAR" property="shopAcceptTime"/>
+        <result column="pay_food_coupon" jdbcType="DECIMAL" property="payFoodCoupon"/>
+        <result column="after_discount_price" jdbcType="DECIMAL" property="afterDiscountPrice"/>
         <association property="complete" javaType="ops.school.api.entity.OrdersComplete">
             <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
             <result column="app_get_school_rate" jdbcType="DECIMAL" property="appGetSchoolRate"/>
@@ -122,7 +125,8 @@
         evaluate_flag,
         resever_time,
         shop_accept_time,
-        pay_food_coupon
+        pay_food_coupon,
+        after_discount_price
     </sql>
 
     <sql id="Table_Name">

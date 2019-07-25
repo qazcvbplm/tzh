@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface TSecondService {
 
-    List<SecondHand> fuzzyFind(String title, Integer page, Integer size);
+    List<SecondHand> fuzzyFind(String title, Integer isShow, Integer schoolId,
+                               String category, Integer page, Integer size);
 }

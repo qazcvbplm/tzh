@@ -74,8 +74,9 @@ public ResponseObject find(HttpServletRequest request, HttpServletResponse respo
 	 * @return
 	 */
 	@RequestMapping(value = "fuzzyFindSecondHand",method = RequestMethod.POST)
-	public ResponseObject fuzzyFindSecondHand(String title, Integer page,Integer size){
-		List<SecondHand> secondHands = tSecondService.fuzzyFind(title,page,size);
+	public ResponseObject fuzzyFindSecondHand(String title, Integer isShow, Integer schoolId,
+											  String category, Integer page,Integer size){
+		List<SecondHand> secondHands = tSecondService.fuzzyFind(title, isShow, schoolId, category, page, size);
 		return new ResponseObject(true,"查询成功").push("list",secondHands);
 	}
 }

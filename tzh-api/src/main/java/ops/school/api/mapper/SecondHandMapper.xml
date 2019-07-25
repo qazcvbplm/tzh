@@ -170,8 +170,14 @@
         <where>
             and is_show = 1
             and is_delete = 0
-            <if test="title != null">
+            <if test="title != null and title != ''">
                 and title like concat('%',#{title},'%')
+            </if>
+            <if test="schoolId != null">
+                and school_id = #{schoolId}
+            </if>
+            <if test="category != null and category != ''">
+                and category = #{category}
             </if>
         </where>
         limit #{page},#{size}

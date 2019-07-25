@@ -205,7 +205,7 @@ public class WxUserController {
     @RequestMapping(value = "findAllUserCoupons", method = RequestMethod.POST)
     public ResponseObject findAllUserCoupons(@RequestParam String wxUserId){
 
-        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findAllUserCoupons(Long.valueOf(wxUserId));
+        List<Map<String,Object>> wxUserCoupons = tWxUserCouponService.findAllUserCoupons(Long.valueOf(wxUserId));
         return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
     }
     /**

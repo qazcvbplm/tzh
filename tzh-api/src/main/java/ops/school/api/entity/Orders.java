@@ -300,8 +300,12 @@ public class Orders extends Base implements Serializable {
     @NotNull
     private BigDecimal payFoodCoupon;
 
+    private BigDecimal afterDiscountPrice;
+
+    @TableField(exist = false)
     private List<OrderProduct> op;
 
+    @TableField(exist = false)
     private OrdersComplete complete;
 
     @TableField(exist = false)
@@ -693,6 +697,14 @@ public class Orders extends Base implements Serializable {
         this.payFoodCoupon = payFoodCoupon;
     }
 
+    public BigDecimal getAfterDiscountPrice() {
+        return afterDiscountPrice;
+    }
+
+    public void setAfterDiscountPrice(BigDecimal afterDiscountPrice) {
+        this.afterDiscountPrice = afterDiscountPrice;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {return true;}
@@ -768,6 +780,7 @@ public class Orders extends Base implements Serializable {
                 ", shopAddress='" + shopAddress + '\'' +
                 ", shopPhone='" + shopPhone + '\'' +
                 ", openId='" + openId + '\'' +
+                ", wxUserPhone='" + wxUserPhone + '\'' +
                 ", addressName='" + addressName + '\'' +
                 ", addressPhone='" + addressPhone + '\'' +
                 ", addressDetail='" + addressDetail + '\'' +
@@ -806,8 +819,10 @@ public class Orders extends Base implements Serializable {
                 ", reseverTime='" + reseverTime + '\'' +
                 ", shopAcceptTime='" + shopAcceptTime + '\'' +
                 ", payFoodCoupon=" + payFoodCoupon +
+                ", afterDiscountPrice=" + afterDiscountPrice +
                 ", op=" + op +
                 ", complete=" + complete +
+                ", productOrderDTOS=" + productOrderDTOS +
                 '}';
     }
 

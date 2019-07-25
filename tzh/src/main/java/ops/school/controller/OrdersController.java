@@ -96,12 +96,12 @@ public class OrdersController {
 					  request.getRemoteAddr(), "", OrdersNotify.URL+"notify/takeout");
 			  Map<String,Object> map = MapUtil.objectToMap(msg,true);
 			  if(map.get("return_code").equals("SUCCESS")){
-				  Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
-						  , formid, "pages/mine/payment/payment", " 微信支付成功！", orders.getWaterNumber()+"", orders.getId(),
-						  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), list.get(0).getProductName(),
-						  "如有疑问请在小程序内联系客服人员！", null, null,
-						  null, null, null);
-				  WxGUtil.snedM(message.toJson());
+//				  Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
+//						  , formid, "pages/mine/payment/payment", " 微信支付成功！", orders.getWaterNumber()+"", orders.getId(),
+//						  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), list.get(0).getProductName(),
+//						  "如有疑问请在小程序内联系客服人员！", null, null,
+//						  null, null, null);
+//				  WxGUtil.snedM(message.toJson());
 				  stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(),JSON.toJSONString(formid));
 			  }
 			  return new ResponseObject(true, "ok").push("msg", msg);

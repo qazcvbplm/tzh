@@ -100,9 +100,9 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @date:
      * @author: Lee
      * @version:version
-     * @return: java.util.List
+     * @return: java.util.Map
      * @param   wxUserId 用户id
      * @Desc:   desc 根据用户id查询用户所有优惠券
      */
-    List<WxUserCoupon> findAllUserCoupons(Long wxUserId);
+    List<Map<String,Object>> findAllUserCoupons(Long wxUserId);
 }
