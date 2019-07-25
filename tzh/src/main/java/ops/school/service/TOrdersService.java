@@ -43,6 +43,7 @@ public interface TOrdersService {
 
     Map countKindsOrderByBIdAndTime(Integer buildId,String beginTime,String endTime);
 
+
     @Transactional
-    int orderSettlement(String orderId, boolean end);
+    int orderSettlement(String orderId);
 }

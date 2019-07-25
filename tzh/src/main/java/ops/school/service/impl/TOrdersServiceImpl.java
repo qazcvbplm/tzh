@@ -9,7 +9,6 @@ import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.project.OrderTempDTO;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.ProductOrderDTO;
-import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
@@ -20,7 +19,6 @@ import ops.school.api.service.*;
 import ops.school.api.util.*;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
-import ops.school.api.wxutil.WxGUtil;
 import ops.school.constants.NumConstants;
 import ops.school.constants.OrderConstants;
 import ops.school.constants.ProductConstants;
@@ -739,7 +737,7 @@ public class TOrdersServiceImpl implements TOrdersService {
 
     @Transactional
     @Override
-    public int orderSettlement(String orderId, boolean end) {
+    public int orderSettlement(String orderId) {
         Orders orders = ordersService.findById(orderId);
         // 配送员
         Sender sender = senderService.findById(orders.getSenderId());
@@ -794,7 +792,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             ordersComplete.setSchoolGetSenderRate(sender.getRate());
             // 配送员所得
             // 如果时楼上送达 --> 配送费 * （1-学校抽成）
-            if (end){
+            if (orders.getDestination() == 1) {
                 /**
                  * 配送员所得
                  */

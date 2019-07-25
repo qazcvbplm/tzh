@@ -56,6 +56,18 @@ spring:
     username: root
     validationQuery: SELECT 1 FROM DUAL
   redis:
-    host: 47.101.221.55
-    password: toor
+    host: www.chuyinkeji.cn
+    password: tzh1234567890
     port: 6379
+  rabbitmq:
+    host: www.chuyinkeji.cn
+    port: 5672
+    username: root
+    password: tzh1234567890
+    publisher-confirms: true
+    publisher-returns: true
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual

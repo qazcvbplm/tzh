@@ -1,32 +1,24 @@
 package ops.school.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.dto.redis.SchoolAddMoneyDTO;
 import ops.school.api.dto.redis.SenderAddMoneyDTO;
 import ops.school.api.dto.redis.WxUserAddSourceDTO;
-import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
-import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
-import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
-import ops.school.api.wx.towallet.WeChatPayUtil;
-import ops.school.api.wxutil.WxGUtil;
+import ops.school.config.RabbitMQConfig;
 import ops.school.service.TSenderService;
 import ops.school.util.WxMessageUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,23 +39,12 @@ public class TSenderServiceImpl implements TSenderService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
-    private ShopService shopService;
-    @Autowired
     private RunOrdersService runOrdersService;
-    @Autowired
-    private OrderCompleteService orderCompleteService;
-    @Autowired
-    private TxLogService txLogService;
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
-    private OrderProductService orderProductService;
-    @Autowired
-    private WxUserCouponService wxUserCouponService;
-    @Autowired
-    private ShopFullCutService shopFullCutService;
-    @Autowired
-    private CouponService couponService;
+    private RabbitTemplate rabbitTemplate;
+
 
     @Override
     public List<Orders> findorderbydjs(Integer senderId, Integer page, Integer size, String status) {
@@ -175,6 +156,8 @@ public class TSenderServiceImpl implements TSenderService {
             // 删除redis缓存
             stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
         }
+        //结算
+        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_ORDERS_COMPLETE, orders.getId());
     }
 
     @Override

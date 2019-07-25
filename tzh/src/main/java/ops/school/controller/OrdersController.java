@@ -2,12 +2,9 @@ package ops.school.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.vdurmont.emoji.EmojiManager;
-import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.dto.project.ProductOrderDTO;
-import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.School;
@@ -19,20 +16,19 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
-import ops.school.api.wxutil.WxGUtil;
 import ops.school.service.TOrdersService;
 import ops.school.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Api(tags="订单模块")
@@ -220,12 +216,7 @@ public class OrdersController {
 		     }
 	}
 
-	@RequestMapping(value = "orderSettlement",method = RequestMethod.POST)
-	public ResponseObject orderSettlement(@RequestParam String orderId, @RequestParam boolean end){
 
-		int rs = tOrdersService.orderSettlement(orderId,end);
-		return new ResponseObject(true,"结算成功");
-	}
 	/////////////////////////////////////////////////////////////android/////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////android/////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////android/////////////////////////////////////////////////////////////////
