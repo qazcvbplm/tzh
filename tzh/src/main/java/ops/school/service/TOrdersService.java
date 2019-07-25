@@ -42,4 +42,7 @@ public interface TOrdersService {
     ShopTj shopstatistics(Integer shopId, String beginTime, String endTime);
 
     Map countKindsOrderByBIdAndTime(Integer buildId,String beginTime,String endTime);
+
+    @Transactional
+    int orderSettlement(String orderId, boolean end);
 }

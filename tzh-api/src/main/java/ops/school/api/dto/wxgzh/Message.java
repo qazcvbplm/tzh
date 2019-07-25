@@ -46,22 +46,11 @@ public class Message {
         JSONObject minprogram = null;
         output.put("touser", this.toUser);
         output.put("template_id", this.templateId);
-        if (formId != null) {
-            keyword = new JSONObject();
-            keyword.put("value", formId);
-            keyword.put("color", "#173177");
-            data.put("form_id", keyword);
-        }
-        if (emphasisKeyword != null) {
-            keyword = new JSONObject();
-            keyword.put("value", emphasisKeyword);
-            keyword.put("color", "#173177");
-            data.put("emphasis_keyword", keyword);
-        }
+        output.put("form_id",formId);
+        output.put("emphasis_keyword",emphasisKeyword);
         if (dataKeyWord1 != null) {
             keyword = new JSONObject();
             keyword.put("value", dataKeyWord1);
-            keyword.put("color", "#173177");
             data.put("keyword1", keyword);
         }
         if (dataKeyWord2 != null) {
@@ -117,6 +106,7 @@ public class Message {
             minprogram = new JSONObject();
             output.put("page", minprogram);
         }
+        System.out.println(output);
         return output;
     }
 
