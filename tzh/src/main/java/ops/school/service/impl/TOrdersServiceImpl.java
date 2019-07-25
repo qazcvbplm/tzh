@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dto.ShopTj;
-import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.OrderTempDTO;
+import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
@@ -17,26 +20,20 @@ import ops.school.api.util.*;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.api.wxutil.WxGUtil;
-import ops.school.constants.CouponConstants;
 import ops.school.constants.NumConstants;
 import ops.school.constants.OrderConstants;
-import ops.school.api.enums.PublicErrorEnums;
-import ops.school.api.enums.ResponseViewEnums;
-import ops.school.api.exception.Assertions;
 import ops.school.constants.ProductConstants;
 import ops.school.service.TCouponService;
 import ops.school.service.TOrdersService;
+import ops.school.service.TShopFullCutService;
 import ops.school.service.TWxUserCouponService;
 import ops.school.util.WxMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ops.school.service.TShopFullCutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import springfox.documentation.spring.web.json.Json;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -647,23 +644,14 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Transactional
     @Override
     public int shopAcceptOrderById(String orderId) {
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Orders::getId,orderId);
-        Orders orders = ordersService.getOne(queryWrapper);
-//        Orders orders = ordersService.findById(orderId);
+        Orders orders = ordersService.getById(orderId);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        synchronized (orders.getShopId()) {
             Orders update = new Orders();
             update.setShopId(orders.getShopId());
             update.setId(orderId);
-            System.out.println("创建时间为："+df.format(orders.getCreateTime()).substring(0, 10) + "%");
             update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
-            System.out.println("------线程测试开始------");
-            synchronized (update.getShopId()) {
-                int water = ordersService.waterNumber(update);
-                update.setWaterNumber(water + 1);
-            }
-            System.out.println("------线程测试结束------");
+        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
+        update.setWaterNumber(water + 1);
             int res = ordersService.shopAcceptOrderById(update);
             if (res == 1) {
                 if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
@@ -687,7 +675,6 @@ public class TOrdersServiceImpl implements TOrdersService {
                 return orders.getShopId();
             }
             return 0;
-        }
     }
 
 
