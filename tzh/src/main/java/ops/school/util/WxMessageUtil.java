@@ -1,0 +1,82 @@
+package ops.school.util;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import ops.school.api.dto.wxgzh.Message;
+import ops.school.api.entity.OrderProduct;
+import ops.school.api.entity.Orders;
+import ops.school.api.service.OrderProductService;
+import ops.school.api.wxutil.WxGUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+public class WxMessageUtil {
+
+    @Autowired
+    private static OrderProductService orderProductService;
+
+    private static final String templateId = "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o";
+
+    // 商家接手跳转页面/配送员已接手
+    private static final String acceptOrder = "pages/order/orderDetail/orderDetail?orderId=";
+
+    // 跑腿订单/外卖订单完成
+    private static final String orderFinish = "pages/mine/integral/integral";
+
+    // 商家接手备注
+    private static final String shopAcceptRemark = "商家正火速备餐中，请耐心等待";
+
+    // 配送员接手备注（含跑腿）
+    private static final String senderAcceptRemark = "配送员正火速配送中，请耐心等待";
+
+    // 配送员送达备注(楼上)
+    private static final String senderOrderFinishRemarkTop = "订单已送达到寝，并获得X的积分奖励，请注意查收";
+
+    // 配送员送达备注(楼下)
+    private static final String senderOrderFinishRemarkDown = "订单已放置楼下，请及时下楼自取。系统返还X元粮票，并获得X的积分奖励，请注意查收";
+
+    // 跑腿订单送达
+    private static final String runOrderFinishRemark = "订单已完成，并获得X的积分奖励，请注意查收";
+
+    // 自取或堂食自动完成
+    private static final String SelfTakingAndTSFinishRemark = "订单已自动完成，并获得X的积分奖励，请注意查收";
+
+    public static void wxSendMsg(Orders orders, String openid, String formid){
+
+        Message message = new Message();
+        message.setToUser(openid);
+        message.setTemplateId(templateId);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (orders.getTyp().equals("外卖订单")){
+           /* QueryWrapper<OrderProduct> query = new QueryWrapper<>();
+            query.lambda().eq(OrderProduct::getOrderId,orders.getId());
+            List<OrderProduct> list = orderProductService.list(query);*/
+            System.out.println("订单状态:"+orders.getStatus());
+            boolean rs = orders.getStatus().equals("待接手");
+            System.out.println(rs);
+            if (rs){
+                // 订单状态
+                message.setDataKeyWord1("商家已接手");
+                // 订单流水号
+                message.setDataKeyWord2(orders.getWaterNumber()+"");
+                // 订单编号
+                message.setDataKeyWord3(orders.getId());
+                // 更新时间
+                message.setDataKeyWord4(df.format(new Date()));
+                // 订单内容
+                message.setDataKeyWord5("日式料理");
+                // 订单备注
+                message.setDataKeyWord6(shopAcceptRemark);
+                // 接手订单跳转页面
+                message.setMinPath(acceptOrder + orders.getId() + "&typ=" + orders.getTyp());
+                // formid
+                message.setFormId(formid);
+                // 放大内容
+                message.setEmphasisKeyword("keyword1.DATA");
+                WxGUtil.snedM(message.toJson());
+            }
+        }
+    }
+}

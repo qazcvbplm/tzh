@@ -6,9 +6,12 @@ import ops.school.api.entity.TxLog;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TxLogMapper extends BaseMapper<TxLog> {
 
     @Select("select * from tx_log")
     List<TxLog> test(Page<TxLog> txLogPage);
+
+    int findTxLogs(Map<String,Object> map);
 }

@@ -36,4 +36,6 @@ public interface WxUserBellMapper extends BaseMapper<WxUserBell> {
 
     int updatePhone(Map<String,Object> map);
 
+    int txUpdate(Map<String,Object> map);
+
 }

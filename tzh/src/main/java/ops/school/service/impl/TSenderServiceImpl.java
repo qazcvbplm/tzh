@@ -100,8 +100,7 @@ public class TSenderServiceImpl implements TSenderService {
                     formid, "pages/order/orderDetail/orderDetail?orderId="
                     + orders.getId() + "&typ=" + orders.getTyp(),
                     "您的订单已被配送员接手！",orders.getWaterNumber()+"", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    orderProduct.getProductName(), " 配送员正火速配送中，请耐心等待！", null, null, null, null,
-                    null);
+                    orderProduct.getProductName(), "配送员正火速配送中，请耐心等待！", null, null, null, null);
             WxGUtil.snedM(message.toJson());
             /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
                     "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
@@ -312,7 +311,6 @@ public class TSenderServiceImpl implements TSenderService {
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
         ordersComplete.setShopGetTotal(schoolGetTotal);
         orderCompleteService.save(ordersComplete);
-
         redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
         stringRedisTemplate.convertAndSend(Server.PRODUCTADD, orderId);
         String formId = JSON.parseObject(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
@@ -325,11 +323,11 @@ public class TSenderServiceImpl implements TSenderService {
                     formId, "pages/mine/integral/integral",
                     null, orders.getWaterNumber()+"",orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),orderProduct.getProductName()
                     , "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！", null, null, null,
-                    null,null);
+                    null);
             if (orders.getDestination() == 1) {
-                message.setDataFirst("您的订单已送达到寝。");
+//                message.setDataFirst("您的订单已送达到寝。");
             } else {
-                message.setDataFirst("您的订单已送达楼下，请下楼自取。系统已返还" + returnPrice + "元至您粮票余额内，请注意查收！");
+//                message.setDataFirst("您的订单已送达楼下，请下楼自取。系统已返还" + returnPrice + "元至您粮票余额内，请注意查收！");
             }
             WxGUtil.snedM(message.toJson());
         }
@@ -364,8 +362,7 @@ public class TSenderServiceImpl implements TSenderService {
                     formid, "pages/order/orderDetail/orderDetail?orderId="
                     + orders.getId() + "&typ=" + orders.getTyp(),
                     "您的订单已被配送员接手！","该订单暂无编号", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    orders.getContent(), " 配送员正火速配送中，请耐心等待！", null, null, null, null,
-                    null);
+                    orders.getContent(), " 配送员正火速配送中，请耐心等待！", null, null, null, null);
             WxGUtil.snedM(message.toJson());
             /*wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
                     "dVHcAp-Bc2ATpgYe09-5D7n50hjLshju8Zl6GGoyB7M",
@@ -405,7 +402,7 @@ public class TSenderServiceImpl implements TSenderService {
                     formid, "pages/mine/integral/integral",
                     "您的跑腿订单已经完成!","该订单暂无编号", orderId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
                     orders.getContent(), "成功获得" + orders.getTotalPrice().intValue() + "积分，可以前往积分商城兑换哟！", null, null, null,
-                    null,null);
+                    null);
             WxGUtil.snedM(message.toJson());
            /* wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
                     "8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",

@@ -46,7 +46,7 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
     }
 
     @Override
-    public List<WxUserCoupon> findAllUserCoupons(Long wxUserId) {
+    public List<Map<String,Object>> findAllUserCoupons(Long wxUserId) {
         return wxUserCouponMapper.findAllUserCoupons(wxUserId);
     }
 

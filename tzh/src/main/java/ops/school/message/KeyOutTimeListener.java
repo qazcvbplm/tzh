@@ -43,12 +43,12 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
                 tSenderService.end(key.toString().split(",")[1], true);
 				   stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
 				WxUser wxUser = wxUserService.findById(orders.getOpenId());
-				wxUserService.sendWXGZHM(wxUser.getPhone(), new ops.school.api.dto.wxgzh.Message(null,
-						"8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
-						null, null,
-						"您的" + orders.getTyp() + "已经自动完成!", orders.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-						null, null, null, null, null, null,
-						null, "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！"));
+//				wxUserService.sendWXGZHM(wxUser.getPhone(), new ops.school.api.dto.wxgzh.Message(null,
+//						"8Qy7KQRt2upGjwmhp7yYaR2ycfKkXNI8gqRvGBnovsk",
+//						null, null,
+//						"您的" + orders.getTyp() + "已经自动完成!", orders.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+//						null, null, null, null, null, null,
+//						null, "成功获得" + orders.getPayPrice().intValue() + "积分，可以前往积分商城兑换哟！"));
 
 			} catch (Exception e) {
 				LoggerUtil.log("堂食完成失败:"+e.getMessage());

@@ -118,14 +118,14 @@ public class TWxUserServiceImpl implements TWxUserService {
 
             WxUserBell userbell = wxUserBellService.getById(wxUser.getOpenId() + "-" + wxUser.getPhone());
             //发送模板
-            wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
-                    "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
-                    school.getWxAppId(),
-                    "pages/mine/payment/payment",
-                    "暂无",
-                    "+" + log.getPay().add(log.getSend()),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
-                    , "充值", userbell.getMoney() + "", null, null, null, null, null, "如有疑问请在小程序内联系客服人员！"));
+//            wxUserService.sendWXGZHM(wxUser.getPhone(), new Message(null,
+//                    "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
+//                    school.getWxAppId(),
+//                    "pages/mine/payment/payment",
+//                    "暂无",
+//                    "+" + log.getPay().add(log.getSend()),
+//                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+//                    , "充值", userbell.getMoney() + "", null, null, null, null, null, "如有疑问请在小程序内联系客服人员！"));
         }
     }
 
@@ -180,6 +180,7 @@ public class TWxUserServiceImpl implements TWxUserService {
                                 throw new YWException("修改用户手机号失败");
                             }
                         }
+
                         // 修改用户手机号
                         wxUser.setPhone(phoneNumber);
                         wxUserService.updateById(wxUser);

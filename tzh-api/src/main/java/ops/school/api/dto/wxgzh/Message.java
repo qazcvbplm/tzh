@@ -8,16 +8,13 @@ public class Message {
 
     private String secret;
 
-
     private String toUser;
 
     private String templateId;
 
-    private String minAppId;
+    private String formId;
 
     private String minPath;
-
-    private String dataFirst;
 
     private String dataKeyWord1;
 
@@ -37,7 +34,10 @@ public class Message {
 
     private String dataKeyWord9;
 
-    private String dataRemark;
+    private String emphasisKeyword;
+
+    public Message() {
+    }
 
     public JSONObject toJson() {
         JSONObject output = new JSONObject();
@@ -46,17 +46,17 @@ public class Message {
         JSONObject minprogram = null;
         output.put("touser", this.toUser);
         output.put("template_id", this.templateId);
-        if (dataFirst != null) {
+        if (formId != null) {
             keyword = new JSONObject();
-            keyword.put("value", dataFirst);
+            keyword.put("value", formId);
             keyword.put("color", "#173177");
-            data.put("first", keyword);
+            data.put("form_id", keyword);
         }
-        if (dataRemark != null) {
+        if (emphasisKeyword != null) {
             keyword = new JSONObject();
-            keyword.put("value", dataRemark);
+            keyword.put("value", emphasisKeyword);
             keyword.put("color", "#173177");
-            data.put("remark", keyword);
+            data.put("emphasis_keyword", keyword);
         }
         if (dataKeyWord1 != null) {
             keyword = new JSONObject();
@@ -113,31 +113,11 @@ public class Message {
             data.put("keyword9", keyword);
         }
         output.put("data", data);
-        if (minAppId != null) {
+        if (minPath != null) {
             minprogram = new JSONObject();
-            minprogram.put("appid", minAppId);
-            minprogram.put("path", minPath);
-            output.put("miniprogram", minprogram);
+            output.put("page", minprogram);
         }
         return output;
-    }
-
-    public Message(String toUser, String templateId, String minAppId, String minPath, String dataFirst, String dataKeyWord1, String dataKeyWord2, String dataKeyWord3, String dataKeyWord4, String dataKeyWord5, String dataKeyWord6, String dataKeyWord7, String dataKeyWord8, String dataKeyWord9, String dataRemark) {
-        this.toUser = toUser;
-        this.templateId = templateId;
-        this.minAppId = minAppId;
-        this.minPath = minPath;
-        this.dataFirst = dataFirst;
-        this.dataKeyWord1 = dataKeyWord1;
-        this.dataKeyWord2 = dataKeyWord2;
-        this.dataKeyWord3 = dataKeyWord3;
-        this.dataKeyWord4 = dataKeyWord4;
-        this.dataKeyWord5 = dataKeyWord5;
-        this.dataKeyWord6 = dataKeyWord6;
-        this.dataKeyWord7 = dataKeyWord7;
-        this.dataKeyWord8 = dataKeyWord8;
-        this.dataKeyWord9 = dataKeyWord9;
-        this.dataRemark = dataRemark;
     }
 
     public String getAppId() {
@@ -172,12 +152,12 @@ public class Message {
         this.templateId = templateId;
     }
 
-    public String getMinAppId() {
-        return minAppId;
+    public String getFormId() {
+        return formId;
     }
 
-    public void setMinAppId(String minAppId) {
-        this.minAppId = minAppId;
+    public void setFormId(String formId) {
+        this.formId = formId;
     }
 
     public String getMinPath() {
@@ -186,14 +166,6 @@ public class Message {
 
     public void setMinPath(String minPath) {
         this.minPath = minPath;
-    }
-
-    public String getDataFirst() {
-        return dataFirst;
-    }
-
-    public void setDataFirst(String dataFirst) {
-        this.dataFirst = dataFirst;
     }
 
     public String getDataKeyWord1() {
@@ -268,11 +240,28 @@ public class Message {
         this.dataKeyWord9 = dataKeyWord9;
     }
 
-    public String getDataRemark() {
-        return dataRemark;
+    public String getEmphasisKeyword() {
+        return emphasisKeyword;
     }
 
-    public void setDataRemark(String dataRemark) {
-        this.dataRemark = dataRemark;
+    public void setEmphasisKeyword(String emphasisKeyword) {
+        this.emphasisKeyword = emphasisKeyword;
+    }
+
+    public Message(String toUser, String templateId, String formId, String minPath, String dataKeyWord1, String dataKeyWord2, String dataKeyWord3, String dataKeyWord4, String dataKeyWord5, String dataKeyWord6, String dataKeyWord7, String dataKeyWord8, String dataKeyWord9, String emphasisKeyword) {
+        this.toUser = toUser;
+        this.templateId = templateId;
+        this.formId = formId;
+        this.minPath = minPath;
+        this.dataKeyWord1 = dataKeyWord1;
+        this.dataKeyWord2 = dataKeyWord2;
+        this.dataKeyWord3 = dataKeyWord3;
+        this.dataKeyWord4 = dataKeyWord4;
+        this.dataKeyWord5 = dataKeyWord5;
+        this.dataKeyWord6 = dataKeyWord6;
+        this.dataKeyWord7 = dataKeyWord7;
+        this.dataKeyWord8 = dataKeyWord8;
+        this.dataKeyWord9 = dataKeyWord9;
+        this.emphasisKeyword = emphasisKeyword;
     }
 }

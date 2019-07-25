@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import ops.school.api.entity.WxUserCoupon;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TWxUserCouponService {
 
@@ -41,11 +42,11 @@ public interface TWxUserCouponService {
      * @date:
      * @author: Lee
      * @version:version
-     * @return: java.util.List
+     * @return: java.util.Map
      * @param   wxUserId 用户id
      * @Desc:   desc 根据用户id查询用户所有优惠券
      */
-    List<WxUserCoupon> findAllUserCoupons(Long wxUserId);
+    List<Map<String,Object>> findAllUserCoupons(Long wxUserId);
 
     /**
      * @date:   2019/7/25 15:29
@@ -57,4 +58,5 @@ public interface TWxUserCouponService {
      * @Desc:   desc 分页查询用户所有的优惠券（isInvalid不传查所有，传0查有效）
      */
     IPage<WxUserCoupon> pageFindALLCouponsByUserId(Long userId, WxUserCoupon wxUserCoupon);
+
 }

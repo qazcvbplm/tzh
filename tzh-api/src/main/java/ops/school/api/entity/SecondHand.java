@@ -40,6 +40,7 @@ public class SecondHand extends Base {
 
     private String createTime;
 
+    private String schoolName;
 
     public String getCreateTime() {
         return createTime;
@@ -47,6 +48,14 @@ public class SecondHand extends Base {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public String getSchoolName() {
+        return schoolName;
+    }
+
+    public void setSchoolName(String schoolName) {
+        this.schoolName = schoolName;
     }
 
     public Integer getId() {

@@ -7,14 +7,10 @@ import com.github.qcloudsms.httpclient.HTTPException;
 import ops.school.api.dto.RunOrdersTj;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
-import ops.school.api.util.LoggerUtil;
-import ops.school.api.util.RedisUtil;
-import ops.school.api.util.SpringUtil;
-import ops.school.api.util.Util;
+import ops.school.api.util.*;
 import ops.school.controller.SignController;
 import ops.school.service.TCouponService;
 import ops.school.service.TWxUserCouponService;
-import ops.school.api.util.TimeUtilS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -50,8 +46,10 @@ public class Task {
     private TWxUserCouponService tWxUserCouponService;
 
     //0 0 10,14,16 * * ?   每天上午10点，下午2点，4点
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void task() {
+        //订单流水号重置
+        stringRedisTemplate.delete("SHOP_WATER_NUMBER");
         ordersService.remove(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "待付款"));
         runOrdersService.remove(new QueryWrapper<RunOrders>().lambda().eq(RunOrders::getStatus, "待付款"));
     }

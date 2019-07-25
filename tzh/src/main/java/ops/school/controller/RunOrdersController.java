@@ -89,7 +89,7 @@ public class RunOrdersController {
 						 , formid, "pages/mine/payment/payment", " 微信支付成功！", "该订单暂无编号", orders.getId(),
 						 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), orders.getContent(),
 						 "如有疑问请在小程序内联系客服人员！", null, null,
-						 null, null, null);
+						 null, null);
 				 WxGUtil.snedM(message.toJson());
 				 stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(), JSON.toJSONString(formid));
 			 }

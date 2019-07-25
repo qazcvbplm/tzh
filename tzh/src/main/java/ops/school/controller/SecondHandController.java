@@ -11,13 +11,11 @@ import ops.school.api.service.SecondHandService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.constants.NumConstants;
+import ops.school.service.TSecondService;
 import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,9 +27,10 @@ import java.util.List;
 @RequestMapping("ops/secondhand")
 public class SecondHandController {
 
-
     @Autowired
 	private SecondHandService secondHandService;
+    @Autowired
+	private TSecondService tSecondService;
 	
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
@@ -65,5 +64,19 @@ public ResponseObject find(HttpServletRequest request, HttpServletResponse respo
 			return new ResponseObject(false, "更新失败");
 		}
 
+	}
+
+	/**
+	 * @author Lee
+	 * @param title 二手商品名称
+	 * @param page 分页 page
+	 * @param size 分页 size
+	 * @return
+	 */
+	@RequestMapping(value = "fuzzyFindSecondHand",method = RequestMethod.POST)
+	public ResponseObject fuzzyFindSecondHand(String title, Integer isShow, Integer schoolId,
+											  String category, Integer page,Integer size){
+		List<SecondHand> secondHands = tSecondService.fuzzyFind(title, isShow, schoolId, category, page, size);
+		return new ResponseObject(true,"查询成功").push("list",secondHands);
 	}
 }
