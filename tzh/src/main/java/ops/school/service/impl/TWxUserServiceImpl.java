@@ -180,6 +180,7 @@ public class TWxUserServiceImpl implements TWxUserService {
                                 throw new YWException("修改用户手机号失败");
                             }
                         }
+
                         // 修改用户手机号
                         wxUser.setPhone(phoneNumber);
                         wxUserService.updateById(wxUser);

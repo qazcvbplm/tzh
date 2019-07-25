@@ -634,6 +634,7 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Transactional
     @Override
     public int shopAcceptOrderById(String orderId) {
+
         Orders orders = ordersService.findById(orderId);
         synchronized (orders.getShopId()) {
             Orders update = new Orders();
