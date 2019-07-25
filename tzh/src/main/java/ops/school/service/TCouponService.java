@@ -1,5 +1,6 @@
 package ops.school.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.Coupon;
 import ops.school.api.util.ResponseObject;
@@ -13,7 +14,12 @@ public interface TCouponService {
 
     Integer count(Long schoolId, Integer couponType);
 
-    List<Coupon> findCoupons(Long schoolId, Integer couponType, int page, int size);
+    /**
+     * @author: QinDaoFang
+     * @date:   2019/7/25 16:03 
+     * @desc:   
+     */
+    IPage<Coupon> findCoupons(Long schoolId, Integer couponType, int page, int size);
 
     int insert(Coupon coupon);
 

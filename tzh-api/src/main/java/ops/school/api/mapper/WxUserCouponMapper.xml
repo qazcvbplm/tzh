@@ -11,6 +11,26 @@
     <result column="use_time" property="useTime" jdbcType="TIMESTAMP" />
     <result column="failure_time" property="failureTime" jdbcType="TIMESTAMP" />
     <result column="is_invalid" property="isInvalid" jdbcType="INTEGER" />
+    <collection property="coupon" ofType="ops.school.api.entity.Coupon">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="school_id" property="schoolId" jdbcType="BIGINT"/>
+        <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
+        <result column="coupon_desc" property="couponDesc" jdbcType="VARCHAR"/>
+        <result column="full_amount" property="fullAmount" jdbcType="INTEGER"/>
+        <result column="cut_amount" property="cutAmount" jdbcType="INTEGER"/>
+        <result column="coupon_type" property="couponType" jdbcType="INTEGER"/>
+        <result column="yes_show_index" property="yesShowIndex" jdbcType="INTEGER"/>
+        <result column="send_begin_time" property="sendBeginTime" jdbcType="TIMESTAMP"/>
+        <result column="send_end_time" property="sendEndTime" jdbcType="TIMESTAMP"/>
+        <result column="effective_days" property="effectiveDays" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_id" property="createId" jdbcType="BIGINT"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+        <result column="is_invalid" property="isInvalid" jdbcType="INTEGER"/>
+        <result column="is_delete" property="isDelete" jdbcType="INTEGER"/>
+    </collection>
+
 </resultMap>
 
     <sql id="Base_Column_List" >
@@ -23,6 +43,36 @@
         use_time,
         failure_time,
         is_invalid
+    </sql>
+
+    <sql id="Rel_Column_List" >
+        wx_user_coupon.id,
+        wx_user_coupon.wx_user_id,
+        wx_user_coupon.coupon_id,
+        wx_user_coupon.shop_id,
+        wx_user_coupon.coupon_type,
+        wx_user_coupon.get_time,
+        wx_user_coupon.use_time,
+        wx_user_coupon.failure_time,
+        wx_user_coupon.is_invalid,
+
+        coupon.id,
+        coupon.school_id,
+        coupon.coupon_name,
+        coupon.coupon_desc,
+        coupon.full_amount,
+        coupon.cut_amount,
+        coupon.coupon_type,
+        coupon.yes_show_index,
+        coupon.send_begin_time,
+        coupon.send_end_time,
+        coupon.effective_days,
+        coupon.create_time,
+        coupon.create_id,
+        coupon.update_time,
+        coupon.update_id,
+        coupon.is_invalid,
+        coupon.is_delete
     </sql>
 
     <sql id="Table_Name">
@@ -148,4 +198,17 @@
 	    order by uc.failure_time desc
     </select>
 
+
+    <!--CreatBy Fang Time:2019/7/25 15:33 | 分页查询用户所有的优惠券（isInvalid不传查所有，传0查有效） -->
+    <select id="pageFindALLCouponsByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM coupon,wx_user_coupon
+        WHERE wx_user_coupon.wx_user_id = #{userId}
+        AND wx_user_coupon.coupon_id = coupon.id
+        <if test="wxUserCoupon.isInvalid != null">
+            AND wx_user_coupon.is_invalid = #{wxUserCoupon.isInvalid}
+        </if>
+        ORDER BY wx_user_coupon.get_time DESC,wx_user_coupon.failure_time ASC
+        LIMIT #{wxUserCoupon.page},#{wxUserCoupon.size}
+    </select>
 </mapper>

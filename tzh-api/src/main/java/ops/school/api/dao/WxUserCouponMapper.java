@@ -105,4 +105,15 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @Desc:   desc 根据用户id查询用户所有优惠券
      */
     List<WxUserCoupon> findAllUserCoupons(Long wxUserId);
+
+    /**
+     * @date:   2019/7/25 15:32
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.WxUserCoupon>
+     * @param   userId
+     * @param   wxUserCoupon
+     * @Desc:   desc 分页查询用户所有的优惠券（isInvalid不传查所有，传0查有效）
+     */
+    List<WxUserCoupon> pageFindALLCouponsByUserId(@Param("userId") Long userId, @Param("wxUserCoupon") WxUserCoupon wxUserCoupon);
 }

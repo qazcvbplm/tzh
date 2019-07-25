@@ -1,6 +1,8 @@
 package ops.school.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Coupon;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
@@ -33,6 +35,8 @@ public class CouponController {
     @Autowired
     private TShopCouponService tShopCouponService;
 
+
+
     /**
      * 学校首页优惠券查询
      * @author Lee
@@ -40,6 +44,7 @@ public class CouponController {
      * @param couponType 优惠券类型
      * @return ops.school.api.util.ResponseObject
      */
+    @ApiOperation(value="学校首页优惠券查询",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "findByIndex", method = RequestMethod.POST)
     public ResponseObject find(@RequestParam String schoolId, @RequestParam Integer couponType) {
@@ -51,19 +56,20 @@ public class CouponController {
     /**
      * 通过学校id和优惠券类型查询优惠券列表
      * @author Lee
-     * @param schoolId 学校id
-     * @param couponType 优惠券类型
-     * @param page
-     * @param size
      * @return ops.school.api.util.ResponseObject
      */
+    /**
+     * @author: QinDaoFang
+     * @date:   2019/7/25 16:02 
+     * @desc:   
+     */
+    @ApiOperation(value="通过学校id和优惠券类型查询优惠券列表",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "findCoupons", method = RequestMethod.POST)
-    public ResponseObject findCoupons(@RequestParam String schoolId, @RequestParam Integer couponType, int page, int size){
-
-        List<Coupon> coupons = tCouponService.findCoupons(Long.valueOf(schoolId),couponType,page,size);
-        Integer count = tCouponService.count(Long.valueOf(schoolId),couponType);
-        return new ResponseObject(true,"查询成功").push("list",coupons).push("total",count);
+    public ResponseObject findCoupons(Coupon coupon){
+        Assertions.notNull(coupon,coupon.getSchoolId());
+        IPage<Coupon> coupons = tCouponService.findCoupons(coupon.getSchoolId(),coupon.getCouponType(),coupon.getPage(),coupon.getSize());
+        return new ResponseObject(true,"查询成功").push("list",coupons.getRecords()).push("total",coupons.getTotal());
     }
 
     /**
@@ -73,6 +79,7 @@ public class CouponController {
      * @param coupon 前端数据封装成实体
      * @return ops.school.api.util.ResponseObject
      */
+    @ApiOperation(value="新增优惠券",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public ResponseObject add(HttpServletRequest request, Coupon coupon){
@@ -86,6 +93,7 @@ public class CouponController {
      * @param coupon 封装成coupon实体
      * @return
      */
+    @ApiOperation(value="更新优惠券",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ResponseObject update(Coupon coupon){
@@ -100,6 +108,7 @@ public class CouponController {
      * @param shopIds 需要绑定的店铺id（字符串,拼接）
      * @return
      */
+    @ApiOperation(value="店铺绑定优惠券",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "bindShop", method = RequestMethod.POST)
     public ResponseObject bindShop(@RequestParam String couponId, @RequestParam String shopIds){
@@ -121,6 +130,7 @@ public class CouponController {
      * @param   couponId
      * @Desc:   desc 根据用户id，学校id，店铺id，用户优惠券id，让用户获取优惠券
      */
+    @ApiOperation(value="根据用户id，学校id，店铺id，用户优惠券id，让用户获取优惠券",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "getCoupons", method = RequestMethod.POST)
     public ResponseObject userGetCoupons(Long userId,Long schoolId,Long shopId,Long couponId){

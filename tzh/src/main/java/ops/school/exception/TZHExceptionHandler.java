@@ -20,17 +20,19 @@ public class TZHExceptionHandler {
 
 
     private StringWriter stringWriter;
-	  /**
+
+    /**
      * 全局异常捕捉处理
+     *
      * @param ex
      * @return
      */
 
-      @ExceptionHandler(DisplayException.class)
-      public ResponseObject errorHandlerDisPlay(DisplayException ex) {
-          logger.error(ex.getMessage(),ex);
-          return new ResponseObject(false, ex.getMessage());
-      }
+    @ExceptionHandler(DisplayException.class)
+    public ResponseObject errorHandlerDisPlay(DisplayException ex) {
+        logger.error(ex.getMessage(), ex);
+        return new ResponseObject(false, ex.getMessage());
+    }
 
     @ExceptionHandler(YWException.class)
     public ResponseObject errorHandlerYW(YWException ex) {
@@ -44,8 +46,7 @@ public class TZHExceptionHandler {
         LoggerUtil.log(out.toString());
         if (ex instanceof YWException) {
             return new ResponseObject(false, ex.getMessage());
-        }
-        else{
+        } else {
             return new ResponseObject(false, "服务器被外星人攻击了！");
         }
     }
@@ -72,13 +73,13 @@ public class TZHExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseObject handlerNoFoundException(Exception e) {
         // logger.error(e.getMessage(), e);
-        return new ResponseObject(false,"页面被外星人带走了！");
+        return new ResponseObject(false, "页面被外星人带走了！");
     }
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseObject handleException(Exception e){
-        return new ResponseObject(false,"服务器被外星人攻击了！");
+    public ResponseObject handleException(Exception e) {
+        return new ResponseObject(false, "服务器被外星人攻击了！");
     }
-    
+
 }

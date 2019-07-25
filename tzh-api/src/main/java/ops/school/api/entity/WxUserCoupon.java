@@ -7,6 +7,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 /**
@@ -14,7 +15,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
  * @author 
  */
 @Table(name="wx_user_coupon")
-public class WxUserCoupon implements Serializable {
+public class WxUserCoupon extends Base implements Serializable {
     /**
      * 主键id
      */
@@ -65,6 +66,9 @@ public class WxUserCoupon implements Serializable {
      */
     @NotNull
     private Integer isInvalid;
+
+    @TableField(exist = false)
+    private Coupon coupon;
 
     private static final long serialVersionUID = 1L;
 
@@ -139,6 +143,14 @@ public class WxUserCoupon implements Serializable {
 
     public void setCouponType(Integer couponType) {
         this.couponType = couponType;
+    }
+
+    public Coupon getCoupon() {
+        return coupon;
+    }
+
+    public void setCoupon(Coupon coupon) {
+        this.coupon = coupon;
     }
 
     @Override

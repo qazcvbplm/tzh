@@ -28,63 +28,61 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@Api(tags="评论模块")
+@Api(tags = "评论模块")
 @RequestMapping("ops/evaluate")
 public class EvaluateController {
 
 
     @Autowired
     private EvaluateService evaluateService;
-	@Autowired
+    @Autowired
     private OrdersService ordersService;
-	@Autowired
+    @Autowired
     private RunOrdersService runOrdersService;
-	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
-	
-	@ApiOperation(value="添加",httpMethod="POST")
-	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Evaluate evaluate,
-							  @RequestParam String userId, BindingResult result){
-		              Util.checkParams(result);
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @ApiOperation(value = "添加", httpMethod = "POST")
+    @PostMapping("add")
+    public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Evaluate evaluate,@RequestParam String userId, BindingResult result) {
+        Util.checkParams(result);
         if (ordersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-                          stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
-		              }
+            stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+        }
         if (runOrdersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-                          stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
-		            	  }
-		              return new ResponseObject(true, "添加成功");
-	}
+            stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+        }
+        return new ResponseObject(true, "添加成功");
+    }
 
-
-	@ApiOperation(value="查询",httpMethod="POST")
-	@PostMapping("find")
-	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Evaluate evaluate){
-	    evaluate.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
-        QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().setEntity(evaluate);
+    @ApiOperation(value = "查询", httpMethod = "POST")
+    @PostMapping("find")
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Evaluate evaluate) {
+        evaluate.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
+        QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().setEntity(evaluate).orderByDesc("create_time");
 //        List<Evaluate> list = evaluateService.list(query);
         IPage<Evaluate> iPage = evaluateService.page(new Page<>(evaluate.getPage(), evaluate.getSize()), query);
         //Integer count = evaluateService.count(query);
         return new ResponseObject(true, "ok")
-                .push("total",iPage.getTotal())
+                .push("total", iPage.getTotal())
                 .push("list", iPage.getRecords());
-	}
+    }
 
     @ApiOperation(value = "按店铺查询", httpMethod = "POST")
     @PostMapping("findbyshopid")
-    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int shopId,Base base) {
-        QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>();
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int shopId, Base base) {
+        QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().orderByDesc("create_time");
         query.lambda().eq(Evaluate::getShopId, shopId);
         List<Evaluate> list = evaluateService.page(new Page<>(base.getPage(), base.getSize()), query).getRecords();
         return new ResponseObject(true, "ok").push("list", list);
     }
 
-    @ApiOperation(value = "更新",httpMethod = "POST")
+    @ApiOperation(value = "更新", httpMethod = "POST")
     @PostMapping("update")
-    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, Evaluate evaluate){
-	    evaluateService.updateById(evaluate);
-	    return new ResponseObject(true,"更新成功");
+    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, Evaluate evaluate) {
+        evaluateService.updateById(evaluate);
+        return new ResponseObject(true, "更新成功");
     }
 }
