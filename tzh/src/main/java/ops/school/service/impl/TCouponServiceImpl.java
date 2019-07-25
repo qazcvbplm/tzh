@@ -87,7 +87,29 @@ public class TCouponServiceImpl implements TCouponService {
     @Override
     public int insert(Coupon coupon) {
         couponMapper.insert(coupon);
-        return 0;
+        Long couponId = coupon.getId();
+        if (couponId == null){
+            return -1;
+        }
+        if (coupon != null && !coupon.getShopIds().isEmpty()){
+            return 2;
+        }
+        String[] shopIdS = coupon.getShopIds().split(",");
+        List<ShopCoupon> shopCouponList = null;
+        Long shopIdLong = null;
+        ShopCoupon shopCoupon = new ShopCoupon();
+        for (String shopId : shopIdS) {
+            shopIdLong = Long.valueOf(shopId);
+            shopCoupon.setCouponId(couponId);
+            shopCoupon.setShopId(shopIdLong);
+            shopCoupon.setCreateId(coupon.getCreateId());
+            shopCoupon.setCreateTime(new Date());
+            shopCoupon.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
+            shopCouponList.add(shopCoupon);
+        }
+
+        int saveNum = tShopCouponService.bindShopCoupon(shopCouponList);
+        return saveNum;
     }
 
     /**

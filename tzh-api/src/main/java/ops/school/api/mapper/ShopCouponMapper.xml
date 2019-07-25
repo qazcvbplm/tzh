@@ -102,4 +102,30 @@
     null, #{shopId}, #{couponId}, now(), #{createId}, 0
     );
 </insert>
+
+    <!--CreatBy Fang Time:2019/7/25 21:05 |  -->
+    <insert id="batchInsert">
+        INSERT INTO <include refid="Table_Name"/>
+        (
+        id,
+        shop_id,
+        coupon_id,
+        create_time,
+        create_id,
+        is_delete
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            (
+            #{item.id},
+            #{item.shopId},
+            #{item.couponId},
+            now(),
+            #{item.createId},
+            #{item.isDelete}
+            )
+        </foreach>
+
+
+    </insert>
 </mapper>

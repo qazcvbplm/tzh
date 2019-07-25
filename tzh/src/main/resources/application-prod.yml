@@ -1,0 +1,61 @@
+#线上部署环境
+barcode:
+  path: /home/barcode
+cert:
+  path: /home/cert
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://212.129.149.27:8761/eureka/
+  instance:
+    leaseExpirationDurationInSeconds: 2
+    leaseRenewalIntervalInSeconds: 1
+feign:
+  hystrix:
+    enabled: true
+logging:
+  file: logs/chuyin.log
+  level:
+    com:
+      util: debug
+  root: debug
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: ops/school/api/mapper/*.xml
+ops:
+  redis:
+    cache: true
+server:
+  compression:
+    enabled: true
+    mime-types: image/png,image/jpeg,image/jpg,text/html,application/javascript,text/css,application/octet-stream,application/json
+    min-response-size: 1024
+  port: 11000
+spring:
+  application:
+    name: ops
+  datasource:
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    driverClassName: com.mysql.jdbc.Driver
+    filters: stat,wall,log4j
+    initialSize: 2
+    maxActive: 8
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 2
+    password: TZH1234567890
+    poolPreparedStatements: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://sh-cdb-0e99ru5c.sql.tencentcdb.com:62580/ops?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    validationQuery: SELECT 1 FROM DUAL
+  redis:
+    host: 47.101.221.55
+    password: toor
+    port: 6379

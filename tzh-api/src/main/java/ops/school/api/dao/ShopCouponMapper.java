@@ -67,4 +67,14 @@ public interface ShopCouponMapper extends BaseMapper<ShopCoupon> {
     Integer startOneById(Long id);
 
     int insert(ShopCoupon shopCoupon);
+
+    /**
+     * @date:   2019/7/25 21:05
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   shopCouponList
+     * @Desc:   desc
+     */
+    Integer batchInsert(@Param("list") List<ShopCoupon> shopCouponList);
 }
