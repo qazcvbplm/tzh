@@ -56,7 +56,7 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
                 // 删除redis缓存
                 stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
                 // 自取堂食结算
-                tOrdersService.orderSettlement(orders,true);
+                tOrdersService.orderSettlement(orders.getId(),true);
 			} catch (Exception e) {
 				LoggerUtil.log("堂食完成失败:"+e.getMessage());
 			}
