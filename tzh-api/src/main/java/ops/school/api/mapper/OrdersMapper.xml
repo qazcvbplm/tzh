@@ -429,7 +429,7 @@
     order by create_time desc
      limit #{page},#{size}
   </select>
-    <select id="findByShopYJS" parameterType="ops.school.api.entity.Shop" resultMap="BaseResultMap">
+    <select id="findByShopYJS" parameterType="map" resultMap="BaseResultMap">
    select 
     orders.*
     from orders

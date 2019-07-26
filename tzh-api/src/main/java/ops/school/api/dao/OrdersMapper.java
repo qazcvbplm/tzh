@@ -58,7 +58,7 @@ public interface OrdersMapper extends BaseMapper<Orders> {
 
     List<Orders> shopsta(Map<String, Object> map);
 
-    List<Orders> findByShopYJS(@Param("s") Shop s, @Param("page")int page,@Param("size") int size);
+    List<Orders> findByShopYJS(Map<String,Object> map);
 
     List<Orders> findAllDjs();
 }
