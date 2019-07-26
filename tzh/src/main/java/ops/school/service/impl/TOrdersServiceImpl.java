@@ -801,6 +801,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal schoolUnderTakeAmount = BigDecimal.ZERO;
         // 楼下返还金额
         BigDecimal downStairs = BigDecimal.ZERO;
+        // 是否有优惠券
+        Boolean isCoupon = false;
         // 负责人抽成配送员百分比
         // 如果配送员为空
         if (orders.getSenderId() == 0 || orders.getSenderId() == null){
@@ -851,7 +853,8 @@ public class TOrdersServiceImpl implements TOrdersService {
          */
         ordersComplete.setAppGetTotal(appGetTotal);
         // 如果使用了优惠券
-        if (orders.getCouponId() != 0 || orders.getCouponId() != null){
+        if (orders.getCouponId() != 0 && orders.getCouponId() != null){
+            isCoupon = true;
             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
             coupon = couponService.getById(wxUserCoupon.getCouponId());
             // 优惠券优惠金额
@@ -874,9 +877,19 @@ public class TOrdersServiceImpl implements TOrdersService {
         /**
          * 负责人承担比例金额
          */
-        schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
-                .add(couponAmount.multiply(shop.getCouponRate()))
-                .add(discountAmount.multiply(shop.getDiscountRate()));
+        if (isCoupon){
+            // 如果优惠券类型为2 --> 负责人承担所有优惠券金额
+            if (coupon.getCouponType() == 2){
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
+                        .add(couponAmount)
+                        .add(discountAmount.multiply(shop.getDiscountRate()));
+            } else {
+                // 否则为店铺优惠券 --> 负责人承担一定比例
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
+                        .add(couponAmount.multiply(shop.getCouponRate()))
+                        .add(discountAmount.multiply(shop.getDiscountRate()));
+            }
+        }
         /**
          * 店铺所得
          */
@@ -886,7 +899,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         /**
          * 负责人所得
          */
-        schoolGetSender = schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(appGetTotal)
+        schoolGetTotal = schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(appGetTotal)
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
         ordersComplete.setShopGetTotal(schoolGetTotal);
         orderCompleteService.save(ordersComplete);
