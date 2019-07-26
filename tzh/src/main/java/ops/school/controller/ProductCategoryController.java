@@ -3,9 +3,12 @@ package ops.school.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.ProductCategory;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.ProductCategoryService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.service.TProductCategoryService;
+import ops.school.service.TProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,6 +29,9 @@ public class ProductCategoryController {
 
     @Autowired
 	private ProductCategoryService productCategoryService;
+
+    @Autowired
+    private TProductCategoryService tProductCategoryService;
 
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
@@ -52,6 +58,14 @@ public class ProductCategoryController {
             return new ResponseObject(false
                     , "更新失败");
         }
+	}
 
+	@ApiOperation(value="根据类目id删除类目和商品",httpMethod="POST")
+	@PostMapping("delete")
+	public ResponseObject deleteCategoryAndProdSById(HttpServletRequest request,HttpServletResponse response,ProductCategory pc){
+		Assertions.notNull(pc,pc.getId());
+		Integer categoryId = pc.getId();
+		ResponseObject responseObject = tProductCategoryService.deleteCategoryAndProdSById(categoryId);
+		return responseObject;
 	}
 }

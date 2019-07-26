@@ -31,6 +31,7 @@ public class NumConstants {
 
     /**-------------------业务类常量，不会变动的-------------------------------*/
     public final static int DB_TABLE_IS_DELETE_NO = 0;
+    public final static int DB_TABLE_IS_DELETE_YES_DELETE = 1;
     public final static int DB_TABLE_IS_INVALID_YES = 0;
     public final static int DB_TABLE_IS_INVALID_NO = 1;
     public final static int DB_TABLE_IS_INVALID_NOT_USED = 0;

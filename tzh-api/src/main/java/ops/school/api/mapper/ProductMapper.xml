@@ -103,6 +103,7 @@
   update  product set stock=stock-#{count} where id=#{id} and (stock >#{count} or stock = #{count})
   </update>
 
+
     <select id="findin" parameterType="list" resultMap="BaseResultMap">
         select * from product where id in
         <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
@@ -208,6 +209,18 @@
             </if>
         </set>
         where Id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <!--CreatBy Fang Time:2019/7/26 11:12 |  批量删除-->
+    <update id="deleteLogicBatchIds">
+        UPDATE <include refid="Table_Name"/>
+        SET is_delete = 1
+        WHERE id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND is_delete = 0
     </update>
 
 </mapper>

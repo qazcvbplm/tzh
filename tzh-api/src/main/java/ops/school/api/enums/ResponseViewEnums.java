@@ -13,6 +13,10 @@ public enum ResponseViewEnums implements RootEnums{
     SUCCESS("1210001","操作成功"),
     /**操作失败*/
     FAILED("1210002","操作失败"),
+    /**操作失败*/
+    DELETE_FAILED("1210003","删除失败，请检查后操作"),
+
+
     /**----------2-楼栋错误-----------*/
     FLOOR_SELECT_NULL("1220001","楼栋数据变更，更新后操作"),
 
