@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Coupon;
+import ops.school.api.entity.ShopCoupon;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.constants.NumConstants;
 import ops.school.service.TCouponService;
 import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @Api(tags = "优惠券模块")
@@ -69,8 +68,8 @@ public class CouponController {
     @RequestMapping(value = "findCoupons", method = RequestMethod.POST)
     public ResponseObject findCoupons(Coupon coupon){
         Assertions.notNull(coupon,coupon.getSchoolId());
-        IPage<Coupon> coupons = tCouponService.findCoupons(coupon.getSchoolId(),coupon.getCouponType(),coupon.getPage(),coupon.getSize());
-        return new ResponseObject(true,"查询成功").push("list",coupons.getRecords()).push("total",coupons.getTotal());
+        ResponseObject responseObject = tCouponService.findCoupons(coupon.getSchoolId(),coupon.getCouponType(),coupon.getPage(),coupon.getSize());
+        return responseObject;
     }
 
     /**
@@ -86,6 +85,7 @@ public class CouponController {
     public ResponseObject add(HttpServletRequest request, Coupon coupon){
         Assertions.notNull(coupon,coupon.getSchoolId());
         coupon.setCreateId(coupon.getSchoolId());
+        coupon.setUpdateId(coupon.getSchoolId());
         coupon.setCreateTime(new Date());
         coupon.setUpdateTime(new Date());
         tCouponService.insert(coupon);
@@ -102,8 +102,8 @@ public class CouponController {
     @ResponseBody
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ResponseObject update(Coupon coupon){
-        couponService.updateById(coupon);
-        return new ResponseObject(true,"更新成功");
+        ResponseObject responseObject = tCouponService.updateOneById(coupon);
+        return responseObject;
     }
 
     /**

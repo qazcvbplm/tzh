@@ -29,10 +29,7 @@ public class Base implements Serializable {
     private String queryType;
 
     public Integer getPage() {
-        if (page == null){
-            return null;
-        }
-        return page - 1;
+        return page ;
     }
 
     public void setPage(Integer page) {

@@ -81,7 +81,7 @@ public interface CouponMapper extends BaseMapper<Coupon> {
      * @param coupon
      * @return
      */
-    int insert(Coupon coupon);
+    int insertOne(Coupon coupon);
 
     /**
      * @date:   2019/7/18 15:38
