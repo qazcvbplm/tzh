@@ -10,7 +10,7 @@ import ops.school.api.service.WxUserService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.wxutil.XMLUtil;
 import ops.school.config.RedisConfig;
-import ops.school.dto.message.WxUserAddSourceDTO;
+import ops.school.message.dto.WxUserAddSourceDTO;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

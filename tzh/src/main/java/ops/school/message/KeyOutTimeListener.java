@@ -7,7 +7,7 @@ import ops.school.api.service.OrdersService;
 import ops.school.api.service.SenderService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
-import ops.school.dto.message.WxUserAddSourceDTO;
+import ops.school.message.dto.WxUserAddSourceDTO;
 import ops.school.service.TOrdersService;
 import ops.school.service.TSenderService;
 import ops.school.util.WxMessageUtil;

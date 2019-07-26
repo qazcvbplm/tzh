@@ -14,7 +14,7 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.config.RedisConfig;
 import ops.school.constants.NumConstants;
-import ops.school.dto.message.WxUserAddSourceDTO;
+import ops.school.message.dto.WxUserAddSourceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;

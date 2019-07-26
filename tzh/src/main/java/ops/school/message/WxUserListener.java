@@ -7,9 +7,9 @@ import ops.school.api.service.LogsService;
 import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
-import ops.school.dto.message.RedisMessage;
-import ops.school.dto.message.SenderAddMoneyDTO;
-import ops.school.dto.message.WxUserAddSourceDTO;
+import ops.school.message.dto.RedisMessage;
+import ops.school.message.dto.SenderAddMoneyDTO;
+import ops.school.message.dto.WxUserAddSourceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -10,8 +10,8 @@ import ops.school.api.service.SenderService;
 import ops.school.api.service.TxLogService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
-import ops.school.dto.message.RedisMessage;
-import ops.school.dto.message.SchoolAddMoneyDTO;
+import ops.school.message.dto.RedisMessage;
+import ops.school.message.dto.SchoolAddMoneyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
