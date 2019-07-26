@@ -7,7 +7,7 @@ import ops.school.api.service.LogsService;
 import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
-import ops.school.message.dto.RedisMessage;
+import ops.school.message.dto.BaseMessage;
 import ops.school.message.dto.SenderAddMoneyDTO;
 import ops.school.message.dto.WxUserAddSourceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class WxUserListener {
     private LogsService logsService;
 
     public void receiveMessage(String message) {
-        RedisMessage redisMessage = JSON.parseObject(message, RedisMessage.class);
+        BaseMessage redisMessage = JSON.parseObject(message, BaseMessage.class);
         if (redisMessage.getType().equals("addsource")) {
             WxUserAddSourceDTO wxUserAddSourceDTO = JSON.parseObject(message, WxUserAddSourceDTO.class);
             addsource(wxUserAddSourceDTO.getOpenId(), wxUserAddSourceDTO.getSource());

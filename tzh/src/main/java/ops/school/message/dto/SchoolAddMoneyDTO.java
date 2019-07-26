@@ -2,7 +2,7 @@ package ops.school.message.dto;
 
 import java.math.BigDecimal;
 
-public class SchoolAddMoneyDTO extends RedisMessage {
+public class SchoolAddMoneyDTO extends BaseMessage {
 
     private Integer schoolId;
 

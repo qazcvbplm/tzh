@@ -10,7 +10,7 @@ import ops.school.api.service.SenderService;
 import ops.school.api.service.TxLogService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
-import ops.school.message.dto.RedisMessage;
+import ops.school.message.dto.BaseMessage;
 import ops.school.message.dto.SchoolAddMoneyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class SchoolListener {
 	public void receiveMessage(String message) {
 		List<Mqtt> mqtt = mqttMapper.selectList(new QueryWrapper<>());
 		Mqtt ok = null;
-		RedisMessage redisMessage = JSON.parseObject(message, RedisMessage.class);
+		BaseMessage redisMessage = JSON.parseObject(message, BaseMessage.class);
 		if (redisMessage.getType().equals("addmoney")) {
 			SchoolAddMoneyDTO schoolAddMoneyDTO = JSON.parseObject(message, SchoolAddMoneyDTO.class);
             School school = schoolService.findById(schoolAddMoneyDTO.getSchoolId());

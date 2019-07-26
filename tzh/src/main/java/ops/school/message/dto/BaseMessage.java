@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSON;
 
 import java.io.Serializable;
 
-public class RedisMessage implements Serializable {
+public class BaseMessage implements Serializable {
 
     private String type;
 
-    public RedisMessage(String type) {
+    public BaseMessage(String type) {
         this.type = type;
     }
 
