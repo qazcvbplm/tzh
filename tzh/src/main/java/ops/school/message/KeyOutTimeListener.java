@@ -49,10 +49,12 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
                 stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
 				WxUser wxUser = wxUserService.findById(orders.getOpenId());
                 List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-                // 自取或堂食订单完成，发送消息
-                WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
-                // 删除redis缓存
-                stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
+                if (formIds.size() > 0){
+					// 自取或堂食订单完成，发送消息
+					WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+					// 删除redis缓存
+					stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
+				}
                 // 自取堂食结算
 				tOrdersService.orderSettlement(orders.getId());
 			} catch (Exception e) {
