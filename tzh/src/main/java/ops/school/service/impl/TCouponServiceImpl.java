@@ -6,9 +6,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ops.school.api.dao.*;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.*;
+import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
+import ops.school.api.service.ShopCouponService;
+import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.TimeUtilS;
 import ops.school.constants.NumConstants;
@@ -18,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TCouponServiceImpl implements TCouponService {
@@ -36,6 +36,9 @@ public class TCouponServiceImpl implements TCouponService {
 
     @Autowired
     private TShopCouponService tShopCouponService;
+
+    @Autowired
+    private ShopCouponService shopCouponService;
 
     @Autowired
     private WxUserMapper wxUserMapper;
@@ -70,35 +73,73 @@ public class TCouponServiceImpl implements TCouponService {
      * @desc:   
      */
     @Override
-    public IPage<Coupon> findCoupons(Long schoolId, Integer couponType, int page, int size) {
+    public ResponseObject findCoupons(Long schoolId, Integer couponType, int page, int size) {
         if (schoolId == null){
-            return null;
+            return new ResponseObject(false, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         }
         QueryWrapper<Coupon> query = new QueryWrapper<>();
         query.eq("school_id",schoolId)
-                .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_NO);
+                .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_NO)
+                .orderByDesc("create_time");
         if (couponType != null){
             query.eq("coupon_type",couponType);
         }
         IPage<Coupon> rs = couponService.page(new Page<>(page,size),query);
-        return rs;
+        if (rs == null || rs.getTotal() < 1 || rs.getRecords().size() < 1 ){
+            return new ResponseObject(true, ResponseViewEnums.SUCCESS)
+                    .push("list",rs.getRecords())
+                    .push("total",rs.getTotal());
+        }
+        List<Long> couponIdS = PublicUtilS.getValueList(rs.getRecords(),"id");
+        if (couponIdS.size() < 1){
+            return new ResponseObject(true, ResponseViewEnums.SUCCESS)
+                    .push("list",rs.getRecords())
+                    .push("total",rs.getTotal());
+        }
+        List<ShopCoupon> shopCouponList =  shopCouponService.batchFindSCByCouponIdS(couponIdS);
+        if (CollectionUtils.isEmpty(shopCouponList)){
+            return new ResponseObject(true, ResponseViewEnums.SUCCESS)
+                    .push("list",rs.getRecords())
+                    .push("total",rs.getTotal());
+        }
+        List<Long> shopIds = PublicUtilS.getValueList(shopCouponList,"shopId");
+        PublicUtilS.removeDuplicate(shopIds);
+        StringBuffer resultShopIds = new StringBuffer();
+        for (int i = 0; i < shopIds.size() -1; i++) {
+            resultShopIds.append(shopIds.get(i));
+            if (shopIds.get(i+1) != null && !shopIds.get(i+1).toString().isEmpty()){
+                resultShopIds.append(',');
+            }
+
+        }
+        Map<Long,List<ShopCoupon>> listforListMap = PublicUtilS.listforEqualKeyListMap(shopCouponList,"couponId");
+        for (Coupon record : rs.getRecords()) {
+            if (listforListMap.get(record.getId()) != null){
+                record.setShopCouponList(listforListMap.get(record.getId()));
+            }
+            record.setShopIds(resultShopIds.toString());
+        }
+        return new ResponseObject(true, ResponseViewEnums.SUCCESS)
+                .push("list",rs.getRecords())
+                .push("total",rs.getTotal());
+
     }
 
     @Override
     public int insert(Coupon coupon) {
-        couponMapper.insert(coupon);
+        couponMapper.insertOne(coupon);
         Long couponId = coupon.getId();
         if (couponId == null){
             return -1;
         }
-        if (coupon != null && !coupon.getShopIds().isEmpty()){
+        if (coupon != null && coupon.getShopIds().isEmpty()){
             return 2;
         }
         String[] shopIdS = coupon.getShopIds().split(",");
-        List<ShopCoupon> shopCouponList = null;
+        List<ShopCoupon> shopCouponList = new ArrayList<>();
         Long shopIdLong = null;
-        ShopCoupon shopCoupon = new ShopCoupon();
         for (String shopId : shopIdS) {
+            ShopCoupon shopCoupon = new ShopCoupon();
             shopIdLong = Long.valueOf(shopId);
             shopCoupon.setCouponId(couponId);
             shopCoupon.setShopId(shopIdLong);
@@ -107,7 +148,6 @@ public class TCouponServiceImpl implements TCouponService {
             shopCoupon.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
             shopCouponList.add(shopCoupon);
         }
-
         int saveNum = tShopCouponService.bindShopCoupon(shopCouponList);
         return saveNum;
     }
@@ -170,5 +210,37 @@ public class TCouponServiceImpl implements TCouponService {
             return new ResponseObject(false,ResponseViewEnums.COUPON_USER_GET_ERROR);
         }
         return new ResponseObject(true,ResponseViewEnums.COUPON_USER_GET_SUCCESS);
+    }
+
+    /**
+     * @date:   2019/7/26 19:36
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   coupon
+     * @Desc:   desc
+     */
+    @Override
+    public ResponseObject updateOneById(Coupon coupon) {
+        Assertions.notNull(coupon);
+        couponMapper.updateById(coupon);
+        if (coupon == null ||  coupon.getShopIds().isEmpty()){
+            return  new ResponseObject(true,"更新成功");
+        }
+        String[] shopIdS = coupon.getShopIds().split(",");
+        List<ShopCoupon> shopCouponList = new ArrayList<>();
+        Long shopIdLong = null;
+        for (String shopId : shopIdS) {
+            ShopCoupon shopCoupon = new ShopCoupon();
+            shopIdLong = Long.valueOf(shopId);
+            shopCoupon.setCouponId(coupon.getId());
+            shopCoupon.setShopId(shopIdLong);
+            shopCoupon.setCreateId(coupon.getSchoolId());
+            shopCoupon.setCreateTime(new Date());
+            shopCoupon.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
+            shopCouponList.add(shopCoupon);
+        }
+        int saveNum = tShopCouponService.bindShopCoupon(shopCouponList);
+        return new ResponseObject(true,"更新成功");
     }
 }

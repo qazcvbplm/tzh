@@ -315,9 +315,11 @@ public class TOrdersServiceImpl implements TOrdersService {
                         // 优惠折扣已使用，店铺满减无法再使用
                         isDiscount = true;
                         // 使用商品折扣时的优惠价格
-                        discountPrice = discountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(1).subtract(product.getDiscount())));
+                        discountPrice = discountPrice.add(productAttribute.getPrice()
+                                .multiply(new BigDecimal(1).subtract(product.getDiscount()))
+                                .multiply(new BigDecimal(count)));
                         // 商品折扣之后的价格(原价-商品折扣价)
-                        afterDiscountPrice = afterDiscountPrice.subtract(discountPrice.multiply(new BigDecimal(count)));
+                        afterDiscountPrice = afterDiscountPrice.subtract(discountPrice);
                         // 如果有折扣的话
                         orderProduct.setProductDiscount(discountPrice);
                         orderProduct.setTotalPrice(productAttribute.getPrice().subtract(discountPrice));
@@ -600,6 +602,19 @@ public class TOrdersServiceImpl implements TOrdersService {
                     school.setUserChargeSend(school.getUserChargeSend().add(orders.getPayFoodCoupon()));
                     schoolService.updateById(school);
                 }
+                // 如果订单使用优惠券 --> 退还优惠券
+                if (orders.getCouponId() != null && orders.getCouponId() != 0){
+                    // 用户优惠券
+                    WxUserCoupon wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+                    if (wxUserCoupon != null){
+                        // 修改状态为0
+                        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NOT_USED);
+                        int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
+                        if (updateUserCouponNum != NumConstants.INT_NUM_1){
+                            logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+                        }
+                    }
+                }
                 if (!temp.equals("待付款")) {
                     if (orders.getPayment().equals("余额支付")) {
                         // 订单消费的余额要退回用户余额内
@@ -646,6 +661,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
             synchronized (update.getShopId()) {
                 int water = ordersService.waterNumber(update);
+//                int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
                 update.setWaterNumber(water + 1);
             }
             int res = ordersService.shopAcceptOrderById(update);
@@ -656,7 +672,10 @@ public class TOrdersServiceImpl implements TOrdersService {
                 WxUser wxUser = wxUserService.findById(orders.getOpenId());
                 List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
                 // 微信小程序推送消息
-                WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+                // 从redis中获取的formId,判断是否为空
+                if (formIds.size() > 0){
+                    WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+                }
                 return orders.getShopId();
             }
             return 0;
@@ -741,10 +760,16 @@ public class TOrdersServiceImpl implements TOrdersService {
         Orders orders = ordersService.findById(orderId);
         // 配送员
         Sender sender = senderService.findById(orders.getSenderId());
+        // 对配送员信息进行校验
+        Assertions.notNull(sender, ResponseViewEnums.SCHOOL_HAD_CHANGE);
         // 店铺
         Shop shop = shopService.getById(orders.getShopId());
+        // 对店铺信息进行校验
+        Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
         // 学校
         School school = schoolService.findById(orders.getSchoolId());
+        // 对学校信息进行校验
+        Assertions.notNull(school, ResponseViewEnums.SCHOOL_HAD_CHANGE);
         // 对订单进行结算
         OrdersComplete ordersComplete = new OrdersComplete();
         // 平台抽负责人百分比
@@ -776,6 +801,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal schoolUnderTakeAmount = BigDecimal.ZERO;
         // 楼下返还金额
         BigDecimal downStairs = BigDecimal.ZERO;
+        // 是否有优惠券
+        Boolean isCoupon = false;
         // 负责人抽成配送员百分比
         // 如果配送员为空
         if (orders.getSenderId() == 0 || orders.getSenderId() == null){
@@ -800,12 +827,12 @@ public class TOrdersServiceImpl implements TOrdersService {
                 /**
                  * 负责人抽取配送员所得
                  */
-                schoolGetSender.add(orders.getSendPrice().multiply(sender.getRate()));
+                schoolGetSender = schoolGetSender.add(orders.getSendPrice().multiply(sender.getRate()));
                 ordersComplete.setSchoolGetSender(schoolGetSender);
             } else {
                 // 楼下送达，要返还楼上楼下差价 --> （配送费-楼下返还） * （1-学校抽成）
                 // 楼下返还金额
-                downStairs.add(orders.getSchoolTopDownPrice());
+                downStairs = downStairs.add(orders.getSchoolTopDownPrice());
                 /**
                  * 配送员所得
                  */
@@ -814,50 +841,55 @@ public class TOrdersServiceImpl implements TOrdersService {
                 /**
                  * 负责人抽取配送员所得
                  */
-                schoolGetSender.add((orders.getSendPrice().subtract(downStairs))
+                schoolGetSender = schoolGetSender.add((orders.getSendPrice().subtract(downStairs))
                         .multiply(sender.getRate()));
                 ordersComplete.setSchoolGetSender(schoolGetSender);
             }
         }
-        // 微信平台所得为0.6% --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  0.006
-        /**
-         * 微信平台所得
-         */
-        BigDecimal wx = orders.getPayPrice().multiply(new BigDecimal(0.006));
-        // 总平台获得比例对应金额 --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  比例
-        BigDecimal total = orders.getPayPrice().multiply(school.getRate());
-        // 超级后台所得 --> total - wx
+        // 超级后台所得对应金额 --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  比例
+        BigDecimal appGetTotal = orders.getPayPrice().multiply(school.getRate());
         /**
          * 超级后台所得
          */
-        ordersComplete.setAppGetTotal(total.subtract(wx));
+        ordersComplete.setAppGetTotal(appGetTotal);
         // 如果使用了优惠券
-        if (orders.getCouponId() != 0 || orders.getCouponId() != null){
+        if (orders.getCouponId() != 0 && orders.getCouponId() != null){
+            isCoupon = true;
             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
             coupon = couponService.getById(wxUserCoupon.getCouponId());
             // 优惠券优惠金额
-            couponAmount.add(new BigDecimal(coupon.getCutAmount()));
+            couponAmount = couponAmount.add(new BigDecimal(coupon.getCutAmount()));
         } else if (orders.getFullCutId() != null || orders.getFullCutId() != 0){
             shopFullCut = shopFullCutService.getById(orders.getFullCutId());
             // 店铺满减优惠金额
-            fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+            fullCutAmount = fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
         } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1){
             // 商品折扣金额
-            discountAmount.add(orders.getDiscountPrice());
+            discountAmount = discountAmount.add(orders.getDiscountPrice());
         }
-        tempPrice.add(orders.getBoxPrice().add(orders.getProductPrice())
+        tempPrice = tempPrice.add(orders.getBoxPrice().add(orders.getProductPrice())
                 .subtract(couponAmount).subtract(fullCutAmount).subtract(discountAmount));
         /**
          * 负责人抽取店铺金额
          */
-        schoolGetshop.add(tempPrice.multiply(shop.getRate()));
+        schoolGetshop = schoolGetshop.add(tempPrice.multiply(shop.getRate()));
         ordersComplete.setSchoolGetShop(schoolGetshop);
         /**
          * 负责人承担比例金额
          */
-        schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
-                .add(couponAmount.multiply(shop.getCouponRate()))
-                .add(discountAmount.multiply(shop.getDiscountRate()));
+        if (isCoupon){
+            // 如果优惠券类型为2 --> 负责人承担所有优惠券金额
+            if (coupon.getCouponType() == 2){
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
+                        .add(couponAmount)
+                        .add(discountAmount.multiply(shop.getDiscountRate()));
+            } else {
+                // 否则为店铺优惠券 --> 负责人承担一定比例
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
+                        .add(couponAmount.multiply(shop.getCouponRate()))
+                        .add(discountAmount.multiply(shop.getDiscountRate()));
+            }
+        }
         /**
          * 店铺所得
          */
@@ -867,7 +899,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         /**
          * 负责人所得
          */
-        schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(total)
+        schoolGetTotal = schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(appGetTotal)
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
         ordersComplete.setShopGetTotal(schoolGetTotal);
         orderCompleteService.save(ordersComplete);

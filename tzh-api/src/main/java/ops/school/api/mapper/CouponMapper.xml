@@ -177,12 +177,44 @@
         </where>
     </select>
 
-    <insert id="insert" parameterType="ops.school.api.entity.Coupon">
-        insert into <include refid="Table_Name"/>
+        <insert id="insertOne" parameterType="ops.school.api.entity.Coupon" useGeneratedKeys="true"  keyProperty="id" >
+        insert into
+        <include refid="Table_Name"/>
+        (
+        school_id,
+        coupon_name,
+        coupon_desc,
+        full_amount,
+        cut_amount,
+        coupon_type,
+        yes_show_index,
+        send_begin_time,
+        send_end_time,
+        effective_days,
+        create_time,
+        create_id,
+        update_time,
+        update_id,
+        is_invalid,
+        is_delete
+        )
         values (
-        null, #{schoolId}, #{couponName}, #{couponDesc}, #{fullAmount},
-        #{cutAmount}, #{couponType},0, #{sendBeginTime},#{sendEndTime}, #{effectiveDays}, now(),
-        #{createId}, null, null, 0,0
+        #{schoolId},
+        #{couponName},
+        #{couponDesc},
+        #{fullAmount},
+        #{cutAmount},
+        #{couponType},
+        #{yesShowIndex},
+        #{sendBeginTime},
+        #{sendEndTime},
+        #{effectiveDays},
+        now(),
+        #{createId},
+        now(),
+        #{updateId},
+        0,
+        0
         );
     </insert>
 

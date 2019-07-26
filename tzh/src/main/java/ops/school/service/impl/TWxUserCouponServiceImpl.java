@@ -1,6 +1,5 @@
 package ops.school.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,7 +7,6 @@ import ops.school.api.dao.WxUserCouponMapper;
 import ops.school.api.entity.WxUserCoupon;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
-import ops.school.api.service.WxUserCouponService;
 import ops.school.service.TWxUserCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

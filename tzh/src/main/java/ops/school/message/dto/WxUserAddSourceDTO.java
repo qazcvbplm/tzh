@@ -1,6 +1,6 @@
-package ops.school.api.dto.redis;
+package ops.school.message.dto;
 
-public class WxUserAddSourceDTO extends RedisMessage {
+public class WxUserAddSourceDTO extends BaseMessage {
 
     private String openId;
 

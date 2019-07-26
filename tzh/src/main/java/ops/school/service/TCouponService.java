@@ -19,7 +19,7 @@ public interface TCouponService {
      * @date:   2019/7/25 16:03 
      * @desc:   
      */
-    IPage<Coupon> findCoupons(Long schoolId, Integer couponType, int page, int size);
+    ResponseObject findCoupons(Long schoolId, Integer couponType, int page, int size);
 
     int insert(Coupon coupon);
 
@@ -52,4 +52,14 @@ public interface TCouponService {
      * @Desc:   desc 根据用户id，学校id，店铺id，优惠券id，让用户获取优惠券
      */
     ResponseObject userGetCouponByIdMap(Map map);
+
+    /**
+     * @date:   2019/7/26 19:35
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   coupon
+     * @Desc:   desc
+     */
+    ResponseObject updateOneById(Coupon coupon);
 }

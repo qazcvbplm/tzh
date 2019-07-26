@@ -8,6 +8,37 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="create_id" property="createId" jdbcType="BIGINT" />
     <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+    <collection property="shop" ofType="ops.school.api.entity.Shop">
+        <id column="Id" jdbcType="INTEGER" property="id"/>
+        <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
+        <result column="shop_name" jdbcType="VARCHAR" property="shopName"/>
+        <result column="shop_phone" jdbcType="VARCHAR" property="shopPhone"/>
+        <result column="shop_image" jdbcType="VARCHAR" property="shopImage"/>
+        <result column="shop_category_id" jdbcType="INTEGER" property="shopCategoryId"/>
+        <result column="open_flag" jdbcType="INTEGER" property="openFlag"/>
+        <result column="send_model_flag" jdbcType="INTEGER" property="sendModelFlag"/>
+        <result column="get_model_flag" jdbcType="INTEGER" property="getModelFlag"/>
+        <result column="ts_model_flag" jdbcType="INTEGER" property="tsModelFlag"/>
+        <result column="score" jdbcType="INTEGER" property="score"/>
+        <result column="start_price" jdbcType="DECIMAL" property="startPrice"/>
+        <result column="box_price" jdbcType="DECIMAL" property="boxPrice"/>
+        <result column="min_discount" jdbcType="DECIMAL" property="minDiscount"/>
+        <result column="send_price" jdbcType="DECIMAL" property="sendPrice"/>
+        <result column="send_time" jdbcType="VARCHAR" property="sendTime"/>
+        <result column="top_title" jdbcType="VARCHAR" property="topTitle"/>
+        <result column="shop_login_name" jdbcType="VARCHAR" property="shopLoginName"/>
+        <result column="shop_login_pass_word" jdbcType="VARCHAR" property="shopLoginPassWord"/>
+        <result column="shop_address" jdbcType="VARCHAR" property="shopAddress"/>
+        <result column="rate" jdbcType="DECIMAL" property="rate"/>
+        <result column="lat" jdbcType="VARCHAR" property="lat"/>
+        <result column="lng" jdbcType="VARCHAR" property="lng"/>
+        <result column="vip_discount_flag" jdbcType="INTEGER" property="vipDiscountFlag"/>
+        <result column="send_price_add_by_count_flag" jdbcType="INTEGER" property="sendPriceAddByCountFlag"/>
+        <result column="send_price_add" jdbcType="DECIMAL" property="sendPriceAdd"/>
+        <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
+        <result column="sort" jdbcType="BIGINT" property="sort"/>
+        <result column="shop_tx_flag" property="shopTxFlag"/>
+    </collection>
 </resultMap>
 
     <sql id="Base_Column_List" >
@@ -17,6 +48,47 @@
         create_time,
         create_id,
         is_delete
+    </sql>
+
+    <sql id="Rel_Column_List" >
+        shop_coupon.id,
+        shop_coupon.shop_id,
+        shop_coupon.coupon_id,
+        shop_coupon.create_time,
+        shop_coupon.create_id,
+        shop_coupon.is_delete,
+        shop.Id,
+        shop.school_id,
+        shop.shop_name,
+        shop.shop_phone,
+        shop.shop_image,
+        shop.shop_category_id,
+        shop.open_flag,
+        shop.send_model_flag,
+        shop.get_model_flag,
+        shop.score,
+        shop.start_price,
+        shop.box_price,
+        shop.send_price,
+        shop.send_time,
+        shop.top_title,
+        shop.shop_login_name,
+        shop.shop_address,
+        shop.rate,
+        shop.lat,
+        shop.lng,
+        shop.vip_discount_flag,
+        shop.send_price_add_by_count_flag,
+        shop.send_price_add,
+        shop.is_delete,
+        shop.sort,
+        shop.ts_model_flag,
+        shop.full_minus_rate,
+        shop.coupon_rate,
+        shop.discount_rate,
+        shop.shop_tx_flag,
+        shop.tx_amount,
+        shop.all_tx_amount
     </sql>
 
     <sql id="Table_Name">
@@ -77,10 +149,20 @@
     </foreach>
 </select>
 
+    <!--CreatBy Fang Time:2019/7/26 18:00 |  根据couponIds查询-->
+    <select id="batchFindSCByCouponIdS" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM shop_coupon,shop
+        WHERE shop_coupon.coupon_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND shop_coupon.is_delete = 0
+        AND shop_coupon.shop_id = shop.id
+    </select>
 
 
-
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0
@@ -107,7 +189,6 @@
     <insert id="batchInsert">
         INSERT INTO <include refid="Table_Name"/>
         (
-        id,
         shop_id,
         coupon_id,
         create_time,
@@ -115,15 +196,14 @@
         is_delete
         )
         VALUES
-        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
-            (
-            #{item.id},
+        <foreach collection="list" item="item" index="index" open=" " separator="," close=" ">
+        (
             #{item.shopId},
             #{item.couponId},
             now(),
             #{item.createId},
             #{item.isDelete}
-            )
+        )
         </foreach>
 
 

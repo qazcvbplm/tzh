@@ -42,4 +42,14 @@ public interface ProductMapper extends BaseMapper<Product> {
      * @Desc:   desc 根据商品id和商品规格id批量查询商品及规格 map<pid,aid>
      */
     List<ProductAndAttributeDTO> batchFindProdAttributeByIdS(@Param("map") Map<Long,Long> pIdAndAIdMap);
+
+    /**
+     * @date:   2019/7/26 11:12
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   productIdS
+     * @Desc:   desc
+     */
+    Integer deleteLogicBatchIds(@Param("list") List<Long> productIdS);
 }

@@ -17,6 +17,7 @@
 
     <properties>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>

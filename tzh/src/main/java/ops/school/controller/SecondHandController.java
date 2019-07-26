@@ -45,7 +45,7 @@ public class SecondHandController {
 	@PostMapping("find")
 public ResponseObject find(HttpServletRequest request, HttpServletResponse response, SecondHand secondHand, PageQueryDTO pageQueryDTO){
 		secondHand.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
-		QueryWrapper<SecondHand> query = new QueryWrapper<SecondHand>().setEntity(secondHand);
+		QueryWrapper<SecondHand> query = new QueryWrapper<SecondHand>().setEntity(secondHand).orderByDesc("create_time");
 		Integer countNum = secondHandService.count(query);
 		IPage<SecondHand> iPage = secondHandService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
 		List<SecondHand> secondHandList =iPage.getRecords();

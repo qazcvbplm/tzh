@@ -102,6 +102,10 @@ public class Coupon extends Base implements Serializable {
     @TableField(exist = false)
     private String shopIds;
 
+
+    @TableField(exist = false)
+    List<ShopCoupon> shopCouponList;
+
     public Long getId() {
         return id;
     }
@@ -244,6 +248,14 @@ public class Coupon extends Base implements Serializable {
 
     public void setShopIds(String shopIds) {
         this.shopIds = shopIds;
+    }
+
+    public List<ShopCoupon> getShopCouponList() {
+        return shopCouponList;
+    }
+
+    public void setShopCouponList(List<ShopCoupon> shopCouponList) {
+        this.shopCouponList = shopCouponList;
     }
 
     @Override

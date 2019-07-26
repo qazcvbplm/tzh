@@ -1,9 +1,9 @@
 package ops.school.config;
 
+import ops.school.api.config.RedisConverter;
 import ops.school.message.PoductListener;
 import ops.school.message.SchoolListener;
 import ops.school.message.WxUserListener;
-import ops.school.api.config.RedisConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -85,11 +85,10 @@ public class RedisConfig {
         return new MessageListenerAdapter(receiver, "receiveMessage");
     }
 
-    
 
-
-
-    /**redis 读取内容的template */
+    /**
+     * message 读取内容的template
+     */
     @Bean
     StringRedisTemplate template(RedisConnectionFactory connectionFactory) {
         return new StringRedisTemplate(connectionFactory);

@@ -28,25 +28,30 @@ public class Base implements Serializable {
     @TableField(exist = false)
     private String queryType;
 
-    @Transient
-    public String getQueryType() {
-        return queryType;
+    public Integer getPage() {
+        return page ;
     }
 
-    public void setQueryType(String queryType) {
-        this.queryType = queryType;
+    public void setPage(Integer page) {
+        this.page = page;
     }
 
-    @Transient
-    public String getQuery() {
-        return query;
+    public Integer getSize() {
+        return size;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setSize(Integer size) {
+        this.size = size;
     }
 
-    @Transient
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
     public Integer getTotal() {
         return total;
     }
@@ -55,33 +60,19 @@ public class Base implements Serializable {
         this.total = total;
     }
 
-    @Transient
-    public Integer getPage() {
-        if (page == null)
-            return null;
-        else
-            return (page - 1) * this.size;
+    public String getQuery() {
+        return query;
     }
 
-    public void setPage(Integer page) {
-        this.page = page;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
-    @Transient
-    public Integer getSize() {
-        return this.size;
+    public String getQueryType() {
+        return queryType;
     }
 
-    public void setSize(Integer size) {
-        this.size = size;
-    }
-
-    @Transient
-    public String getOrderBy() {
-        return orderBy;
-    }
-
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
+    public void setQueryType(String queryType) {
+        this.queryType = queryType;
     }
 }

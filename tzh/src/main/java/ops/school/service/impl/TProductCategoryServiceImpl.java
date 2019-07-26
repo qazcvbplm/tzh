@@ -1,46 +1,41 @@
-package ops.school.api.serviceimple;
+package ops.school.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ops.school.api.dao.ProductCategoryMapper;
 import ops.school.api.dao.ProductMapper;
 import ops.school.api.entity.Product;
 import ops.school.api.entity.ProductCategory;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
-import ops.school.api.service.ProductCategoryService;
 import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.ResponseObject;
+import ops.school.constants.NumConstants;
+import ops.school.service.TProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * CreatebyFang
+ * fangfor@outlook.com
+ * 2019/7/26
+ * 10:59
+ * #
+ */
 @Service
-public class ProductCategoryServiceImple extends ServiceImpl<ProductCategoryMapper, ProductCategory> implements ProductCategoryService {
+public class TProductCategoryServiceImpl implements TProductCategoryService {
 
     @Autowired
     private ProductCategoryMapper productCategoryMapper;
 
-
     @Autowired
     private ProductMapper productMapper;
 
-    @Override
-    public void add(@Valid ProductCategory productCategory) {
-        productCategory.setSort(System.currentTimeMillis());
-        this.save(productCategory);
-    }
-
-    @Override
-    public List<ProductCategory> findByShop(int shopId) {
-        return productCategoryMapper.findByShop(shopId);
-    }
-
     /**
-     * @date:   2019/7/26 10:54
+     * @date:   2019/7/26 11:17
      * @author: QinDaoFang
      * @version:version
      * @return: ops.school.api.util.ResponseObject
@@ -51,27 +46,27 @@ public class ProductCategoryServiceImple extends ServiceImpl<ProductCategoryMapp
     public ResponseObject deleteCategoryAndProdSById(Integer categoryId) {
         Assertions.notNull(categoryId);
         ProductCategory productCategory = new ProductCategory();
+        productCategory.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_YES_DELETE);
         productCategory.setId(categoryId);
-        productCategory.setIsDelete(1);
         int categoryNum = productCategoryMapper.updateById(productCategory);
         if (categoryNum != 1){
-            return new ResponseObject(false,"删除失败");
+            return new ResponseObject(false, ResponseViewEnums.SUCCESS);
         }
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("product_category_id",categoryId)
-                .eq("is_delete",0);
+                .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_YES_DELETE);
         List<Product> productList = productMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(productList)){
-            return new ResponseObject(true,"删除成功");
+            return new ResponseObject(true,ResponseViewEnums.SUCCESS);
         }
         List<Long> productIdS = PublicUtilS.getValueList(productList,"id");
         if (CollectionUtils.isEmpty(productIdS)){
-            return new ResponseObject(true,"删除成功");
+            return new ResponseObject(true,ResponseViewEnums.SUCCESS);
         }
         Integer deleteNum = productMapper.deleteLogicBatchIds(productIdS);
-        if (deleteNum < 1){
-            return new ResponseObject(false,"删除失败，请检查后操作");
+        if (deleteNum < NumConstants.INT_NUM_1){
+            return new ResponseObject(false,ResponseViewEnums.DELETE_FAILED);
         }
-        return new ResponseObject(true,"删除成功");
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 }

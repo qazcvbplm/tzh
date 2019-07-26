@@ -64,6 +64,7 @@ public class SpringUtil implements ApplicationContextAware {
         if (stringRedisTemplate == null) {
             return false;
         } else {
+            stringRedisTemplate.opsForValue().set("cache","true");
             String rs = stringRedisTemplate.opsForValue().get("cache");
             if (rs == null) {
                 return false;

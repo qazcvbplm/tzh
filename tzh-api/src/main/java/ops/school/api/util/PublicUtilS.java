@@ -1,6 +1,7 @@
 package ops.school.api.util;
 
 import com.alibaba.fastjson.JSON;
+import ops.school.api.entity.Coupon;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import com.ibatis.common.beans.Probe;
@@ -60,6 +61,100 @@ public class PublicUtilS {
     }
 
     /**
+     * 根据字段名获取list
+     */
+    @SuppressWarnings("unchecked")
+    public static <K, V, E> Map<K, V> getValueMap(List<E> list, String keyProp) {
+
+        Map<K, V> map = new LinkedHashMap<>();
+
+        if (CollectionUtils.isNotEmpty(list)) {
+
+            list.removeAll(Collections.singleton(null));
+
+            for (E object : list) {
+
+                K key = null;
+                try {
+                    key = (K) PROBE.getObject(object, keyProp);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (key != null) {
+                    map.put(key, (V) object);
+                }
+
+            }
+
+        }
+        return map;
+    }
+
+
+    /**
+     * @date:   2019/7/26 17:19
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.Map<K,java.util.List<V>>
+     * @param   list
+     * @param   keyProp
+     * @param   valueProp
+     * @Desc:   desc
+     */
+    @SuppressWarnings("unchecked")
+    public static <K, V, E> Map<K, List<V>> listforListMap(List<E> list,String keyProp, String valueProp) {
+        Map<K, List<V>> map = Collections.emptyMap();
+        if (CollectionUtils.isNotEmpty(list)) {
+            list.removeAll(Collections.singleton(null));
+            map = new HashMap<K, List<V>>(list.size());
+            V value = null;
+            for (E object : list) {
+                K key = (K) PROBE.getObject(object, keyProp);
+                if (StringUtils.isEmpty(valueProp)) {
+                    value = (V) object;
+                } else {
+                    value = (V) PROBE.getObject(object, valueProp);
+                }
+                List<V> values = map.get(key);
+                if (values == null) {
+                    values = new ArrayList<V>();
+                }
+                values.add(value);
+                map.put(key, values);
+            }
+        }
+        return map;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <K, V, E> Map<K, List<V>> listforEqualKeyListMap(List<E> list,String keyProp) {
+        Map<K, List<V>> map = Collections.emptyMap();
+        if (CollectionUtils.isNotEmpty(list)) {
+            list.removeAll(Collections.singleton(null));
+            map = new HashMap<K, List<V>>(list.size());
+            V value = null;
+            for (E object : list) {
+                K key = (K) PROBE.getObject(object, keyProp);
+                value = (V) object;
+                //如果map里面有key，则取出value
+                List<V> valueListInMap = null;
+                if (map.containsKey(key)){
+                    valueListInMap = map.get(key);
+                    valueListInMap.add(value);
+                    map.put(key,valueListInMap);
+                    continue;
+                }
+                List<V> values = map.get(key);
+                if (values == null) {
+                    values = new ArrayList<V>();
+                }
+                values.add(value);
+                map.put(key, values);
+            }
+        }
+        return map;
+    }
+    /**
      * 根据字段名将list转为map
      */
     @SuppressWarnings("unchecked")
@@ -75,7 +170,7 @@ public class PublicUtilS {
 
                 K key = null;
                 try {
-                    key = (K) ReflectUtilS.getValue(object, keyProp);
+                    key = (K) PROBE.getObject(object, keyProp);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -247,5 +342,8 @@ public class PublicUtilS {
         List list = GetPropertyList(shopList, "id");
 
         List map3 = getValueList(shopList, "id");
+
     }
+
+
 }

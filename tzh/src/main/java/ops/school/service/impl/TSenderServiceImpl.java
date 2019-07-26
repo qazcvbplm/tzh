@@ -3,13 +3,15 @@ package ops.school.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import ops.school.api.config.Server;
 import ops.school.api.dto.SenderTj;
-import ops.school.api.dto.redis.SchoolAddMoneyDTO;
-import ops.school.api.dto.redis.SenderAddMoneyDTO;
-import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.*;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.*;
 import ops.school.api.util.RedisUtil;
 import ops.school.config.RabbitMQConfig;
+import ops.school.message.dto.SchoolAddMoneyDTO;
+import ops.school.message.dto.SenderAddMoneyDTO;
+import ops.school.message.dto.WxUserAddSourceDTO;
 import ops.school.service.TSenderService;
 import ops.school.util.WxMessageUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -75,7 +77,9 @@ public class TSenderServiceImpl implements TSenderService {
         if ((rs = ordersService.senderAccept(orders)) == 1) {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-            WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
+            if (formIds.size() > 0){
+                WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
+            }
         }
         return rs;
     }
@@ -152,9 +156,11 @@ public class TSenderServiceImpl implements TSenderService {
         stringRedisTemplate.convertAndSend(Server.PRODUCTADD, orderId);
         List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
         if (orders.getTyp().equals("外卖订单")) {
-            WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(2));
-            // 删除redis缓存
-            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
+            if (formIds.size() > 0){
+                WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(2));
+                // 删除redis缓存
+                stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
+            }
         }
         //结算
         rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_ORDERS_COMPLETE, orders.getId());
@@ -184,7 +190,9 @@ public class TSenderServiceImpl implements TSenderService {
         if ((rs = runOrdersService.senderAccept(orders)) == 1) {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-            WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+            if (formIds.size() > 0){
+                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+            }
         }
         return rs;
     }
@@ -195,12 +203,33 @@ public class TSenderServiceImpl implements TSenderService {
         if (runOrdersService.end(orderId) == 1) {
             RunOrders orders = runOrdersService.getById(orderId);
             Sender sender = senderService.findById(orders.getSenderId());
+            // 对配送员信息进行校验
+            Assertions.notNull(sender, ResponseViewEnums.SCHOOL_HAD_CHANGE);
+            School school = schoolService.findById(sender.getSchoolId());
+            // 对学校信息进行校验
+            Assertions.notNull(school, ResponseViewEnums.SCHOOL_HAD_CHANGE);
+            /**
+             * 超级后台所得
+             */
+            // 超级后台所得对应金额 --> 支付价格＊  比例
+            BigDecimal appGetTotal = orders.getTotalPrice().multiply(school.getRate());
+            // 配送员所得 -->
             BigDecimal senderGet = orders.getTotalPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
+            /**
+             * 负责人所得
+             */
+            BigDecimal schoolGet = orders.getTotalPrice().subtract(senderGet).subtract(appGetTotal);
+            /**
+             * 将配送员所得存进redis缓存
+             */
             stringRedisTemplate.convertAndSend(Server.SENDERBELL,
                     new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
             );
+            /**
+             * 将负责人所得存进redis缓存
+             */
             stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
-                    new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getTotalPrice().subtract(senderGet), senderGet).toJsonString()
+                    new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGet, senderGet).toJsonString()
             );
             // senderAddMoney(orders.getTotalPrice(),orders.getSenderId());
             // 增加积分
@@ -212,10 +241,12 @@ public class TSenderServiceImpl implements TSenderService {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             // 从Redis里面获取
             List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-            // 发送微信信息模板
-            WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
-            // 删除redis缓存
-            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
+            if (formIds.size() > 0){
+                // 发送微信信息模板
+                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
+                // 删除redis缓存
+                stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
+            }
         }
     }
 

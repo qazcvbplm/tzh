@@ -13,6 +13,10 @@ public enum ResponseViewEnums implements RootEnums{
     SUCCESS("1210001","操作成功"),
     /**操作失败*/
     FAILED("1210002","操作失败"),
+    /**操作失败*/
+    DELETE_FAILED("1210003","删除失败，请检查后操作"),
+
+
     /**----------2-楼栋错误-----------*/
     FLOOR_SELECT_NULL("1220001","楼栋数据变更，更新后操作"),
 
@@ -38,8 +42,11 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------7-学校信息错误-----------*/
     SCHOOL_HAD_CHANGE("1270001","学校信息发生变化，请联系后台管理"),
 
-    /**----------8-学校信息错误-----------*/
+    /**----------8-店铺信息错误-----------*/
     SHOP_HAD_CHANGE("1280001","店铺信息发生变化，请联系后台管理"),
+
+    /**----------9-配送员信息错误-----------*/
+    SENDER_HAD_CHANGE("1290001","配送员信息发生变化，请联系后台管理"),
     ;
 
     private String errorCode;

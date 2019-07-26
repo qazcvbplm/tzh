@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 /**
@@ -52,7 +53,11 @@ public class ShopCoupon implements Serializable {
     @NotNull
     private Integer isDelete;
 
+    @TableField(exist = false)
     private Coupon coupon;
+
+    @TableField(exist = false)
+    private Shop shop;
 
     private static final long serialVersionUID = 1L;
 
@@ -110,6 +115,14 @@ public class ShopCoupon implements Serializable {
 
     public void setCoupon(Coupon coupon) {
         this.coupon = coupon;
+    }
+
+    public Shop getShop() {
+        return shop;
+    }
+
+    public void setShop(Shop shop) {
+        this.shop = shop;
     }
 
     @Override

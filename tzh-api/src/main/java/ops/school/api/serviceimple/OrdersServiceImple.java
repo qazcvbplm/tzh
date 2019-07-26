@@ -9,6 +9,7 @@ import ops.school.api.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,9 +71,11 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
 
     @Override
     public List<Orders> findByShopYJS(int shopId, int page, int size) {
-        Shop s = new Shop();
-        s.setId(shopId);
-        return ordersMapper.findByShopYJS(s,page,size);
+        Map<String,Object> map = new HashMap<>();
+        map.put("id",shopId);
+        map.put("page",page);
+        map.put("size",size);
+        return ordersMapper.findByShopYJS(map);
     }
 
     @Override

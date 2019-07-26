@@ -1,15 +1,15 @@
 package ops.school.message;
 
 import com.alibaba.fastjson.JSON;
-import ops.school.api.dto.redis.RedisMessage;
-import ops.school.api.dto.redis.SenderAddMoneyDTO;
-import ops.school.api.dto.redis.WxUserAddSourceDTO;
 import ops.school.api.entity.Logs;
 import ops.school.api.entity.WxUser;
 import ops.school.api.service.LogsService;
 import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
+import ops.school.message.dto.BaseMessage;
+import ops.school.message.dto.SenderAddMoneyDTO;
+import ops.school.message.dto.WxUserAddSourceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +28,7 @@ public class WxUserListener {
     private LogsService logsService;
 
     public void receiveMessage(String message) {
-        RedisMessage redisMessage = JSON.parseObject(message, RedisMessage.class);
+        BaseMessage redisMessage = JSON.parseObject(message, BaseMessage.class);
         if (redisMessage.getType().equals("addsource")) {
             WxUserAddSourceDTO wxUserAddSourceDTO = JSON.parseObject(message, WxUserAddSourceDTO.class);
             addsource(wxUserAddSourceDTO.getOpenId(), wxUserAddSourceDTO.getSource());

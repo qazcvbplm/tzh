@@ -1,8 +1,8 @@
-package ops.school.api.dto.redis;
+package ops.school.message.dto;
 
 import java.math.BigDecimal;
 
-public class SenderAddMoneyDTO extends RedisMessage {
+public class SenderAddMoneyDTO extends BaseMessage {
 
     private String openId;
 
