@@ -602,6 +602,19 @@ public class TOrdersServiceImpl implements TOrdersService {
                     school.setUserChargeSend(school.getUserChargeSend().add(orders.getPayFoodCoupon()));
                     schoolService.updateById(school);
                 }
+                // 如果订单使用优惠券 --> 退还优惠券
+                if (orders.getCouponId() != null && orders.getCouponId() != 0){
+                    // 用户优惠券
+                    WxUserCoupon wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+                    if (wxUserCoupon != null){
+                        // 修改状态为0
+                        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NOT_USED);
+                        int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
+                        if (updateUserCouponNum != NumConstants.INT_NUM_1){
+                            logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+                        }
+                    }
+                }
                 if (!temp.equals("待付款")) {
                     if (orders.getPayment().equals("余额支付")) {
                         // 订单消费的余额要退回用户余额内
