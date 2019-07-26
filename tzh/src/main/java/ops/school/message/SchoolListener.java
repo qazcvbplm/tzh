@@ -3,8 +3,6 @@ package ops.school.message;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dao.MqttMapper;
-import ops.school.api.dto.redis.RedisMessage;
-import ops.school.api.dto.redis.SchoolAddMoneyDTO;
 import ops.school.api.entity.Mqtt;
 import ops.school.api.entity.School;
 import ops.school.api.service.SchoolService;
@@ -12,6 +10,8 @@ import ops.school.api.service.SenderService;
 import ops.school.api.service.TxLogService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
+import ops.school.dto.message.RedisMessage;
+import ops.school.dto.message.SchoolAddMoneyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
