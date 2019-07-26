@@ -19,6 +19,7 @@ public class OrderInit implements CommandLineRunner {
     private OrdersService ordersService;
     @Override
     public void run(String... args) throws Exception {
+        System.out.println("v1.0");
         List<Orders> orders= ordersService.findAllDjs();
         for(Orders temp:orders){
             String key = "SHOP_DJS"+temp.getShopId();

@@ -654,16 +654,12 @@ public class TOrdersServiceImpl implements TOrdersService {
         queryWrapper.lambda().eq(Orders::getId,orderId);
         Orders orders = ordersService.getOne(queryWrapper);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        synchronized (orders.getShopId()) {
             Orders update = new Orders();
             update.setShopId(orders.getShopId());
             update.setId(orderId);
             update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
-            synchronized (update.getShopId()) {
-                int water = ordersService.waterNumber(update);
-//                int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
-                update.setWaterNumber(water + 1);
-            }
+        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
+        update.setWaterNumber(water);
             int res = ordersService.shopAcceptOrderById(update);
             if (res == 1) {
                 if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
@@ -679,7 +675,6 @@ public class TOrdersServiceImpl implements TOrdersService {
                 return orders.getShopId();
             }
             return 0;
-        }
     }
 
 
