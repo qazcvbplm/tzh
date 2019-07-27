@@ -13,7 +13,6 @@ import java.util.Map;
 /**
  * WxUserCouponDAO继承基类
  */
-@Repository
 public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
 
     /**
@@ -91,10 +90,9 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @author: Lee
      * @version:version
      * @return: java.util.List
-     * @param map map集合  wxUserId 和 shopId
      * @Desc:   desc 根据店铺查询用户所有可用的优惠券
      */
-    List<WxUserCoupon> findUserCoupon(Map<String,Object> map);
+    // List<WxUserCoupon> findUserCoupon(@Param("wxUserId") Long wxUserId, @Param("shopId") Long shopId);
 
     /**
      * @date:
@@ -116,4 +114,12 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @Desc:   desc 分页查询用户所有的优惠券（isInvalid不传查所有，传0查有效）
      */
     List<WxUserCoupon> pageFindALLCouponsByUserId(@Param("userId") Long userId, @Param("wxUserCoupon") WxUserCoupon wxUserCoupon);
+
+    /**
+     * Fang
+     * @param wxUserId
+     * @param shopId
+     * @return
+     */
+    List<WxUserCoupon> userFindCouponsByWIdSId(@Param("wxUserId") Long wxUserId, @Param("shopId") Long shopId);
 }
