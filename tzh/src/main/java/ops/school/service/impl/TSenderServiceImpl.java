@@ -95,21 +95,21 @@ public class TSenderServiceImpl implements TSenderService {
             // 已送达到楼上
             orders.setDestination(1);
             if (ordersService.end(orders) == 1) {
-                BigDecimal senderGet = new BigDecimal(0);
-                if (orders.getSenderId() != 0) {
-                    // 配送员获得金额
-                    senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
-                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
-                    );
-                }
-                stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
-                        new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
-                );
-                // 增加积分
-                stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                        new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
-                );
+//                BigDecimal senderGet = new BigDecimal(0);
+//                if (orders.getSenderId() != 0) {
+//                    // 配送员获得金额
+//                    senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
+//                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+//                    );
+//                }
+//                stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
+//                        new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
+//                );
+//                // 增加积分
+//                stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                        new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+//                );
 
             } else {
                 return;
@@ -136,17 +136,17 @@ public class TSenderServiceImpl implements TSenderService {
                     School school = schoolService.findById(orders.getSchoolId());
                     school.setUserChargeSend(school.getUserChargeSend().add(returnPrice));
                     schoolService.updateById(school);
-                    BigDecimal senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
-                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
-                    );
-                    stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
-                            new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
-                    );
-                    // 增加积分
-                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                            new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
-                    );
+//                    BigDecimal senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
+//                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+//                    );
+//                    stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
+//                            new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
+//                    );
+//                    // 增加积分
+//                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                            new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+//                    );
                 }
             } else {
                 return;

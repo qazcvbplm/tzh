@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dao.SchoolMapper;
+import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.project.OrderTempDTO;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
@@ -23,6 +24,9 @@ import ops.school.api.wxutil.AmountUtils;
 import ops.school.constants.NumConstants;
 import ops.school.constants.OrderConstants;
 import ops.school.constants.ProductConstants;
+import ops.school.message.dto.SchoolAddMoneyDTO;
+import ops.school.message.dto.SenderAddMoneyDTO;
+import ops.school.message.dto.WxUserAddSourceDTO;
 import ops.school.service.TCouponService;
 import ops.school.service.TOrdersService;
 import ops.school.service.TShopFullCutService;
@@ -66,7 +70,7 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Autowired
     private OrdersService ordersService;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private WxUserBellMapper wxUserBellMapper;
     @Autowired
     private SchoolMapper schoolMapper;
     @Autowired
@@ -937,29 +941,48 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersComplete.setOrderId(orderId);
         orderCompleteService.save(ordersComplete);
         /**
-         * 将配送员所得金额添加到配送员账户内
+         * 对配送员所得存储
          */
-        WxUser wxUser = wxUserService.findById(sender.getOpenId());
-        WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId()+"-"+wxUser.getPhone());
-        wxUserBell.setMoney(wxUserBell.getMoney().add(senderGetTotal));
-        if (!wxUserBellService.updateById(wxUserBell)){
-            logger.error("配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
-            System.out.println("配送员所得金额添加失败，请联系负责人");
-        }
-        // 将负责人所得添加到负责人可提现金额内
-        school.setMoney(school.getMoney().add(senderGetTotal));
-        school.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
-        if (schoolMapper.updateByPrimaryKeySelective(school) == 0){
-            logger.error("负责人所得金额为"+schoolGetSender+"配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
-            System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
-        }
-        // 将店铺所得添加到店铺可提现金额内
-        shop.setTxAmount(shop.getTxAmount().add(shopGetTotal));
-        boolean rs = shopService.updateById(shop);
-        if (!rs){
-            logger.error("店铺所得金额为"+shopGetTotal+"添加失败，请联系负责人");
-            System.out.println("店铺所得金额添加失败，请联系负责人");
-        }
+        stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+                new SenderAddMoneyDTO(sender.getOpenId(), senderGetTotal).toJsonString()
+        );
+        /**
+         * 对负责人所得存储
+         */
+        stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
+                new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGetTotal, senderGetTotal).toJsonString()
+        );
+        // 增加积分
+        stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+                new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+        );
+//        /**
+//         * 将配送员所得金额添加到配送员账户内
+//         */
+//        WxUser wxUser = wxUserService.findById(sender.getOpenId());
+//        WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId()+"-"+wxUser.getPhone());
+//        wxUserBell.setMoney(wxUserBell.getMoney().add(senderGetTotal));
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("amount",wxUserBell.getMoney().add(senderGetTotal));
+//        map.put("phone",wxUserBell.getPhone());
+//        if (wxUserBellMapper.txUpdate(map) == 0){
+//            logger.error("配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+//            System.out.println("配送员所得金额添加失败，请联系负责人");
+//        }
+//        // 将负责人所得添加到负责人可提现金额内
+//        school.setMoney(school.getMoney().add(senderGetTotal));
+//        school.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
+//        if (schoolMapper.updateByPrimaryKeySelective(school) == 0){
+//            logger.error("负责人所得金额为"+schoolGetSender+"配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+//            System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
+//        }
+//        // 将店铺所得添加到店铺可提现金额内
+//        shop.setTxAmount(shop.getTxAmount().add(shopGetTotal));
+//        boolean rs = shopService.updateById(shop);
+//        if (!rs){
+//            logger.error("店铺所得金额为"+shopGetTotal+"添加失败，请联系负责人");
+//            System.out.println("店铺所得金额添加失败，请联系负责人");
+//        }
         return 0;
     }
 
