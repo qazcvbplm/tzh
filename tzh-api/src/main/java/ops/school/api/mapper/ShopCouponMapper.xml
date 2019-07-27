@@ -8,6 +8,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="create_id" property="createId" jdbcType="BIGINT" />
     <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+    <result column="coupon_type" property="couponType" jdbcType="INTEGER" />
     <collection property="shop" ofType="ops.school.api.entity.Shop">
         <id column="ShopId" jdbcType="INTEGER" property="id"/>
         <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
@@ -47,7 +48,8 @@
         coupon_id,
         create_time,
         create_id,
-        is_delete
+        is_delete,
+        coupon_type
     </sql>
 
     <sql id="Rel_Column_List" >
@@ -57,6 +59,7 @@
         shop_coupon.create_time,
         shop_coupon.create_id,
         shop_coupon.is_delete,
+        shop_coupon.coupon_type,
         shop.Id AS ShopId,
         shop.school_id,
         shop.shop_name,
@@ -114,6 +117,9 @@
     </if>
     <if test="isDelete != null and isDelete != '' ">
         AND is_delete = #{isDelete}
+    </if>
+    <if test="couponType != null and couponType != '' ">
+        AND coupon_type = #{couponType}
     </if>
 </sql>
 
@@ -201,7 +207,7 @@
     <insert id="insertOne" parameterType="ops.school.api.entity.ShopCoupon">
     insert into <include refid="Table_Name"/>
     values (
-    null, #{shopId}, #{couponId}, now(), #{createId}, 0
+    null, #{shopId}, #{couponId}, now(), #{createId}, 0, 0
     );
 </insert>
 
@@ -223,7 +229,7 @@
             #{item.couponId},
             now(),
             #{item.createId},
-            #{item.isDelete}
+            #{item.isDelete},
             #{item.couponType}
         )
         </foreach>
