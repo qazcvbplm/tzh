@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -155,7 +156,7 @@ public class Task {
         } else {
             orders = ordersService.list(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "商家已接手"));
         }
-        if (!orders.isEmpty()) {
+        if (orders != null) {
             for (Orders order : orders) {
                 School school = schoolService.findById(order.getSchoolId());
                 long currentTime = System.currentTimeMillis();

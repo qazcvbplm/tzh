@@ -26,19 +26,25 @@ public class OrderTempDTO {
     private BigDecimal productPrice;
 
     /**
-     * 优惠后价格
+     * 优惠的价格
      */
-    private BigDecimal afterDiscountPrice;
+    private BigDecimal discountPrice;
+
+    /**
+     * 粮票金额
+     */
+    private BigDecimal payFoodCoupon;
 
     public OrderTempDTO() {
     }
 
-    public OrderTempDTO(BigDecimal sendPrice, BigDecimal boxPrice, BigDecimal payPrice, BigDecimal productPrice, BigDecimal afterDiscountPrice) {
+    public OrderTempDTO(BigDecimal sendPrice, BigDecimal boxPrice, BigDecimal payPrice, BigDecimal productPrice, BigDecimal discountPrice, BigDecimal payFoodCoupon) {
         this.sendPrice = sendPrice;
         this.boxPrice = boxPrice;
         this.payPrice = payPrice;
         this.productPrice = productPrice;
-        this.afterDiscountPrice = afterDiscountPrice;
+        this.discountPrice = discountPrice;
+        this.payFoodCoupon = payFoodCoupon;
     }
 
     public BigDecimal getSendPrice() {
@@ -73,12 +79,20 @@ public class OrderTempDTO {
         this.productPrice = productPrice;
     }
 
-    public BigDecimal getAfterDiscountPrice() {
-        return afterDiscountPrice;
+    public BigDecimal getDiscountPrice() {
+        return discountPrice;
     }
 
-    public void setAfterDiscountPrice(BigDecimal afterDiscountPrice) {
-        this.afterDiscountPrice = afterDiscountPrice;
+    public void setDiscountPrice(BigDecimal discountPrice) {
+        this.discountPrice = discountPrice;
+    }
+
+    public BigDecimal getPayFoodCoupon() {
+        return payFoodCoupon;
+    }
+
+    public void setPayFoodCoupon(BigDecimal payFoodCoupon) {
+        this.payFoodCoupon = payFoodCoupon;
     }
 
     @Override
@@ -90,11 +104,12 @@ public class OrderTempDTO {
                 boxPrice.equals(that.boxPrice) &&
                 payPrice.equals(that.payPrice) &&
                 productPrice.equals(that.productPrice) &&
-                afterDiscountPrice.equals(that.afterDiscountPrice);
+                discountPrice.equals(that.discountPrice) &&
+                payFoodCoupon.equals(that.payFoodCoupon);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sendPrice, boxPrice, payPrice, productPrice, afterDiscountPrice);
+        return Objects.hash(sendPrice, boxPrice, payPrice, productPrice, discountPrice, payFoodCoupon);
     }
 }

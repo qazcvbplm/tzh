@@ -158,7 +158,7 @@ public class TCouponServiceImpl implements TCouponService {
         if (couponId == null){
             return -1;
         }
-        if (coupon != null && coupon.getShopIds().isEmpty()){
+        if (coupon != null && StringUtils.hasText(coupon.getShopIds())){
             return 2;
         }
         String[] shopIdS = coupon.getShopIds().split(",");

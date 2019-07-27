@@ -56,6 +56,9 @@ public enum ResponseViewEnums implements RootEnums{
 
     /**----------9-配送员信息错误-----------*/
     SENDER_HAD_CHANGE("1290001","配送员信息发生变化，请联系后台管理"),
+
+    /**----------10-订单完成表信息错误-----------*/
+    ORDERSCOMPLETE_HAD_ERROR("1300001","订单完成表信息错误，请联系后台管理"),
     ;
 
     private String errorCode;

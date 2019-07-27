@@ -13,6 +13,7 @@ import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -44,7 +45,7 @@ public class TShopCouponServiceImpl implements TShopCouponService {
     @Override
     public int bindShopCoupon(String couponId, String shopIds) {
         Coupon coupon = couponService.getById(couponId);
-        if (coupon != null && !shopIds.isEmpty()){
+        if (coupon != null && StringUtils.hasText(shopIds)){
             String[] shopId = shopIds.split(",");
             for (int i = 0; i < shopId.length ; i++) {
                 ShopCoupon shopCoupon = new ShopCoupon();

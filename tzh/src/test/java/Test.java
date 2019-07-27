@@ -73,15 +73,6 @@ public class Test {
 
     @org.junit.Test
     public void wxPhoneTest(){
-        String encrypData = "5GrGvJFACGg3YKNUcO2TbvQbjCyOkWnz9f0qPaAWtNLMKF872LSL5zle8kQf0b5IcWAwaRdgsGkSk4BdALn93BbueQNnuIiYZA6yz4J81FhTL/ZWtuquOuuI+Sm/N+YWd8AkECqBskGoE0eIAqFuTB+Z892mdmngukR+SDDMg0ff36AUxOJROZPbY7YKxmxvwD/RNhlyjWNqJmlO+O7Q4A==";
-        String ivData =  "bB1fP2EQoNDV3gYMPP3QCg==";
-        String sessionKey =  "s9aZmQNEK5MDivm85/5uDg==";
-        try {
-            String rs = Base64Util.getPhoneNumberBeanS5(encrypData,sessionKey,ivData);
-            System.out.println(rs);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
+        tOrdersService.orderSettlement("201907271706272822542855187");
     }
 }
