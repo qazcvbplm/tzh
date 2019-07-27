@@ -83,7 +83,7 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @param
      * @Desc:   desc 修改用户优惠券is_invalid状态
      */
-    int update(WxUserCoupon userCoupon);
+    int updateOnee(WxUserCoupon userCoupon);
 
     /**
      * @date:

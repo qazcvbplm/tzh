@@ -23,8 +23,9 @@ mybatis-plus:
   mapper-locations: ops/school/api/mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#    cache-enabled: false
-#    map-underscore-to-camel-case: true
+    cache-enabled: false
+    map-underscore-to-camel-case: true
+
 ops:
   redis:
     cache: true

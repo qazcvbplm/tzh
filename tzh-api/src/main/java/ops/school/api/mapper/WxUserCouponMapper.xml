@@ -164,7 +164,7 @@
     </select>
 
     <!--修改用户优惠券is_invalid状态-->
-    <update id="update" parameterType="ops.school.api.entity.WxUserCoupon">
+    <update id="updateOnee" parameterType="ops.school.api.entity.WxUserCoupon">
         UPDATE <include refid="Table_Name"/>
         set is_invalid = #{isInvalid}
         where id = #{id}
