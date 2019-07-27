@@ -31,7 +31,7 @@ server:
     enabled: true
     mime-types: image/png,image/jpeg,image/jpg,text/html,application/javascript,text/css,application/octet-stream,application/json
     min-response-size: 1024
-  port: 11000
+  port: 18888
 spring:
   application:
     name: ops

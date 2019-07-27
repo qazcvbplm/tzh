@@ -1,3 +1,5 @@
+#开发dev端口18888
+#线上prod端口11000
 spring:
   profiles:
     active: prod
