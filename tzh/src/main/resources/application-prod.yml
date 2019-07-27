@@ -20,9 +20,11 @@ logging:
       util: debug
   root: debug
 mybatis-plus:
+  mapper-locations: ops/school/api/mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: ops/school/api/mapper/*.xml
+#    cache-enabled: false
+#    map-underscore-to-camel-case: true
 ops:
   redis:
     cache: true
@@ -31,7 +33,7 @@ server:
     enabled: true
     mime-types: image/png,image/jpeg,image/jpg,text/html,application/javascript,text/css,application/octet-stream,application/json
     min-response-size: 1024
-  port: 18888
+  port: 11000
 spring:
   application:
     name: ops
