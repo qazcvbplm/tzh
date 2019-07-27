@@ -29,13 +29,13 @@ public class TZHExceptionHandler {
      */
 
     @ExceptionHandler(DisplayException.class)
-    public ResponseObject errorHandlerDisPlay(DisplayException ex) {
+    public ResponseObject handlerDisplayException(DisplayException ex) {
         logger.error(ex.getMessage(), ex);
         return new ResponseObject(false, ex.getMessage());
     }
 
     @ExceptionHandler(YWException.class)
-    public ResponseObject errorHandlerYW(YWException ex) {
+    public ResponseObject handlerYWException(YWException ex) {
        /* stringWriter = new StringWriter();
         ex.printStackTrace(new PrintWriter(stringWriter));*/
         StackTraceElement[] trace = ex.getStackTrace();
@@ -75,7 +75,6 @@ public class TZHExceptionHandler {
         // logger.error(e.getMessage(), e);
         return new ResponseObject(false, "页面被外星人带走了！");
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseObject handleException(Exception ex) {
