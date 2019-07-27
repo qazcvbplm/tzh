@@ -43,7 +43,7 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
         if (wxUserCoupon == null || wxUserCoupon.getId() == null || wxUserCoupon.getIsInvalid() == null){
             return -1;
         }
-        int rs = wxUserCouponMapper.update(wxUserCoupon);
+        int rs = wxUserCouponMapper.updateOnee(wxUserCoupon);
         return rs;
     }
 

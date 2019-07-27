@@ -11,5 +11,5 @@ public interface ProductAttributeMapper extends BaseMapper<ProductAttribute> {
 
     int updateByPrimaryKey(ProductAttribute record);
 
-    int delete(int id);
+    int deleteOne(int id);
 }

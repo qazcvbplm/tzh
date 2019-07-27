@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FullCutMapper extends BaseMapper<FullCut> {
 
-    int delete(int id);
+    int deleteOne(int id);
 
     List<FullCut> findByShop(int shopId);
 }

@@ -203,7 +203,7 @@
         AND is_delete = 0
     </update>
 
-    <insert id="insert" parameterType="ops.school.api.entity.ShopCoupon">
+    <insert id="insertOne" parameterType="ops.school.api.entity.ShopCoupon">
     insert into <include refid="Table_Name"/>
     values (
     null, #{shopId}, #{couponId}, now(), #{createId}, 0, 0
