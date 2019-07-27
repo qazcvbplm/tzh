@@ -208,19 +208,7 @@ public class WxUserController {
         List<Map<String,Object>> wxUserCoupons = tWxUserCouponService.findAllUserCoupons(Long.valueOf(wxUserId));
         return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
     }
-    /**
-     * @author Lee
-     * 根据店铺查询用户所有可用的优惠券
-     * @param wxUserId 用户id
-     * @param shopId 店铺id
-     * @return
-     */
-    @RequestMapping(value = "findWxUserCoupons", method = RequestMethod.POST)
-    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId, @RequestParam String shopId){
 
-        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId),Long.valueOf(shopId));
-        return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
-    }
 
     /**
      * 对加密手机号进行解密

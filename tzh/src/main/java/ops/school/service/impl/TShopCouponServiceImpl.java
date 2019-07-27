@@ -86,10 +86,16 @@ public class TShopCouponServiceImpl implements TShopCouponService {
         Assertions.notNull(coupon, ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         //如果是平台优惠券不需要绑定店铺直接返回
         //现在的逻辑是所有的优惠券绑定店铺
-        if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_PLATE || coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME){
+        if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_PLATE ){
             ShopCoupon shopCoupon2 = new ShopCoupon();
             shopCoupon2.setCoupon(coupon);
-            shopCoupon2.setShopId(NumConstants.Long_NUM_0);
+            shopCoupon2.setShopId(CouponConstants.USER_COUPON_TYPE_PLATE);
+            return shopCoupon2;
+        }
+        if ( coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME){
+            ShopCoupon shopCoupon2 = new ShopCoupon();
+            shopCoupon2.setCoupon(coupon);
+            shopCoupon2.setShopId(CouponConstants.USER_COUPON_TYPE_HOME);
             return shopCoupon2;
         }
         //店铺优惠券，或者首页优惠券（需要绑定店铺）查询是否绑定店铺
