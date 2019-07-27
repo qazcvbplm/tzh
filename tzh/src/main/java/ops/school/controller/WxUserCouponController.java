@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Coupon;
+import ops.school.api.entity.Shop;
 import ops.school.api.entity.WxUserCoupon;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
@@ -51,7 +52,32 @@ public class WxUserCouponController {
     public ResponseObject pageFindALLCouponsByUserId(Long userId,WxUserCoupon wxUserCoupon) {
         Assertions.notNull(userId, ResponseViewEnums.WX_USER_NEED_USER_ID);
         IPage<WxUserCoupon> resultList= tWxUserCouponService.pageFindALLCouponsByUserId(userId,wxUserCoupon);
-        return new ResponseObject(true, "查询成功").push("list", resultList.getRecords()).push("total",resultList.getTotal());
+        return new ResponseObject(true, "查询成功")
+                .push("list", resultList.getRecords())
+                .push("total",resultList.getTotal());
+    }
+
+
+    /**
+     * @date:   2019/7/27 17:15
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   userId
+     * @param   couponId
+     * @Desc:   desc
+     */
+    @ApiOperation(value="根据优惠券id查询所有优惠券是1，2的店铺",httpMethod="POST")
+    @ResponseBody
+    @RequestMapping(value = "shops", method = RequestMethod.POST)
+    public ResponseObject findALLType12ShopsByUserId(Long userId,Long couponId) {
+        Assertions.notNull(userId, ResponseViewEnums.WX_USER_NEED_USER_ID);
+        Assertions.notNull(couponId, ResponseViewEnums.COUPON_FIND_NEED_ID);
+        List<Shop> resultList= tWxUserCouponService.findALLType12ShopsByUserId(userId,couponId);
+        if (resultList == null){
+            return  new ResponseObject(false,ResponseViewEnums.FIND_FAILED);
+        }
+        return new ResponseObject(true,ResponseViewEnums.FIND_SUCCESS).push("shopList",resultList);
     }
 
 }

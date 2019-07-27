@@ -54,6 +54,9 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
 //        }else if ("wxuser".equals(school.getQueryType())){
 //            return schoolMapper.find(school);
 //        }
+        if (school.getPage() != null){
+            school.setPage(school.getPage()-1);
+        }
         List<School> schoolList = schoolMapper.find(school);
         return schoolList;
     }

@@ -12,6 +12,7 @@ import ops.school.constants.NumConstants;
 import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -69,7 +70,7 @@ public class TShopCouponServiceImpl implements TShopCouponService {
      */
     @Override
     public ShopCoupon findPoweredCouponBySIdAndSId(Long schoolId, Long shopId, Long couponId) {
-        Assertions.notNull(schoolId,shopId,couponId);
+        Assertions.notNull(schoolId,couponId);
         //先查询优惠券是否有效且存在
         QueryWrapper<Coupon> queryWrapperCoupon = new QueryWrapper<>();
         queryWrapperCoupon
@@ -83,22 +84,61 @@ public class TShopCouponServiceImpl implements TShopCouponService {
         Coupon coupon = couponService.getOne(queryWrapperCoupon);
         Assertions.notNull(coupon, ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         //如果是平台优惠券不需要绑定店铺直接返回
-        if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_PLATE){
+        //现在的逻辑是所有的优惠券绑定店铺
+        if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_PLATE || coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME){
             ShopCoupon shopCoupon2 = new ShopCoupon();
             shopCoupon2.setCoupon(coupon);
+            shopCoupon2.setShopId(NumConstants.Long_NUM_0);
             return shopCoupon2;
         }
         //店铺优惠券，或者首页优惠券（需要绑定店铺）查询是否绑定店铺
         QueryWrapper<ShopCoupon> queryWrapperShopCoupon = new QueryWrapper<>();
         queryWrapperShopCoupon
-                .eq("shop_id",shopId)
                 .eq("coupon_id",couponId)
                 .eq("is_delete", NumConstants.DB_TABLE_IS_DELETE_NO)
                 .select("id","shop_id","coupon_id","create_time","create_id","is_delete");
+        if (shopId != null){
+            queryWrapperShopCoupon.eq("shop_id",couponId);
+        }
         ShopCoupon shopCoupon = shopCouponMapper.selectOne(queryWrapperShopCoupon);
         Assertions.notNull(shopCoupon,ResponseViewEnums.COUPON_USER_GET_NEED_SHOP);
         //存在并绑定店铺则有效，返回
         shopCoupon.setCoupon(coupon);
         return shopCoupon;
+    }
+
+
+    /**
+     * @date:   2019/7/27 11:46
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   deleteShopIds
+     * @Desc:   desc 根据店铺id批量逻辑删除优惠卷
+     */
+    @Override
+    public Integer batchDeleteSCByShopId(List<Long> deleteShopIds) {
+        if (CollectionUtils.isEmpty(deleteShopIds)){
+            return 0;
+        }
+        Integer deleteNum = shopCouponMapper.batchDeleteSCByShopId(deleteShopIds);
+        return deleteNum;
+    }
+
+    /**
+     * @date:   2019/7/27 11:52
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   id
+     * @Desc:   desc 根据优惠券id批量逻辑删除优惠卷
+     */
+    @Override
+    public Integer batchDeleteSCByCouponId(Long id) {
+        if (id == null){
+            return 0;
+        }
+        Integer deleteNum = shopCouponMapper.batchDeleteSCByCouponId(id);
+        return deleteNum;
     }
 }

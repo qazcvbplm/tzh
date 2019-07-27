@@ -71,14 +71,14 @@ public class TZHExceptionHandler {
 //    }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseObject handlerNoFoundException(Exception e) {
+    public ResponseObject handlerNoFoundException(Exception ex) {
         // logger.error(e.getMessage(), e);
         return new ResponseObject(false, "页面被外星人带走了！");
     }
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseObject handleException(Exception e) {
+    public ResponseObject handleException(Exception ex) {
         return new ResponseObject(false, "服务器被外星人攻击了！");
     }
 

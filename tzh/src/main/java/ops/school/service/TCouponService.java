@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface TCouponService {
 
-    List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex);
+    List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex,Long userId);
 
     Integer count(Long schoolId, Integer couponType);
 
@@ -62,4 +62,15 @@ public interface TCouponService {
      * @Desc:   desc
      */
     ResponseObject updateOneById(Coupon coupon);
+
+    /**
+     * @date:   2019/7/27 11:57
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   coupon
+     * @Desc:   desc 根据优惠券id删除优惠券
+     */
+    ResponseObject deleteCouponAndShopByCId(Coupon coupon);
+
 }

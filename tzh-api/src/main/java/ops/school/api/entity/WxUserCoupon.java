@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
  * @author 
  */
 @Table(name="wx_user_coupon")
-public class WxUserCoupon extends Base implements Serializable {
+public class WxUserCoupon extends PageQueryDTO implements Serializable {
     /**
      * 主键id
      */
@@ -69,6 +69,9 @@ public class WxUserCoupon extends Base implements Serializable {
 
     @TableField(exist = false)
     private Coupon coupon;
+
+    @TableField(exist = false)
+    private Shop shop;
 
     private static final long serialVersionUID = 1L;
 
@@ -151,6 +154,15 @@ public class WxUserCoupon extends Base implements Serializable {
 
     public void setCoupon(Coupon coupon) {
         this.coupon = coupon;
+    }
+
+
+    public Shop getShop() {
+        return shop;
+    }
+
+    public void setShop(Shop shop) {
+        this.shop = shop;
     }
 
     @Override

@@ -58,6 +58,7 @@ public class FloorController {
             case "admin":
                 break;
         }
+        query.orderByDesc("sort");
         IPage<Floor> floorIPage = floorService.page(new Page<>(floor.getPage(), floor.getSize()), query);
         return new ResponseObject(true, "ok").push("list", floorIPage.getRecords()).
                 push("total", floorIPage.getTotal());

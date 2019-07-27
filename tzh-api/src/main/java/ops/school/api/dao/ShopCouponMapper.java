@@ -87,4 +87,24 @@ public interface ShopCouponMapper extends BaseMapper<ShopCoupon> {
      * @Desc:   desc 根据couponIds查询
      */
     List<ShopCoupon> batchFindSCByCouponIdS(@Param("list") List<Long> couponIdS);
+
+    /**
+     * @date:   2019/7/27 11:48
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   deleteShopIds
+     * @Desc:   desc 根据店铺id批量逻辑删除优惠卷
+     */
+    Integer batchDeleteSCByShopId(@Param("list") List<Long> deleteShopIds);
+
+    /**
+     * @date:   2019/7/27 11:53
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   id
+     * @Desc:   desc 根据优惠券id批量逻辑删除优惠卷
+     */
+    Integer batchDeleteSCByCouponId(Long id);
 }

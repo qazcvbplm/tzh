@@ -9,7 +9,7 @@
     <result column="create_id" property="createId" jdbcType="BIGINT" />
     <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
     <collection property="shop" ofType="ops.school.api.entity.Shop">
-        <id column="Id" jdbcType="INTEGER" property="id"/>
+        <id column="ShopId" jdbcType="INTEGER" property="id"/>
         <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
         <result column="shop_name" jdbcType="VARCHAR" property="shopName"/>
         <result column="shop_phone" jdbcType="VARCHAR" property="shopPhone"/>
@@ -57,7 +57,7 @@
         shop_coupon.create_time,
         shop_coupon.create_id,
         shop_coupon.is_delete,
-        shop.Id,
+        shop.Id AS ShopId,
         shop.school_id,
         shop.shop_name,
         shop.shop_phone,
@@ -178,7 +178,27 @@
     AND is_delete = 0
 </update>
 
-<insert id="insert" parameterType="ops.school.api.entity.ShopCoupon">
+
+    <!--CreatBy Fang Time:2019/7/27 11:54 |根据店铺id批量逻辑删除优惠卷  -->
+    <update id="batchDeleteSCByShopId">
+        UPDATE <include refid="Table_Name"/>
+        SET is_delete = 1
+        WHERE shop_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND is_delete = 0
+    </update>
+
+    <!--CreatBy Fang Time:2019/7/27 11:54 | 根据优惠券id批量逻辑删除优惠卷 -->
+    <update id="batchDeleteSCByCouponId">
+        UPDATE <include refid="Table_Name"/>
+        SET is_delete = 1
+        WHERE coupon_id = #{id}
+        AND is_delete = 0
+    </update>
+
+    <insert id="insert" parameterType="ops.school.api.entity.ShopCoupon">
     insert into <include refid="Table_Name"/>
     values (
     null, #{shopId}, #{couponId}, now(), #{createId}, 0

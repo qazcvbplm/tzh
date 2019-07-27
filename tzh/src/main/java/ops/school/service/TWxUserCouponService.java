@@ -1,6 +1,7 @@
 package ops.school.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import ops.school.api.entity.Shop;
 import ops.school.api.entity.WxUserCoupon;
 
 import java.util.List;
@@ -59,4 +60,14 @@ public interface TWxUserCouponService {
      */
     IPage<WxUserCoupon> pageFindALLCouponsByUserId(Long userId, WxUserCoupon wxUserCoupon);
 
+    /**
+     * @date:   2019/7/27 17:15
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.Shop>
+     * @param   userId
+     * @param   couponId
+     * @Desc:   desc 根据优惠券id查询所有优惠券是1，2的店铺
+     */
+    List<Shop> findALLType12ShopsByUserId(Long userId, Long couponId);
 }

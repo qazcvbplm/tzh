@@ -31,7 +31,7 @@ server:
     enabled: true
     mime-types: image/png,image/jpeg,image/jpg,text/html,application/javascript,text/css,application/octet-stream,application/json
     min-response-size: 1024
-  port: 12000
+  port: 11000
 spring:
   application:
     name: ops
@@ -55,19 +55,19 @@ spring:
     url: jdbc:mysql://sh-cdb-0e99ru5c.sql.tencentcdb.com:62580/ops?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
     validationQuery: SELECT 1 FROM DUAL
-redis:
-  host: 47.101.221.55
-  password: toor
-  port: 6379
-rabbitmq:
-  host: www.chuyinkeji.cn
-  port: 5672
-  username: root
-  password: tzh1234567890
-  publisher-confirms: true
-  publisher-returns: true
-  listener:
-    direct:
-      acknowledge-mode: manual
-    simple:
-      acknowledge-mode: manual
+  redis:
+    host: www.chuyinkeji.cn
+    password: tzh1234567890
+    port: 6379
+  rabbitmq:
+    host: www.chuyinkeji.cn
+    port: 5672
+    username: root
+    password: tzh1234567890
+    publisher-confirms: true
+    publisher-returns: true
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual

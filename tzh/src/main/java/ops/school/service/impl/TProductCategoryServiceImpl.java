@@ -54,7 +54,7 @@ public class TProductCategoryServiceImpl implements TProductCategoryService {
         }
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("product_category_id",categoryId)
-                .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_YES_DELETE);
+                .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_NO);
         List<Product> productList = productMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(productList)){
             return new ResponseObject(true,ResponseViewEnums.SUCCESS);

@@ -1,8 +1,10 @@
 package ops.school.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.models.auth.In;
 import ops.school.api.dao.*;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.*;
@@ -20,6 +22,7 @@ import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -43,15 +46,32 @@ public class TCouponServiceImpl implements TCouponService {
     @Autowired
     private WxUserMapper wxUserMapper;
 
+
+    @Autowired
+    private ShopCouponMapper shopCouponMapper;
+
+
     @Override
-    public List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex) {
-        if (schoolId == null || yesShowIndex == null){
-            return null;
-        }
+    public List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex,Long userId) {
+        Assertions.notNull(schoolId,yesShowIndex,userId);
         Map<String,Object> map = new HashMap<>();
         map.put("schoolId",schoolId);
         map.put("yesShowIndex",yesShowIndex);
-        return couponMapper.findByIndex(map);
+        List<Coupon> couponList = couponMapper.findByIndex(map);
+        if (CollectionUtils.isEmpty(couponList)){
+            return new ArrayList<>();
+        }
+        QueryWrapper<WxUserCoupon> wrapper = new QueryWrapper<>();
+        wrapper.eq("wx_user_id",userId);
+        List<WxUserCoupon> userCoupons =  wxUserCouponMapper.selectList(wrapper);
+        Map<Long,Integer> couponIdMap = PublicUtilS.listForMap(userCoupons,"couponId","couponType");
+        List<Coupon> result = new ArrayList<>();
+        for (Coupon coupon : couponList) {
+            if (couponIdMap.get(coupon.getId()) == null){
+                result.add(coupon);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -80,7 +100,7 @@ public class TCouponServiceImpl implements TCouponService {
         QueryWrapper<Coupon> query = new QueryWrapper<>();
         query.eq("school_id",schoolId)
                 .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_NO)
-                .orderByDesc("create_time");
+                .orderByDesc("create_time").orderByAsc("is_invalid");
         if (couponType != null){
             query.eq("coupon_type",couponType);
         }
@@ -102,21 +122,28 @@ public class TCouponServiceImpl implements TCouponService {
                     .push("list",rs.getRecords())
                     .push("total",rs.getTotal());
         }
-        List<Long> shopIds = PublicUtilS.getValueList(shopCouponList,"shopId");
-        PublicUtilS.removeDuplicate(shopIds);
-        StringBuffer resultShopIds = new StringBuffer();
-        for (int i = 0; i < shopIds.size(); i++) {
-            resultShopIds.append(shopIds.get(i));
-            if (i < shopIds.size() -1){
-                resultShopIds.append(',');
+        //根据优惠券id分组，id一样的放到一个集合里面
+        Map<Long,List<ShopCoupon>> groupCIdListShopCouponMap = PublicUtilS.listforEqualKeyListMap(shopCouponList,"couponId");
+        //给前端shopId的字符串拼接，Map<CouponId,ShopIdsString>
+        Map<Long,String> couponIdAndShopIdsStringMap = new HashMap();
+        for (Map.Entry<Long, List<ShopCoupon>> entry : groupCIdListShopCouponMap.entrySet()) {
+            List<ShopCoupon> shopCouponListInEntry = entry.getValue();
+            StringBuffer resultShopIds = new StringBuffer();
+            for (int i = 0; i <shopCouponListInEntry.size() ; i++) {
+                resultShopIds.append(shopCouponListInEntry.get(i).getShopId());
+                if (i < shopCouponListInEntry.size() -1){
+                    resultShopIds.append(',');
+                }
             }
+            couponIdAndShopIdsStringMap.put(entry.getKey(),resultShopIds.toString());
         }
-        Map<Long,List<ShopCoupon>> listforListMap = PublicUtilS.listforEqualKeyListMap(shopCouponList,"couponId");
         for (Coupon record : rs.getRecords()) {
-            if (listforListMap.get(record.getId()) != null){
-                record.setShopCouponList(listforListMap.get(record.getId()));
+            if (groupCIdListShopCouponMap.get(record.getId()) != null){
+                record.setShopCouponList(groupCIdListShopCouponMap.get(record.getId()));
             }
-            record.setShopIds(resultShopIds.toString());
+            if (couponIdAndShopIdsStringMap.get(record.getId()) != null){
+                record.setShopIds(couponIdAndShopIdsStringMap.get(record.getId()));
+            }
         }
         return new ResponseObject(true, ResponseViewEnums.SUCCESS)
                 .push("list",rs.getRecords())
@@ -189,10 +216,13 @@ public class TCouponServiceImpl implements TCouponService {
      */
     @Override
     public ResponseObject userGetCouponByIdMap(Map map) {
-        Assertions.notNull(map,map.get("userId"),map.get("schoolId"),map.get("shopId"),map.get("couponId"));
+        Assertions.notNull(map,map.get("userId"),map.get("schoolId"),map.get("couponId"));
         //查询用户是否存在 todo 可能导致查询速度慢
         WxUser wxUser = wxUserMapper.selectOneByUserId((Long)map.get("userId"));
         Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST);
+        Long couponId = (Long) map.get("couponId");
+        Coupon coupon = couponMapper.selectById(couponId);
+        Assertions.notNull(coupon,ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         //根据id查询有效的优惠券
         ShopCoupon shopCoupon = tShopCouponService.findPoweredCouponBySIdAndSId((Long) map.get("schoolId"),(Long)map.get("shopId"),(Long)map.get("couponId"));
         Assertions.notNull(shopCoupon,ResponseViewEnums.COUPON_HOME_NUM_ERROR);
@@ -201,6 +231,12 @@ public class TCouponServiceImpl implements TCouponService {
         wxUserCoupon.setGetTime(new Date());
         wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NOT_USED);
         wxUserCoupon.setWxUserId(wxUser.getId());
+        wxUserCoupon.setCouponType(shopCoupon.getCoupon().getCouponType());
+        if (shopCoupon != null && shopCoupon.getShopId() != null){
+            wxUserCoupon.setShopId(shopCoupon.getShopId());
+        }else {
+            wxUserCoupon.setShopId(NumConstants.Long_NUM_0);
+        }
         //加上过期时间
         Date failureTime = TimeUtilS.getNextDay(new Date(),shopCoupon.getCoupon().getEffectiveDays());
         wxUserCoupon.setFailureTime(failureTime);
@@ -222,16 +258,22 @@ public class TCouponServiceImpl implements TCouponService {
     @Override
     public ResponseObject updateOneById(Coupon coupon) {
         Assertions.notNull(coupon);
+        if (coupon.getCouponType() != null){
+            coupon.setCouponType(null);
+            return new ResponseObject(false,ResponseViewEnums.COUPON_TYPE_CANT_UPDATE);
+        }
         couponMapper.updateById(coupon);
-        if (coupon == null ||  coupon.getShopIds().isEmpty()){
+        if (coupon == null || !StringUtils.hasText(coupon.getShopIds())){
             return  new ResponseObject(true,"更新成功");
         }
         String[] shopIdS = coupon.getShopIds().split(",");
         List<ShopCoupon> shopCouponList = new ArrayList<>();
         Long shopIdLong = null;
+        List<Long> deleteShopIds = new ArrayList<>();
         for (String shopId : shopIdS) {
             ShopCoupon shopCoupon = new ShopCoupon();
             shopIdLong = Long.valueOf(shopId);
+            deleteShopIds.add(shopIdLong);
             shopCoupon.setCouponId(coupon.getId());
             shopCoupon.setShopId(shopIdLong);
             shopCoupon.setCreateId(coupon.getSchoolId());
@@ -239,7 +281,30 @@ public class TCouponServiceImpl implements TCouponService {
             shopCoupon.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
             shopCouponList.add(shopCoupon);
         }
+        //先删除关联
+        Integer deleteNum = tShopCouponService.batchDeleteSCByCouponId(coupon.getId());
+        //再新增
         int saveNum = tShopCouponService.bindShopCoupon(shopCouponList);
         return new ResponseObject(true,"更新成功");
+    }
+
+    /**
+     * @date:   2019/7/27 11:58
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   coupon
+     * @Desc:   desc 根据优惠券id删除优惠券
+     */
+    @Override
+    public ResponseObject deleteCouponAndShopByCId(Coupon coupon) {
+        Assertions.notNull(coupon,coupon.getId());
+        coupon.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_YES_DELETE);
+        int deleteNum = couponMapper.updateById(coupon);
+        if (deleteNum < NumConstants.INT_NUM_1){
+            return new ResponseObject(false,ResponseViewEnums.DELETE_FAILED);
+        }
+        Integer deleteShopCoupon = shopCouponMapper.batchDeleteSCByCouponId(coupon.getId());
+        return new ResponseObject(true,ResponseViewEnums.DELETE_SUCCESS);
     }
 }

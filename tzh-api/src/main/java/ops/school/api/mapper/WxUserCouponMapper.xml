@@ -208,7 +208,7 @@
         <if test="wxUserCoupon.isInvalid != null">
             AND wx_user_coupon.is_invalid = #{wxUserCoupon.isInvalid}
         </if>
-        ORDER BY wx_user_coupon.get_time DESC,wx_user_coupon.failure_time ASC
+        ORDER BY wx_user_coupon.get_time DESC,wx_user_coupon.failure_time,wx_user_coupon.is_invalid ASC
         LIMIT #{wxUserCoupon.page},#{wxUserCoupon.size}
     </select>
 </mapper>

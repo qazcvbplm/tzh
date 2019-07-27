@@ -41,15 +41,15 @@ public class CouponController {
      * 学校首页优惠券查询
      * @author Lee
      * @param schoolId 学校id
-     * @param couponType 优惠券类型
+     * @param yesShowIndex 优惠券类型
      * @return ops.school.api.util.ResponseObject
      */
     @ApiOperation(value="学校首页优惠券查询",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "findByIndex", method = RequestMethod.POST)
-    public ResponseObject find(@RequestParam String schoolId, @RequestParam Integer couponType) {
-
-        List<Coupon> list = tCouponService.findByIndex(Long.valueOf(schoolId),1);
+    public ResponseObject find(Long schoolId, Integer yesShowIndex,Long userId) {
+        Assertions.notNull(schoolId,yesShowIndex,userId);
+        List<Coupon> list = tCouponService.findByIndex(schoolId,yesShowIndex,userId);
         return new ResponseObject(true, "查询成功").push("list", list);
     }
 
@@ -106,6 +106,25 @@ public class CouponController {
         return responseObject;
     }
 
+
+
+    /**
+     * @date:   2019/7/27 11:56
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   coupon
+     * @Desc:   desc
+     */
+    @ApiOperation(value="根据优惠券id删除优惠券",httpMethod="POST")
+    @ResponseBody
+    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    public ResponseObject deleteCouponAndShopByCId(Coupon coupon){
+        Assertions.notNull(coupon,coupon.getId());
+        ResponseObject responseObject = tCouponService.deleteCouponAndShopByCId(coupon);
+        return responseObject;
+    }
+
     /**
      * 店铺绑定优惠券
      * @author Lee
@@ -139,10 +158,12 @@ public class CouponController {
     @ResponseBody
     @RequestMapping(value = "getCoupons", method = RequestMethod.POST)
     public ResponseObject userGetCoupons(Long userId,Long schoolId,Long shopId,Long couponId){
-        Assertions.notNull(userId,schoolId,shopId,couponId);
+        Assertions.notNull(userId,schoolId,couponId);
         Map map = new HashMap();
+        if (shopId != null){
+            map.put("shopId",shopId);
+        }
         map.put("userId",userId);
-        map.put("shopId",shopId);
         map.put("couponId",couponId);
         map.put("schoolId",schoolId);
         ResponseObject responseObject = tCouponService.userGetCouponByIdMap(map);

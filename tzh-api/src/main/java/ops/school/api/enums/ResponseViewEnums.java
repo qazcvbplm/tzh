@@ -15,6 +15,13 @@ public enum ResponseViewEnums implements RootEnums{
     FAILED("1210002","操作失败"),
     /**操作失败*/
     DELETE_FAILED("1210003","删除失败，请检查后操作"),
+    /**操作失败*/
+    DELETE_SUCCESS("1210004","删除成功"),
+    /**操作成功*/
+    FIND_SUCCESS("1210005","查询成功"),
+
+    /**操作失败*/
+    FIND_FAILED("1210006","查询失败"),
 
 
     /**----------2-楼栋错误-----------*/
@@ -25,6 +32,8 @@ public enum ResponseViewEnums implements RootEnums{
     COUPON_USER_GET_ERROR("1230002","领取优惠券失败，稍后再来！"),
     COUPON_USER_GET_SUCCESS("1230003","领取优惠券成功，尽情使用吧！"),
     COUPON_USER_GET_NEED_SHOP("1230004","店铺优惠券和首页优惠券需要先绑定店铺"),
+    COUPON_TYPE_CANT_UPDATE("1230005","优惠券类型无法修改"),
+    COUPON_FIND_NEED_ID("1230006","优惠券查询需要优惠券id"),
 
     /**----------4-微信用户错误-----------*/
     WX_USER_NO_EXIST("1240001","微信用户不存在，更新后操作"),

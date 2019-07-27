@@ -2,6 +2,7 @@ package ops.school.api.util;
 
 import com.alibaba.fastjson.JSON;
 import ops.school.api.entity.Coupon;
+import ops.school.api.entity.ShopCoupon;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import com.ibatis.common.beans.Probe;
@@ -47,6 +48,31 @@ public class PublicUtilS {
             list.removeAll(Collections.singleton(null));
 
             for (E e : list) {
+
+                K value = (K) PROBE.getObject(e, valueProp);
+                if (value != null) {
+                    valueList.add(value);
+                }
+
+            }
+
+        }
+
+        return valueList;
+    }
+
+    /**
+     * 根据字段名获取list
+     */
+    @SuppressWarnings("unchecked")
+    public static <E, K> List<K> getValueList(Collection<E> collection, String valueProp) {
+
+        List<K> valueList = new LinkedList<>();
+
+        if (CollectionUtils.isNotEmpty(collection)) {
+
+            collection.removeAll(Collections.singleton(null));
+            for (E e : collection) {
 
                 K value = (K) PROBE.getObject(e, valueProp);
                 if (value != null) {
@@ -154,6 +180,43 @@ public class PublicUtilS {
         }
         return map;
     }
+
+    /**
+     * @author: QinDaoFang
+     * @date:   2019/7/27 12:17
+     * @desc:   特殊方法
+     */
+//    @SuppressWarnings("unchecked")
+//    public static <K, V, E> Map<K, V> getCouponIdAndShopIdsString(List<E> list,String keyProp,String valueProp){
+//        Map<K, List<V>> map = Collections.emptyMap();
+//        if (CollectionUtils.isNotEmpty(list)) {
+//            list.removeAll(Collections.singleton(null));
+//            StringBuffer shopIdsString = null;
+//            V value = null;
+//            map = new HashMap<K, List<V>>(list.size());
+//            for (int i = 0; i < list.size(); i++) {
+//                E object = list.get(i);
+//                K key = (K) PROBE.getObject(object, keyProp);
+//                value = (V) PROBE.getObject(object, valueProp);
+//                shopIdsString.append(value);
+//                if (i < shopIds.size() -1){
+//                    resultShopIds.append(',');
+//                }
+//
+//                List<V> values = map.get(key);
+//                if (values == null) {
+//                    values = new ArrayList<V>();
+//                }
+//                values.add(value);
+//                map.put(key, values);
+//            }
+//            for (E object : list) {
+//
+//            }
+//        }
+//        return map;
+//    }
+
     /**
      * 根据字段名将list转为map
      */
@@ -200,6 +263,33 @@ public class PublicUtilS {
             list.removeAll(Collections.singleton(null));
 
             for (E object : list) {
+
+                K key = (K) PROBE.getObject(object, keyProp);
+                V value = (V) object;
+                if (value != null) {
+                    map.put(key, value);
+                }
+
+            }
+
+        }
+
+        return map;
+    }
+
+    /**
+     * 根据字段名将list转为map
+     */
+    @SuppressWarnings("unchecked")
+    public static <K, V, E> Map<K, V> listForMapValueE(Collection<E> Collection, String keyProp) {
+
+        Map<K, V> map = new HashMap<>();
+
+        if (CollectionUtils.isNotEmpty(Collection)) {
+
+            Collection.removeAll(Collections.singleton(null));
+
+            for (E object : Collection) {
 
                 K key = (K) PROBE.getObject(object, keyProp);
                 V value = (V) object;
@@ -343,7 +433,11 @@ public class PublicUtilS {
 
         List map3 = getValueList(shopList, "id");
 
+        map2.get(Long.valueOf(2));
+        map2.get(1);
+
     }
+
 
 
 }
