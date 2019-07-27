@@ -109,7 +109,7 @@ public class SenderController {
     @ApiOperation(value = "送达订单", httpMethod = "POST")
     @PostMapping("nocheck/senderend")
     public ResponseObject senderend(HttpServletRequest request, HttpServletResponse response,
-                                    @RequestParam String orderId, @RequestParam boolean end, @RequestParam int senderId) {
+                                    @RequestParam String orderId, @RequestParam boolean end) {
         tSenderService.end(orderId, end);
         return new ResponseObject(true, "送达完成");
     }

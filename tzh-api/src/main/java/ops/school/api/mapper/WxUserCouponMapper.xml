@@ -179,10 +179,11 @@
         from `wx_user_coupon` as uc
         left join `coupon` as cp
         on uc.coupon_id = cp.id
-        where uc.shop_id = #{shopId} or uc.coupon_type = 2
-        and uc.wx_user_id = #{wxUserId}
+        where uc.shop_id = #{shopId}
         and uc.is_invalid = 0
         and cp.is_invalid = 0
+        and uc.wx_user_id = #{wxUserId}
+        or uc.coupon_type = 2
         order by uc.failure_time desc
     </select>
 

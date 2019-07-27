@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.OrdersMapper;
+import ops.school.api.dao.SchoolMapper;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.project.OrderTempDTO;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -65,7 +67,8 @@ public class TOrdersServiceImpl implements TOrdersService {
     private OrdersService ordersService;
     @Autowired
     private OrdersMapper ordersMapper;
-
+    @Autowired
+    private SchoolMapper schoolMapper;
     @Autowired
     private RunOrdersService runOrdersService;
     @Autowired
@@ -189,7 +192,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         //生成订单id
         String generatorOrderId = Util.GenerateOrderId();
-        if (generatorOrderId == null || generatorOrderId.isEmpty()){
+        if (generatorOrderId == null || StringUtils.hasText(generatorOrderId)){
             DisplayException.throwMessageWithEnum(PublicErrorEnums.CALL_THE_BACK_WORKER);
         }
         /**
@@ -226,6 +229,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal couponUsedAmount = BigDecimal.ZERO;
         // 订单实付金额
         BigDecimal payPrice = BigDecimal.ZERO;
+        // 粮票金额
+        BigDecimal payFoodCoupon = new BigDecimal(0.00);
         // 优惠折扣是否使用
         Boolean isDiscount = false;
         // 订单内商品总数
@@ -319,7 +324,9 @@ public class TOrdersServiceImpl implements TOrdersService {
                                 .multiply(new BigDecimal(1).subtract(product.getDiscount()))
                                 .multiply(new BigDecimal(count)));
                         // 商品折扣之后的价格(原价-商品折扣价)
-                        afterDiscountPrice = afterDiscountPrice.subtract(discountPrice);
+                        afterDiscountPrice = afterDiscountPrice.subtract(productAttribute.getPrice()
+                                .multiply(new BigDecimal(1).subtract(product.getDiscount()))
+                                .multiply(new BigDecimal(count)));
                         // 如果有折扣的话
                         orderProduct.setProductDiscount(discountPrice);
                         orderProduct.setTotalPrice(productAttribute.getPrice().subtract(discountPrice));
@@ -403,13 +410,17 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
                 //注释
                 Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
-                if (coupon != null && coupon.getIsInvalid() != 2){
+                if (coupon != null && coupon.getIsInvalid() != 1){
                     // 折后价格+餐盒费 >= 优惠券满减使用条件
                     if (beforeCouponPrice.compareTo(new BigDecimal(coupon.getFullAmount())) != -1){
                         //  并且 折后价格+餐盒费 >= 优惠券满减金额时
                         if (beforeCouponPrice.subtract(new BigDecimal(coupon.getCutAmount())).compareTo(BigDecimal.ZERO) != -1){
                             payPrice = payPrice.subtract(new BigDecimal(coupon.getCutAmount()));
+                        } else {
+                            payPrice = new BigDecimal(0.00);
                         }
+                        couponFullAmount = couponUsedAmount.add(new BigDecimal(coupon.getFullAmount()));
+                        couponUsedAmount = couponUsedAmount.add(new BigDecimal(coupon.getCutAmount()));
                         // 否则 payPrice = BigDecimal.ZERO
                         // 优惠券用完之后修改状态为已使用
                         wxUserCoupon.setIsInvalid(1);
@@ -443,9 +454,14 @@ public class TOrdersServiceImpl implements TOrdersService {
                     payPrice = new BigDecimal(0);
                     // 用户粮票修改为 --> 用户粮票余额 - 支付金额（除粮票外）
                     wxUserBell.setFoodCoupon(wxUserBell.getFoodCoupon().subtract(payPrice));
+                    /**
+                     * 消费粮票金额
+                     */
+                    payFoodCoupon = payFoodCoupon.add(payPrice);
                 } else {
                     // 最终的实付款  --> 订单原菜价（原菜价+配送费+餐盒费）-粮票-优惠券-满减/折扣
                     payPrice = payPrice.subtract(wxUserBell.getFoodCoupon());
+                    payFoodCoupon = payFoodCoupon.add(wxUserBell.getFoodCoupon());
                     wxUserBell.setFoodCoupon(BigDecimal.ZERO);
                 }
                 // 修改用户粮票余额 todo 不判断么
@@ -456,11 +472,13 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
         }
         // 前端传来的数据对象
-        OrderTempDTO tempDTO = new OrderTempDTO(orders.getSendPrice(),orders.getBoxPrice(),orders.getPayPrice(),orders.getProductPrice(),orders.getAfterDiscountPrice());
+        OrderTempDTO tempDTO = new OrderTempDTO(orders.getSendPrice(),orders.getBoxPrice(),orders.getPayPrice(),orders.getProductPrice(),
+                orders.getDiscountPrice(),orders.getPayFoodCoupon());
         // 后端计算的数据对象
-        OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice,boxPrice,payPrice,productPrice,afterDiscountPrice);
+        OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice,boxPrice,payPrice.setScale(2,BigDecimal.ROUND_HALF_UP),
+                productPrice,discountPrice.setScale(2,BigDecimal.ROUND_HALF_UP),payFoodCoupon.setScale(2,BigDecimal.ROUND_HALF_UP));
         if (!tempDTO.equals(orderTempDTO)){
-             // DisplayException.throwMessage("订单金额有问题，请负责人进行核实!");
+              DisplayException.throwMessage("订单金额有问题，请负责人进行核实!");
         }
         ordersSaveTemp.setDiscountPrice(discountPrice);
         ordersSaveTemp.setAddressDetail(orders.getAddressDetail());
@@ -519,15 +537,18 @@ public class TOrdersServiceImpl implements TOrdersService {
         //下单后领优惠券 新页面新接口
         //用户优惠券失效逻辑,如果用户的优惠券是生效的IsInvalid=0
         if (wxUserCoupon != null){
-            wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NO);
-            int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
-            if (updateUserCouponNum != NumConstants.INT_NUM_1){
-                logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+            // 优惠券
+            Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
+            if (coupon != null && coupon.getIsInvalid() != 1){
+                wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NO);
+                int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
+                if (updateUserCouponNum != NumConstants.INT_NUM_1){
+                    logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+                }
             }
         }
         Map resultMap = new HashMap();
         resultMap.put("orderId",generatorOrderId);
-
 //        Long endOrderTime = System.currentTimeMillis();
 //        System.out.println(endOrderTime - startOrderTime);
         return new ResponseObject(true,"创建订单成功！",resultMap);
@@ -752,7 +773,17 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Transactional
     @Override
     public int orderSettlement(String orderId) {
+        QueryWrapper<OrdersComplete> query = new QueryWrapper<>();
+        query.lambda().eq(OrdersComplete::getOrderId,orderId);
+        // 查询订单完成表信息是否存在，存在则不可以结算
+        OrdersComplete orderComplete1 = orderCompleteService.getOne(query);
+        if (orderComplete1 != null){
+            Assertions.notNull(orderComplete1,ResponseViewEnums.ORDERSCOMPLETE_HAD_ERROR);
+        }
+        // 订单信息
         Orders orders = ordersService.findById(orderId);
+        // 对订单进行校验
+        Assertions.notNull(orders,ResponseViewEnums.ORDER_PARAM_ERROR);
         // 配送员
         Sender sender = senderService.findById(orders.getSenderId());
         // 对配送员信息进行校验
@@ -786,6 +817,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal tempPrice = BigDecimal.ZERO;
         // 配送员所得金额
         BigDecimal senderGetTotal = BigDecimal.ZERO;
+        // 店铺所得金额
+        BigDecimal shopGetTotal = BigDecimal.ZERO;
         // 负责人抽取配送员金额
         BigDecimal schoolGetSender = BigDecimal.ZERO;
         // 负责人抽取店铺金额
@@ -854,7 +887,9 @@ public class TOrdersServiceImpl implements TOrdersService {
             coupon = couponService.getById(wxUserCoupon.getCouponId());
             // 优惠券优惠金额
             couponAmount = couponAmount.add(new BigDecimal(coupon.getCutAmount()));
-        } else if (orders.getFullCutId() != null || orders.getFullCutId() != 0){
+        }
+        // 如果使用了店铺满减
+        if (orders.getFullCutId() != null && orders.getFullCutId() != 0){
             shopFullCut = shopFullCutService.getById(orders.getFullCutId());
             // 店铺满减优惠金额
             fullCutAmount = fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
@@ -888,16 +923,43 @@ public class TOrdersServiceImpl implements TOrdersService {
         /**
          * 店铺所得
          */
-        ordersComplete.setShopGetTotal(tempPrice
+        shopGetTotal = shopGetTotal.add(tempPrice
                 .multiply(new BigDecimal(1).subtract(shop.getRate()))
                 .add(schoolUnderTakeAmount));
+        ordersComplete.setShopGetTotal(shopGetTotal);
         /**
          * 负责人所得
          */
         schoolGetTotal = schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(appGetTotal)
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
-        ordersComplete.setShopGetTotal(schoolGetTotal);
+        ordersComplete.setSchoolGetTotal(schoolGetTotal);
+        // 订单Id
+        ordersComplete.setOrderId(orderId);
         orderCompleteService.save(ordersComplete);
+        /**
+         * 将配送员所得金额添加到配送员账户内
+         */
+        WxUser wxUser = wxUserService.findById(sender.getOpenId());
+        WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId()+"-"+wxUser.getPhone());
+        wxUserBell.setMoney(wxUserBell.getMoney().add(senderGetTotal));
+        if (!wxUserBellService.updateById(wxUserBell)){
+            logger.error("配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+            System.out.println("配送员所得金额添加失败，请联系负责人");
+        }
+        // 将负责人所得添加到负责人可提现金额内
+        school.setMoney(school.getMoney().add(senderGetTotal));
+        school.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
+        if (schoolMapper.updateByPrimaryKeySelective(school) == 0){
+            logger.error("负责人所得金额为"+schoolGetSender+"配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+            System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
+        }
+        // 将店铺所得添加到店铺可提现金额内
+        shop.setTxAmount(shop.getTxAmount().add(shopGetTotal));
+        boolean rs = shopService.updateById(shop);
+        if (!rs){
+            logger.error("店铺所得金额为"+shopGetTotal+"添加失败，请联系负责人");
+            System.out.println("店铺所得金额添加失败，请联系负责人");
+        }
         return 0;
     }
 

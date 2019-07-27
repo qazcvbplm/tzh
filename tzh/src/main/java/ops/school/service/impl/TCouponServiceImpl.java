@@ -20,6 +20,7 @@ import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -131,7 +132,7 @@ public class TCouponServiceImpl implements TCouponService {
         if (couponId == null){
             return -1;
         }
-        if (coupon != null && coupon.getShopIds().isEmpty()){
+        if (coupon != null && StringUtils.hasText(coupon.getShopIds())){
             return 2;
         }
         String[] shopIdS = coupon.getShopIds().split(",");
@@ -223,7 +224,7 @@ public class TCouponServiceImpl implements TCouponService {
     public ResponseObject updateOneById(Coupon coupon) {
         Assertions.notNull(coupon);
         couponMapper.updateById(coupon);
-        if (coupon == null ||  coupon.getShopIds().isEmpty()){
+        if (coupon == null ||  !StringUtils.hasText(coupon.getShopIds())){
             return  new ResponseObject(true,"更新成功");
         }
         String[] shopIdS = coupon.getShopIds().split(",");
