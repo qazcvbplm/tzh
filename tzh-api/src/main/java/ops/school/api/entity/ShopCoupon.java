@@ -53,6 +53,8 @@ public class ShopCoupon implements Serializable {
     @NotNull
     private Integer isDelete;
 
+    private Integer couponType;
+
     @TableField(exist = false)
     private Coupon coupon;
 
@@ -123,6 +125,15 @@ public class ShopCoupon implements Serializable {
 
     public void setShop(Shop shop) {
         this.shop = shop;
+    }
+
+
+    public Integer getCouponType() {
+        return couponType;
+    }
+
+    public void setCouponType(Integer couponType) {
+        this.couponType = couponType;
     }
 
     @Override

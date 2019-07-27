@@ -168,6 +168,7 @@ public class TCouponServiceImpl implements TCouponService {
             ShopCoupon shopCoupon = new ShopCoupon();
             shopIdLong = Long.valueOf(shopId);
             shopCoupon.setCouponId(couponId);
+            shopCoupon.setCouponType(coupon.getCouponType());
             shopCoupon.setShopId(shopIdLong);
             shopCoupon.setCreateId(coupon.getCreateId());
             shopCoupon.setCreateTime(new Date());

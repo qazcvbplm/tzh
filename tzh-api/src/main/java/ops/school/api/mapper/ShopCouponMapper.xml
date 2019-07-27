@@ -213,7 +213,8 @@
         coupon_id,
         create_time,
         create_id,
-        is_delete
+        is_delete,
+        coupon_type
         )
         VALUES
         <foreach collection="list" item="item" index="index" open=" " separator="," close=" ">
@@ -223,6 +224,7 @@
             now(),
             #{item.createId},
             #{item.isDelete}
+            #{item.couponType}
         )
         </foreach>
 
