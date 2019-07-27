@@ -53,6 +53,11 @@ public class ShopCoupon implements Serializable {
     @NotNull
     private Integer isDelete;
 
+    /**
+     * 优惠券类型
+     */
+    private Integer couponType;
+
     @TableField(exist = false)
     private Coupon coupon;
 
@@ -109,6 +114,14 @@ public class ShopCoupon implements Serializable {
         this.isDelete = isDelete;
     }
 
+    public Integer getCouponType() {
+        return couponType;
+    }
+
+    public void setCouponType(Integer couponType) {
+        this.couponType = couponType;
+    }
+
     public Coupon getCoupon() {
         return coupon;
     }
@@ -136,12 +149,12 @@ public class ShopCoupon implements Serializable {
                 createTime.equals(that.createTime) &&
                 createId.equals(that.createId) &&
                 isDelete.equals(that.isDelete) &&
-                Objects.equals(coupon, that.coupon);
+                couponType.equals(that.couponType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, shopId, couponId, createTime, createId, isDelete, coupon);
+        return Objects.hash(id, shopId, couponId, createTime, createId);
     }
 
     @Override
@@ -153,7 +166,9 @@ public class ShopCoupon implements Serializable {
                 ", createTime=" + createTime +
                 ", createId=" + createId +
                 ", isDelete=" + isDelete +
+                ", couponType=" + couponType +
                 ", coupon=" + coupon +
+                ", shop=" + shop +
                 '}';
     }
 }
