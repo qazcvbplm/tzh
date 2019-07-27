@@ -105,12 +105,11 @@ public class TCouponServiceImpl implements TCouponService {
         List<Long> shopIds = PublicUtilS.getValueList(shopCouponList,"shopId");
         PublicUtilS.removeDuplicate(shopIds);
         StringBuffer resultShopIds = new StringBuffer();
-        for (int i = 0; i < shopIds.size() -1; i++) {
+        for (int i = 0; i < shopIds.size(); i++) {
             resultShopIds.append(shopIds.get(i));
-            if (shopIds.get(i+1) != null && !shopIds.get(i+1).toString().isEmpty()){
+            if (i < shopIds.size() -1){
                 resultShopIds.append(',');
             }
-
         }
         Map<Long,List<ShopCoupon>> listforListMap = PublicUtilS.listforEqualKeyListMap(shopCouponList,"couponId");
         for (Coupon record : rs.getRecords()) {
