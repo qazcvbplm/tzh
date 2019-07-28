@@ -2,13 +2,13 @@ package ops.school.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Floor;
 import ops.school.api.service.FloorService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
+import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -59,7 +59,7 @@ public class FloorController {
                 break;
         }
         query.orderByDesc("sort");
-        IPage<Floor> floorIPage = floorService.page(new Page<>(floor.getPage(), floor.getSize()), query);
+        IPage<Floor> floorIPage = floorService.page(PageUtil.getPage(floor.getPage(), floor.getSize()), query);
         return new ResponseObject(true, "ok").push("list", floorIPage.getRecords()).
                 push("total", floorIPage.getTotal());
     }

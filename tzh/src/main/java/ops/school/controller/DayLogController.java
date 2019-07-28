@@ -3,12 +3,12 @@ package ops.school.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.DayLogTakeout;
 import ops.school.api.service.DayLogTakeoutService;
 import ops.school.api.util.ResponseObject;
+import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +40,7 @@ public class DayLogController {
         if (day != null)
             query.lambda().eq(DayLogTakeout::getDay, day);
         query.lambda().orderByDesc(DayLogTakeout::getDay);
-        IPage<DayLogTakeout> list = dayLogTakeoutService.page(new Page<>(page, size), query);
+        IPage<DayLogTakeout> list = dayLogTakeoutService.page(PageUtil.getPage(page, size), query);
         return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
     }
 }

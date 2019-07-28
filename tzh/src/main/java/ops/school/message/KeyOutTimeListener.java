@@ -7,10 +7,12 @@ import ops.school.api.service.OrdersService;
 import ops.school.api.service.SenderService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
+import ops.school.config.RabbitMQConfig;
 import ops.school.message.dto.WxUserAddSourceDTO;
 import ops.school.service.TOrdersService;
 import ops.school.service.TSenderService;
 import ops.school.util.WxMessageUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -39,6 +41,8 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
     private TSenderService tSenderService;
     @Autowired
 	private TOrdersService tOrdersService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 	
 	@Override
 	public void onMessage(Message key, byte[] arg1) {
@@ -46,7 +50,7 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener{
             Orders orders = ordersService.findById(key.toString().split(",")[1]);
 			try {
                 tSenderService.end(key.toString().split(",")[1], true);
-                stringRedisTemplate.convertAndSend("bell", new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
+                rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString());
 				WxUser wxUser = wxUserService.findById(orders.getOpenId());
                 List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
                 if (formIds.size() > 0){

@@ -8,7 +8,6 @@ import ops.school.api.service.ProductCategoryService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.service.TProductCategoryService;
-import ops.school.service.TProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -43,7 +42,7 @@ public class ProductCategoryController {
 	
 	
 	@ApiOperation(value="查询",httpMethod="POST")
-	@PostMapping("find")
+    @RequestMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,int shopId){
 		              List<ProductCategory> list = productCategoryService.findByShop(shopId);
 		              return new ResponseObject(true, "ok").push("list", list);

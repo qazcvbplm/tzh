@@ -350,47 +350,44 @@
         orders.*
         from orders
         <where>
-            <if test="id != null">
-                and orders.id = #{id}
+            <if test="o.id != null">
+                and orders.id = #{o.id}
             </if>
-            <if test="typ != null">
-                and orders.typ = #{typ}
+            <if test="o.typ != null">
+                and orders.typ = #{o.typ}
             </if>
-            <if test="status != null">
-                and orders.status = #{status}
+            <if test="o.status != null">
+                and orders.status = #{o.status}
             </if>
-            <if test="addressName != null">
-                and orders.address_name = #{addressName}
+            <if test="o.addressName != null">
+                and orders.address_name = #{o.addressName}
             </if>
-            <if test="addressPhone != null">
-                and orders.address_phone = #{addressPhone}
+            <if test="o.addressPhone != null">
+                and orders.address_phone = #{o.addressPhone}
             </if>
-            <if test="shopName != null">
-                and orders.shop_name = #{shopName}
+            <if test="o.shopName != null">
+                and orders.shop_name = #{o.shopName}
             </if>
-            <if test="schoolId != null">
-                and orders.school_id = #{schoolId,jdbcType=INTEGER}
+            <if test="o.schoolId != null">
+                and orders.school_id = #{o.schoolId,jdbcType=INTEGER}
             </if>
-            <if test="shopId != null">
-                and orders.shop_id = #{shopId,jdbcType=INTEGER}
+            <if test="o.shopId != null">
+                and orders.shop_id = #{o.shopId,jdbcType=INTEGER}
             </if>
-            <if test="openId != null">
-                and orders.open_id = #{openId,jdbcType=VARCHAR}
+            <if test="o.openId != null">
+                and orders.open_id = #{o.openId,jdbcType=VARCHAR}
             </if>
-            <if test="floorId != null">
-                and orders.floor_id = #{floorId,jdbcType=INTEGER}
+            <if test="o.floorId != null">
+                and orders.floor_id = #{o.floorId,jdbcType=INTEGER}
             </if>
-            <if test="senderId != null">
-                and orders.sender_id = #{senderId,jdbcType=INTEGER}
+            <if test="o.senderId != null">
+                and orders.sender_id = #{o.senderId,jdbcType=INTEGER}
             </if>
-            <if test="createTime != null">
-                and orders.create_time like #{createTime,jdbcType=TIMESTAMP}
+            <if test="o.createTime != null">
+                and orders.create_time like #{o.createTime,jdbcType=TIMESTAMP}
             </if>
         </where>
         order by create_time desc
-        <if test="page!=null and size!=null">
-            limit #{page},#{size}
-        </if>
     </select>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 

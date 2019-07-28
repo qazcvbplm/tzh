@@ -1,5 +1,7 @@
 package ops.school.api.serviceimple;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ops.school.api.dao.OrdersMapper;
 import ops.school.api.entity.Orders;
@@ -26,8 +28,14 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
     }
 
     @Override
-    public List<Orders> find(Orders orders) {
-        return ordersMapper.find(orders);
+    public IPage<Orders> find(Orders orders) {
+        if (orders.getId() != null) {
+            orders.setPage(1);
+            orders.setSize(1);
+        }
+        Page<Orders> page = new Page<Orders>(orders.getPage(), orders.getSize());
+        page.setRecords(ordersMapper.find(orders, page));
+        return page;
     }
 
     @Override

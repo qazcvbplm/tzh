@@ -3,18 +3,16 @@ package ops.school.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.TxLog;
 import ops.school.api.service.TxLogService;
 import ops.school.api.util.ResponseObject;
 import ops.school.service.TCommonService;
+import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 
 @RestController
@@ -40,7 +38,7 @@ public class TxLogController {
 		if(appId!=null)
 			query.lambda().eq(TxLog::getAppId, appId);
 		query.lambda().orderByDesc(TxLog::getCreateTime);
-        IPage<TxLog> rs = txLogService.page(new Page<>(page, size), query);
+		IPage<TxLog> rs = txLogService.page(PageUtil.getPage(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
 	}
 
@@ -56,7 +54,7 @@ public class TxLogController {
 		query.lambda().eq(TxLog::getIshow, "0");
 		query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid");
 		query.lambda().orderByDesc(TxLog::getCreateTime);
-        IPage<TxLog> rs = txLogService.page(new Page<>(page, size), query);
+		IPage<TxLog> rs = txLogService.page(PageUtil.getPage(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
 	}
 

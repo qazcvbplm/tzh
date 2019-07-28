@@ -36,7 +36,7 @@ public class ShopCategoryController {
 	}
 	
 	@ApiOperation(value="查询",httpMethod="POST")
-	@PostMapping("find")
+    @RequestMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,ShopCategory shopCategory){
 		              List<ShopCategory> list = shopCategoryService.find(shopCategory);
 		              return new ResponseObject(true, "ok").push("list", list);
