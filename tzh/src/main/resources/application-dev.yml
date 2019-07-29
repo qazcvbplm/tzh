@@ -1,10 +1,12 @@
 #本地开发环境
+server:
+  port: 18888
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-server:
-  port: 18888
 spring:
+  application:
+    name: ops-dev
   datasource:
     url: jdbc:mysql://sh-cdb-0e99ru5c.sql.tencentcdb.com:62580/ops?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8&useSSL=false
     type: com.alibaba.druid.pool.DruidDataSource

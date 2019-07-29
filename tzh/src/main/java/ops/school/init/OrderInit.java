@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.entity.Orders;
 import ops.school.api.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,9 @@ public class OrderInit implements CommandLineRunner {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private OrdersService ordersService;
+
+    @Value("${server.port}")
+    private String port;
 
 
     public void redisInit() {
@@ -45,5 +49,6 @@ public class OrderInit implements CommandLineRunner {
         for (Orders temp : list) {
             stringRedisTemplate.boundHashOps("SHOP_YJS").put(temp.getId(), JSON.toJSONString(temp));
         }
+        System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成-port-" + port);
     }
 }
