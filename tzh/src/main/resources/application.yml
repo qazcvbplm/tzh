@@ -2,4 +2,54 @@
 #线上prod端口11000
 spring:
   profiles:
-    active: prod
+    active: dev
+  application:
+    name: ops
+  datasource:
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    driverClassName: com.mysql.jdbc.Driver
+    filters: stat,wall,log4j
+    initialSize: 2
+    maxActive: 8
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 2
+    poolPreparedStatements: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    validationQuery: SELECT 1 FROM DUAL
+barcode:
+  path: /home/barcode
+cert:
+  path: /home/cert
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://212.129.149.27:8761/eureka/
+  instance:
+    leaseExpirationDurationInSeconds: 2
+    leaseRenewalIntervalInSeconds: 1
+feign:
+  hystrix:
+    enabled: true
+logging:
+  file: logs/chuyin.log
+  level:
+    com:
+      util: debug
+  root: debug
+ops:
+  redis:
+    cache: true
+server:
+  compression:
+    enabled: true
+    mime-types: image/png,image/jpeg,image/jpg,text/html,application/javascript,text/css,application/octet-stream,application/json
+    min-response-size: 1024
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: ops/school/api/mapper/*.xml
