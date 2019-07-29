@@ -768,9 +768,16 @@ public class TOrdersServiceImpl implements TOrdersService {
         map.put("floorId",buildId);
         map.put("beginTime",beginTime);
         map.put("endTime",endTime);
-        BigDecimal ordersCountPayPrice = ordersMapper.countPayPriceByFloor(map);
+        BigDecimal ordersCountPayPrice = BigDecimal.ZERO;
+        if (ordersMapper.countPayPriceByFloor(map) != null){
+            ordersCountPayPrice = ordersMapper.countPayPriceByFloor(map);
+        }
         // 跑腿订单总营业额
-        BigDecimal runOrdersCountTotalPrice = tRunOrdersService.countTotalPriceByFloor(buildId,beginTime,endTime);
+        BigDecimal runOrdersCountTotalPrice = BigDecimal.ZERO;
+
+        if (tRunOrdersService.countTotalPriceByFloor(buildId,beginTime,endTime) != null){
+            runOrdersCountTotalPrice = tRunOrdersService.countTotalPriceByFloor(buildId,beginTime,endTime);
+        }
         BigDecimal ordersAllMoney = ordersCountPayPrice.add(runOrdersCountTotalPrice);
         Map result = new HashMap();
         result.put("allOrders",allOrders);

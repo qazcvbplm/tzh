@@ -53,7 +53,7 @@ public class TSenderServiceImpl implements TSenderService {
     @Override
     public List<Orders> findorderbydjs(Integer senderId, Integer page, Integer size, String status) {
         Sender sender = senderService.findById(senderId);
-        sender.setPage(page);
+        sender.setPage((page-1)*size);
         sender.setSize(size);
         sender.setOrderBy(status);
         if (sender.getTakeoutFlag() == 1) {
@@ -165,7 +165,7 @@ public class TSenderServiceImpl implements TSenderService {
     @Override
     public List<RunOrders> findorderbyrundjs(int senderId, int page, int size, String status) {
         Sender sender = senderService.findById(senderId);
-        sender.setPage(page);
+        sender.setPage((page-1)*size);
         sender.setSize(size);
         sender.setOrderBy(status);
         if (sender.getRunFlag() == 1) {
