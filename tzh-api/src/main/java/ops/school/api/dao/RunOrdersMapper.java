@@ -6,10 +6,13 @@ import ops.school.api.entity.RunOrders;
 import ops.school.api.entity.Sender;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface RunOrdersMapper extends BaseMapper<RunOrders> {
 
 
@@ -54,4 +57,6 @@ public interface RunOrdersMapper extends BaseMapper<RunOrders> {
     @Select("select count(ro.id) as counts,sum(ro.total_price * s.rate) as senderGet,sum(ro.total_price) as total,ro.school_id as schoolId,ro.payment as payType " +
             "from run_orders ro,sender s where ro.school_id=#{schoolId} and ro.sender_id=s.id and ro.status='已完成' and ro.create_time like #{day} group by payType")
     List<RunOrdersTj> tj(@Param("schoolId") Integer schoolId, @Param("day") String day);
+
+    BigDecimal countTotalPriceByFloor(Map<String,Object> map);
 }

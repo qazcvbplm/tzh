@@ -8,6 +8,7 @@ import ops.school.api.entity.Shop;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -62,4 +63,6 @@ public interface OrdersMapper extends BaseMapper<Orders> {
     List<Orders> findByShopYJS(Map<String,Object> map);
 
     List<Orders> findAllDjs();
+
+    BigDecimal countPayPriceByFloor(Map<String,Object> map);
 }

@@ -1,6 +1,7 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import ops.school.api.dao.RunOrdersMapper;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
@@ -36,6 +37,8 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
     private SchoolService schoolService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private RunOrdersMapper runOrdersMapper;
 
     @Transactional
     @Override
@@ -98,6 +101,15 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
         } else {
             throw new YWException("余额不足");
         }
+    }
+
+    @Override
+    public BigDecimal countTotalPriceByFloor(Integer floorId, String beginTime, String endTime) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("floorId",floorId);
+        map.put("beginTime",beginTime);
+        map.put("endTime",endTime);
+        return runOrdersMapper.countTotalPriceByFloor(map);
     }
 
 }

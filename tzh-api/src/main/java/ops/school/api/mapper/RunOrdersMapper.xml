@@ -156,4 +156,11 @@
    update run_orders set status='已取消' where id=#{id} and status!='已取消'
   </update>
 
+    <select id="countTotalPriceByFloor" parameterType="map" resultType="decimal">
+     select sum(total_price) from run_orders
+		 where floor_id = #{floorId}
+		 and create_time
+		 BETWEEN #{beginTime}
+		 AND #{endTime}
+ </select>
 </mapper>
