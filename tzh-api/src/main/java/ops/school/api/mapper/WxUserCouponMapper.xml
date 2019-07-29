@@ -12,7 +12,7 @@
     <result column="failure_time" property="failureTime" jdbcType="TIMESTAMP" />
     <result column="is_invalid" property="isInvalid" jdbcType="INTEGER" />
     <collection property="coupon" ofType="ops.school.api.entity.Coupon">
-        <id column="id" property="id" jdbcType="BIGINT"/>
+        <id column="CId" property="id" jdbcType="BIGINT"/>
         <result column="school_id" property="schoolId" jdbcType="BIGINT"/>
         <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
         <result column="coupon_desc" property="couponDesc" jdbcType="VARCHAR"/>
@@ -56,7 +56,7 @@
         wx_user_coupon.failure_time,
         wx_user_coupon.is_invalid,
 
-        coupon.id,
+        coupon.id as CId,
         coupon.school_id,
         coupon.coupon_name,
         coupon.coupon_desc,
@@ -171,21 +171,22 @@
     </update>
 
     <!--根据店铺查询用户所有可用的优惠券-->
-    <select id="findUserCoupon" parameterType="map" resultType="java.util.HashMap">
-        select cp.*,
-        uc.id as userCouponId,
-        uc.coupon_type as couponType,
-        uc.failure_time as failureTime
-        from `wx_user_coupon` as uc
-        left join `coupon` as cp
-        on uc.coupon_id = cp.id
-        where uc.shop_id = #{shopId}
-        and uc.is_invalid = 0
-        and cp.is_invalid = 0
-        and uc.wx_user_id = #{wxUserId}
-        or uc.coupon_type = 2
-        order by uc.failure_time desc
-    </select>
+    <!--<select id="findUserCoupon" resultMap="BaseResultMap">-->
+        <!--select <include refid="Rel_Column_List"/>-->
+        <!--from wx_user_coupon as wx_user_coupon-->
+        <!--left join coupon as coupon-->
+        <!--on wx_user_coupon.coupon_id = coupon.id-->
+        <!--where-->
+        <!--wx_user_coupon.is_invalid = 0-->
+        <!--and coupon.is_invalid = 0-->
+		<!--and coupon.is_delete = 0-->
+		<!--and wx_user_coupon.wx_user_id = #{wxUserId}-->
+        <!--and wx_user_coupon.shop_id = #{shopId}-->
+		<!--or-->
+		<!--(wx_user_coupon.coupon_type = 2-->
+		<!--and wx_user_coupon.wx_user_id = #{wxUserId})-->
+        <!--order by wx_user_coupon.failure_time desc-->
+    <!--</select>-->
 
     <!--根据用户id查询用户所有优惠券-->
     <select id="findAllUserCoupons" parameterType="Long" resultType="java.util.HashMap">
@@ -211,5 +212,23 @@
         </if>
         ORDER BY wx_user_coupon.get_time DESC,wx_user_coupon.failure_time,wx_user_coupon.is_invalid ASC
         LIMIT #{wxUserCoupon.page},#{wxUserCoupon.size}
+    </select>
+
+
+    <select id="userFindCouponsByWIdSId" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM wx_user_coupon
+        left join coupon on
+        wx_user_coupon.coupon_id = coupon.id
+        WHERE
+        wx_user_coupon.is_invalid = 0
+        AND coupon.is_invalid = 0
+        AND coupon.is_delete = 0
+        AND wx_user_coupon.wx_user_id = #{wxUserId}
+        AND wx_user_coupon.shop_id = #{shopId}
+        OR
+        (wx_user_coupon.coupon_type = 2
+        AND wx_user_coupon.wx_user_id = #{wxUserId})
+        ORDER BY wx_user_coupon.failure_time DESC
     </select>
 </mapper>
