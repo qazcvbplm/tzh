@@ -1,6 +1,6 @@
 #本地开发环境
 server:
-  port: 18888
+  port: 11000
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
