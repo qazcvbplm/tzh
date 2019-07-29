@@ -482,7 +482,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice,boxPrice,payPrice.setScale(2,BigDecimal.ROUND_HALF_UP),
                 productPrice,discountPrice.setScale(2,BigDecimal.ROUND_HALF_UP),payFoodCoupon.setScale(2,BigDecimal.ROUND_HALF_UP));
         if (!tempDTO.equals(orderTempDTO)){
-              DisplayException.throwMessage("订单金额有问题，请负责人进行核实!");
+            return new ResponseObject(false,"订单金额有问题，请负责人进行核实!");
         }
         ordersSaveTemp.setDiscountPrice(discountPrice);
         ordersSaveTemp.setAddressDetail(orders.getAddressDetail());
