@@ -49,3 +49,4 @@ server:
     min-response-size: 1024
 mybatis-plus:
   mapper-locations: ops/school/api/mapper/*.xml
+  type-enums-package: ops/school/api/entity/enums

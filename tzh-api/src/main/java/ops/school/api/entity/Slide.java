@@ -2,6 +2,7 @@ package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.entity.enums.Deleted;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ public class Slide {
     @NotBlank
     private String path;
 
-    private Integer isDelete;
+    private Deleted isDelete;
     @NotNull
     private Integer schoolId;
 
@@ -52,11 +53,11 @@ public class Slide {
         this.path = path == null ? null : path.trim();
     }
 
-    public Integer getIsDelete() {
+    public Deleted getIsDelete() {
         return isDelete;
     }
 
-    public void setIsDelete(Integer isDelete) {
+    public void setIsDelete(Deleted isDelete) {
         this.isDelete = isDelete;
     }
 
