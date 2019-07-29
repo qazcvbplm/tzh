@@ -20,6 +20,7 @@ import ops.school.constants.NumConstants;
 import ops.school.service.TCommonService;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +47,8 @@ public class ShopController {
     private TOrdersService tOrdersService;
 	@Autowired
 	private TCommonService tCommonService;
+	@Value("${barcode.path}")
+	private String path;
    /* @Autowired
     private AuthController auth;*/
 
@@ -173,7 +176,7 @@ public class ShopController {
 	public ResponseObject barcode(HttpServletRequest request,HttpServletResponse response,int id){
 		Shop shop = shopService.getById(id);
 		     School school=schoolService.findById(shop.getSchoolId());
-		     String path="/home/nginx/shopbarcode/shopbarcode/";
+		String path = this.path + "/";
 		     File dir=new File(path);
 		     if(!dir.exists()){
 		    	 dir.mkdirs();
