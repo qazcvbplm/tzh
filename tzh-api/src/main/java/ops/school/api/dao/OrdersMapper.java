@@ -1,6 +1,7 @@
 package ops.school.api.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.Sender;
 import ops.school.api.entity.Shop;
@@ -17,7 +18,7 @@ public interface OrdersMapper extends BaseMapper<Orders> {
 
     int updateByPrimaryKeySelective(Orders record);
 
-    List<Orders> find(Orders orders);
+    List<Orders> find(@Param("o") Orders orders, Page page);
 
     int count(Orders orders);
 

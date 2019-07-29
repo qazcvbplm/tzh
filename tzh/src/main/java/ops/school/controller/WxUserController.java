@@ -8,7 +8,10 @@ import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
-import ops.school.api.entity.*;
+import ops.school.api.entity.ChargeLog;
+import ops.school.api.entity.School;
+import ops.school.api.entity.WxUser;
+import ops.school.api.entity.WxUserBell;
 import ops.school.api.service.ChargeLogService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
@@ -54,7 +57,7 @@ public class WxUserController {
 
 
     @ApiOperation(value = "微信用户登录", httpMethod = "POST")
-    @PostMapping("wx/login")
+    @GetMapping("/wx/login")
     public ResponseObject login(HttpServletRequest request, HttpServletResponse response, String code, String schoolId) {
         Integer sid;
         try {

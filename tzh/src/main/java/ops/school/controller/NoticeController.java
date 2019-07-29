@@ -40,7 +40,7 @@ public class NoticeController {
 	}
 	
 	@ApiOperation(value="查询",httpMethod="POST")
-	@PostMapping("find")
+    @RequestMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,Notice notice){
 		notice.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
 		List<Notice> list = noticeService.list(new QueryWrapper<Notice>().setEntity(notice).orderByDesc("create_time"));

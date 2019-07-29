@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * CreatebyFang
@@ -83,7 +82,7 @@ public class ProductAndAttributeDTO implements Serializable {
         ProductAttribute productAttribute = new ProductAttribute();
         productAttribute.setId(this.attributeId);
         productAttribute.setProductId(this.id);
-        productAttribute.setName(this.productName);
+        productAttribute.setName(this.attributeName);
         productAttribute.setPrice(this.attributePrice);
         productAttribute.setIsDelete(this.attributeIsDelete);
         return  productAttribute;

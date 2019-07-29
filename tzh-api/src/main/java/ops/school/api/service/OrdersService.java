@@ -1,5 +1,6 @@
 package ops.school.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.Sender;
@@ -11,7 +12,7 @@ public interface OrdersService extends IService<Orders> {
 
     Integer pl(String id);
 
-    List<Orders> find(Orders orders);
+    IPage<Orders> find(Orders orders);
 
     Integer count(Orders orders);
 

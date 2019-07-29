@@ -1,21 +1,22 @@
 package ops.school.api.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import ops.school.api.dto.project.ProductOrderDTO;
+import ops.school.api.util.BaiduUtil;
+import ops.school.api.util.Util;
+
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import ops.school.api.dto.project.ProductOrderDTO;
-import ops.school.api.util.BaiduUtil;
-import ops.school.api.util.Util;
 
 /**
  * orders
@@ -249,6 +250,7 @@ public class Orders extends Base implements Serializable {
      * 创建时间
      */
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**

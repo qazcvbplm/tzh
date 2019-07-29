@@ -12,7 +12,6 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.constants.NumConstants;
 import ops.school.service.TSecondService;
-import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +41,7 @@ public class SecondHandController {
 	
 	
 	@ApiOperation(value="查询",httpMethod="POST")
-	@PostMapping("find")
+    @RequestMapping("find")
 public ResponseObject find(HttpServletRequest request, HttpServletResponse response, SecondHand secondHand, PageQueryDTO pageQueryDTO){
 		secondHand.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
 		QueryWrapper<SecondHand> query = new QueryWrapper<SecondHand>().setEntity(secondHand).orderByDesc("create_time");

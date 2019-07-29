@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -108,7 +107,7 @@ public class Task {
      * 每1分钟执行一次,隔5分钟提醒一次
      * 提醒学校负责人，商家有超时未接手订单
      */
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void remindUntakenOrders() {
 
         // 查询所有待接手订单
@@ -146,7 +145,7 @@ public class Task {
      * 每1分钟执行一次，隔5分钟提醒一次
      * 提醒学校负责人，配送员有超时未接手订单
      */
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void remindDistributor() {
 
         // 查询所有商家已接手订单

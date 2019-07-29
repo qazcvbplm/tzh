@@ -1,13 +1,10 @@
 package ops.school.util;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.RunOrders;
-import ops.school.api.service.OrderProductService;
 import ops.school.api.wxutil.WxGUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,8 +12,6 @@ import java.util.List;
 
 public class WxMessageUtil {
 
-    @Autowired
-    private static OrderProductService orderProductService;
 
     private static final String templateId = "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o";
 
@@ -47,11 +42,11 @@ public class WxMessageUtil {
     // 积分查收
     private static final String sourceAccept = "的积分奖励，请注意查收";
 
-    public static void wxSendMsg(Orders orders, String openid, String formid){
+    public static void wxSendMsg(Orders orders, String formid) {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Message message = new Message();
-        message.setToUser(openid);
+        message.setToUser(orders.getOpenId());
         message.setTemplateId(templateId);
         // 订单编号
         message.setDataKeyWord3(orders.getId());
@@ -62,9 +57,7 @@ public class WxMessageUtil {
         // 放大内容
         message.setEmphasisKeyword("keyword1.DATA");
         // 订单商品表信息
-        QueryWrapper<OrderProduct> query = new QueryWrapper<>();
-        query.lambda().eq(OrderProduct::getOrderId,orders.getId());
-        List<OrderProduct> list = orderProductService.list(query);
+        List<OrderProduct> list = orders.getOp();
         /**
          * 外卖订单
          */
