@@ -13,7 +13,7 @@ import java.util.List;
 public class BaseException extends RuntimeException {
 
     private Integer code;
-    private String msg;
+    private String message;
     private List<String> params = new ArrayList<String>(0);
 
     public BaseException(){}
@@ -22,18 +22,18 @@ public class BaseException extends RuntimeException {
         this.code = code;
     }
 
-    public BaseException(String msg){
-        this.msg = msg;
+    public BaseException(String message){
+        this.message = message;
     }
 
-    public BaseException(Integer code,String msg){
+    public BaseException(Integer code,String message){
         this.code = code;
-        this.msg = msg;
+        this.message = message;
     }
 
-    public BaseException(Integer code, String msg, List<String> params) {
+    public BaseException(Integer code, String message, List<String> params) {
         this.code = code;
-        this.msg = msg;
+        this.message = message;
         this.params = params;
     }
 
@@ -47,11 +47,11 @@ public class BaseException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return msg;
+        return message;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setmessage(String message) {
+        this.message = message;
     }
 
 
