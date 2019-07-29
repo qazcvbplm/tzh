@@ -112,4 +112,16 @@ public class OrderTempDTO {
     public int hashCode() {
         return Objects.hash(sendPrice, boxPrice, payPrice, productPrice, discountPrice, payFoodCoupon);
     }
+
+    @Override
+    public String toString() {
+        return "OrderTempDTO{" +
+                "sendPrice=" + sendPrice +
+                ", boxPrice=" + boxPrice +
+                ", payPrice=" + payPrice +
+                ", productPrice=" + productPrice +
+                ", discountPrice=" + discountPrice +
+                ", payFoodCoupon=" + payFoodCoupon +
+                '}';
+    }
 }

@@ -20,6 +20,7 @@ public class FullCutServiceImpl extends ServiceImpl<FullCutMapper, FullCut> impl
     public List<FullCut> findByShopId(Integer shopId) {
         QueryWrapper<FullCut> query = new QueryWrapper<FullCut>();
         query.lambda().eq(FullCut::getShopId, shopId);
+        query.orderByDesc("full");
         return fullCutMapper.selectList(query);
     }
 }
