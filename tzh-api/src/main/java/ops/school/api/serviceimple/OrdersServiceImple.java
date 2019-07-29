@@ -81,7 +81,7 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
     public List<Orders> findByShopYJS(int shopId, int page, int size) {
         Map<String,Object> map = new HashMap<>();
         map.put("id",shopId);
-        map.put("page",page);
+        map.put("page",(page-1) * size);
         map.put("size",size);
         return ordersMapper.findByShopYJS(map);
     }

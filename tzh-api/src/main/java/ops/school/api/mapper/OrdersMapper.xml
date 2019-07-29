@@ -493,6 +493,13 @@
     <update id="cancel" parameterType="string">
     update orders set status='已取消' where status !='已取消' and id=#{id}
   </update>
-    <update id="updateByPrimaryKeySelective"></update>
+
+    <select id="countPayPriceByFloor" parameterType="map" resultType="decimal">
+     select sum(pay_price) from orders
+		 where floor_id = #{floorId}
+		 and create_time
+		 BETWEEN #{beginTime}
+		 AND #{endTime}
+ </select>
 
 </mapper>

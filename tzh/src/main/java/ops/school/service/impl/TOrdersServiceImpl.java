@@ -3,6 +3,8 @@ package ops.school.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
+import ops.school.api.dao.OrdersMapper;
+import ops.school.api.dao.RunOrdersMapper;
 import ops.school.api.dao.SchoolMapper;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ShopTj;
@@ -26,10 +28,7 @@ import ops.school.constants.ProductConstants;
 import ops.school.message.dto.SchoolAddMoneyDTO;
 import ops.school.message.dto.SenderAddMoneyDTO;
 import ops.school.message.dto.WxUserAddSourceDTO;
-import ops.school.service.TCouponService;
-import ops.school.service.TOrdersService;
-import ops.school.service.TShopFullCutService;
-import ops.school.service.TWxUserCouponService;
+import ops.school.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -68,9 +67,9 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Autowired
     private OrdersService ordersService;
     @Autowired
-    private WxUserBellMapper wxUserBellMapper;
+    private OrdersMapper ordersMapper;
     @Autowired
-    private SchoolMapper schoolMapper;
+    private TRunOrdersService tRunOrdersService;
     @Autowired
     private RunOrdersService runOrdersService;
     @Autowired
@@ -764,7 +763,22 @@ public class TOrdersServiceImpl implements TOrdersService {
         //订单总数
         Integer allOrders = allOrdersTakeOut + allOrdersEatHere + allOrdersRunning + allOrdersGetSelf;
         //营业额
-        Integer ordersAllMoney = 0;
+        // 商品订单总营业额
+        Map<String,Object> map = new HashMap<>();
+        map.put("floorId",buildId);
+        map.put("beginTime",beginTime);
+        map.put("endTime",endTime);
+        BigDecimal ordersCountPayPrice = BigDecimal.ZERO;
+        if (ordersMapper.countPayPriceByFloor(map) != null){
+            ordersCountPayPrice = ordersMapper.countPayPriceByFloor(map);
+        }
+        // 跑腿订单总营业额
+        BigDecimal runOrdersCountTotalPrice = BigDecimal.ZERO;
+
+        if (tRunOrdersService.countTotalPriceByFloor(buildId,beginTime,endTime) != null){
+            runOrdersCountTotalPrice = tRunOrdersService.countTotalPriceByFloor(buildId,beginTime,endTime);
+        }
+        BigDecimal ordersAllMoney = ordersCountPayPrice.add(runOrdersCountTotalPrice);
         Map result = new HashMap();
         result.put("allOrders",allOrders);
         result.put("allOrdersTakeOut",allOrdersTakeOut);
