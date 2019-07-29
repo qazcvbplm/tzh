@@ -338,6 +338,12 @@ public class TOrdersServiceImpl implements TOrdersService {
                     if (product.getBoxPriceFlag() == 1){
                         boxcount += count;
                     }
+                    // 修改商品销量 + count
+                    product.setSale(product.getSale()+count);
+                    boolean rs = productService.updateById(product);
+                    if (!rs){
+                        logger.error("商品销量更新失败，商品id为："+ product.getId());
+                    }
                     orderProduct.setOrderId(generatorOrderId);
                     orderProduct.setAttributeName(productAttribute.getName());
                     orderProduct.setAttributePrice(productAttribute.getPrice());
@@ -374,24 +380,24 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 如果商品折扣未使用-->店铺满减
         if (!isDiscount){
             // 查询商家所有满减规则（从最大满减额度开始）
-            List<ShopFullCut> shopFullCuts = tShopFullCutService.findShopFullCut(orders.getShopId());
-            if (shopFullCuts.size() != 0){
-                for (ShopFullCut shopFullCut:shopFullCuts) {
+            List<FullCut> fullCuts =  fullCutService.findByShopId(orders.getShopId());
+            if (fullCuts.size() != 0){
+                for (FullCut shopFullCut:fullCuts) {
                     // 当原菜价满足店铺满减条件时 （>=）todo
-                    if (originalPrice.compareTo(new BigDecimal(shopFullCut.getFullAmount())) != -1){
+                    if (originalPrice.compareTo(new BigDecimal(shopFullCut.getFull())) != -1){
                         // 店铺满减之后的优惠价格 --> 如果原菜价 >= 折扣价格时
-                        if (originalPrice.subtract(new BigDecimal(shopFullCut.getCutAmount())).compareTo(BigDecimal.ZERO) != -1){
+                        if (originalPrice.subtract(new BigDecimal(shopFullCut.getCut())).compareTo(BigDecimal.ZERO) != -1){
                             // 优惠之后的折后价格
-                            afterDiscountPrice = afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCutAmount()));
-                            discountPrice = discountPrice.add(new BigDecimal(shopFullCut.getCutAmount()));
+                            afterDiscountPrice = afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCut()));
+                            discountPrice = discountPrice.add(new BigDecimal(shopFullCut.getCut()));
                         } else {
                             afterDiscountPrice = BigDecimal.ZERO;
                             discountPrice = discountPrice.add(originalPrice);
                         }
-                        fullAmount = fullAmount.add(new BigDecimal(shopFullCut.getFullAmount()));
-                        fullUsedAmount = fullUsedAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+                        fullAmount = fullAmount.add(new BigDecimal(shopFullCut.getFull()));
+                        fullUsedAmount = fullUsedAmount.add(new BigDecimal(shopFullCut.getCut()));
                         // 店铺满减表id
-                        ordersSaveTemp.setFullCutId(shopFullCut.getId());
+                        ordersSaveTemp.setFullCutId(Long.valueOf(shopFullCut.getId()));
                         ordersSaveTemp.setDiscountType("满减优惠");
                         break;
                     }
@@ -411,7 +417,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
                 //注释
                 Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
-                if (coupon != null && coupon.getIsInvalid() != 1){
+                if (coupon != null){
                     // 折后价格+餐盒费 >= 优惠券满减使用条件
                     if (beforeCouponPrice.compareTo(new BigDecimal(coupon.getFullAmount())) != -1){
                         //  并且 折后价格+餐盒费 >= 优惠券满减金额时
@@ -465,11 +471,6 @@ public class TOrdersServiceImpl implements TOrdersService {
                     payFoodCoupon = payFoodCoupon.add(wxUserBell.getFoodCoupon());
                     wxUserBell.setFoodCoupon(BigDecimal.ZERO);
                 }
-                // 修改用户粮票余额 todo 不判断么
-                boolean rs = wxUserBellService.updateById(wxUserBell);
-                if (!rs){
-                    logger.error("修改用户粮票金额失败，用户手机号为:"+wxUser.getPhone());
-                }
             }
         }
         // 前端传来的数据对象
@@ -521,6 +522,11 @@ public class TOrdersServiceImpl implements TOrdersService {
         boolean saveOrderSuccess = ordersService.save(ordersSaveTemp);
         if (!saveOrderSuccess){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_SAVE_ERROR);
+        }
+        // 修改用户粮票余额
+        boolean rs = wxUserBellService.updateById(wxUserBell);
+        if (!rs){
+            logger.error("修改用户粮票金额失败，用户手机号为:"+wxUser.getPhone());
         }
         //保存订单商品逻辑，不行就要自己写接口
         boolean saveOPSuccess = orderProductService.saveBatch(orderProductSaveList);

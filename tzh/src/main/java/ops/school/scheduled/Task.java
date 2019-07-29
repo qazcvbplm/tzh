@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -119,9 +120,34 @@ public class Task {
         }
         //TODO
         //服务重启的话缓存会漏单
+        /**
+         * 批量查询shop信息
+         */
+        List<Integer> shopIdList = PublicUtilS.getValueList(ordersList, "shopId");
+        Collection<Shop> shopCollection = shopService.listByIds(shopIdList);
+        Map<Integer, Shop> shopMap = PublicUtilS.listForMapValueE(shopCollection, "id");
+        /**
+         * 批量查询school信息
+         */
+        List<Integer> schoolIdList = PublicUtilS.getValueList(ordersList, "schoolId");
+        Collection<School> schoolCollection = schoolService.listByIds(schoolIdList);
+        Map<Integer, School> schoolMap = PublicUtilS.listForMapValueE(schoolCollection, "id");
+        if (ordersList == null) {
+            return;
+        }
         for (Orders temp : ordersList) {
-            Shop shop = shopService.getById(temp.getShopId());
-            School school = schoolService.findById(temp.getSchoolId());
+            Shop shop = null;
+            if (shopMap.get(temp.getShopId()) != null) {
+                shop = shopMap.get(temp.getShopId());
+            } else {
+                return;
+            }
+            School school = null;
+            if (schoolMap.get(temp.getSchoolId()) != null) {
+                school = schoolService.findById(temp.getSchoolId());
+            } else {
+                return;
+            }
             // 获取当前时间
             long current = System.currentTimeMillis();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -155,23 +181,38 @@ public class Task {
         } else {
             orders = ordersService.list(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "商家已接手"));
         }
-        if (orders != null) {
-            for (Orders order : orders) {
-                School school = schoolService.findById(order.getSchoolId());
-                long currentTime = System.currentTimeMillis();
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String curTime = df.format(currentTime);
-                // 获取商家接手时间
-                long differTime = TimeUtilS.dateDiff(order.getShopAcceptTime(), curTime);
-                if (differTime > 10) {
-                    if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SENDER" + school.getPhone()) == null) {
-                        try {
-                            Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getPhone(), 372793, "", null);
-                        } catch (HTTPException | IOException | org.json.JSONException e) {
-                            e.printStackTrace();
-                        }
-                        stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SENDER" + school.getPhone(), "", 5, TimeUnit.MINUTES);
+        /**
+         * 批量查询school信息
+         */
+        List<Integer> schoolIdList = PublicUtilS.getValueList(orders, "schoolId");
+        Collection<School> schoolCollection = schoolService.listByIds(schoolIdList);
+        Map<Integer, School> schoolMap = PublicUtilS.listForMapValueE(schoolCollection, "id");
+        if (orders == null) {
+            return;
+        }
+        for (Orders order : orders) {
+            School school = null;
+            if (schoolMap.get(order.getSchoolId()) != null) {
+                school = schoolService.findById(order.getSchoolId());
+            } else {
+                return;
+            }
+            long currentTime = System.currentTimeMillis();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String curTime = df.format(currentTime);
+            // 获取商家接手时间
+            if (order.getShopAcceptTime() == null || order.getShopAcceptTime().length() == 0) {
+                return;
+            }
+            long differTime = TimeUtilS.dateDiff(order.getShopAcceptTime(), curTime);
+            if (differTime > 10) {
+                if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SENDER" + school.getPhone()) == null) {
+                    try {
+                        Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getPhone(), 372793, "", null);
+                    } catch (HTTPException | IOException | org.json.JSONException e) {
+                        e.printStackTrace();
                     }
+                    stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SENDER" + school.getPhone(), "", 5, TimeUnit.MINUTES);
                 }
             }
         }
@@ -182,11 +223,11 @@ public class Task {
      * 每天上午10点,下午14点,18点,晚上22点执行一次
      */
     @Scheduled(cron = "0 0 10,14,18,22 * * ?")
-    public void couponInvalid(){
+    public void couponInvalid() {
 
         List<Coupon> couponList = tCouponService.findInvalidCoupon();
-        if (couponList.size() != 0){
-            for (Coupon coupon:couponList) {
+        if (couponList.size() != 0) {
+            for (Coupon coupon : couponList) {
                 coupon.setIsInvalid(1);
                 couponService.updateById(coupon);
             }
@@ -198,11 +239,11 @@ public class Task {
      * 每天上午8点,下午10点,14点,16点，晚上22点执行一次
      */
     @Scheduled(cron = "0 0 8,10,14,16,22 * * ?")
-    public void wxUserCouponInvalid(){
+    public void wxUserCouponInvalid() {
 
         List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findInvalidUserCoupon();
-        if (wxUserCoupons.size() != 0){
-            for (WxUserCoupon userCoupon:wxUserCoupons) {
+        if (wxUserCoupons.size() != 0) {
+            for (WxUserCoupon userCoupon : wxUserCoupons) {
                 userCoupon.setIsInvalid(2);
                 tWxUserCouponService.updateIsInvalid(userCoupon);
             }

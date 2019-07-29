@@ -118,16 +118,18 @@ public class OrdersController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response,
                                String id) {
         Orders orders = ordersService.findById(id);
+        // 临时存储订单状态
+        String status = orders.getStatus();
         int i = tOrdersService.cancel(id);
         if (i > 2) {
-            if (orders.getStatus().equals("待接手")) {
+            if (status.equals("待接手")) {
                 stringRedisTemplate.boundHashOps("SHOP_DJS" + i).delete(id);
                 stringRedisTemplate.boundHashOps("ALL_DJS").delete(id);
             }
-            if (orders.getStatus().equals("商家已接手")) {
+            if (status.equals("商家已接手")) {
                 stringRedisTemplate.boundHashOps("SHOP_YJS").delete(id);
             }
-            return new ResponseObject(true, "ok");
+            return new ResponseObject(true, "取消订单成功");
         } else {
             return new ResponseObject(false, "请重试");
         }
