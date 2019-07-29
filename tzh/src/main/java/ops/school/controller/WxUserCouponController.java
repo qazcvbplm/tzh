@@ -80,6 +80,20 @@ public class WxUserCouponController {
         return new ResponseObject(true,ResponseViewEnums.FIND_SUCCESS).push("shopList",resultList);
     }
 
+    /**
+     * @author Lee
+     * 根据店铺查询用户所有可用的优惠券
+     * @param wxUserId 用户id
+     * @param shopId 店铺id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "findWxUserCoupons", method = RequestMethod.POST)
+    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId, @RequestParam String shopId){
+        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId),Long.valueOf(shopId));
+        return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
+    }
+
 }
 
 

@@ -1,13 +1,16 @@
 package ops.school.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.swagger.models.auth.In;
-import ops.school.api.dao.*;
+import ops.school.api.dao.CouponMapper;
+import ops.school.api.dao.ShopCouponMapper;
+import ops.school.api.dao.WxUserCouponMapper;
+import ops.school.api.dao.WxUserMapper;
 import ops.school.api.dto.project.CouponDTO;
-import ops.school.api.entity.*;
+import ops.school.api.entity.Coupon;
+import ops.school.api.entity.ShopCoupon;
+import ops.school.api.entity.WxUser;
+import ops.school.api.entity.WxUserCoupon;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
@@ -19,6 +22,7 @@ import ops.school.api.util.TimeUtilS;
 import ops.school.constants.NumConstants;
 import ops.school.service.TCouponService;
 import ops.school.service.TShopCouponService;
+import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -104,7 +108,7 @@ public class TCouponServiceImpl implements TCouponService {
         if (couponType != null){
             query.eq("coupon_type",couponType);
         }
-        IPage<Coupon> rs = couponService.page(new Page<>(page,size),query);
+        IPage<Coupon> rs = couponService.page(PageUtil.getPage(page, size), query);
         if (rs == null || rs.getTotal() < 1 || rs.getRecords().size() < 1 ){
             return new ResponseObject(true, ResponseViewEnums.SUCCESS)
                     .push("list",rs.getRecords())
@@ -158,7 +162,7 @@ public class TCouponServiceImpl implements TCouponService {
         if (couponId == null){
             return -1;
         }
-        if (coupon != null && StringUtils.hasText(coupon.getShopIds())){
+        if (coupon != null && !StringUtils.hasText(coupon.getShopIds())){
             return 2;
         }
         String[] shopIdS = coupon.getShopIds().split(",");
@@ -168,6 +172,7 @@ public class TCouponServiceImpl implements TCouponService {
             ShopCoupon shopCoupon = new ShopCoupon();
             shopIdLong = Long.valueOf(shopId);
             shopCoupon.setCouponId(couponId);
+            shopCoupon.setCouponType(coupon.getCouponType());
             shopCoupon.setShopId(shopIdLong);
             shopCoupon.setCreateId(coupon.getCreateId());
             shopCoupon.setCreateTime(new Date());

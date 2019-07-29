@@ -15,9 +15,20 @@ public class CouponConstants {
     public final static Integer COUPON_TYPE_HOME = 1;
 
     /**
+     * 优惠券类型在用户表优惠券中是首页展示的
+     */
+    public final static Long USER_COUPON_TYPE_HOME = -1L;
+
+    /**
      * 优惠券类型是平台优惠券
      */
     public final static Integer COUPON_TYPE_PLATE = 2;
+
+
+    /**
+     * 优惠券类型在用户表优惠券中是首页展示的
+     */
+    public final static Long USER_COUPON_TYPE_PLATE = -2L;
 
     /**
      * 首页优惠券是否展示的展示

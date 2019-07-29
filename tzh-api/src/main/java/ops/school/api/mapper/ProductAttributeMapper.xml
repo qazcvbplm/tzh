@@ -41,7 +41,7 @@
       is_delete = #{isDelete,jdbcType=INTEGER}
     where Id = #{id,jdbcType=INTEGER}
   </update>
-    <delete id="delete" parameterType="int">
+    <delete id="deleteOne" parameterType="int">
    delete from product_attribute where id=#{id}
   </delete>
 </mapper>

@@ -12,10 +12,7 @@ import ops.school.api.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,8 +40,8 @@ public class SlideController {
         return new ResponseObject(true, "添加成功");
     }
 
-    @ApiOperation(value = "查询", httpMethod = "POST")
-    @PostMapping("find")
+    @ApiOperation(value = "查询", httpMethod = "GET")
+    @GetMapping("find")
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int schoolId) {
         List<Slide> list = null;
         if (SpringUtil.redisCache()) {

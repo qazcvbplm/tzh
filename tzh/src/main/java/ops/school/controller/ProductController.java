@@ -48,7 +48,7 @@ public class ProductController {
 	
 	
 	@ApiOperation(value="查询",httpMethod="POST")
-	@PostMapping("find")
+    @RequestMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,int productCategoryId,Integer type){
 		             List<Product> list;
 		              if(request.getAttribute("role").toString().equals("wxuser")){

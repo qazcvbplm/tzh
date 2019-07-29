@@ -1,7 +1,7 @@
 package ops.school.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import ops.school.api.config.Server;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.entity.*;
 import ops.school.api.enums.ResponseViewEnums;
@@ -37,6 +37,8 @@ public class TSenderServiceImpl implements TSenderService {
     @Autowired
     private SchoolService schoolService;
     @Autowired
+    private OrderProductService orderProductService;
+    @Autowired
     private WxUserBellService wxUserBellService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -66,6 +68,7 @@ public class TSenderServiceImpl implements TSenderService {
         return ordersService.getorder(orderId);
     }
 
+    @Transactional
     @Override
     public Integer acceptOrder(Integer senderId, String orderId) {
         Sender sender = senderService.findById(senderId);
@@ -75,11 +78,7 @@ public class TSenderServiceImpl implements TSenderService {
         orders.setSenderPhone(sender.getPhone());
         int rs = 0;
         if ((rs = ordersService.senderAccept(orders)) == 1) {
-            WxUser wxUser = wxUserService.findById(orders.getOpenId());
-            List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
-            if (formIds.size() > 0){
-                WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
-            }
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
         }
         return rs;
     }
@@ -95,21 +94,21 @@ public class TSenderServiceImpl implements TSenderService {
             // 已送达到楼上
             orders.setDestination(1);
             if (ordersService.end(orders) == 1) {
-                BigDecimal senderGet = new BigDecimal(0);
-                if (orders.getSenderId() != 0) {
-                    // 配送员获得金额
-                    senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
-                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
-                    );
-                }
-                stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
-                        new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
-                );
-                // 增加积分
-                stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                        new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
-                );
+//                BigDecimal senderGet = new BigDecimal(0);
+//                if (orders.getSenderId() != 0) {
+//                    // 配送员获得金额
+//                    senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
+//                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+//                    );
+//                }
+//                stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
+//                        new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
+//                );
+//                // 增加积分
+//                stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                        new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+//                );
 
             } else {
                 return;
@@ -136,31 +135,28 @@ public class TSenderServiceImpl implements TSenderService {
                     School school = schoolService.findById(orders.getSchoolId());
                     school.setUserChargeSend(school.getUserChargeSend().add(returnPrice));
                     schoolService.updateById(school);
-                    BigDecimal senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
-                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
-                    );
-                    stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
-                            new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
-                    );
-                    // 增加积分
-                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
-                            new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
-                    );
+//                    BigDecimal senderGet = orders.getSendPrice().multiply(new BigDecimal(1).subtract(sender.getRate()));
+//                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                            new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+//                    );
+//                    stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
+//                            new SchoolAddMoneyDTO(orders.getSchoolId(), orders.getPayPrice().subtract(senderGet), senderGet).toJsonString()
+//                    );
+//                    // 增加积分
+//                    stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+//                            new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+//                    );
                 }
             } else {
                 return;
             }
         }
         redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
-        stringRedisTemplate.convertAndSend(Server.PRODUCTADD, orderId);
-        List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_PRODUCT_ADD, orderId);
         if (orders.getTyp().equals("外卖订单")) {
-            if (formIds.size() > 0){
-                WxMessageUtil.wxSendMsg(orders,wxUser.getOpenId(),formIds.get(2));
-                // 删除redis缓存
-                stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
-            }
+            orders.setStatus("已完成");
+            //发送模板消息
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
         }
         //结算
         rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_ORDERS_COMPLETE, orders.getId());
@@ -222,19 +218,19 @@ public class TSenderServiceImpl implements TSenderService {
             /**
              * 将配送员所得存进redis缓存
              */
-            stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SENDER_BELL,
                     new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
             );
             /**
              * 将负责人所得存进redis缓存
              */
-            stringRedisTemplate.convertAndSend(Server.SCHOOLBELL,
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SCHOOL_BELL,
                     new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGet, senderGet).toJsonString()
             );
             // senderAddMoney(orders.getTotalPrice(),orders.getSenderId());
             // 增加积分
             // addsource(orders.getOpenId(), orders.getTotalPrice().intValue());
-            stringRedisTemplate.convertAndSend(Server.SENDERBELL,
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL,
                     new WxUserAddSourceDTO(orders.getOpenId(), orders.getTotalPrice().intValue()).toJsonString()
             );
             redisUtil.runCountSuccessadd(orders.getSchoolId());

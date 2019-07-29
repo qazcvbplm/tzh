@@ -1,5 +1,7 @@
 package ops.school.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.dto.SenderTj;
@@ -11,6 +13,7 @@ import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.service.TCommonService;
 import ops.school.service.TSenderService;
+import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -50,8 +52,23 @@ public class SenderController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Sender sender) {
         sender.setQueryType(request.getAttribute("role").toString());
         sender.setQuery(request.getAttribute("Id").toString());
-        List<Sender> list = senderService.find(sender);
-        return new ResponseObject(true, "ok").push("list", list).push("total", senderService.count(sender));
+        QueryWrapper<Sender> query = new QueryWrapper<Sender>();
+        if (sender.getExam() != null) {
+            query.lambda().ne(Sender::getExam, sender.getExam());
+        }
+        switch (sender.getQueryType()) {
+            case "wxuser":
+                query.lambda().eq(Sender::getOpenId, sender.getQuery());
+                break;
+            case "ops":
+                query.lambda().eq(Sender::getSchoolId, Integer.valueOf(sender.getQuery()));
+                break;
+            case "admin":
+                break;
+        }
+        IPage<Sender> list = senderService.page(PageUtil.getPage(sender.getPage(), sender.getSize()), query);
+        return new ResponseObject(true, "ok").push("list", list.getRecords()).
+                push("total", list.getTotal());
     }
 
     @ApiOperation(value = "查询待审核人数", httpMethod = "POST")

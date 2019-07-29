@@ -50,16 +50,7 @@ public class SenderServiceImple extends ServiceImpl<SenderMapper, Sender> implem
 
     @Override
     public List<Sender> find(Sender sender) {
-        switch (sender.getQueryType()) {
-            case "wxuser":
-                sender.setOpenId(sender.getQuery());
-                break;
-            case "ops":
-                sender.setSchoolId(Integer.valueOf(sender.getQuery()));
-                break;
-            case "admin":
-                break;
-        }
+
         return senderMapper.find(sender);
     }
 

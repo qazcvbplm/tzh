@@ -8,7 +8,10 @@ import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
-import ops.school.api.entity.*;
+import ops.school.api.entity.ChargeLog;
+import ops.school.api.entity.School;
+import ops.school.api.entity.WxUser;
+import ops.school.api.entity.WxUserBell;
 import ops.school.api.service.ChargeLogService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
@@ -54,7 +57,7 @@ public class WxUserController {
 
 
     @ApiOperation(value = "微信用户登录", httpMethod = "POST")
-    @PostMapping("wx/login")
+    @GetMapping("/wx/login")
     public ResponseObject login(HttpServletRequest request, HttpServletResponse response, String code, String schoolId) {
         Integer sid;
         try {
@@ -208,19 +211,7 @@ public class WxUserController {
         List<Map<String,Object>> wxUserCoupons = tWxUserCouponService.findAllUserCoupons(Long.valueOf(wxUserId));
         return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
     }
-    /**
-     * @author Lee
-     * 根据店铺查询用户所有可用的优惠券
-     * @param wxUserId 用户id
-     * @param shopId 店铺id
-     * @return
-     */
-    @RequestMapping(value = "findWxUserCoupons", method = RequestMethod.POST)
-    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId, @RequestParam String shopId){
 
-        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId),Long.valueOf(shopId));
-        return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
-    }
 
     /**
      * 对加密手机号进行解密

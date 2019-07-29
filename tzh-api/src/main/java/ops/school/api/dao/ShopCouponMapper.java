@@ -66,7 +66,7 @@ public interface ShopCouponMapper extends BaseMapper<ShopCoupon> {
      */
     Integer startOneById(Long id);
 
-    int insert(ShopCoupon shopCoupon);
+    int insertOne(ShopCoupon shopCoupon);
 
     /**
      * @date:   2019/7/25 21:05

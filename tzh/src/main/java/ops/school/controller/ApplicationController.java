@@ -9,9 +9,10 @@ import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.wxutil.XMLUtil;
-import ops.school.config.RedisConfig;
+import ops.school.config.RabbitMQConfig;
 import ops.school.message.dto.WxUserAddSourceDTO;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +41,8 @@ public class ApplicationController {
 	private WxUserController wxUserController;
 	@Autowired
 	private WxUserBellService wxUserBellService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     @RequestMapping("check")
@@ -88,7 +91,7 @@ public class ApplicationController {
 					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text","绑定成功，恭喜您获得88积分奖励和0.5元红包奖励。奖励都已发放至您的客户端小程序中，请自行前往查看！");
 					//增加积分
 					user=minUser.get(0);
-					stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(user.getOpenId(), 88).toJsonString());
+                    rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(user.getOpenId(), 88).toJsonString());
 	        		Map<String,Object> ch=new HashMap<>();
 	        		ch.put("phone", user.getOpenId()+"-"+user.getPhone());
 	        	    ch.put("amount", "0.5");

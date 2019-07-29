@@ -2,7 +2,6 @@ package ops.school.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Base;
@@ -12,11 +11,12 @@ import ops.school.api.service.OrdersService;
 import ops.school.api.service.RunOrdersService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
-import ops.school.config.RedisConfig;
+import ops.school.config.RabbitMQConfig;
 import ops.school.constants.NumConstants;
 import ops.school.message.dto.WxUserAddSourceDTO;
+import ops.school.util.PageUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +38,7 @@ public class EvaluateController {
     @Autowired
     private RunOrdersService runOrdersService;
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RabbitTemplate rabbitTemplate;
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
@@ -46,11 +46,11 @@ public class EvaluateController {
         Util.checkParams(result);
         if (ordersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-            stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
         }
         if (runOrdersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-            stringRedisTemplate.convertAndSend(RedisConfig.SENDERBELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
         }
         return new ResponseObject(true, "添加成功");
     }
@@ -60,9 +60,7 @@ public class EvaluateController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Evaluate evaluate) {
         evaluate.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
         QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().setEntity(evaluate).orderByDesc("create_time");
-//        List<Evaluate> list = evaluateService.list(query);
-        IPage<Evaluate> iPage = evaluateService.page(new Page<>(evaluate.getPage(), evaluate.getSize()), query);
-        //Integer count = evaluateService.count(query);
+        IPage<Evaluate> iPage = evaluateService.page(PageUtil.getPage(evaluate.getPage(), evaluate.getSize()), query);
         return new ResponseObject(true, "ok")
                 .push("total", iPage.getTotal())
                 .push("list", iPage.getRecords());
@@ -73,7 +71,7 @@ public class EvaluateController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int shopId, Base base) {
         QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().orderByDesc("create_time");
         query.lambda().eq(Evaluate::getShopId, shopId);
-        List<Evaluate> list = evaluateService.page(new Page<>(base.getPage(), base.getSize()), query).getRecords();
+        List<Evaluate> list = evaluateService.page(PageUtil.getPage(base.getPage(), base.getSize()), query).getRecords();
         return new ResponseObject(true, "ok").push("list", list);
     }
 

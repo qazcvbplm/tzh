@@ -83,7 +83,7 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @param
      * @Desc:   desc 修改用户优惠券is_invalid状态
      */
-    int update(WxUserCoupon userCoupon);
+    int updateOnee(WxUserCoupon userCoupon);
 
     /**
      * @date:
@@ -122,4 +122,14 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @return
      */
     List<WxUserCoupon> userFindCouponsByWIdSId(@Param("wxUserId") Long wxUserId, @Param("shopId") Long shopId);
+
+    /**
+     * @date:   2019/7/27 23:05
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.WxUserCoupon>
+     * @param   wxUserId
+     * @Desc:   desc
+     */
+    List<WxUserCoupon> selectAllUserCoupons(Long wxUserId);
 }

@@ -164,7 +164,7 @@
     </select>
 
     <!--修改用户优惠券is_invalid状态-->
-    <update id="update" parameterType="ops.school.api.entity.WxUserCoupon">
+    <update id="updateOnee" parameterType="ops.school.api.entity.WxUserCoupon">
         UPDATE <include refid="Table_Name"/>
         set is_invalid = #{isInvalid}
         where id = #{id}
@@ -227,8 +227,21 @@
         AND wx_user_coupon.wx_user_id = #{wxUserId}
         AND wx_user_coupon.shop_id = #{shopId}
         OR
-        (wx_user_coupon.coupon_type = 2
+        (wx_user_coupon.coupon_type IN (-1,-2,2,1)
         AND wx_user_coupon.wx_user_id = #{wxUserId})
+        ORDER BY wx_user_coupon.failure_time DESC
+    </select>
+
+    <!--CreatBy Fang Time:2019/7/27 23:05 |  -->
+    <select id="selectAllUserCoupons" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM wx_user_coupon,coupon
+        WHERE
+        wx_user_coupon.coupon_id = coupon.id
+        AND wx_user_coupon.is_invalid = 0
+        AND coupon.is_invalid = 0
+        AND coupon.is_delete = 0
+        AND wx_user_coupon.wx_user_id = #{wxUserId}
         ORDER BY wx_user_coupon.failure_time DESC
     </select>
 </mapper>
