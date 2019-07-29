@@ -1,8 +1,5 @@
 package ops.school.api.exception;
 
-import ops.school.api.enums.PublicErrorEnums;
-import ops.school.api.enums.RootEnums;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +13,7 @@ import java.util.List;
 public class BaseException extends RuntimeException {
 
     private Integer code;
-    private String  message;
+    private String msg;
     private List<String> params = new ArrayList<String>(0);
 
     public BaseException(){}
@@ -25,18 +22,18 @@ public class BaseException extends RuntimeException {
         this.code = code;
     }
 
-    public BaseException(String message){
-        this.message = message;
+    public BaseException(String msg){
+        this.msg = msg;
     }
 
-    public BaseException(Integer code,String message){
+    public BaseException(Integer code,String msg){
         this.code = code;
-        this.code = code;
+        this.msg = msg;
     }
 
-    public BaseException(Integer code, String message, List<String> params) {
+    public BaseException(Integer code, String msg, List<String> params) {
         this.code = code;
-        this.message = message;
+        this.msg = msg;
         this.params = params;
     }
 
@@ -50,12 +47,13 @@ public class BaseException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return message;
+        return msg;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
+
 
     public List<String> getParams() {
         return params;

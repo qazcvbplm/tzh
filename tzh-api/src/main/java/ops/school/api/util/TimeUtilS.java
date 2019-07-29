@@ -37,7 +37,7 @@ public class TimeUtilS {
             min = diff % nd % nh / nm + day * 24 * 60;// 计算差多少分钟
         } catch (ParseException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         // 输出结果
         return min;
