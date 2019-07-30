@@ -1,10 +1,14 @@
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.App;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Orders;
+import ops.school.api.entity.Shop;
+import ops.school.api.service.ShopService;
 import ops.school.api.service.TxLogService;
 import ops.school.api.util.ResponseObject;
 import ops.school.service.TOrdersService;
 import ops.school.util.Base64Util;
+import ops.school.util.ImageUtil;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +32,8 @@ public class Test {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private TOrdersService tOrdersService;
+    @Autowired
+    private ShopService shopService;
 
     /*@org.junit.Test
     public void test(){
@@ -74,5 +80,17 @@ public class Test {
     @org.junit.Test
     public void wxPhoneTest(){
         tOrdersService.orderSettlement("201907271706272822542855187");
+    }
+
+    @org.junit.Test
+    public void imageTest(){
+        QueryWrapper<Shop> query = new QueryWrapper<>();
+        query.lambda().eq(Shop::getId,10);
+        Shop shop = shopService.getOne(query);
+        String shopImage = "D:/image/timg3.jpg";
+        String codeImg = "D:/image/9.jpg";
+        String path = "D:/image/";
+        int rs = ImageUtil.imageCombine(shopImage,codeImg,path,shop);
+        System.out.println(rs);
     }
 }

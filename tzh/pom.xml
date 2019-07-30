@@ -157,7 +157,13 @@
             <version>7.2.11</version>
             <scope>compile</scope>
         </dependency>
-<!--        热部署-->
+        <!-- https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+        <!--        热部署-->
 
         <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->

@@ -9,6 +9,7 @@ import ops.school.api.entity.FullCut;
 import ops.school.api.entity.School;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopOpenTime;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.FullCutService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.ShopOpenTimeService;
@@ -19,6 +20,7 @@ import ops.school.api.wxutil.WXUtil;
 import ops.school.constants.NumConstants;
 import ops.school.service.TCommonService;
 import ops.school.service.TOrdersService;
+import ops.school.util.ImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
@@ -28,7 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Api(tags="店铺模块")
@@ -174,15 +178,29 @@ public class ShopController {
 	@ApiOperation(value="店铺二维码",httpMethod="POST")
 	@PostMapping("barcode")
 	public ResponseObject barcode(HttpServletRequest request,HttpServletResponse response,int id){
-		Shop shop = shopService.getById(id);
-		     School school=schoolService.findById(shop.getSchoolId());
-		String path = this.path + "/";
-		     File dir=new File(path);
-		     if(!dir.exists()){
-		    	 dir.mkdirs();
-		     }
-		     WXUtil.getCode(school.getWxAppId()
-		    		 , school.getWxSecret(), "pages/index/item/menu/menu?shopid="+id,path+id+".jpg");
-		     return new ResponseObject(true, "ok").push("barcode", "https://www.chuyinkeji.cn/shopbarcode/"+id+".jpg");
+		 Shop shop = shopService.getById(id);
+		 School school=schoolService.findById(shop.getSchoolId());
+		 String path = this.path + "/";
+		 File dir=new File(path);
+		 if(!dir.exists()){
+			 dir.mkdirs();
+		 }
+		 int rs = WXUtil.getCode(school.getWxAppId()
+				 , school.getWxSecret(), "pages/index/item/menu/menu?shopid="+id,path+id+".jpg");
+		 if (rs == 1 && shop.getShopImage() != null){
+			 Map<String,Object> msg =ImageUtil.pictureCombine(shop.getShopImage(),path+id+".jpg",path,shop);
+			 if ((Integer) msg.get("code") == 1){
+			 	 String shopCodeImage = (String) msg.get("shopCodeImage");
+			 	 shop.setShopCodeImage(shopCodeImage);
+			 	 // 修改店铺二维码图片
+			 	 boolean re = shopService.updateById(shop);
+			 	 if (re){
+					 return new ResponseObject(true, "生成二维码成功").push("barcode", "https://www.chuyinkeji.cn/shopbarcode/"+id+".jpg");
+				 }
+			 } else {
+				 return new ResponseObject(false, "生成二维码失败");
+			 }
+		 }
+		 return new ResponseObject(false, "生成二维码失败");
 	}
 }

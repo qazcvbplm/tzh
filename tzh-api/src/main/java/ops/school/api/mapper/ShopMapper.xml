@@ -31,6 +31,7 @@
         <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
         <result column="sort" jdbcType="BIGINT" property="sort"/>
         <result column="shop_tx_flag" property="shopTxFlag"/>
+        <result column="shop_code_image" property="shopCodeImage"/>
         <collection property="fullCut" ofType="ops.school.api.entity.FullCut"
                     select="ops.school.api.dao.FullCutMapper.findByShop" column="id">
             <result column="full" jdbcType="INTEGER" property="full"/>
@@ -73,7 +74,7 @@
 
     <sql id="fd">
   id,school_id,shop_name,shop_phone,shop_image,shop_category_id,send_model_flag,get_model_flag,score,start_price,box_price,send_price,send_time,top_title,shop_login_name,shop_login_pass_word,shop_address,rate,lat,lng,vip_discount_flag
-  ,send_price_add_by_count_flag,send_price_add,is_delete,sort,ts_model_flag
+  ,send_price_add_by_count_flag,send_price_add,is_delete,sort,ts_model_flag,shop_code_image
   </sql>
 
     <sql id="Base_Column_List" >
@@ -109,7 +110,8 @@
         shop.discount_rate,
         shop.shop_tx_flag,
         shop.tx_amount,
-        shop.all_tx_amount
+        shop.all_tx_amount,
+        shop.shop_code_image
     </sql>
     <select id="count" resultType="int" parameterType="ops.school.api.entity.Shop">
         select count(*) from shop

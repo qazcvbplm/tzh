@@ -74,6 +74,11 @@ public class Shop {
 
     private BigDecimal allTxAmount;
 
+    /**
+     * 店铺二维码图片
+     */
+    private String shopCodeImage;
+
     private Integer isDelete;
 
     private Long sort;
@@ -171,6 +176,14 @@ public class Shop {
 
     public void setAllTxAmount(BigDecimal allTxAmount) {
         this.allTxAmount = allTxAmount;
+    }
+
+    public String getShopCodeImage() {
+        return shopCodeImage;
+    }
+
+    public void setShopCodeImage(String shopCodeImage) {
+        this.shopCodeImage = shopCodeImage;
     }
 
     public Integer getshopTxFlag() {
