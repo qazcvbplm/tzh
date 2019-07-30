@@ -39,7 +39,8 @@ public class RichTextController {
     @ApiOperation(value = "查询", httpMethod = "POST")
     @PostMapping("find")
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Integer parentId) {
-        return new ResponseObject(true, "ok").push("msg", richTextService.getOne(new QueryWrapper<RichText>().lambda().eq(RichText::getParentId, parentId)));
+        return new ResponseObject(true, "ok").push("msg",
+                richTextService.list(new QueryWrapper<RichText>().lambda().eq(RichText::getParentId, parentId)));
     }
 
     @ApiOperation(value = "更新", httpMethod = "POST")
