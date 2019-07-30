@@ -19,6 +19,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @RunWith(SpringRunner.class)
@@ -90,7 +91,6 @@ public class Test {
         String shopImage = "D:/image/timg3.jpg";
         String codeImg = "D:/image/9.jpg";
         String path = "D:/image/";
-        int rs = ImageUtil.imageCombine(shopImage,codeImg,path,shop);
-        System.out.println(rs);
+        Map map = ImageUtil.pictureCombine(shopImage,codeImg,path,shop);
     }
 }

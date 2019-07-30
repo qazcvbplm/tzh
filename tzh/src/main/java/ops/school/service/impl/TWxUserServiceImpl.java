@@ -123,7 +123,7 @@ public class TWxUserServiceImpl implements TWxUserService {
         try {
             jsonString = Base64Util.getPhoneNumberBeanS5(decryptData,sessionKey,ivData);
             if (jsonString == null || jsonString.length() == 0){
-                throw new YWException("手机号码解密失败");
+                return 0;
             }
             // json串转换成map集合
             Map<String, Object> map;
@@ -144,7 +144,7 @@ public class TWxUserServiceImpl implements TWxUserService {
                         // 修改用户信息
                         wxUserService.updateById(wxUser);
                     } else {
-                        throw new YWException("手机号码解密失败");
+                        return 0;
                     }
                 } else {
                     // 手机号不为空时
@@ -161,7 +161,7 @@ public class TWxUserServiceImpl implements TWxUserService {
                             map1.put("phone",wxUserBell.getPhone());
                             int rs = wxUserBellMapper.updatePhone(map1);
                             if (rs == 0){
-                                throw new YWException("修改用户手机号失败");
+                                return 0;
                             }
                         }
 
@@ -169,13 +169,13 @@ public class TWxUserServiceImpl implements TWxUserService {
                         wxUser.setPhone(phoneNumber);
                         wxUserService.updateById(wxUser);
                     } else {
-                        throw new YWException("手机号码解密失败");
+                        return 0;
                     }
                 }
             }
         } catch (Exception e){
             e.printStackTrace();
         }
-        return 0;
+        return 1;
     }
 }

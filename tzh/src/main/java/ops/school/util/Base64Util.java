@@ -16,6 +16,14 @@ public class Base64Util {
          *这里你没必要非按照我的方式写，下面打代码主要是在一个自己的类中 放上decrypts5这个解密工具，工具在下方有代码
          */
         String resultMessage = Base64Util.decryptS5(decryptData,"UTF-8",key,iv);
+        if (resultMessage == null){
+            for (int i = 0; i < 5; i++) {
+                resultMessage = Base64Util.decryptS5(decryptData,"UTF-8",key,iv);
+                if (resultMessage != null){
+                    break;
+                }
+            }
+        }
         return resultMessage;
     }
 

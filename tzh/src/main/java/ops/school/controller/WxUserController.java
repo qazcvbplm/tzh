@@ -225,7 +225,10 @@ public class WxUserController {
     public ResponseObject decryptPhone(@RequestParam String decryptData,@RequestParam String sessionKey,
                                        @RequestParam String ivData,@RequestParam String openid){
         // 对手机号码进行解密，并存进数据库
-        tWxUserService.decryptPhone(decryptData, sessionKey, ivData, openid);
-        return new ResponseObject(true,"ok");
+        int rs = tWxUserService.decryptPhone(decryptData, sessionKey, ivData, openid);
+        if (rs == 0){
+            return new ResponseObject(false,"手机号解密失败");
+        }
+        return new ResponseObject(true,"手机号解密成功");
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Api(tags = "富文本模块")
@@ -38,9 +39,10 @@ public class RichTextController {
 
     @ApiOperation(value = "查询", httpMethod = "POST")
     @PostMapping("find")
-    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Integer parentId) {
-        return new ResponseObject(true, "ok").push("msg",
-                richTextService.list(new QueryWrapper<RichText>().lambda().eq(RichText::getParentId, parentId)));
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Integer parentId, Integer richTextId) {
+
+        List<RichText> richTexts = richTextService.findByIdAndParentId(richTextId,parentId);
+        return new ResponseObject(true, "ok").push("msg", richTexts);
     }
 
     @ApiOperation(value = "更新", httpMethod = "POST")
