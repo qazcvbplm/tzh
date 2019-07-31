@@ -107,7 +107,7 @@ public class QiNiuUtils {
         download(downloadUrl, filePath);
     }
 
-    private static InputStream downloadHttpFile(String httpUrl) {
+    public static InputStream downloadHttpFile(String httpUrl) {
         OkHttpClient client = new OkHttpClient();
         Request req = new Request.Builder().url(httpUrl).build();
         okhttp3.Response resp = null;
@@ -492,29 +492,29 @@ public class QiNiuUtils {
         return BUCKET_HOST_NAME + "/" + key;  
     }  
       
-    public static void main(String[] args) throws IOException {  
-        //uploadFile("C:/test.jpg");  
-          
-        /*String[] buckets = listBucket(); 
-        for(String bucket : buckets) { 
-            System.out.println(bucket); 
-        }*/  
-          
-        /*List<FileInfo> list = listFileOfBucket(BUCKET_NAME, null, 1000); 
-        for(FileInfo fileInfo : list) { 
-            System.out.println("key：" + fileInfo.key); 
-            System.out.println("hash：" + fileInfo.hash); 
-            System.out.println("................"); 
-        }*/  
-          
-        //copyFile(BUCKET_NAME, "images-test", BUCKET_NAME, "images-test-1111");  
-          
-        //renameFile(BUCKET_NAME, "images-test-1111", "images-test-2222.jpg");  
-          
-        //deleteFile(BUCKET_NAME, "images-test-2222.jpg");  
-          
-        //fetchToBucket("http://www.nanrenwo.net/uploads/allimg/121026/14-1210261JJD03.jpg", BUCKET_NAME,"1111111111111111.jpg");  
-          
+    public static void main(String[] args) throws IOException {
+        //uploadFile("C:/test.jpg");
+
+        /*String[] buckets = listBucket();
+        for(String bucket : buckets) {
+            System.out.println(bucket);
+        }*/
+
+        /*List<FileInfo> list = listFileOfBucket(BUCKET_NAME, null, 1000);
+        for(FileInfo fileInfo : list) {
+            System.out.println("key：" + fileInfo.key);
+            System.out.println("hash：" + fileInfo.hash);
+            System.out.println("................");
+        }*/
+
+        //copyFile(BUCKET_NAME, "images-test", BUCKET_NAME, "images-test-1111");
+
+        //renameFile(BUCKET_NAME, "images-test-1111", "images-test-2222.jpg");
+
+        //deleteFile(BUCKET_NAME, "images-test-2222.jpg");
+
+        //fetchToBucket("http://www.nanrenwo.net/uploads/allimg/121026/14-1210261JJD03.jpg", BUCKET_NAME,"1111111111111111.jpg");
+
 //        FileInfo[] fileInfos = findFiles(BUCKET_NAME, "10", LIMIT_SIZE);
 //        for(FileInfo fileInfo : fileInfos) {
 //            System.out.println(fileInfo.key);
@@ -522,5 +522,5 @@ public class QiNiuUtils {
 //            System.out.println("..............");
 //        }
         InputStream inputStream = downloadHttpFile("http://ops.chuyinkeji.cn/708dc02a-f7fd-47f8-8d84-bc7fbbb214ed");
-    }  
+    }
 }  
