@@ -1,6 +1,7 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import ops.school.api.dao.CouponMapper;
@@ -171,7 +172,8 @@ public class TCouponServiceImpl implements TCouponService {
 
     @Override
     public int insert(Coupon coupon) {
-        couponMapper.insertOne(coupon);
+        Assertions.notNull(coupon,coupon.getSchoolId());
+        int saveCouponNum = couponMapper.insertOne(coupon);
         Long couponId = coupon.getId();
         if (couponId == null){
             return -1;
@@ -194,6 +196,14 @@ public class TCouponServiceImpl implements TCouponService {
             shopCouponList.add(shopCoupon);
         }
         int saveNum = tShopCouponService.bindShopCoupon(shopCouponList);
+        if (saveCouponNum > NumConstants.INT_NUM_0){
+            //删除用户优惠券缓存
+            if (SpringUtil.redisCache()){
+                stringRedisTemplate.opsForHash().delete("WX_INDEX_COUPONS_LIST",coupon.getSchoolId().toString());
+                stringRedisTemplate.opsForHash().delete("SHOP_ALL_COUPONS_LIST",shopIdS);
+
+            }
+        }
         return saveNum;
     }
 
@@ -281,7 +291,7 @@ public class TCouponServiceImpl implements TCouponService {
             coupon.setCouponType(null);
             return new ResponseObject(false,ResponseViewEnums.COUPON_TYPE_CANT_UPDATE);
         }
-        couponMapper.updateById(coupon);
+        int updateNum = couponMapper.updateById(coupon);
         if (coupon == null || !StringUtils.hasText(coupon.getShopIds())){
             return  new ResponseObject(true,"更新成功");
         }
@@ -302,6 +312,17 @@ public class TCouponServiceImpl implements TCouponService {
         }
         //先删除关联
         Integer deleteNum = tShopCouponService.batchDeleteSCByCouponId(coupon.getId());
+        if (updateNum > NumConstants.INT_NUM_0){
+            //删除用户优惠券缓存
+            if (SpringUtil.redisCache()){
+                Coupon couponSelect = couponMapper.selectById(coupon.getId());
+                stringRedisTemplate.opsForHash().delete("WX_INDEX_COUPONS_LIST",couponSelect.getSchoolId().toString());
+                stringRedisTemplate.opsForHash().delete("SHOP_ALL_COUPONS_LIST",shopIdS);
+                //todo 这里没有删除 用户的优惠券
+//                stringRedisTemplate.opsForHash().delete("WX_USER_CAN_USE_COUPONS_LIST",shopIdS);
+
+            }
+        }
         //再新增
         int saveNum = tShopCouponService.bindShopCoupon(shopCouponList);
         return new ResponseObject(true,"更新成功");
@@ -326,10 +347,19 @@ public class TCouponServiceImpl implements TCouponService {
             return new ResponseObject(false,ResponseViewEnums.DELETE_FAILED);
         }
         Integer deleteShopCoupon = shopCouponMapper.batchDeleteSCByCouponId(coupon.getId());
-        if (deleteNum > NumConstants.INT_NUM_0 && deleteShopCoupon > NumConstants.INT_NUM_0){
+        if (deleteNum > NumConstants.INT_NUM_0){
+
             //删除用户优惠券缓存
             if (SpringUtil.redisCache()){
-                stringRedisTemplate.opsForHash().delete("WX_INDEX_COUPONS_LIST",selectCoupon.getSchoolId());
+                stringRedisTemplate.opsForHash().delete("WX_INDEX_COUPONS_LIST",selectCoupon.getSchoolId().toString());
+                QueryWrapper<WxUserCoupon> wrapper = new QueryWrapper<>();
+                wrapper.eq("coupon_id",coupon.getId());
+                WxUserCoupon wxUserCoupon = wxUserCouponMapper.selectOne(wrapper);
+                //删除 用户的优惠券
+                if (wxUserCoupon != null && wxUserCoupon.getWxUserId() != null){
+                    stringRedisTemplate.opsForHash().delete("WX_USER_CAN_USE_COUPONS_LIST",wxUserCoupon.getWxUserId().toString());
+
+                }
             }
         }
         return new ResponseObject(true,ResponseViewEnums.DELETE_SUCCESS);

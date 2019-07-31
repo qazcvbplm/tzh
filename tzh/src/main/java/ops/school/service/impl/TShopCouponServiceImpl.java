@@ -181,7 +181,7 @@ public class TShopCouponServiceImpl implements TShopCouponService {
                 .eq("coupon_type",couponType);
         List<ShopCoupon> shopCouponList = shopCouponMapper.selectList(wrapper);
         if (SpringUtil.redisCache()){
-            stringRedisTemplate.boundHashOps("SHOP_ALL_COUPONS_LIST").put(shopId, JSON.toJSON(shopCouponList));
+            stringRedisTemplate.boundHashOps("SHOP_ALL_COUPONS_LIST").put(shopId.toString(), JSON.toJSONString(shopCouponList));
         }
         return shopCouponList;
     }
