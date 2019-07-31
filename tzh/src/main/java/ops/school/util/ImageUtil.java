@@ -38,8 +38,9 @@ public class ImageUtil {
         String shopCodeImage = path + "yzxy" +shop.getId() + ".jpg";
         // 对店铺图片进行压缩
         String tempCodeImage = path + "temp" + (int)(Math.random() * 50 + 1) + ".jpg";
+        InputStream is = QiNiuUtils.downloadHttpFile(shopImage);
         try {
-            Thumbnails.of(shopImage).size(193, 193).keepAspectRatio(false).outputQuality(0.8f).toFile(tempCodeImage);
+            Thumbnails.of(is).size(193, 193).keepAspectRatio(false).outputQuality(0.8f).toFile(tempCodeImage);
             CircleUtil.circleUtil(tempCodeImage,100,100);
             Thumbnails.of(codeImg).size(430, 430).keepAspectRatio(false).watermark(
                     Positions.CENTER,
@@ -51,7 +52,7 @@ public class ImageUtil {
             return map;
         }
         map.put("code",1);
-        map.put("shopCodeImage",shopCodeImage);
+        map.put("shopCodeImage","https://www.chuyinkeji.cn/shopbarcode/"+"yzxy" +shop.getId() + ".jpg");
         return map;
     }
 

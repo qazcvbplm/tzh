@@ -193,9 +193,9 @@ public class ShopController {
 			 	 String shopCodeImage = (String) msg.get("shopCodeImage");
 			 	 shop.setShopCodeImage(shopCodeImage);
 			 	 // 修改店铺二维码图片
-			 	 int re = shopService.update(shop);
-			 	 if (re == 1){
-					 return new ResponseObject(true, "生成二维码成功").push("barcode", "https://www.chuyinkeji.cn/shopbarcode/"+id+".jpg");
+			 	 boolean re = shopService.updateById(shop);
+			 	 if (re){
+					 return new ResponseObject(true, "生成二维码成功").push("barcode", shopCodeImage);
 				 }
 			 } else {
 				 return new ResponseObject(false, "生成二维码失败");
