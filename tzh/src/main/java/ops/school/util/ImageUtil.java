@@ -43,7 +43,8 @@ public class ImageUtil {
         InputStream is = QiNiuUtils.downloadHttpFile(shopImage);
         try {
             Thumbnails.of(is).size(190, 190).keepAspectRatio(false).outputQuality(0.8f).toFile(tempCodeImage);
-            CircleUtil.circleUtil(imagePath + "temp" + randomNumber + ".jpg",100,100);
+            tempCodeImage = imagePath + "temp" + randomNumber + ".jpg";
+            CircleUtil.circleUtil(tempCodeImage,100,100);
             Thumbnails.of(codeImg).size(430, 430).keepAspectRatio(false).watermark(
                     Positions.CENTER,
                     ImageIO.read(new File(tempCodeImage)), 0.9f)
