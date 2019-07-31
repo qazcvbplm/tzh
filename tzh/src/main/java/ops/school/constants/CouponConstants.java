@@ -12,8 +12,13 @@ public class CouponConstants {
     /**
      * 优惠券类型是首页展示的
      */
-    public final static Integer COUPON_TYPE_HOME = 1;
+    public final static int COUPON_TYPE_HOME = 1;
 
+
+    /**
+     * 优惠券类型是店铺 的
+     */
+    public final static int COUPON_TYPE_SHOP = 0;
     /**
      * 优惠券类型在用户表优惠券中是首页展示的
      */
@@ -22,7 +27,7 @@ public class CouponConstants {
     /**
      * 优惠券类型是平台优惠券
      */
-    public final static Integer COUPON_TYPE_PLATE = 2;
+    public final static int COUPON_TYPE_PLATE = 2;
 
 
     /**

@@ -242,6 +242,7 @@
         AND coupon.is_invalid = 0
         AND coupon.is_delete = 0
         AND wx_user_coupon.wx_user_id = #{wxUserId}
+        AND wx_user_coupon.is_invalid = 0
         ORDER BY wx_user_coupon.failure_time DESC
     </select>
 </mapper>

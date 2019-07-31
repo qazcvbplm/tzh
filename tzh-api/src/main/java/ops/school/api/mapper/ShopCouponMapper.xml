@@ -40,7 +40,37 @@
         <result column="sort" jdbcType="BIGINT" property="sort"/>
         <result column="shop_tx_flag" property="shopTxFlag"/>
     </collection>
+
 </resultMap>
+
+    <resultMap id="CouponResultMap" type="ops.school.api.entity.ShopCoupon" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+        <result column="coupon_id" property="couponId" jdbcType="BIGINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="create_id" property="createId" jdbcType="BIGINT" />
+        <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+        <result column="coupon_type" property="couponType" jdbcType="INTEGER" />
+        <collection property="coupon" ofType="ops.school.api.entity.Coupon">
+            <id column="couponId" property="id" jdbcType="BIGINT"/>
+            <result column="school_id" property="schoolId" jdbcType="BIGINT"/>
+            <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
+            <result column="coupon_desc" property="couponDesc" jdbcType="VARCHAR"/>
+            <result column="full_amount" property="fullAmount" jdbcType="INTEGER"/>
+            <result column="cut_amount" property="cutAmount" jdbcType="INTEGER"/>
+            <result column="coupon_type" property="couponType" jdbcType="INTEGER"/>
+            <result column="yes_show_index" property="yesShowIndex" jdbcType="INTEGER"/>
+            <result column="send_begin_time" property="sendBeginTime" jdbcType="TIMESTAMP"/>
+            <result column="send_end_time" property="sendEndTime" jdbcType="TIMESTAMP"/>
+            <result column="effective_days" property="effectiveDays" jdbcType="INTEGER"/>
+            <result column="couponCreateTime" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="create_id" property="createId" jdbcType="BIGINT"/>
+            <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+            <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+            <result column="is_invalid" property="isInvalid" jdbcType="INTEGER"/>
+            <result column="couponIsDelete" property="isDelete" jdbcType="INTEGER"/>
+        </collection>
+    </resultMap>
 
     <sql id="Base_Column_List" >
         id,
@@ -60,6 +90,7 @@
         shop_coupon.create_id,
         shop_coupon.is_delete,
         shop_coupon.coupon_type,
+
         shop.Id AS ShopId,
         shop.school_id,
         shop.shop_name,
@@ -93,6 +124,35 @@
         shop.tx_amount,
         shop.all_tx_amount
     </sql>
+
+
+    <sql id="Rel_Coupon_Column_List" >
+        shop_coupon.id,
+        shop_coupon.shop_id,
+        shop_coupon.coupon_id,
+        shop_coupon.create_time,
+        shop_coupon.create_id,
+        shop_coupon.is_delete,
+
+        coupon.id as couponId,
+        coupon.school_id,
+        coupon.coupon_name,
+        coupon.coupon_desc,
+        coupon.full_amount,
+        coupon.cut_amount,
+        coupon.coupon_type,
+        coupon.yes_show_index,
+        coupon.send_begin_time,
+        coupon.send_end_time,
+        coupon.effective_days,
+        coupon.create_time as couponCreateTime,
+        coupon.update_time,
+        coupon.update_id,
+        coupon.is_invalid,
+        coupon.is_delete as couponIsDelete
+    </sql>
+
+
 
     <sql id="Table_Name">
         shop_coupon
@@ -164,6 +224,31 @@
             #{item}
         </foreach>
         AND shop_coupon.is_delete = 0
+        AND shop_coupon.shop_id = shop.id
+    </select>
+
+    <!--CreatBy Fang Time:2019/7/31 16:28 |  desc根据店铺id查询店铺发放的优惠券-->
+    <select id="batchFindSCByShopIdAndType" resultMap="CouponResultMap">
+        SELECT <include refid="Rel_Coupon_Column_List"/>
+        FROM shop_coupon,coupon
+        WHERE shop_coupon.shop_id = #{shopId}
+        AND shop_coupon.coupon_type = #{couponType}
+        AND shop_coupon.is_delete = 0
+        AND coupon.is_delete = 0
+        AND coupon.is_invalid = 0
+        AND shop_coupon.coupon_id = coupon.id
+    </select>
+
+    <!--CreatBy Fang Time:2019/7/31 19:31 | 根据优惠卷ids和shopid查询优惠券 -->
+    <select id="batchFindSCByCouponIdSAndShopId" resultType="ops.school.api.entity.ShopCoupon">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM shop_coupon,shop
+        WHERE shop_coupon.coupon_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND shop_coupon.is_delete = 0
+        AND shop_coupon.shop_id = #{shopId}
         AND shop_coupon.shop_id = shop.id
     </select>
 

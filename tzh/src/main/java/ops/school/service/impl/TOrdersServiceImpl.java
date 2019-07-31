@@ -408,6 +408,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         WxUserCoupon wxUserCoupon = null;
         if (orders.getCouponId() != null && orders.getCouponId() != 0){
              wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+             //判断优惠券类型是
             Long currentTime = System.currentTimeMillis();
             // 用户优惠券失效 >= 当前时间
             if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){

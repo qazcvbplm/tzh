@@ -63,12 +63,12 @@ public class TCouponServiceImpl implements TCouponService {
 
     @Override
     public List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex,Long userId) {
-        if (SpringUtil.redisCache()){
-            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_INDEX_COUPONS_LIST",schoolId.toString());
-            if (cacheList != null){
-                return JSON.parseArray(cacheList,Coupon.class);
-            }
-        }
+//        if (SpringUtil.redisCache()){
+//            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_INDEX_COUPONS_LIST",schoolId.toString());
+//            if (cacheList != null){
+//                return JSON.parseArray(cacheList,Coupon.class);
+//            }
+//        }
         Assertions.notNull(schoolId,yesShowIndex,userId);
         Map<String,Object> map = new HashMap<>();
         map.put("schoolId",schoolId);

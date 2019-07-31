@@ -16,6 +16,7 @@ import ops.school.api.exception.Assertions;
 import ops.school.api.service.ShopService;
 import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.SpringUtil;
+import ops.school.constants.CouponConstants;
 import ops.school.constants.NumConstants;
 import ops.school.service.TWxUserCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,17 +71,55 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
     @Override
     public List<WxUserCoupon> findUserCoupon(Long wxUserId, Long shopId) {
         Assertions.notNull(wxUserId,shopId);
-        if (SpringUtil.redisCache()){
-            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_USER_CAN_USE_COUPONS_LIST",wxUserId.toString());
-            if (cacheList != null){
-                return JSON.parseArray(cacheList, WxUserCoupon.class);
+//        if (SpringUtil.redisCache()){
+//            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_USER_CAN_USE_COUPONS_LIST",wxUserId.toString());
+//            if (cacheList != null){
+//                return JSON.parseArray(cacheList, WxUserCoupon.class);
+//            }
+//        }
+        List<WxUserCoupon> wxUserCoupons = wxUserCouponMapper.selectAllUserCoupons(wxUserId,shopId);
+        if (wxUserCoupons.size() < NumConstants.INT_NUM_1){
+            return wxUserCoupons;
+        }
+        List<Long> couponIdS = PublicUtilS.getValueList(wxUserCoupons,"couponId");
+        if (couponIdS.size() < NumConstants.INT_NUM_1){
+            return wxUserCoupons;
+        }
+        List<ShopCoupon> shopCouponList = shopCouponMapper.batchFindSCByCouponIdSAndShopId(couponIdS,shopId);
+        if (shopCouponList.size() < NumConstants.INT_NUM_1){
+            return wxUserCoupons;
+        }
+        List<WxUserCoupon> resultWXCouponList = new ArrayList<>();
+        for (WxUserCoupon wxUserCoupon : wxUserCoupons) {
+            for (ShopCoupon shopCoupon : shopCouponList) {
+                if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_HOME ){
+                    //如果是优惠券id是一样的，
+                    if (wxUserCoupon.getCouponId().intValue() == shopCoupon.getCouponId().intValue()){
+                        //如果是优惠卷是1 并且优惠卷是一张，并且shopid是当前shopid就是传的值
+                        if (shopId.intValue() == shopCoupon.getShopId().intValue()){
+                            resultWXCouponList.add(wxUserCoupon);
+                            break;
+                        }
+
+                    }
+                }else if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_SHOP){
+                    // 如果类型是0 并且是当前店铺的，就是传过来的id
+                    if (wxUserCoupon.getShopId().intValue() == shopId.intValue()){
+                        resultWXCouponList.add(wxUserCoupon);
+                        break;
+                    }
+                }
+                else {
+                //如果是2的直接返回
+                resultWXCouponList.add(wxUserCoupon);
             }
+
+            } //for
         }
-        List<WxUserCoupon> wxUserCoupons = wxUserCouponMapper.selectAllUserCoupons(wxUserId);
         if (SpringUtil.redisCache()){
-            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId.toString(), JSON.toJSONString(wxUserCoupons));
+            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId.toString(), JSON.toJSONString(resultWXCouponList));
         }
-        return wxUserCoupons;
+        return resultWXCouponList;
     }
 
     @Override
@@ -107,6 +146,12 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
         }
         Integer countNum = wxUserCouponMapper.selectCount(wrapper);
         List<WxUserCoupon> userCoupons =  wxUserCouponMapper.pageFindALLCouponsByUserId(userId,wxUserCoupon);
+        if (userCoupons.size() < NumConstants.INT_NUM_1){
+            IPage<WxUserCoupon> wxUserCouponIPage = new Page<>();
+            wxUserCouponIPage.setRecords(new ArrayList<>());
+            wxUserCouponIPage.setTotal(NumConstants.Long_NUM_0);
+            return wxUserCouponIPage;
+        }
         //把店铺也拼接进去
         List<Long> shopIds = PublicUtilS.getValueList(userCoupons,"shopId");
         PublicUtilS.removeDuplicate(shopIds);
