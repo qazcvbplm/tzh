@@ -291,6 +291,8 @@ public class TCouponServiceImpl implements TCouponService {
             coupon.setCouponType(null);
             return new ResponseObject(false,ResponseViewEnums.COUPON_TYPE_CANT_UPDATE);
         }
+        Coupon couponSelect = couponMapper.selectById(coupon.getId());
+        Assertions.notNull(couponSelect,ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         int updateNum = couponMapper.updateById(coupon);
         if (coupon == null || !StringUtils.hasText(coupon.getShopIds())){
             return  new ResponseObject(true,"更新成功");
@@ -305,6 +307,7 @@ public class TCouponServiceImpl implements TCouponService {
             deleteShopIds.add(shopIdLong);
             shopCoupon.setCouponId(coupon.getId());
             shopCoupon.setShopId(shopIdLong);
+            shopCoupon.setCouponType(couponSelect.getCouponType());
             shopCoupon.setCreateId(coupon.getSchoolId());
             shopCoupon.setCreateTime(new Date());
             shopCoupon.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
@@ -315,7 +318,6 @@ public class TCouponServiceImpl implements TCouponService {
         if (updateNum > NumConstants.INT_NUM_0){
             //删除用户优惠券缓存
             if (SpringUtil.redisCache()){
-                Coupon couponSelect = couponMapper.selectById(coupon.getId());
                 stringRedisTemplate.opsForHash().delete("WX_INDEX_COUPONS_LIST",couponSelect.getSchoolId().toString());
                 stringRedisTemplate.opsForHash().delete("SHOP_ALL_COUPONS_LIST",shopIdS);
                 //todo 这里没有删除 用户的优惠券

@@ -59,7 +59,7 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
                 WxUserCoupon wxUserCouponSelect = wxUserCouponMapper.selectOne(wrapper);
                 //删除 用户的优惠券
                 if (wxUserCouponSelect != null && wxUserCouponSelect.getWxUserId() != null){
-                    stringRedisTemplate.opsForHash().delete("WX_USER_CAN_USE_COUPONS_LIST",wxUserCouponSelect.getWxUserId());
+                    stringRedisTemplate.opsForHash().delete("WX_USER_CAN_USE_COUPONS_LIST",wxUserCouponSelect.getWxUserId().toString());
 
                 }
             }
