@@ -1,11 +1,13 @@
 package ops.school.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ops.school.api.dao.ShopCouponMapper;
 import ops.school.api.dao.ShopMapper;
 import ops.school.api.dao.WxUserCouponMapper;
+import ops.school.api.entity.Coupon;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopCoupon;
 import ops.school.api.entity.WxUserCoupon;
@@ -13,9 +15,12 @@ import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.ShopService;
 import ops.school.api.util.PublicUtilS;
+import ops.school.api.util.SpringUtil;
 import ops.school.constants.NumConstants;
 import ops.school.service.TWxUserCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -32,6 +37,9 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
 
     @Autowired
     private ShopCouponMapper shopCouponMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public List<WxUserCoupon> findInvalidUserCoupon() {
@@ -50,7 +58,16 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
     @Override
     public List<WxUserCoupon> findUserCoupon(Long wxUserId, Long shopId) {
         Assertions.notNull(wxUserId,shopId);
+        if (SpringUtil.redisCache()){
+            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_USER_CAN_USE_COUPONS_LIST",wxUserId);
+            if (cacheList != null){
+                return JSON.parseArray(cacheList, WxUserCoupon.class);
+            }
+        }
         List<WxUserCoupon> wxUserCoupons = wxUserCouponMapper.selectAllUserCoupons(wxUserId);
+        if (SpringUtil.redisCache()){
+            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId, JSON.toJSON(wxUserCoupons));
+        }
         return wxUserCoupons;
     }
 

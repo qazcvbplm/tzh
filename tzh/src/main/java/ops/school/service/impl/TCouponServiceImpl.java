@@ -1,5 +1,6 @@
 package ops.school.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import ops.school.api.dao.CouponMapper;
@@ -16,14 +17,15 @@ import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
 import ops.school.api.service.ShopCouponService;
-import ops.school.api.util.PublicUtilS;
-import ops.school.api.util.ResponseObject;
-import ops.school.api.util.TimeUtilS;
+import ops.school.api.util.*;
+import ops.school.config.RedisConfig;
 import ops.school.constants.NumConstants;
 import ops.school.service.TCouponService;
 import ops.school.service.TShopCouponService;
 import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -54,9 +56,18 @@ public class TCouponServiceImpl implements TCouponService {
     @Autowired
     private ShopCouponMapper shopCouponMapper;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
 
     @Override
     public List<Coupon> findByIndex(Long schoolId, Integer yesShowIndex,Long userId) {
+        if (SpringUtil.redisCache()){
+            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_INDEX_COUPONS_LIST",schoolId.toString());
+            if (cacheList != null){
+                return JSON.parseArray(cacheList,Coupon.class);
+            }
+        }
         Assertions.notNull(schoolId,yesShowIndex,userId);
         Map<String,Object> map = new HashMap<>();
         map.put("schoolId",schoolId);
@@ -74,6 +85,9 @@ public class TCouponServiceImpl implements TCouponService {
             if (couponIdMap.get(coupon.getId()) == null){
                 result.add(coupon);
             }
+        }
+        if (SpringUtil.redisCache()){
+            stringRedisTemplate.boundHashOps("WX_INDEX_COUPONS_LIST").put(schoolId.toString(), JSON.toJSONString(result));
         }
         return result;
     }
@@ -304,12 +318,20 @@ public class TCouponServiceImpl implements TCouponService {
     @Override
     public ResponseObject deleteCouponAndShopByCId(Coupon coupon) {
         Assertions.notNull(coupon,coupon.getId());
+        Coupon selectCoupon = couponMapper.selectById(coupon.getId());
+        Assertions.notNull(selectCoupon,ResponseViewEnums.COUPON_HOME_NUM_ERROR);
         coupon.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_YES_DELETE);
         int deleteNum = couponMapper.updateById(coupon);
         if (deleteNum < NumConstants.INT_NUM_1){
             return new ResponseObject(false,ResponseViewEnums.DELETE_FAILED);
         }
         Integer deleteShopCoupon = shopCouponMapper.batchDeleteSCByCouponId(coupon.getId());
+        if (deleteNum > NumConstants.INT_NUM_0 && deleteShopCoupon > NumConstants.INT_NUM_0){
+            //删除用户优惠券缓存
+            if (SpringUtil.redisCache()){
+                stringRedisTemplate.opsForHash().delete("WX_INDEX_COUPONS_LIST",selectCoupon.getSchoolId());
+            }
+        }
         return new ResponseObject(true,ResponseViewEnums.DELETE_SUCCESS);
     }
 }
