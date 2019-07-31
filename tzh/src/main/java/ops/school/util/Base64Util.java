@@ -1,10 +1,11 @@
 package ops.school.util;
 
-import sun.misc.BASE64Decoder;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import java.util.Base64.Decoder;
 
 public class Base64Util {
 
@@ -29,13 +30,13 @@ public class Base64Util {
 
     public static String decryptS5(String sSrc, String encodingFormat, String sKey, String ivParameter) throws Exception {
         try {
-            BASE64Decoder decoder = new BASE64Decoder();
-            byte[] raw = decoder.decodeBuffer(sKey);
+            Decoder decoder = Base64.getDecoder();
+            byte[] raw = decoder.decode(sKey);
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-            IvParameterSpec iv = new IvParameterSpec(decoder.decodeBuffer(ivParameter));
+            IvParameterSpec iv = new IvParameterSpec(decoder.decode(ivParameter));
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
-            byte[] myendicod = decoder.decodeBuffer(sSrc);
+            byte[] myendicod = decoder.decode(sSrc);
             byte[] original = cipher.doFinal(myendicod);
             String originalString = new String(original, encodingFormat);
             return originalString;

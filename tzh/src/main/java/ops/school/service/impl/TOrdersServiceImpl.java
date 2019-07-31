@@ -4,9 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.OrdersMapper;
-import ops.school.api.dao.RunOrdersMapper;
-import ops.school.api.dao.SchoolMapper;
-import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.project.OrderTempDTO;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
@@ -971,6 +968,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL,
                 new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
         );
+        stringRedisTemplate.boundListOps("JR").rightPush(JSON.toJSONString(orders));
 //        /**
 //         * 将配送员所得金额添加到配送员账户内
 //         */
