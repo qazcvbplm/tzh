@@ -195,7 +195,8 @@ public class WxUserController {
     @ApiOperation(value = "查询充值记录", httpMethod = "POST")
     @PostMapping("findcharges")
     public ResponseObject charges(HttpServletRequest request, HttpServletResponse response, String openId) {
-        IPage<ChargeLog> res = chargeLogService.page(PageUtil.noPage(), new QueryWrapper<ChargeLog>().lambda().eq(ChargeLog::getOpenId, openId));
+        IPage<ChargeLog> res = chargeLogService.page(PageUtil.noPage(), new QueryWrapper<ChargeLog>()
+                .lambda().eq(ChargeLog::getOpenId, openId).orderByDesc(ChargeLog::getCreateTime));
         return new ResponseObject(true, "ok").push("msg", res.getRecords());
     }
 

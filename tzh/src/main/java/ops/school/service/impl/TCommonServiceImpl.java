@@ -61,17 +61,19 @@ public class TCommonServiceImpl implements TCommonService {
             }
             if (shop.getTxAmount().compareTo(amount) != -1){
                 log = new TxLog(shop.getId(), "商家提现", null, amount, "", shop.getSchoolId(), wxUser.getAppId());
+                log.setTxName(shop.getShopName());
             }
         } else  {
             // 配送员提现
             Sender sender = senderService.check(senderId);
             map.put("txerId",sender.getId());
-            map.put("type","商家提现");
+            map.put("type","配送员提现");
             if (txLogMapper.findTxLogs(map) > 0){
                 return 3;
             }
             log = new TxLog(sender.getId(), "配送员提现", null, amount, "", sender.getSchoolId(),
                     wxUser.getAppId());
+            log.setTxName(sender.getName());
         }
         // 申请提现设置isTx为0
         log.setIsTx(0);

@@ -32,7 +32,7 @@ public class TxLogController {
 			return new ResponseObject(false, "");
 		}
 		QueryWrapper<TxLog> query=new QueryWrapper<>();
-        query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid");
+        query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid","tx_name");
 		if(schoolId!=null)
 			query.lambda().eq(TxLog::getSchoolId, schoolId);
 		if(appId!=null)
@@ -52,7 +52,7 @@ public class TxLogController {
 		query.lambda().eq(TxLog::getTxerId, id);
 		query.lambda().eq(TxLog::getType, "配送员提现");
 		query.lambda().eq(TxLog::getIshow, "0");
-		query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid");
+		query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid","tx_name");
 		query.lambda().orderByDesc(TxLog::getCreateTime);
 		IPage<TxLog> rs = txLogService.page(PageUtil.getPage(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
@@ -94,6 +94,6 @@ public class TxLogController {
 		if (rs == 1) {
 			return new ResponseObject(true, "提现成功");
 		}
-		return new ResponseObject(false,"提现失败");
+		return new ResponseObject(true,"提现失败");
 	}
 }

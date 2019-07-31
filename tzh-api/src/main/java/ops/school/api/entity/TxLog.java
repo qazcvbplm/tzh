@@ -30,6 +30,8 @@ public class TxLog {
 
     private String dzOpenid;
 
+    private String txName;
+
     public String getDzOpenid() {
         return dzOpenid;
     }
@@ -132,5 +134,13 @@ public class TxLog {
 
     public void setAppId(Integer appId) {
         this.appId = appId;
+    }
+
+    public String getTxName() {
+        return txName;
+    }
+
+    public void setTxName(String txName) {
+        this.txName = txName;
     }
 }
