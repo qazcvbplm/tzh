@@ -26,7 +26,7 @@ public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements S
     public void add(Shop shop) {
         if (shopMapper.checkByLoginName(shop.getShopLoginName()) == null) {
             shop.setSort(System.currentTimeMillis());
-            this.add(shop);
+            shopMapper.insert(shop);
         } else {
             throw new YWException("登录名重复请重新 输入");
         }
