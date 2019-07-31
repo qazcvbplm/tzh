@@ -1,16 +1,22 @@
 package ops.school.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dao.ShopCouponMapper;
 import ops.school.api.entity.Coupon;
 import ops.school.api.entity.ShopCoupon;
+import ops.school.api.entity.WxUserCoupon;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
+import ops.school.api.util.SpringUtil;
 import ops.school.constants.CouponConstants;
 import ops.school.constants.NumConstants;
 import ops.school.service.TShopCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -25,6 +31,9 @@ public class TShopCouponServiceImpl implements TShopCouponService {
     private ShopCouponMapper shopCouponMapper;
     @Autowired
     private CouponService couponService;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
 
     /**
@@ -147,5 +156,33 @@ public class TShopCouponServiceImpl implements TShopCouponService {
         }
         Integer deleteNum = shopCouponMapper.batchDeleteSCByCouponId(id);
         return deleteNum;
+    }
+
+    /**
+     * @date:   2019/7/31 11:58
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.ShopCoupon>
+     * @param   shopId
+     * @Desc:   desc 根据店铺id查询店铺发放的优惠券
+     */
+    @Override
+    public List<ShopCoupon> getAllShopCouponsByShopId(Long shopId,Integer couponType) {
+        Assertions.notNull(shopId,couponType);
+        if (SpringUtil.redisCache()){
+            String cacheList = (String) stringRedisTemplate.opsForHash().get("SHOP_ALL_COUPONS_LIST",shopId.toString());
+            if (cacheList != null){
+                return JSON.parseArray(cacheList, ShopCoupon.class);
+            }
+        }
+        QueryWrapper<ShopCoupon> wrapper = new QueryWrapper<>();
+        wrapper.eq("shop_id",shopId)
+                .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_NO)
+                .eq("coupon_type",couponType);
+        List<ShopCoupon> shopCouponList = shopCouponMapper.selectList(wrapper);
+        if (SpringUtil.redisCache()){
+            stringRedisTemplate.boundHashOps("SHOP_ALL_COUPONS_LIST").put(shopId, JSON.toJSON(shopCouponList));
+        }
+        return shopCouponList;
     }
 }

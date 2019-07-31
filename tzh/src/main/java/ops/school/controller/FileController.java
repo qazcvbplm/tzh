@@ -1,6 +1,8 @@
 package ops.school.controller;
 
 import com.google.gson.Gson;
+import com.qiniu.cdn.CdnManager;
+import com.qiniu.cdn.CdnResult;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;

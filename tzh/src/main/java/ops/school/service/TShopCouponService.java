@@ -54,4 +54,14 @@ public interface TShopCouponService {
      * @Desc:   desc 根据优惠券id批量逻辑删除优惠卷
      */
     Integer batchDeleteSCByCouponId(Long id);
+
+    /**
+     * @date:   2019/7/31 11:58
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.ShopCoupon>
+     * @param   shopId
+     * @Desc:   desc根据店铺id查询店铺发放的优惠券
+     */
+    List<ShopCoupon> getAllShopCouponsByShopId(Long shopId,Integer couponType);
 }

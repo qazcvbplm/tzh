@@ -52,6 +52,7 @@ public class SourceOrderController {
     @PostMapping("find")
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, SourceOrder sourceOrder) {
         QueryWrapper<SourceOrder> query = new QueryWrapper<SourceOrder>().setEntity(sourceOrder);
+        query.orderByDesc("create_time");
         IPage<SourceOrder> list = sourceOrderService.page(PageUtil.noPage(), query);
         return new ResponseObject(true, "ok").push("total", list.getTotal())
                 .push("list", list.getRecords());

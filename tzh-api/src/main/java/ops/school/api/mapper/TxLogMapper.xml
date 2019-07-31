@@ -13,6 +13,7 @@
         <result column="ishow" jdbcType="INTEGER" property="ishow"/>
         <result column="is_tx" jdbcType="INTEGER" property="isTx"/>
         <result column="dz_openid" jdbcType="VARCHAR" property="dzOpenid"/>
+        <result column="tx_name" jdbcType="VARCHAR" property="txName" />
     </resultMap>
 
     <!--查询提现人是否存在未审核的提现记录-->

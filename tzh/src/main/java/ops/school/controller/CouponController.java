@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Coupon;
 import ops.school.api.entity.ShopCoupon;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
 import ops.school.api.util.ResponseObject;
@@ -168,6 +169,17 @@ public class CouponController {
         map.put("schoolId",schoolId);
         ResponseObject responseObject = tCouponService.userGetCouponByIdMap(map);
         return  responseObject;
+    }
+
+
+    @ApiOperation(value="根据店铺id查询店铺发放的优惠券",httpMethod="POST")
+    @ResponseBody
+    @RequestMapping(value = "shopCoupons", method = RequestMethod.POST)
+    public ResponseObject getAllShopCouponsByShopId(Long shopId,Integer couponType){
+        Assertions.notNull(shopId,couponType);
+        List<ShopCoupon> shopCouponList = tShopCouponService.getAllShopCouponsByShopId(shopId,couponType);
+        return  new ResponseObject(true, ResponseViewEnums.FIND_SUCCESS)
+                .push("shopCouponList",shopCouponList);
     }
 
 }
