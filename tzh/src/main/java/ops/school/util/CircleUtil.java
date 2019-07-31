@@ -18,10 +18,9 @@ public class CircleUtil {
 
     public static void circleUtil(String strUrl, Integer width, Integer height) {
         try {
-//            // 获取图片的流
+            // 获取图片的流
 //            BufferedImage url =
-//                    getUrlByBufferedImage("http://avatar.csdn.net/3/1/7/1_qq_27292113.jpg?1488183229974");
-
+//                    getUrlByBufferedImage(strUrl);
 			Image src = ImageIO.read(new File(strUrl));
 			BufferedImage url = (BufferedImage) src;
             // 处理图片将其压缩成正方形的小图

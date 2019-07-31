@@ -41,11 +41,10 @@ public class ImageUtil {
         // 对店铺图片进行压缩
         String tempCodeImage = path + "temp" + randomNumber + ".jpg";
         // 切圆之后的图片
-        String circleImage = imagePath + "temp" + randomNumber + ".jpg";;
         InputStream is = QiNiuUtils.downloadHttpFile(shopImage);
         try {
             Thumbnails.of(is).size(190, 190).keepAspectRatio(false).outputQuality(0.8f).toFile(tempCodeImage);
-            CircleUtil.circleUtil(circleImage,100,100);
+            CircleUtil.circleUtil(tempCodeImage,100,100);
             Thumbnails.of(codeImg).size(430, 430).keepAspectRatio(false).watermark(
                     Positions.CENTER,
                     ImageIO.read(new File(tempCodeImage)), 0.9f)
