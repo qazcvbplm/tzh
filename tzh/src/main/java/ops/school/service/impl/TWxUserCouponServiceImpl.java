@@ -52,6 +52,18 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
             return -1;
         }
         int rs = wxUserCouponMapper.updateOnee(wxUserCoupon);
+        if (rs > NumConstants.INT_NUM_0){
+            if (SpringUtil.redisCache()){
+                QueryWrapper<WxUserCoupon> wrapper = new QueryWrapper<>();
+                wrapper.eq("id",wxUserCoupon.getId());
+                WxUserCoupon wxUserCouponSelect = wxUserCouponMapper.selectOne(wrapper);
+                //删除 用户的优惠券
+                if (wxUserCouponSelect != null && wxUserCouponSelect.getWxUserId() != null){
+                    stringRedisTemplate.opsForHash().delete("WX_USER_CAN_USE_COUPONS_LIST",wxUserCouponSelect.getWxUserId());
+
+                }
+            }
+        }
         return rs;
     }
 
@@ -59,14 +71,14 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
     public List<WxUserCoupon> findUserCoupon(Long wxUserId, Long shopId) {
         Assertions.notNull(wxUserId,shopId);
         if (SpringUtil.redisCache()){
-            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_USER_CAN_USE_COUPONS_LIST",wxUserId);
+            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_USER_CAN_USE_COUPONS_LIST",wxUserId.toString());
             if (cacheList != null){
                 return JSON.parseArray(cacheList, WxUserCoupon.class);
             }
         }
         List<WxUserCoupon> wxUserCoupons = wxUserCouponMapper.selectAllUserCoupons(wxUserId);
         if (SpringUtil.redisCache()){
-            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId, JSON.toJSON(wxUserCoupons));
+            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId.toString(), JSON.toJSONString(wxUserCoupons));
         }
         return wxUserCoupons;
     }
