@@ -26,7 +26,7 @@ import com.qiniu.util.Auth;
  * @date:   2019/7/31 13:52
  * @desc:   七牛操作工具类
  */
-public class QiniuUtils {  
+public class QiNiuUtils {
     private final static String ACCESS_KEY = "jra5S4ulxngso0Fs6JhCmx2OMAS9DL1yjwa6v6Oo";
     private final static String SECRET_KEY = "eywGi5zc52FYWQkAECG5RtvlOf53yXHtKIvSWPQV";
     /**默认上传空间*/  
