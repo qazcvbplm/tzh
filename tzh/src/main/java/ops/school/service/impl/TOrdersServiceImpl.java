@@ -686,8 +686,8 @@ public class TOrdersServiceImpl implements TOrdersService {
             update.setId(orderId);
             update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
         int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
-        orders.setWaterNumber(water);
-        update.setWaterNumber(water);
+        orders.setWaterNumber(water + 1);
+        update.setWaterNumber(water + 1);
             int res = ordersService.shopAcceptOrderById(update);
             if (res == 1) {
                 if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
