@@ -119,7 +119,8 @@ public class TCouponServiceImpl implements TCouponService {
         QueryWrapper<Coupon> query = new QueryWrapper<>();
         query.eq("school_id",schoolId)
                 .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_NO)
-                .orderByDesc("create_time").orderByAsc("is_invalid");
+                .orderByAsc("is_invalid")
+                .orderByDesc("create_time");
         if (couponType != null){
             query.eq("coupon_type",couponType);
         }
