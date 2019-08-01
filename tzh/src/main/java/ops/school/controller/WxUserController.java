@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("ops/user")
 public class WxUserController {
 
-
     @Autowired
     private WxUserService wxUserService;
     @Autowired
@@ -55,7 +54,14 @@ public class WxUserController {
     @Autowired
     private TWxUserCouponService tWxUserCouponService;
 
-
+    /**
+     * 微信用户登录
+     * @param request
+     * @param response
+     * @param code 小程序端传来的code码，用于获取openid和sessionKey
+     * @param schoolId 学校Id
+     * @return
+     */
     @ApiOperation(value = "微信用户登录", httpMethod = "POST")
     @GetMapping("/wx/login")
     public ResponseObject login(HttpServletRequest request, HttpServletResponse response, String code, String schoolId) {
@@ -70,7 +76,7 @@ public class WxUserController {
         String sessionKey = null;
         WxUser user = null;
         if (school != null) {
-            Map<String,Object> map = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
+            Map<String, Object> map = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
             openid = (String) map.get("openid");
             sessionKey = (String) map.get("sessionKey");
             String token = JWTUtil.sign(openid, "wx", "wxuser");
@@ -83,15 +89,15 @@ public class WxUserController {
             // user.setBell(wxUserBell);
             // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
             cache.userCountadd(sid);
-            return new ResponseObject(true, "ok").push("token", token).push("user", user).push("sessionKey",sessionKey);
+            return new ResponseObject(true, "ok").push("token", token).push("user", user).push("sessionKey", sessionKey);
         } else {
             return new ResponseObject(false, "请选择学校");
         }
     }
 
-    @ApiOperation(value = "获取微信用户session_key",httpMethod = "POST")
+    @ApiOperation(value = "获取微信用户session_key", httpMethod = "POST")
     @PostMapping("getSessionKey")
-    public ResponseObject getSessionKey(HttpServletRequest request, HttpServletResponse response, String code, String schoolId){
+    public ResponseObject getSessionKey(HttpServletRequest request, HttpServletResponse response, String code, String schoolId) {
         Integer sid;
         try {
             sid = Integer.parseInt(schoolId);
@@ -99,9 +105,9 @@ public class WxUserController {
             return null;
         }
         School school = schoolService.findById(sid);
-        Map<String,Object> map = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
+        Map<String, Object> map = WXUtil.wxlogin(school.getWxAppId(), school.getWxSecret(), code);
         System.out.println(map);
-        return new ResponseObject(true,"ok").push("map",map);
+        return new ResponseObject(true, "ok").push("map", map);
     }
 
     @ApiOperation(value = "获取钱包信息", httpMethod = "POST")
@@ -122,7 +128,6 @@ public class WxUserController {
             return new ResponseObject(true, "ok").push("gz", WxGUtil.checkGz(wxGUser.getOpenId()));
         }
     }
-
 
     @ApiOperation(value = "微信用户更新(必传id)", httpMethod = "POST")
     @PostMapping("wx/update")
@@ -146,7 +151,6 @@ public class WxUserController {
         wxUser.setTotal(1);
         return new ResponseObject(true, "ok").push("list", list).push("total", wxUserService.find(wxUser));
     }
-
 
     @ApiOperation(value = "获取验证码", httpMethod = "POST")
     @PostMapping("getcode")
@@ -184,7 +188,6 @@ public class WxUserController {
         }
     }
 
-
     @ApiOperation(value = "充值", httpMethod = "POST")
     @PostMapping("charges")
     public ResponseObject charges(HttpServletRequest request, HttpServletResponse response, int chargeId) {
@@ -201,35 +204,34 @@ public class WxUserController {
     }
 
     /**
-     * @author Lee
-     * @desc 查询用户所有优惠券
      * @param wxUserId 用户id
      * @return
+     * @author Lee
+     * @desc 查询用户所有优惠券
      */
     @RequestMapping(value = "findAllUserCoupons", method = RequestMethod.POST)
-    public ResponseObject findAllUserCoupons(@RequestParam String wxUserId){
+    public ResponseObject findAllUserCoupons(@RequestParam String wxUserId) {
 
-        List<Map<String,Object>> wxUserCoupons = tWxUserCouponService.findAllUserCoupons(Long.valueOf(wxUserId));
-        return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
+        List<Map<String, Object>> wxUserCoupons = tWxUserCouponService.findAllUserCoupons(Long.valueOf(wxUserId));
+        return new ResponseObject(true, "查询成功").push("list", wxUserCoupons);
     }
-
 
     /**
      * 对加密手机号进行解密
      * @param decryptData 敏感参数
-     * @param sessionKey session_key
-     * @param ivData iv
-     * @param openid 用户openid
+     * @param sessionKey  session_key
+     * @param ivData      iv
+     * @param openid      用户openid
      * @return
      */
-    @RequestMapping(value = "decryptPhone",method = RequestMethod.POST)
-    public ResponseObject decryptPhone(@RequestParam String decryptData,@RequestParam String sessionKey,
-                                       @RequestParam String ivData,@RequestParam String openid){
+    @RequestMapping(value = "decryptPhone", method = RequestMethod.POST)
+    public ResponseObject decryptPhone(@RequestParam String decryptData, @RequestParam String sessionKey,
+                                       @RequestParam String ivData, @RequestParam String openid) {
         // 对手机号码进行解密，并存进数据库
         int rs = tWxUserService.decryptPhone(decryptData, sessionKey, ivData, openid);
-        if (rs == 0){
-            return new ResponseObject(false,"手机号解密失败");
+        if (rs == 0) {
+            return new ResponseObject(false, "手机号解密失败");
         }
-        return new ResponseObject(true,"手机号解密成功");
+        return new ResponseObject(true, "手机号解密成功");
     }
 }
