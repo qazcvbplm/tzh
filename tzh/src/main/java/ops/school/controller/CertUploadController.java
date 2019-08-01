@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("cert")
+@RequestMapping("ops/cert")
 @Api(tags="证书上传")
 public class CertUploadController {
 
