@@ -19,37 +19,38 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@Api(tags="店铺分类模块")
+@Api(tags = "店铺分类模块")
 @RequestMapping("ops/shopcategory")
 public class ShopCategoryController {
 
     @Autowired
-	private ShopCategoryService shopCategoryService;
+    private ShopCategoryService shopCategoryService;
 
-	@ApiOperation(value="添加",httpMethod="POST")
-	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid ShopCategory shopCategory, BindingResult result){
-		              Util.checkParams(result);
-		              shopCategory.setSchoolId(Integer.valueOf(request.getAttribute("Id").toString()));
-		              shopCategoryService.add(shopCategory);
-		              return new ResponseObject(true, "添加成功");
-	}
-	
-	@ApiOperation(value="查询",httpMethod="POST")
+    @ApiOperation(value = "添加", httpMethod = "POST")
+    @PostMapping("add")
+    public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid ShopCategory shopCategory, BindingResult result) {
+        Util.checkParams(result);
+        shopCategory.setSchoolId(Integer.valueOf(request.getAttribute("Id").toString()));
+        shopCategoryService.add(shopCategory);
+        return new ResponseObject(true, "添加成功");
+    }
+
+    @ApiOperation(value = "查询", httpMethod = "POST")
     @RequestMapping("find")
-	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,ShopCategory shopCategory){
-		              List<ShopCategory> list = shopCategoryService.find(shopCategory);
-		              return new ResponseObject(true, "ok").push("list", list);
-	}
-	
-	@ApiOperation(value="更新",httpMethod="POST")
-	@PostMapping("update")
-	public ResponseObject update(HttpServletRequest request, HttpServletResponse response, ShopCategory shopCategory) {
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, ShopCategory shopCategory) {
+        shopCategory.setPage((shopCategory.getPage()-1) * shopCategory.getSize());
+        List<ShopCategory> list = shopCategoryService.find(shopCategory);
+        return new ResponseObject(true, "ok").push("list", list);
+    }
+
+    @ApiOperation(value = "更新", httpMethod = "POST")
+    @PostMapping("update")
+    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, ShopCategory shopCategory) {
         if (shopCategoryService.updateById(shopCategory)) {
             return new ResponseObject(true, "更新成功");
         } else {
             return new ResponseObject(false, "更新失败");
         }
 
-	}
+    }
 }

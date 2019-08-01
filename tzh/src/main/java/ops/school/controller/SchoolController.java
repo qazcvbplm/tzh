@@ -121,7 +121,7 @@ public class SchoolController {
         }
         School school = schoolService.findById(schoolId);
         if (distance > school.getSendMaxDistance()) {
-            int per = (distance / school.getSendPerOut()) + 1;
+            int per = ((distance - school.getSendMaxDistance()) / school.getSendPerOut()) + 1;
             BigDecimal rs = new BigDecimal(per).multiply(school.getSendPerMoney());
             return rs;
         } else {

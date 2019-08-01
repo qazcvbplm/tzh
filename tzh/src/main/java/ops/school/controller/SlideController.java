@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Slide;
+import ops.school.api.entity.enums.Deleted;
 import ops.school.api.service.SlideService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
@@ -60,7 +61,10 @@ public class SlideController {
 
     @ApiOperation(value = "更新", httpMethod = "POST")
     @PostMapping("update")
-    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, Slide slide) {
+    public ResponseObject update(HttpServletRequest request, HttpServletResponse response, Slide slide, Integer status) {
+        if (status == 1){
+            slide.setIsDelete(Deleted.DELETED);
+        }
         boolean rs = slideService.updateById(slide);
         if (SpringUtil.redisCache()) {
             Slide temp = slideService.getById(slide.getId());

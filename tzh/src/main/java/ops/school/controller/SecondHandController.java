@@ -42,11 +42,11 @@ public class SecondHandController {
 	
 	@ApiOperation(value="查询",httpMethod="POST")
     @RequestMapping("find")
-public ResponseObject find(HttpServletRequest request, HttpServletResponse response, SecondHand secondHand, PageQueryDTO pageQueryDTO){
+public ResponseObject find(HttpServletRequest request, HttpServletResponse response, SecondHand secondHand){
 		secondHand.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
 		QueryWrapper<SecondHand> query = new QueryWrapper<SecondHand>().setEntity(secondHand).orderByDesc("create_time");
 		Integer countNum = secondHandService.count(query);
-		IPage<SecondHand> iPage = secondHandService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query);
+		IPage<SecondHand> iPage = secondHandService.page(new Page<>(secondHand.getPage(), secondHand.getSize()), query);
 		List<SecondHand> secondHandList =iPage.getRecords();
 		return new ResponseObject(true, "ok")
 				.push("list",secondHandList)

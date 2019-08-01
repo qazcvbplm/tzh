@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class SourceProduct extends Base {
+public class SourceProduct extends PageQueryDTO {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotBlank

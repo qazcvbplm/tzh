@@ -1,5 +1,6 @@
 package ops.school.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.SourceProduct;
@@ -40,7 +41,10 @@ public class SourceProductController {
 	@PostMapping("find")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,SourceProduct sourceProduct){
 		              List<SourceProduct> list = sourceProductService.find(sourceProduct);
-		              return new ResponseObject(true, "ok").push("list", list);
+		              QueryWrapper<SourceProduct> queryWrapper = new QueryWrapper<>();
+		              Integer total = sourceProductService.count(queryWrapper
+							  .lambda().eq(SourceProduct::getSchoolId,sourceProduct.getSchoolId()));
+		              return new ResponseObject(true, "ok").push("list", list).push("total",total);
 	}
 	
 	

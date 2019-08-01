@@ -62,9 +62,7 @@
                 and is_show = #{isShow,jdbcType=INTEGER}
             </if>
         </where>
-        <if test="orderBy!=null">
-            order by #{orderBy}
-        </if>
+        order by sale desc
         <if test="page!=null and size!=null">
             limit #{page},#{size}
         </if>

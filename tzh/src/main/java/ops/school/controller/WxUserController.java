@@ -147,8 +147,9 @@ public class WxUserController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, WxUser wxUser) {
         wxUser.setQueryType(request.getAttribute("role").toString());
         wxUser.setQuery(request.getAttribute("Id").toString());
+        wxUser.setPage((wxUser.getPage() - 1) * wxUser.getSize());
         List<WxUser> list = wxUserService.find(wxUser);
-        wxUser.setTotal(1);
+        wxUser.setTotal(list.size());
         return new ResponseObject(true, "ok").push("list", list).push("total", wxUserService.find(wxUser));
     }
 

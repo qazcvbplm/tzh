@@ -367,7 +367,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             // 配送费-->判断配送距离增加配送费
             int distance = BaiduUtil.DistanceAll(floor.getLat() + "," + floor.getLng(), shop.getLat() + "," + shop.getLng());
             if (distance > school.getSendMaxDistance()) {
-                int per = (distance / school.getSendPerOut()) + 1;
+                int per = ((distance - school.getSendMaxDistance()) / school.getSendPerOut()) + 1;
                 sendAddDistancePrice = new BigDecimal(per).multiply(school.getSendPerMoney());
             }
             // 最终配送费-->基础配送费+额外距离配送费+额外件数配送费
