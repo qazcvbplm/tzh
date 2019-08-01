@@ -112,6 +112,7 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
                 else {
                 //如果是2的直接返回
                 resultWXCouponList.add(wxUserCoupon);
+                break;
             }
 
             } //for
