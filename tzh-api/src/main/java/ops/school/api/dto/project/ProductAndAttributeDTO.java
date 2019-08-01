@@ -69,7 +69,7 @@ public class ProductAndAttributeDTO implements Serializable {
         product.setBoxPriceFlag(this.boxPriceFlag);
         product.setProductCategoryId(this.productCategoryId);
         product.setShopId(this.shopId);
-        product.setShopId(this.schoolId);
+        product.setSchoolId(this.schoolId);
         product.setSale(this.sale);
         product.setIsShow(this.isShow);
         product.setIsDelete(this.isDelete);

@@ -155,13 +155,13 @@
             product_attribute.is_delete = 0
             AND product_attribute.id IN
             <foreach collection="map" index="key" item="value"  open="(" separator="," close=")">
-                #{value}
+                #{key}
             </foreach>
         ) as product_attribute
         WHERE product.id = product_attribute.product_id
         AND product.id IN
         <foreach collection="map" index="key" item="value"  open="(" separator="," close=")">
-            #{key}
+            #{value}
         </foreach>
         AND product.is_show = 1
         AND product.is_delete = 0

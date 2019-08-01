@@ -179,10 +179,10 @@ public class TOrdersServiceImpl implements TOrdersService {
         Floor floor = floorService.getById(orders.getFloorId());
         Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
         //判断商品有并且库存够，批量id查询
-        Map pIdAndAIdMap = PublicUtilS.listForMap(productOrderDTOS,"productId","attributeId");
+        Map pIdAndAIdMap = PublicUtilS.listForMap(productOrderDTOS,"attributeId","productId");
         //根据商品id和商品规格id批量查询商品及规格
         List<ProductAndAttributeDTO> productAndAttributeS = productService.batchFindProdAttributeByIdS(pIdAndAIdMap);
-        Map proAttributeSelectMap =  PublicUtilS.listForMapValueE(productAndAttributeS,"id");
+        Map proAttributeSelectMap =  PublicUtilS.listForMapValueE(productAndAttributeS,"attributeId");
         //假如前端传3个商品，查出来两个，有一个就没有，报错
         if (productAndAttributeS.size() < productOrderDTOS.size()){
             //报错 商品信息变化
@@ -266,7 +266,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             /**
              * 商品校验逻辑
              */
-            productAndAttributeDTOTemp = (ProductAndAttributeDTO)proAttributeSelectMap.get(productOrder.getProductId());
+            productAndAttributeDTOTemp = (ProductAndAttributeDTO)proAttributeSelectMap.get(productOrder.getAttributeId());
             product = productAndAttributeDTOTemp.getProduct();
             productAttribute = productAndAttributeDTOTemp.getProductAttribute();
             Assertions.notNull(product,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
@@ -413,21 +413,21 @@ public class TOrdersServiceImpl implements TOrdersService {
         //优惠券id是wx的wxCouponId
         WxUserCoupon wxUserCoupon = null;
         if (orders.getCouponId() != null && orders.getCouponId() != 0){
-             List<ShopCoupon> shopCouponList = tShopCouponService.findShopCouponBySIdAndCId(orders.getShopId(),orders.getCouponId());
-             if (shopCouponList == null || shopCouponList.size() < 0){
-                 DisplayException.throwMessageWithEnum(ResponseViewEnums.COUPON_CANT_USE_THIS_SHOP);
-             }
-             //判断优惠券类型是
+            wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+            // 当前时间戳
             Long currentTime = System.currentTimeMillis();
             // 用户优惠券失效 >= 当前时间
             if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
                 //注释
                 Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
-                // 判断优惠卷只能在某个店铺使用
+                //判断优惠券类型是
                 if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_SHOP || coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME){
-
+                    // 判断优惠卷只能在某个店铺使用
+                    List<ShopCoupon> shopCouponList = tShopCouponService.findShopCouponBySIdAndCId(orders.getShopId(),coupon.getId());
+                    if (shopCouponList == null || shopCouponList.size() == 0){
+                        DisplayException.throwMessageWithEnum(ResponseViewEnums.COUPON_CANT_USE_THIS_SHOP);
+                    }
                 }
-
                 if (coupon != null){
                     // 折后价格+餐盒费 >= 优惠券满减使用条件
                     if (beforeCouponPrice.compareTo(new BigDecimal(coupon.getFullAmount())) != -1){
@@ -626,8 +626,13 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Override
     public int cancel(String id) {
         Orders orders = ordersService.findById(id);
+        // 查询订单商品表信息
+        QueryWrapper<OrderProduct> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(OrderProduct::getOrderId,id);
+        List<OrderProduct> orderProducts = orderProductService.list(queryWrapper);
         WxUser user = wxUserService.findById(orders.getOpenId());
         School school = schoolService.findById(user.getSchoolId());
+        List<Product> productDisStockList = new ArrayList<>();
         if (!orders.getStatus().equals("待付款")) {
             if (System.currentTimeMillis() - orders.getPayTimeLong() < 5 * 60 * 1000) {
                 throw new YWException("需要至少5分钟才能退款");
@@ -635,6 +640,15 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         String temp = orders.getStatus();
             if (ordersService.cancel(id) == 1) {
+                if (orderProducts != null || orderProducts.size() > 0){
+                    for (OrderProduct orderProduct:orderProducts) {
+                        Product product = productService.getById(orderProduct.getProductId());
+                        if (product.getStockFlag() == 1){
+                            product.setStock(product.getStock() + orderProduct.getProductCount());
+                            productDisStockList.add(product);
+                        }
+                    }
+                }
                 // 当订单内粮票额度不等于0时
                 if (orders.getPayFoodCoupon().compareTo(new BigDecimal("0")) != 0) {
                     // 订单消费的粮票要退回用户粮票内
@@ -668,6 +682,11 @@ public class TOrdersServiceImpl implements TOrdersService {
                         map1.put("charge", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
                         schoolService.charge(map1);
                         if (wxUserBellService.charge(map) == 1) {
+                            boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                            if (!disProductStockSuccess){
+                                // 这里想的扣库存失败还是可以下单
+                                logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                            }
                             return orders.getShopId();
                         } else {
                             throw new YWException("退款失败联系管理员");
@@ -679,12 +698,23 @@ public class TOrdersServiceImpl implements TOrdersService {
                         if (result != 1) {
                             throw new YWException("退款失败联系管理员");
                         } else {
+                            boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                            if (!disProductStockSuccess){
+                                // 这里想的扣库存失败还是可以下单
+                                logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                            }
                             return orders.getShopId();
                         }
                     }
                 } else {
+                    boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                    if (!disProductStockSuccess){
+                        // 这里想的扣库存失败还是可以下单
+                        logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                    }
                     return orders.getShopId();
                 }
+
             }
         return 0;
     }
