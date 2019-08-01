@@ -108,16 +108,18 @@ public class TShopCouponServiceImpl implements TShopCouponService {
             return shopCoupon2;
         }
         //店铺优惠券，或者首页优惠券（需要绑定店铺）查询是否绑定店铺
+        Assertions.notNull(shopId,ResponseViewEnums.COUPON_TYPE_CANT_UPDATE);
         QueryWrapper<ShopCoupon> queryWrapperShopCoupon = new QueryWrapper<>();
         queryWrapperShopCoupon
                 .eq("coupon_id",couponId)
+                .eq("shop_id",shopId)
                 .eq("is_delete", NumConstants.DB_TABLE_IS_DELETE_NO)
                 .select("id","shop_id","coupon_id","create_time","create_id","is_delete");
         if (shopId != null){
-            queryWrapperShopCoupon.eq("shop_id",couponId);
+            queryWrapperShopCoupon.eq("shop_id",shopId);
         }
         ShopCoupon shopCoupon = shopCouponMapper.selectOne(queryWrapperShopCoupon);
-        Assertions.notNull(shopCoupon,ResponseViewEnums.COUPON_USER_GET_NEED_SHOP);
+        Assertions.notNull(shopCoupon,ResponseViewEnums.COUPON_TYPE_SHOP_NEED_SHOP_ID);
         //存在并绑定店铺则有效，返回
         shopCoupon.setCoupon(coupon);
         return shopCoupon;
@@ -169,17 +171,17 @@ public class TShopCouponServiceImpl implements TShopCouponService {
     @Override
     public List<ShopCoupon> getAllShopCouponsByShopId(Long shopId,Integer couponType) {
         Assertions.notNull(shopId,couponType);
-        if (SpringUtil.redisCache()){
-            String cacheList = (String) stringRedisTemplate.opsForHash().get("SHOP_ALL_COUPONS_LIST",shopId.toString());
-            if (cacheList != null){
-                return JSON.parseArray(cacheList, ShopCoupon.class);
-            }
-        }
+//        if (SpringUtil.redisCache()){
+//            String cacheList = (String) stringRedisTemplate.opsForHash().get("SHOP_ALL_COUPONS_LIST",shopId.toString());
+//            if (cacheList != null){
+//                return JSON.parseArray(cacheList, ShopCoupon.class);
+//            }
+//        }
         QueryWrapper<ShopCoupon> wrapper = new QueryWrapper<>();
         wrapper.eq("shop_id",shopId)
                 .eq("is_delete",NumConstants.DB_TABLE_IS_DELETE_NO)
                 .eq("coupon_type",couponType);
-        List<ShopCoupon> shopCouponList = shopCouponMapper.selectList(wrapper);
+        List<ShopCoupon> shopCouponList = shopCouponMapper.batchFindSCByShopIdAndType(shopId,couponType);
         if (SpringUtil.redisCache()){
             stringRedisTemplate.boundHashOps("SHOP_ALL_COUPONS_LIST").put(shopId.toString(), JSON.toJSONString(shopCouponList));
         }

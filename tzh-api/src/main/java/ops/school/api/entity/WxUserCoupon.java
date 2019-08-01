@@ -73,6 +73,9 @@ public class WxUserCoupon extends PageQueryDTO implements Serializable {
     @TableField(exist = false)
     private Shop shop;
 
+    @TableField(exist = false)
+    private String shopIdList;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -163,6 +166,15 @@ public class WxUserCoupon extends PageQueryDTO implements Serializable {
 
     public void setShop(Shop shop) {
         this.shop = shop;
+    }
+
+
+    public String getShopIdList() {
+        return shopIdList;
+    }
+
+    public void setShopIdList(String shopIdList) {
+        this.shopIdList = shopIdList;
     }
 
     @Override

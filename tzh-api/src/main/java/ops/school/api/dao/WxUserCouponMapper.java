@@ -131,5 +131,5 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @param   wxUserId
      * @Desc:   desc
      */
-    List<WxUserCoupon> selectAllUserCoupons(Long wxUserId);
+    List<WxUserCoupon> selectAllUserCoupons(@Param("wxUserId") Long wxUserId,@Param("shopId") Long shopId);
 }
