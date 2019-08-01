@@ -53,3 +53,6 @@ server:
 mybatis-plus:
   mapper-locations: ops/school/api/mapper/*.xml
   type-enums-package: ops/school/api/entity/enums
+chuyin:
+  white: "/ops/aaaa"
+
