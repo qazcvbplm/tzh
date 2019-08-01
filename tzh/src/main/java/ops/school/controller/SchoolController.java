@@ -96,6 +96,7 @@ public class SchoolController {
         } else {
             Application login = new Application();
             login.setLoginName(loginName);
+            // Base64加密
             login.setLoginPass(Util.EnCode(loginPass));
             Application application = applicationService.login(login.getLoginName(), login.getLoginPass());
             if (application != null) {
@@ -162,7 +163,7 @@ public class SchoolController {
         } catch (HTTPException | IOException | org.json.JSONException e) {
             return new ResponseObject(false, "发送失败");
         }
-        return new ResponseObject(true, "验证吗3分钟有效哦！亲");
+        return new ResponseObject(true, "验证码3分钟有效哦！亲");
     }
 
     /**
