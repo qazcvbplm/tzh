@@ -64,4 +64,15 @@ public interface TShopCouponService {
      * @Desc:   desc根据店铺id查询店铺发放的优惠券
      */
     List<ShopCoupon> getAllShopCouponsByShopId(Long shopId,Integer couponType);
+
+    /**
+     * @date:   2019/8/1 16:47
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.ShopCoupon>
+     * @param   shopId
+     * @param   couponId
+     * @Desc:   desc
+     */
+    List<ShopCoupon> findShopCouponBySIdAndCId(Integer shopId, Long couponId);
 }

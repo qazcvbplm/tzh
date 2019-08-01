@@ -252,6 +252,16 @@
         AND shop_coupon.shop_id = shop.id
     </select>
 
+    <!--CreatBy Fang Time:2019/8/1 16:49 |  -->
+    <select id="findShopCouponBySIdAndCId" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM shop_coupon,shop
+        WHERE shop_coupon.coupon_id = #{couponId}
+        AND shop_coupon.is_delete = 0
+        AND shop_coupon.shop_id = #{shopId}
+        AND shop_coupon.shop_id = shop.id
+    </select>
+
 
     <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">

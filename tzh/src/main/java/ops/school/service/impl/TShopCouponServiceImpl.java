@@ -187,4 +187,20 @@ public class TShopCouponServiceImpl implements TShopCouponService {
         }
         return shopCouponList;
     }
+
+    /**
+     * @date:   2019/8/1 16:47
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.ShopCoupon>
+     * @param   shopId
+     * @param   couponId
+     * @Desc:   desc
+     */
+    @Override
+    public List<ShopCoupon> findShopCouponBySIdAndCId(Integer shopId, Long couponId) {
+        Assertions.notNull(shopId,couponId);
+        List<ShopCoupon> shopCouponList = shopCouponMapper.findShopCouponBySIdAndCId(shopId, couponId);
+        return shopCouponList;
+    }
 }

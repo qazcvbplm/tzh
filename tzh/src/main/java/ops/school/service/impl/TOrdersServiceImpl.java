@@ -19,6 +19,7 @@ import ops.school.api.util.*;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.config.RabbitMQConfig;
+import ops.school.constants.CouponConstants;
 import ops.school.constants.NumConstants;
 import ops.school.constants.OrderConstants;
 import ops.school.constants.ProductConstants;
@@ -53,6 +54,8 @@ public class TOrdersServiceImpl implements TOrdersService {
     private SchoolService schoolService;
     @Autowired
     private ShopService shopService;
+    @Autowired
+    private TShopCouponService tShopCouponService;
     @Autowired
     private ProductService productService;
     @Autowired
@@ -400,6 +403,9 @@ public class TOrdersServiceImpl implements TOrdersService {
                 }
             }
         }
+        /**
+         * 优惠券
+         */
         // 折后价格+餐盒费-->优惠券使用时的价格
         beforeCouponPrice = beforeCouponPrice.add(afterDiscountPrice).add(boxPrice);
         // 在没有优惠券的时候，支付价格为折后价格
@@ -407,13 +413,21 @@ public class TOrdersServiceImpl implements TOrdersService {
         //优惠券id是wx的wxCouponId
         WxUserCoupon wxUserCoupon = null;
         if (orders.getCouponId() != null && orders.getCouponId() != 0){
-             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+             List<ShopCoupon> shopCouponList = tShopCouponService.findShopCouponBySIdAndCId(orders.getShopId(),orders.getCouponId());
+             if (shopCouponList == null || shopCouponList.size() < 0){
+                 DisplayException.throwMessageWithEnum(ResponseViewEnums.COUPON_CANT_USE_THIS_SHOP);
+             }
              //判断优惠券类型是
             Long currentTime = System.currentTimeMillis();
             // 用户优惠券失效 >= 当前时间
             if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
                 //注释
                 Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
+                // 判断优惠卷只能在某个店铺使用
+                if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_SHOP || coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME){
+
+                }
+
                 if (coupon != null){
                     // 折后价格+餐盒费 >= 优惠券满减使用条件
                     if (beforeCouponPrice.compareTo(new BigDecimal(coupon.getFullAmount())) != -1){

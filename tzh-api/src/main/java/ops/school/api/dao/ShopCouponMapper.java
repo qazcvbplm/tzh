@@ -129,4 +129,15 @@ public interface ShopCouponMapper extends BaseMapper<ShopCoupon> {
      * @Desc:   desc 根据优惠卷ids和shopid查询优惠券
      */
     List<ShopCoupon> batchFindSCByCouponIdSAndShopId(@Param("list") List<Long> couponIdS, @Param("shopId") Long shopId);
+
+    /**
+     * @date:   2019/8/1 16:48
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.ShopCoupon>
+     * @param   shopId
+     * @param   couponId
+     * @Desc:   desc
+     */
+    List<ShopCoupon> findShopCouponBySIdAndCId(@Param("shopId") Integer shopId, @Param("couponId") Long couponId);
 }
