@@ -116,7 +116,6 @@ public class TWxUserServiceImpl implements TWxUserService {
 
     @Override
     public int decryptPhone(String decryptData, String sessionKey, String ivData, String openid) {
-
         String phoneNumber = null;
         String jsonString = null;
         WxUser wxUser = wxUserService.findById(openid);

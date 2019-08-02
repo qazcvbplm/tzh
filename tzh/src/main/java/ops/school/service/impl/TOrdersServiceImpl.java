@@ -682,10 +682,13 @@ public class TOrdersServiceImpl implements TOrdersService {
                         map1.put("charge", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
                         schoolService.charge(map1);
                         if (wxUserBellService.charge(map) == 1) {
-                            boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-                            if (!disProductStockSuccess){
-                                // 这里想的扣库存失败还是可以下单
-                                logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                            //集合大于0才会扣库存
+                            if (productDisStockList.size() > 0 ){
+                                boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                                if (!disProductStockSuccess){
+                                    // 这里想的扣库存失败还是可以下单
+                                    logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                                }
                             }
                             return orders.getShopId();
                         } else {
@@ -698,19 +701,26 @@ public class TOrdersServiceImpl implements TOrdersService {
                         if (result != 1) {
                             throw new YWException("退款失败联系管理员");
                         } else {
-                            boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-                            if (!disProductStockSuccess){
-                                // 这里想的扣库存失败还是可以下单
-                                logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                            //集合大于0才会扣库存
+                            if (productDisStockList.size() > 0 ){
+                                boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                                if (!disProductStockSuccess){
+                                    // 这里想的扣库存失败还是可以下单
+                                    logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                                }
                             }
                             return orders.getShopId();
                         }
                     }
                 } else {
-                    boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-                    if (!disProductStockSuccess){
-                        // 这里想的扣库存失败还是可以下单
-                        logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                    //待付款
+                    //集合大于0才会扣库存 开启库存
+                    if (productDisStockList.size() > 0 ){
+                        boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                        if (!disProductStockSuccess){
+                            // 这里想的扣库存失败还是可以下单
+                            logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                        }
                     }
                     return orders.getShopId();
                 }

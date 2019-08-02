@@ -86,16 +86,16 @@ public class ApplicationController {
 				String phone=stringRedisTemplate.opsForValue().get(user.getOpenId());
 				request.setAttribute("Id", user.getOpenId());
 				List<WxUser> minUser=wxUserService.findByPhoneGZH(phone);
-				ResponseObject rs=wxUserController.bind(request, response, phone, Content);
+				ResponseObject rs=wxUserController.bind(request, response, phone, Content,user.getId());
 				if(rs.isCode()){
-					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text","绑定成功，恭喜您获得88积分奖励和0.5元红包奖励。奖励都已发放至您的客户端小程序中，请自行前往查看！");
+					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text","绑定成功，恭喜您获得88积分奖励。奖励已发放至您的客户端小程序中，请自行前往查看！");
 					//增加积分
 					user=minUser.get(0);
                     rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(user.getOpenId(), 88).toJsonString());
-	        		Map<String,Object> ch=new HashMap<>();
-	        		ch.put("phone", user.getOpenId()+"-"+user.getPhone());
-	        	    ch.put("amount", "0.5");
-					wxUserBellService.charge(ch);
+//	        		Map<String,Object> ch=new HashMap<>();
+//	        		ch.put("phone", user.getOpenId()+"-"+user.getPhone());
+//	        	    ch.put("amount", "0.5");
+//					wxUserBellService.charge(ch);
 					return re.Msg2Xml();
 				}else{
 					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text","绑定失败请联系管理员");

@@ -12,6 +12,8 @@ import ops.school.api.entity.ChargeLog;
 import ops.school.api.entity.School;
 import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.ChargeLogService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
@@ -171,7 +173,8 @@ public class WxUserController {
 
     @ApiOperation(value = "绑定手机", httpMethod = "POST")
     @PostMapping("bind")
-    public ResponseObject bind(HttpServletRequest request, HttpServletResponse response, @RequestParam String phone, @RequestParam String codes) {
+    public ResponseObject bind(HttpServletRequest request, HttpServletResponse response, @RequestParam String phone, @RequestParam String codes,Long wxId) {
+        Assertions.notNull(wxId, ResponseViewEnums.WX_USER_FAILED_TO_WX);
         String code = stringRedisTemplate.opsForValue().get(phone);
         if (code != null) {
             if (codes.equals(code)) {
@@ -179,8 +182,10 @@ public class WxUserController {
                 WxUser wxUser = new WxUser();
                 wxUser.setPhone(phone);
                 wxUser.setOpenId(id);
+                wxUser.setId(wxId);
                 stringRedisTemplate.delete(phone);
-                return new ResponseObject(true, "绑定成功").push("user", wxUserService.update(wxUser));
+                WxUser user = wxUserService.update(wxUser);
+                return new ResponseObject(true, "绑定成功").push("user",user);
             } else {
                 return new ResponseObject(false, "验证码错误");
             }
