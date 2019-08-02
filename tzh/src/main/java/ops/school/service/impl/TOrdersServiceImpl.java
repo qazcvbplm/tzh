@@ -594,6 +594,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             String[] formIds = formid.split(",");
             stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(),JSON.toJSONString(formIds));
+            stringRedisTemplate.expire("FORMID" + orders.getId(), 1, TimeUnit.DAYS);
             return 1;
         } else {
             throw new YWException("余额不足");
