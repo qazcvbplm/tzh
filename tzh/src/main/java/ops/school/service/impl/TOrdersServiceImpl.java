@@ -358,10 +358,19 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (throwErrorNoStockYes){
             DisplayException.throwMessage(noStockProdctNames+"卖完啦！");
         }
+        /**
+         * 餐盒费之和
+         */
         // 餐盒费之和
         if (orders.getTyp().equals("外卖订单") || orders.getTyp().equals("自取订单")){
             boxPrice = boxPrice.add(shop.getBoxPrice().multiply(new BigDecimal(boxcount)));
+        }else {
+            //其他的（堂食订单）数值还是要置为0
+            boxPrice = new BigDecimal(0);
         }
+        /**
+         * 配送费
+         */
         // 配送费-->按物品件数增加配送费
         if (orders.getTyp().equals("外卖订单")){
             if (shop.getSendPriceAddByCountFlag() == 1) {
@@ -375,6 +384,9 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             // 最终配送费-->基础配送费+额外距离配送费+额外件数配送费
             sendPrice = sendPrice.add(shop.getSendPrice()).add(sendAddCountPrice).add(sendAddDistancePrice);
+        }else {
+            // 其他的（堂食订单，自取订单）数值还是要置为0
+            sendPrice = new BigDecimal(0);
         }
         // 如果商品折扣未使用-->店铺满减
         if (!isDiscount){
@@ -490,7 +502,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 后端计算的数据对象
         OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice,boxPrice,payPrice.setScale(2,BigDecimal.ROUND_HALF_UP),
                 productPrice,discountPrice.setScale(2,BigDecimal.ROUND_HALF_UP),payFoodCoupon.setScale(2,BigDecimal.ROUND_HALF_UP));
-        if (!tempDTO.equals(orderTempDTO)){
+        if (!tempDTO.thisCompareToTempTrue(orderTempDTO)){
             return new ResponseObject(false,"订单金额有问题，请负责人进行核实!");
         }
         ordersSaveTemp.setDiscountPrice(discountPrice);

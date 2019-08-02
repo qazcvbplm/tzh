@@ -108,6 +108,42 @@ public class OrderTempDTO {
                 payFoodCoupon.equals(that.payFoodCoupon);
     }
 
+
+    /**
+     * @date:   2019/8/2 18:19
+     * @author: QinDaoFang
+     * @version:version
+     * @return: boolean
+     * @param   o
+     * @Desc:   desc 这里不不能用equals比较，要用数值比较
+     */
+    public boolean thisCompareToTempTrue(Object o) {
+        if (this == o) {return true;}
+        if (o == null ) {return false;}
+        OrderTempDTO that = (OrderTempDTO) o;
+        if (that.getSendPrice() == null || this.sendPrice.compareTo(that.getSendPrice()) != 0){
+            return false;
+        }
+        if (that.getBoxPrice() == null || this.getBoxPrice().compareTo(that.getBoxPrice()) != 0){
+            return false;
+        }
+        if (that.getPayPrice() == null || this.getPayPrice().compareTo(that.getPayPrice()) != 0){
+            return false;
+        }
+        if (that.getProductPrice() == null || this.getProductPrice().compareTo(that.getProductPrice()) != 0){
+            return false;
+        }
+        if (that.getDiscountPrice() == null || this.getDiscountPrice().compareTo(that.getDiscountPrice()) != 0){
+            return false;
+        }
+        if (that.getPayFoodCoupon() == null || this.getPayFoodCoupon().compareTo(that.getPayFoodCoupon()) != 0){
+            return false;
+        }
+        return true;
+    }
+
+
+
     @Override
     public int hashCode() {
         return Objects.hash(sendPrice, boxPrice, payPrice, productPrice, discountPrice, payFoodCoupon);
