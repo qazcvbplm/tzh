@@ -53,16 +53,21 @@ public class RunOrdersController {
 	
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")
-	public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
-							  @ModelAttribute @Valid RunOrders orders, BindingResult result){
-		              Util.checkParams(result);
-		              orders.init();
-		              orders.setOpenId(request.getAttribute("Id").toString());
-		              School school=schoolService.findById(orders.getSchoolId());
-		              orders.setAppId(school.getAppId());
-		              runOrdersService.add(orders);
-		              return new ResponseObject(true, orders.getId());
-	}
+    public ResponseObject add(HttpServletRequest request, HttpServletResponse response,
+                              @ModelAttribute @Valid RunOrders orders, BindingResult result) {
+        Util.checkParams(result);
+        orders.init();
+        orders.setOpenId(request.getAttribute("Id").toString());
+        School school = schoolService.findById(orders.getSchoolId());
+        orders.setAppId(school.getAppId());
+        //一、获取当前系统时间和日期并格式化输出:
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+        String dateTime = df.format(new Date()); // Formats a Date into a date/time string.
+        System.out.println(dateTime);  // 2017-09-24 23:33:20
+        orders.setCreateTime(dateTime);
+        runOrdersService.add(orders);
+        return new ResponseObject(true, orders.getId());
+    }
 	
 	@ApiOperation(value="查询",httpMethod="POST")
 	@PostMapping("find")
@@ -107,7 +112,7 @@ public class RunOrdersController {
 	@PostMapping("cancel")
 	public ResponseObject find(HttpServletRequest request,HttpServletResponse response,
 			String id){
-		    int i=runOrdersService.cancel(id);
+		    int i=tRunOrdersService.cancel(id);
 		    if(i==1){
 		    	return new ResponseObject(true, "ok");
 		    }else if(i==2){
