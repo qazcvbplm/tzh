@@ -83,8 +83,8 @@ public class RunOrdersController {
 			  Object msg= WXpayUtil.payrequest(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
 					  "椰子-w", orders.getId(),orders.getTotalPrice().multiply(new BigDecimal(100)).intValue()+"", orders.getOpenId(),
 					  request.getRemoteAddr(), "", OrdersNotify.URL+"notify/run");
-			 Map<String,Object> map = MapUtil.objectToMap(msg,true);
-			 if(map.get("return_code").equals("SUCCESS")){
+			 Map<String,Object> map = (Map<String, Object>) msg;
+			 if("SUCCESS".equals(map.get("return_code"))){
 				 String[] formIds = formid.split(",");
 				 stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(), JSON.toJSONString(formIds));
 			 }

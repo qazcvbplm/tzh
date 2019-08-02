@@ -19,6 +19,7 @@ public class MapUtil {
         return map;
     }
 
+    //todo 错误的
     public static Map objectToMap(Object obj, boolean keepNullVal) {
         if (obj == null) {
             return null;
