@@ -2,16 +2,21 @@ package ops.school.scheduled;
 
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.qcloudsms.httpclient.HTTPException;
+import ops.school.api.dao.OrdersMapper;
+import ops.school.api.dao.RunOrdersMapper;
 import ops.school.api.dto.RunOrdersTj;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
 import ops.school.api.util.*;
+import ops.school.constants.NumConstants;
 import ops.school.controller.SignController;
 import ops.school.service.TCouponService;
 import ops.school.service.TWxUserCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -46,14 +51,64 @@ public class Task {
     @Autowired
     private TWxUserCouponService tWxUserCouponService;
 
+    @Autowired
+    private RunOrdersMapper runOrdersMapper;
+
+    /**
+     * 每天晚上把待付款的改成取消的
+     */
     //0 0 10,14,16 * * ?   每天上午10点，下午2点，4点
     @Scheduled(cron = "0 0 0 * * ?")
     public void task() {
         //订单流水号重置
         stringRedisTemplate.delete("SHOP_WATER_NUMBER");
         cache.clear();
-        ordersService.remove(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "待付款"));
-        runOrdersService.remove(new QueryWrapper<RunOrders>().lambda().eq(RunOrders::getStatus, "待付款"));
+        QueryWrapper<Orders> wrapper = new QueryWrapper<>();
+        wrapper.eq("status","待付款");
+        List<Orders> ordersList = ordersService.list(wrapper);
+        List<String> cancleFaidIds = new ArrayList<>();
+        List<Long> ordersIds = PublicUtilS.getValueList(ordersList,"id");
+        for (Orders orders : ordersList) {
+            if ( !"待付款".equals(orders.getStatus())){
+                continue;
+            }
+            Integer cancleNum = ordersService.cancel(orders.getId());
+            if (cancleNum != NumConstants.INT_NUM_1){
+                cancleFaidIds.add(orders.getId());
+            }
+        }
+        if (cancleFaidIds.size() > NumConstants.INT_NUM_0){
+            //如果有失败的计日志
+            LoggerUtil.log("定时取消订单，订单号是："+ordersIds.toString()+"失败的订单号："+cancleFaidIds.toString());
+        }
+    }
+
+
+    /**
+     * Fang -每天晚上把取消跑腿订单
+     */
+    //0 0 10,14,16 * * ?   每天上午10点，下午2点，4点
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void cancelRunOrdersTask() {
+        QueryWrapper<RunOrders> wrapper = new QueryWrapper<>();
+        wrapper.eq("status","待付款");
+        List<RunOrders> runOrdersList =  runOrdersService.list(wrapper);
+        List<Long> runOrdersIds = PublicUtilS.getValueList(runOrdersList,"id");
+        List<RunOrders> cancelRunOrders = new ArrayList<>();
+        for (RunOrders runOrders : runOrdersList) {
+            if ( !"待付款".equals(runOrders.getStatus())){
+                continue;
+            }
+            RunOrders runOrdersCancel = new RunOrders();
+            runOrdersCancel.setId(runOrders.getId());
+            runOrdersCancel.setStatus("已取消");
+            cancelRunOrders.add(runOrdersCancel);
+        }
+        boolean cancelRunTrue = runOrdersService.updateBatchById(cancelRunOrders);
+        if (cancelRunTrue){
+            //如果有失败的计日志
+            LoggerUtil.log("定时取消跑腿订单，订单号是："+runOrdersIds.toString());
+        }
     }
 
 
