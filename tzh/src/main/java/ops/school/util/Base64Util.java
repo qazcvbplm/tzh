@@ -10,7 +10,8 @@ import java.util.Base64.Decoder;
 public class Base64Util {
 
     /**
-     * TODO:在这里你需要注意了:你需要对整个返回的String做处理，把需要的那个手机号拿出来就ok了，你可以打印一下这个返回值然后处理，因为处理方式很多，我的处理方式不一定适合大家自身的习惯，所以这里改动了一下
+     * TODO:在这里你需要注意了:你需要对整个返回的String做处理，把需要的那个手机号拿出来就ok了，
+     * 你可以打印一下这个返回值然后处理，因为处理方式很多，我的处理方式不一定适合大家自身的习惯，所以这里改动了一下
      */
     public static String getPhoneNumberBeanS5(String decryptData, String key, String iv) throws Exception {
         /*
