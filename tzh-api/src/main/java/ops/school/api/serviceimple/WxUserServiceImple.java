@@ -8,6 +8,7 @@ import ops.school.api.entity.WxUser;
 import ops.school.api.entity.WxUserBell;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
@@ -47,7 +48,11 @@ public class WxUserServiceImple extends ServiceImpl<WxUserMapper, WxUser> implem
             wxUser.setSchoolId(schoolId);
             this.save(wxUser);
         }
-        return wxUser;
+        WxUser result = findById(openid);
+        if (result == null || result.getId() == null){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_USER_FAILED_TO_WX);
+        }
+        return result;
     }
 
     //todo 加了微信id的操作
