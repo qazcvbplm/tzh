@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-public class RunOrders extends Base {
+public class RunOrders extends PageQueryDTO {
     @TableId(type = IdType.INPUT)
     private String id;
     private Integer appId;
