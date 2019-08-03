@@ -2,16 +2,19 @@ package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.entity.*;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.*;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
 import ops.school.config.RabbitMQConfig;
 import ops.school.message.dto.SchoolAddMoneyDTO;
 import ops.school.message.dto.SenderAddMoneyDTO;
 import ops.school.message.dto.WxUserAddSourceDTO;
+import ops.school.service.TOrdersService;
 import ops.school.service.TSenderService;
 import ops.school.util.WxMessageUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +53,9 @@ public class TSenderServiceImpl implements TSenderService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private TOrdersService tOrdersService;
+
 
     @Override
     public List<Orders> findorderbydjs(Integer senderId, Integer page, Integer size, String status) {
@@ -73,12 +80,27 @@ public class TSenderServiceImpl implements TSenderService {
     public Integer acceptOrder(Integer senderId, String orderId) {
         Sender sender = senderService.findById(senderId);
         Orders orders = ordersService.findById(orderId);
+        List<OrderProduct> orderProductList =  orderProductService
+                .list(new QueryWrapper<OrderProduct>().eq("order_id", orders.getId()));
+        orders.setOp(orderProductList);
         orders.setSenderId(senderId);
         orders.setSenderName(sender.getName());
         orders.setSenderPhone(sender.getPhone());
         int rs = 0;
         if ((rs = ordersService.senderAccept(orders)) == 1) {
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
+            //rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
+            List<String> formIds = new ArrayList<>();
+            try {
+                formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0,-1);
+            }catch (Exception ex){
+                LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
+            }
+            if (formIds.size() > 0){
+                WxMessageUtil.wxSendMsg(orders,formIds.get(0));
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+            }else {
+                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，formid取缓存为空"+orders.getId());
+            }
         }
         return rs;
     }
@@ -90,6 +112,7 @@ public class TSenderServiceImpl implements TSenderService {
         Sender sender = senderService.findById(orders.getSenderId());
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
         BigDecimal returnPrice = new BigDecimal("0");
+
         if (end) {
             // 已送达到楼上
             orders.setDestination(1);
@@ -152,14 +175,32 @@ public class TSenderServiceImpl implements TSenderService {
             }
         }
         redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
+        //rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_ORDER_END_SENDER_COUNT, orderId);
         rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_PRODUCT_ADD, orderId);
         if (orders.getTyp().equals("外卖订单")) {
-            orders.setStatus("已完成");
+            orders.setStatus("配送员已接手");
             //发送模板消息
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
+            //rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
+            List<OrderProduct> orderProductList =  orderProductService
+                    .list(new QueryWrapper<OrderProduct>().eq("order_id", orders.getId()));
+            orders.setOp(orderProductList);
+            List<String> formIds = new ArrayList<>();
+            try {
+                formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0,-1);
+            }catch (Exception ex){
+                LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
+            }
+            if (formIds.size() > 0){
+                WxMessageUtil.wxSendMsg(orders,formIds.get(0));
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+            }else {
+                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，formid取缓存为空"+orders.getId());
+            }
         }
+        tOrdersService.orderSettlement(orderId);
+        //todo 去掉消息队列
         //结算
-        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_ORDERS_COMPLETE, orders.getId());
+//        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_ORDERS_COMPLETE, orders.getId());
     }
 
     @Override
@@ -185,9 +226,18 @@ public class TSenderServiceImpl implements TSenderService {
         int rs = 0;
         if ((rs = runOrdersService.senderAccept(orders)) == 1) {
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
-            List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+
+            List<String> formIds = new ArrayList<>();
+            try {
+                formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0,-1);
+            }catch (Exception ex){
+                LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
+            }
             if (formIds.size() > 0){
                 WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+            }else {
+                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
         }
         return rs;
@@ -236,12 +286,20 @@ public class TSenderServiceImpl implements TSenderService {
             redisUtil.runCountSuccessadd(orders.getSchoolId());
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             // 从Redis里面获取
-            List<String> formIds = JSONArray.parseArray(stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).values().toString(),String.class);
+            List<String> formIds = new ArrayList<>();
+            try {
+                formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0,-1);
+            }catch (Exception ex){
+                LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
+            }
             if (formIds.size() > 0){
+                orders.setStatus("配送员已接手");
                 // 发送微信信息模板
-                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(1));
+                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
                 // 删除redis缓存
-                stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).delete(orders.getId());
+                stringRedisTemplate.delete("FORMID" + orders.getId());
+            }else {
+                LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
         }
     }

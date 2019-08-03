@@ -1,6 +1,7 @@
 package ops.school.message;
 
 import com.rabbitmq.client.Channel;
+import ops.school.api.util.LoggerUtil;
 import ops.school.config.RabbitMQConfig;
 import ops.school.service.TOrdersService;
 import org.springframework.amqp.core.Message;
@@ -19,8 +20,12 @@ public class OrderComplete {
     private TOrdersService tOrdersService;
 
     @RabbitHandler
-    public void orderSettlement(String msg, Channel channel, Message message) throws IOException {
+    public void orderSettlement(String msg, Channel channel, Message message) {
         tOrdersService.orderSettlement(msg);
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        try {
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception ex) {
+            LoggerUtil.logError("rabbitMQ手动确定消息失败："+OrderComplete.class.getName());
+        }
     }
 }

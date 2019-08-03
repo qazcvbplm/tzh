@@ -13,6 +13,7 @@ public class RabbitMQConfig {
     public final static String QUEUE_PRODUCT_ADD = "product_add";
     public final static String QUEUE_ORDERS_COMPLETE = "order_complete";
     public final static String QUEUE_MIN_PROGRAM_MESSAGE = "min_program_message";
+    public final static String QUEUE_ORDER_END_SENDER_COUNT = "order_end_sender_count";
 
 
     @Bean
@@ -45,4 +46,8 @@ public class RabbitMQConfig {
         return new Queue(QUEUE_ORDERS_COMPLETE);
     }
 
+    @Bean
+    public Queue queue7() {
+        return new Queue(QUEUE_ORDER_END_SENDER_COUNT);
+    }
 }

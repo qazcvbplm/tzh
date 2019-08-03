@@ -11,4 +11,8 @@ public class LoggerUtil {
     public static void log(String msg) {
         logger.debug(msg);
     }
+
+    public static void logError(String msg) {
+        logger.error("系统异常日志："+msg);
+    }
 }

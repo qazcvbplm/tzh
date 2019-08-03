@@ -6,6 +6,7 @@ import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.api.wxutil.WxGUtil;
@@ -90,7 +91,10 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
             }
             WxUserBell userbell = wxUserBellService.getById(user.getOpenId() + "-" + user.getPhone());
             String[] formIds = formid.split(",");
-            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(), JSON.toJSONString(formIds));
+            if (formIds.length < 1){
+                LoggerUtil.logError("runOrder pay formid为空"+ orders.getId());
+            }
+            stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
             /*wxUserService.sendWXGZHM(user.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
                     null, null
                     + orders.getId() + "&typ=" + orders.getTyp(),

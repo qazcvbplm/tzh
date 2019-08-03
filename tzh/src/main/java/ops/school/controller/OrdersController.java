@@ -11,6 +11,7 @@ import ops.school.api.entity.WxUser;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.*;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.util.Util;
@@ -97,7 +98,11 @@ public class OrdersController {
 //						  "如有疑问请在小程序内联系客服人员！", null, null,
 //						  null, null, null);
 //				  WxGUtil.snedM(message.toJson());
-                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formid.split(","));
+                String[] formIds = formid.split(",");
+                if (formIds.length < 1){
+                    LoggerUtil.logError("order pay formid为空"+ orders.getId());
+                }
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
             }
             return new ResponseObject(true, "ok").push("msg", msg);
         }
@@ -107,6 +112,8 @@ public class OrdersController {
                 map.put("schoolId", orders.getSchoolId());
                 map.put("amount", orders.getPayPrice());
                 schoolService.chargeUse(map);
+                //todo 不能判断支付状态是void 在pay里面存redis
+
             }
             return new ResponseObject(true, orderId);
         }

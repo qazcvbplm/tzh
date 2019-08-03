@@ -15,6 +15,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class WxUserListener {
         if (wxUserBellService.addSource(map2) == 0) {
             LoggerUtil.log("用户增加积分失败：" + wxUser.getOpenId() + "-" + wxUser.getPhone() + wxUserAddSourceDTO.getSource());
         }
+
     }
 
 

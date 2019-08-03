@@ -4,6 +4,7 @@ import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.RunOrders;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.wxutil.WxGUtil;
 
 import java.text.SimpleDateFormat;
@@ -101,7 +102,12 @@ public class WxMessageUtil {
                 message.setMinPath(orderFinish);
             }
             // 发送消息模板
-            WxGUtil.snedM(message.toJson());
+            // 发送消息模板
+            try{
+                WxGUtil.snedM(message.toJson());
+            }catch (Exception ex){
+                LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
+            }
         }
         else if(orders.getTyp().equals("自取订单") || orders.getTyp().equals("堂食订单")){
             /**
@@ -121,7 +127,12 @@ public class WxMessageUtil {
                 // 跳转页面
                 message.setMinPath(null);
                 // 发送消息模板
-                WxGUtil.snedM(message.toJson());
+                // 发送消息模板
+                try{
+                    WxGUtil.snedM(message.toJson());
+                }catch (Exception ex){
+                    LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
+                }
             }
 
         }
@@ -155,6 +166,11 @@ public class WxMessageUtil {
             message.setMinPath(orderFinish);
         }
         // 发送消息模板
-        WxGUtil.snedM(message.toJson());
+        try{
+            WxGUtil.snedM(message.toJson());
+        }catch (Exception ex){
+            LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
+        }
+
     }
 }

@@ -3,7 +3,10 @@ package ops.school.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
+import ops.school.api.dao.AddressMapper;
 import ops.school.api.dao.OrdersMapper;
+import ops.school.api.dao.SchoolMapper;
+import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.project.OrderTempDTO;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
@@ -100,6 +103,12 @@ public class TOrdersServiceImpl implements TOrdersService {
     private ShopFullCutService shopFullCutService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private WxUserBellMapper wxUserBellMapper;
+
+    @Autowired
+    private SchoolMapper schoolMapper;
 
     @Transactional
     @Override
@@ -605,7 +614,10 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
             String[] formIds = formid.split(",");
-            stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(),JSON.toJSONString(formIds));
+            if (formIds.length < 1){
+                LoggerUtil.logError("order pay formid为空"+ orders.getId());
+            }
+            stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
             stringRedisTemplate.expire("FORMID" + orders.getId(), 1, TimeUnit.DAYS);
             return 1;
         } else {
@@ -866,6 +878,10 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         // 订单信息
         Orders orders = ordersService.findById(orderId);
+        if (!"已完成".equals(orders.getStatus())){
+            LoggerUtil.logError("消息队列MQ完成订单异常，订单不是已完成状态：订单id-"+orderId);
+            return -1;
+        }
         // 对订单进行校验
         Assertions.notNull(orders,ResponseViewEnums.ORDER_PARAM_ERROR);
         // 配送员
@@ -1020,50 +1036,52 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 订单Id
         ordersComplete.setOrderId(orderId);
         orderCompleteService.save(ordersComplete);
+        senderGetTotal = ordersComplete.getSenderGetTotal();
         /**
          * 对配送员所得存储
          */
-        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SENDER_BELL,
-                new SenderAddMoneyDTO(sender.getOpenId(), senderGetTotal).toJsonString()
-        );
+//        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SENDER_BELL,
+//                new SenderAddMoneyDTO(sender.getOpenId(), senderGetTotal).toJsonString()
+//        );
         /**
          * 对负责人所得存储
          */
-        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SCHOOL_BELL,
-                new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGetTotal, senderGetTotal).toJsonString()
-        );
+//        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SCHOOL_BELL,
+//                new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGetTotal, senderGetTotal).toJsonString()
+//        );
         // 增加积分
         rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL,
                 new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
         );
         stringRedisTemplate.boundListOps("JR").rightPush(JSON.toJSONString(orders));
-//        /**
-//         * 将配送员所得金额添加到配送员账户内
-//         */
-//        WxUser wxUser = wxUserService.findById(sender.getOpenId());
-//        WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId()+"-"+wxUser.getPhone());
-//        wxUserBell.setMoney(wxUserBell.getMoney().add(senderGetTotal));
-//        Map<String,Object> map = new HashMap<>();
-//        map.put("amount",wxUserBell.getMoney().add(senderGetTotal));
-//        map.put("phone",wxUserBell.getPhone());
-//        if (wxUserBellMapper.txUpdate(map) == 0){
-//            logger.error("配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
-//            System.out.println("配送员所得金额添加失败，请联系负责人");
-//        }
-//        // 将负责人所得添加到负责人可提现金额内
-//        school.setMoney(school.getMoney().add(senderGetTotal));
-//        school.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
-//        if (schoolMapper.updateByPrimaryKeySelective(school) == 0){
-//            logger.error("负责人所得金额为"+schoolGetSender+"配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
-//            System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
-//        }
-//        // 将店铺所得添加到店铺可提现金额内
-//        shop.setTxAmount(shop.getTxAmount().add(shopGetTotal));
-//        boolean rs = shopService.updateById(shop);
-//        if (!rs){
-//            logger.error("店铺所得金额为"+shopGetTotal+"添加失败，请联系负责人");
-//            System.out.println("店铺所得金额添加失败，请联系负责人");
-//        }
+        /**
+         * 将配送员所得金额添加到配送员账户内
+         */
+        WxUser wxUser = wxUserService.findById(sender.getOpenId());
+        WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId()+"-"+wxUser.getPhone());
+        wxUserBell.setMoney(wxUserBell.getMoney().add(ordersComplete.getSenderGetTotal()));
+        Map<String,Object> map = new HashMap<>();
+        map.put("amount",wxUserBell.getMoney());
+        map.put("phone",wxUserBell.getPhone());
+        if (wxUserBellMapper.txUpdate(map) == 0){
+            logger.error("配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+            System.out.println("配送员所得金额添加失败，请联系负责人");
+        }
+        // 将负责人所得添加到负责人可提现金额内
+        school.setMoney(school.getMoney().add(senderGetTotal));
+        school.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
+        boolean updateSchooleTrue = schoolMapper.updateById(school) != 1 ? false : true;
+        if (!updateSchooleTrue){
+            logger.error("负责人所得金额为"+schoolGetSender+"配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+            System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
+        }
+        // 将店铺所得添加到店铺可提现金额内
+        shop.setTxAmount(shop.getTxAmount().add(shopGetTotal));
+        boolean rs = shopService.updateById(shop);
+        if (!rs){
+            logger.error("店铺所得金额为"+shopGetTotal+"添加失败，请联系负责人");
+            System.out.println("店铺所得金额添加失败，请联系负责人");
+        }
         return 0;
     }
 

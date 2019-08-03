@@ -7,6 +7,7 @@ import ops.school.api.entity.WxUser;
 import ops.school.api.service.LogsService;
 import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
+import ops.school.api.util.LoggerUtil;
 import ops.school.config.RabbitMQConfig;
 import ops.school.message.dto.SenderAddMoneyDTO;
 import org.springframework.amqp.core.Message;
@@ -41,5 +42,11 @@ public class SenderListener {
         if (wxUserBellService.charge(map) == 0) {
             logsService.save(new Logs("配送员送达订单增加余额失败：" + wxUser.getOpenId() + "-" + wxUser.getPhone() + "," + amount.toString()));
         }
+        try {
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception ex) {
+            LoggerUtil.logError("rabbitMQ手动确定消息失败："+SenderListener.class.getName());
+        }
+
     }
 }

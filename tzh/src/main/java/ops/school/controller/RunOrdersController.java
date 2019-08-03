@@ -10,6 +10,7 @@ import ops.school.api.entity.WxUser;
 import ops.school.api.service.RunOrdersService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
@@ -91,7 +92,10 @@ public class RunOrdersController {
 			 Map<String,Object> map = (Map<String, Object>) msg;
 			 if("SUCCESS".equals(map.get("return_code"))){
 				 String[] formIds = formid.split(",");
-				 stringRedisTemplate.boundHashOps("FORMID" + orders.getId()).put(orders.getId(), JSON.toJSONString(formIds));
+				 if (formIds.length < 1){
+					 LoggerUtil.logError("runOrder pay formid为空"+ orders.getId());
+				 }
+				 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
 			 }
 			  return new ResponseObject(true, "ok").push("msg", msg);
 		 } 
@@ -101,6 +105,8 @@ public class RunOrdersController {
 				 map.put("schoolId", orders.getSchoolId());
 				 map.put("amount", orders.getTotalPrice());
 				 schoolService.chargeUse(map);
+				 //todo 不能判断支付状态是void 这里redis存是在pay的方法里面
+
 			 }
 			 return new ResponseObject(true, orderId);
 		 }
