@@ -34,4 +34,15 @@ public interface WxUserBellService extends IService<WxUserBell> {
      * @return
      */
     Boolean useFoodCoupon(String id, BigDecimal amount);
+
+    /**
+     * @date:   2019/8/4 19:22
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   senderGet
+     * @param   id
+     * @Desc:   desc
+     */
+    Integer addSenderMoneyByWXId(BigDecimal senderGet, Long id);
 }

@@ -2,15 +2,18 @@ package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.entity.*;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
 import ops.school.config.RabbitMQConfig;
+import ops.school.constants.NumConstants;
 import ops.school.message.dto.SchoolAddMoneyDTO;
 import ops.school.message.dto.SenderAddMoneyDTO;
 import ops.school.message.dto.WxUserAddSourceDTO;
@@ -244,6 +247,7 @@ public class TSenderServiceImpl implements TSenderService {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void endRun(String orderId) {
         if (runOrdersService.end(orderId) == 1) {
@@ -265,18 +269,30 @@ public class TSenderServiceImpl implements TSenderService {
              * 负责人所得
              */
             BigDecimal schoolGet = orders.getTotalPrice().subtract(senderGet).subtract(appGetTotal);
+            School schoolAddGet = new School();
+            schoolAddGet.setSenderMoney(school.getSenderMoney().add(senderGet));
+            schoolAddGet.setMoney(school.getMoney().add(schoolGet));
+            QueryWrapper<School> wrapper = new QueryWrapper<>();
+            wrapper.eq("Id",school.getId());
+            boolean addSchoolTrue = schoolService.update(schoolAddGet,wrapper);
+            if (!addSchoolTrue){
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.RUN_ORDERS_COMPLETE_HAD_ERROR);
+            }
+            //删除学校缓存
+            stringRedisTemplate.delete("SCHOOL_ID_"+school.getId().toString());
             /**
              * 将配送员所得存进redis缓存
              */
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SENDER_BELL,
-                    new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
-            );
+
+//            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SENDER_BELL,
+//                    new SenderAddMoneyDTO(sender.getOpenId(), senderGet).toJsonString()
+//            );
             /**
              * 将负责人所得存进redis缓存
              */
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SCHOOL_BELL,
-                    new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGet, senderGet).toJsonString()
-            );
+//            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_SCHOOL_BELL,
+//                    new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGet, senderGet).toJsonString()
+//            );
             // senderAddMoney(orders.getTotalPrice(),orders.getSenderId());
             // 增加积分
             // addsource(orders.getOpenId(), orders.getTotalPrice().intValue());
@@ -284,7 +300,19 @@ public class TSenderServiceImpl implements TSenderService {
                     new WxUserAddSourceDTO(orders.getOpenId(), orders.getTotalPrice().intValue()).toJsonString()
             );
             redisUtil.runCountSuccessadd(orders.getSchoolId());
+            redisUtil.amountadd(orders.getSchoolId(),orders.getTotalPrice());
             WxUser wxUser = wxUserService.findById(orders.getOpenId());
+
+            /**
+             * 给跑腿充值余额
+             */
+            Integer addSenderNum = wxUserBellService.addSenderMoneyByWXId(senderGet,sender.getWxUser().getId());
+            if (addSenderNum != NumConstants.INT_NUM_1){
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.RUN_ORDERS_COMPLETE_HAD_ERROR);
+            }
+            //删除用户缓存
+            stringRedisTemplate.boundHashOps("WX_USER_LIST").delete(sender.getWxUser().getOpenId());
+            stringRedisTemplate.boundHashOps("SENDER_LIST").delete(sender.getId().toString());
             // 从Redis里面获取
             List<String> formIds = new ArrayList<>();
             try {

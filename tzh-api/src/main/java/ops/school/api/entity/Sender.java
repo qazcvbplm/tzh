@@ -1,6 +1,7 @@
 package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import javax.validation.constraints.NotBlank;
@@ -32,6 +33,9 @@ public class Sender extends Base {
     private String shopIds;
 
     private String floorIds;
+
+    @TableField(exist = false)
+    private WxUser wxUser;
 
 
     public Integer getSchoolId() {
@@ -128,5 +132,13 @@ public class Sender extends Base {
 
     public void setFloorIds(String floorIds) {
         this.floorIds = floorIds == null ? null : floorIds.trim();
+    }
+
+    public WxUser getWxUser() {
+        return wxUser;
+    }
+
+    public void setWxUser(WxUser wxUser) {
+        this.wxUser = wxUser;
     }
 }

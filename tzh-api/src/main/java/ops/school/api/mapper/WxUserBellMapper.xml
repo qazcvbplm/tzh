@@ -56,6 +56,13 @@
         </if>
     </sql>
 
+    <!--CreatBy Fang Time:2019/8/4 21:40 |  -->
+    <update id="addSenderMoneyByWXId">
+        UPDATE wx_user_bell
+        SET money = money + #{senderGet}
+        WHERE wx_user_id = #{wxUserId}
+    </update>
+
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     *

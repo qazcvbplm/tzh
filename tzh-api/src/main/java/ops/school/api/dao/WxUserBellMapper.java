@@ -38,4 +38,14 @@ public interface WxUserBellMapper extends BaseMapper<WxUserBell> {
 
     int txUpdate(Map<String,Object> map);
 
+    /**
+     * @date:   2019/8/4 21:38
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   senderGet
+     * @param   wxUserId
+     * @Desc:   desc
+     */
+    Integer addSenderMoneyByWXId(@Param("senderGet") BigDecimal senderGet, @Param("wxUserId") Long wxUserId);
 }

@@ -1,9 +1,13 @@
 package ops.school.api.serviceimple;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ops.school.api.dao.SenderMapper;
+import ops.school.api.dao.WxUserMapper;
 import ops.school.api.entity.Sender;
+import ops.school.api.entity.WxUser;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.SenderService;
 import ops.school.api.util.RedisUtil;
@@ -24,6 +28,9 @@ public class SenderServiceImple extends ServiceImpl<SenderMapper, Sender> implem
     @Autowired
     private RedisUtil cache;
 
+    @Autowired
+    private WxUserMapper wxUserMapper;
+
     @Override
     public Sender findById(Integer id) {
         if (SpringUtil.redisCache()) {
@@ -32,11 +39,24 @@ public class SenderServiceImple extends ServiceImpl<SenderMapper, Sender> implem
                 return JSON.parseObject(rs.toString(), Sender.class);
             } else {
                 Sender sender = senderMapper.selectByPrimaryKey(id);
+                QueryWrapper<WxUser> wrapper = new QueryWrapper<>();
+                if (sender != null && sender.getOpenId() != null){
+                    wrapper.eq("open_id",sender.getOpenId());
+                    WxUser wxUser = wxUserMapper.selectOne(wrapper);
+                    sender.setWxUser(wxUser);
+                }
                 stringRedisTemplate.boundHashOps("SENDER_LIST").put(id.toString(), JSON.toJSONString(sender));
                 return sender;
             }
         }
-        return senderMapper.selectByPrimaryKey(id);
+        Sender sender = senderMapper.selectByPrimaryKey(id);
+        QueryWrapper<WxUser> wrapper = new QueryWrapper<>();
+        if (sender != null && sender.getOpenId() != null){
+            wrapper.eq("open_id",sender.getOpenId());
+            WxUser wxUser = wxUserMapper.selectOne(wrapper);
+            sender.setWxUser(wxUser);
+        }
+        return sender;
     }
 
     @Override
