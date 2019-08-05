@@ -46,7 +46,8 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------5-订单错误-----------*/
     ORDER_DONT_HAVE_PRODUCT("1250001","订单中不存在商品，请点单后下单"),
     ORDER_SAVE_ERROR("1250002","订单下单失败，请稍后重新下单"),
-    ORDER_PARAM_ERROR("1250002","订单信息错误，请稍后重新下单或者请联系后台管理"),
+    ORDER_PARAM_ERROR("1250003","订单信息错误，请稍后重新下单或者请联系后台管理"),
+    ORDER_COMPLETE_SOURCE_ERROR("1250004","订单完结增加积分错误，请稍后重试或者请联系后台管理"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),
@@ -65,6 +66,13 @@ public enum ResponseViewEnums implements RootEnums{
 
     /**----------11-跑腿订单完成表信息错误-----------*/
     RUN_ORDERS_COMPLETE_HAD_ERROR("1211001","跑腿订单完成失败，请联系后台管理"),
+    RUN_ORDERS_WX_USER_ERROR("1211002","跑腿订单下单用户信息错误，请重试或者删除微信小程序重新进入"),
+
+    /**----------12-提现信息错误-----------*/
+    TX_ERROR_USER_BELL_FAILED("1212001","用户账户提现失败，请重试或者联系后台管理"),
+    TX_ERROR_SCHOOL_BELL_FAILED("1212002","学校负责人账户失败，请重试或者联系后台管理"),
+    TX_ERROR_BACK_FAILED("1212003","提现后台失败，请重试或者联系后台管理"),
+    TX_ERROR_WX_CHARGE_FAILED("1212004","提现微信交易失败，请重试或者联系后台管理"),
     ;
 
     private String errorCode;

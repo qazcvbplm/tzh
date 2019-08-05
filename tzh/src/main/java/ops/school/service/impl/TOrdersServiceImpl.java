@@ -1050,9 +1050,9 @@ public class TOrdersServiceImpl implements TOrdersService {
 //                new SchoolAddMoneyDTO(orders.getSchoolId(), schoolGetTotal, senderGetTotal).toJsonString()
 //        );
         // 增加积分
-        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL,
-                new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
-        );
+//        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL,
+//                new WxUserAddSourceDTO(orders.getOpenId(), orders.getPayPrice().intValue()).toJsonString()
+//        );
         stringRedisTemplate.boundListOps("JR").rightPush(JSON.toJSONString(orders));
         /**
          * 将配送员所得金额添加到配送员账户内
@@ -1066,6 +1066,13 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (wxUserBellMapper.txUpdate(map) == 0){
             logger.error("配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
             System.out.println("配送员所得金额添加失败，请联系负责人");
+        }
+        //增加用户积分
+        //积分不保存小数位，向下取整
+        Integer addSource = orders.getPayPrice().setScale( 0, BigDecimal.ROUND_DOWN ).intValue();
+        Integer addUserSourceNum = wxUserBellMapper.addSourceByWxId(addSource,wxUser.getId());
+        if (addUserSourceNum != NumConstants.INT_NUM_1){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
         }
         // 将负责人所得添加到负责人可提现金额内
         school.setMoney(school.getMoney().add(senderGetTotal));

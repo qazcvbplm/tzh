@@ -11,6 +11,7 @@ import ops.school.api.service.RunOrdersService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.LoggerUtil;
+import ops.school.api.util.RedisUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;

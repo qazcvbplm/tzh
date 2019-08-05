@@ -187,7 +187,11 @@
   </update>
 
     <update id="sendertx" parameterType="map">
-   update school set sender_money=sender_money-#{amount},sender_all_tx=sender_all_tx+#{amount} where id=#{schoolId}
+   update school
+   set
+   sender_money=sender_money-#{amount},
+   sender_all_tx=sender_all_tx+#{amount}
+   where id=#{schoolId}
   </update>
 
     <update id="endOrder" parameterType="map">

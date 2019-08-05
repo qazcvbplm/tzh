@@ -3,13 +3,17 @@ package ops.school.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ReplyTextMsg;
 import ops.school.api.entity.WxUser;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.wxutil.XMLUtil;
 import ops.school.config.RabbitMQConfig;
+import ops.school.constants.NumConstants;
 import ops.school.message.dto.WxUserAddSourceDTO;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,6 +26,7 @@ import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +50,8 @@ public class ApplicationController {
     private RabbitTemplate rabbitTemplate;
 
 
-    @RequestMapping("check")
+
+	@RequestMapping("check")
 	public String version(HttpServletRequest request,HttpServletResponse response) throws IOException, SAXException{
 		Map<String, String>  map = XMLUtil.parseXML(request);
 		String ToUserName=map.get("ToUserName");//	开发者微信号
@@ -91,7 +97,14 @@ public class ApplicationController {
 					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text","绑定成功，恭喜您获得88积分奖励。奖励已发放至您的客户端小程序中，请自行前往查看！");
 					//增加积分
 					user=minUser.get(0);
-                    rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(user.getOpenId(), 88).toJsonString());
+					// rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(user.getOpenId(), 88).toJsonString());
+					//增加用户积分
+					//积分不保存小数位，向下取整
+					Integer addSource = 88;
+					Integer addUserSourceNum = wxUserBellService.addSourceByWxId(addSource,user.getId());
+					if (addUserSourceNum != NumConstants.INT_NUM_1){
+						DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
+					}
 //	        		Map<String,Object> ch=new HashMap<>();
 //	        		ch.put("phone", user.getOpenId()+"-"+user.getPhone());
 //	        	    ch.put("amount", "0.5");

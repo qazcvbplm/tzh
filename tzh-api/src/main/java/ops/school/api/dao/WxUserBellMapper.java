@@ -48,4 +48,15 @@ public interface WxUserBellMapper extends BaseMapper<WxUserBell> {
      * @Desc:   desc
      */
     Integer addSenderMoneyByWXId(@Param("senderGet") BigDecimal senderGet, @Param("wxUserId") Long wxUserId);
+
+    /**
+     * @date:   2019/8/5 17:46
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   source
+     * @param   wxUserId
+     * @Desc:   desc
+     */
+    Integer addSourceByWxId(@Param("source") Integer source, @Param("wxUserId") Long wxUserId);
 }

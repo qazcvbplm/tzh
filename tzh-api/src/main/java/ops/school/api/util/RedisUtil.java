@@ -59,6 +59,18 @@ public class RedisUtil {
         set(schoolId, temp);
     }
 
+    public void cancelRunOrdersAdd(int schoolId) {
+        SchoolIndexDto temp = init(schoolId);
+        temp.setCancelRunOrderCount(temp.getCancelRunOrderCount()+1);
+        set(schoolId, temp);
+    }
+
+    public void cancelOrdersAdd(int schoolId) {
+        SchoolIndexDto temp = init(schoolId);
+        temp.setCancelOrderCount(temp.getCancelOrderCount()+1);
+        set(schoolId, temp);
+    }
+
     public void amountadd(int schoolId, BigDecimal amount) {
         SchoolIndexDto temp = init(schoolId);
         temp.amountadd(amount);

@@ -7,9 +7,11 @@ import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
+import ops.school.api.util.RedisUtil;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.api.wxutil.WxGUtil;
+import ops.school.constants.NumConstants;
 import ops.school.service.TRunOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -41,36 +43,54 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
     @Autowired
     private RunOrdersMapper runOrdersMapper;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
     @Transactional
     @Override
     public int cancel(String id) {
-        RunOrders orders = runOrdersService.getById(id);
-        if (System.currentTimeMillis() - orders.getPayTimeLong() < 5 * 60 * 1000) {
+        RunOrders runOrders = runOrdersService.getById(id);
+        if (System.currentTimeMillis() - runOrders.getPayTimeLong() < 5 * 60 * 1000) {
             return 2;
         }
         if (runOrdersService.cancel(id) == 1) {
-            if (orders.getPayment().equals("微信支付")) {
-                School school = schoolService.findById(orders.getSchoolId());
-                String fee = AmountUtils.changeY2F(orders.getTotalPrice().toString());
+            if (runOrders.getPayment().equals("微信支付")) {
+                School school = schoolService.findById(runOrders.getSchoolId());
+                String fee = AmountUtils.changeY2F(runOrders.getTotalPrice().toString());
                 int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(), school.getWxPayId(), school.getCertPath(),
-                        orders.getId(), fee, fee);
+                        runOrders.getId(), fee, fee);
                 if (result != 1) {
                     throw new YWException("退款失败联系管理员");
                 } else {
+                    //取消跑腿订单计入缓存
+                    redisUtil.cancelRunOrdersAdd(runOrders.getSchoolId());
                     return 1;
                 }
             }
-            if (orders.getPayment().equals("余额支付")) {
+            if (runOrders.getPayment().equals("余额支付")) {
                 Map<String, Object> map = new HashMap<>();
-                WxUser user = wxUserService.findById(orders.getOpenId());
+                WxUser user = wxUserService.findById(runOrders.getOpenId());
                 map.put("phone", user.getOpenId() + "-" + user.getPhone());
-                map.put("amount", orders.getTotalPrice());
+                map.put("amount", runOrders.getTotalPrice());
                 if (wxUserBellService.charge(map) == 1) {
+                    //取消后把钱加会学校表，余额剩余,钱包剩余,user_bell_all
+                    School schoolCancel = new School();
+                    schoolCancel.setId(runOrders.getSchoolId());
+                    schoolCancel.setUserCharge(BigDecimal.valueOf(0));
+                    schoolCancel.setUserBellAll(runOrders.getTotalPrice());
+                    schoolCancel.setUserChargeSend(BigDecimal.valueOf(0));
+                    Integer cancelAddSchool = schoolService.rechargeScChargeSendBellByModel(schoolCancel);
+                    if (cancelAddSchool != NumConstants.INT_NUM_1){
+                        LoggerUtil.logError("跑腿订单取消退还学校余额错误-runOrdersId"+runOrders.getId());
+                    }
+                    //取消跑腿订单计入缓存
+                    redisUtil.cancelRunOrdersAdd(runOrders.getSchoolId());
                     return 1;
                 } else {
                     throw new YWException("退款失败联系管理员");
                 }
             }
+
         }
         return 0;
     }

@@ -20,6 +20,10 @@ public class SchoolIndexDto implements Serializable {
 
     private BigDecimal amount;
 
+    private int cancelRunOrderCount;
+
+    private int cancelOrderCount;
+
 
     public SchoolIndexDto() {
         super();
@@ -29,6 +33,8 @@ public class SchoolIndexDto implements Serializable {
         this.runcount = 0;
         this.takeoutCountSuccess = 0;
         this.runcountSuccess = 0;
+        this.cancelOrderCount = 0;
+        this.cancelRunOrderCount = 0;
         this.amount = new BigDecimal(0);
     }
 
@@ -78,6 +84,22 @@ public class SchoolIndexDto implements Serializable {
 
     public void setRuncountSuccess(int runcountSuccess) {
         this.runcountSuccess = runcountSuccess;
+    }
+
+    public int getCancelRunOrderCount() {
+        return cancelRunOrderCount;
+    }
+
+    public void setCancelRunOrderCount(int cancelRunOrderCount) {
+        this.cancelRunOrderCount = cancelRunOrderCount;
+    }
+
+    public int getCancelOrderCount() {
+        return cancelOrderCount;
+    }
+
+    public void setCancelOrderCount(int cancelOrderCount) {
+        this.cancelOrderCount = cancelOrderCount;
     }
 
     public BigDecimal getAmount() {

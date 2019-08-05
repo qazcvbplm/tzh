@@ -109,9 +109,12 @@ public class TWxUserServiceImpl implements TWxUserService {
                 // Formats a Date into a date/time string.
                 String dateTime = df.format(new Date());
                 log.setCreateTime(dateTime);
-                log.setWxTradeNo(Integer.valueOf(orderId));
+                log.setWxTradeNo(orderId);
                 // 添加进充值记录
-                chargeLogService.save(log);
+                boolean chargeLogTrue = chargeLogService.save(log);
+                if (!chargeLogTrue){
+                    LoggerUtil.logError("微信充值错误-chargeLog日志失败-orderId"+orderId+"-openId"+openId+"attach"+attach);
+                }
             }catch (Exception ex){
                 LoggerUtil.logError("微信充值回调错误-orderId"+orderId+"-openId"+openId+"attach"+attach+ex);
             }

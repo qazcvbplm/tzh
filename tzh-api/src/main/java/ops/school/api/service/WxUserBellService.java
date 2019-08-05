@@ -45,4 +45,26 @@ public interface WxUserBellService extends IService<WxUserBell> {
      * @Desc:   desc
      */
     Integer addSenderMoneyByWXId(BigDecimal senderGet, Long id);
+
+    /**
+     * @date:   2019/8/5 18:02
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   addSource
+     * @param   id
+     * @Desc:   desc
+     */
+    Integer addSourceByWxId(Integer addSource, Long id);
+
+    /**
+     * @date:   2019/8/5 18:06
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   addSource
+     * @param   userId
+     * @Desc:   desc
+     */
+    Integer addSourceByOpenId(Integer addSource, String userId);
 }

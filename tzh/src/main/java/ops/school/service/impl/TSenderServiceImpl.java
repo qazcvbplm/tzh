@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.SenderTj;
 import ops.school.api.entity.*;
 import ops.school.api.enums.ResponseViewEnums;
@@ -58,6 +59,9 @@ public class TSenderServiceImpl implements TSenderService {
 
     @Autowired
     private TOrdersService tOrdersService;
+
+    @Autowired
+    private WxUserBellMapper wxUserBellMapper;
 
 
     @Override
@@ -255,6 +259,9 @@ public class TSenderServiceImpl implements TSenderService {
             Sender sender = senderService.findById(orders.getSenderId());
             // 对配送员信息进行校验
             Assertions.notNull(sender, ResponseViewEnums.SCHOOL_HAD_CHANGE);
+            WxUser wxUser = wxUserService.findById(orders.getOpenId());
+            //下单用户校验
+            Assertions.notNull(wxUser,ResponseViewEnums.RUN_ORDERS_WX_USER_ERROR);
             School school = schoolService.findById(sender.getSchoolId());
             // 对学校信息进行校验
             Assertions.notNull(school, ResponseViewEnums.SCHOOL_HAD_CHANGE);
@@ -296,13 +303,18 @@ public class TSenderServiceImpl implements TSenderService {
             // senderAddMoney(orders.getTotalPrice(),orders.getSenderId());
             // 增加积分
             // addsource(orders.getOpenId(), orders.getTotalPrice().intValue());
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL,
-                    new WxUserAddSourceDTO(orders.getOpenId(), orders.getTotalPrice().intValue()).toJsonString()
-            );
+//            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL,
+////                    new WxUserAddSourceDTO(orders.getOpenId(), orders.getTotalPrice().intValue()).toJsonString()
+////            );
+            //增加用户积分
+            //积分不保存小数位，向下取整
+            Integer addSource = orders.getTotalPrice().setScale( 0, BigDecimal.ROUND_DOWN ).intValue();
+            Integer addUserSourceNum = wxUserBellMapper.addSourceByWxId(addSource,wxUser.getId());
+            if (addUserSourceNum != NumConstants.INT_NUM_1){
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
+            }
             redisUtil.runCountSuccessadd(orders.getSchoolId());
             redisUtil.amountadd(orders.getSchoolId(),orders.getTotalPrice());
-            WxUser wxUser = wxUserService.findById(orders.getOpenId());
-
             /**
              * 给跑腿充值余额
              */

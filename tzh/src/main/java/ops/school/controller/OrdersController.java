@@ -11,10 +11,7 @@ import ops.school.api.entity.WxUser;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.*;
-import ops.school.api.util.LoggerUtil;
-import ops.school.api.util.ResponseObject;
-import ops.school.api.util.SpringUtil;
-import ops.school.api.util.Util;
+import ops.school.api.util.*;
 import ops.school.api.wxutil.WXpayUtil;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +45,9 @@ public class OrdersController {
     @Autowired
     private OrderProductService orderProductService;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
@@ -74,17 +74,6 @@ public class OrdersController {
                                String orderId, String payment, String formid) {
         Orders orders = ordersService.findById(orderId);
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
-       /* QueryWrapper<OrderProduct> query = new QueryWrapper<>();
-        query.lambda().eq(OrderProduct::getOrderId, orders.getId());
-        List<OrderProduct> list = orderProductService.list(query);
-        List<OrderProduct> ops = orders.getOp();
-        List<Integer> pids = new ArrayList<>();
-        List<Integer> counts = new ArrayList<>();
-        for (OrderProduct temp : ops) {
-            pids.add(temp.getProductId());
-            counts.add(temp.getProductCount());
-        }
-        productService.sale(pids, counts);*/
         if (payment.equals("微信支付")) {
             School school = schoolService.findById(orders.getSchoolId());
             Object msg = WXpayUtil.payrequest(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
@@ -92,12 +81,6 @@ public class OrdersController {
                     request.getRemoteAddr(), "", OrdersNotify.URL + "notify/takeout");
             HashMap<String, String> map = (HashMap<String, String>) msg;
             if (map.get("return_code").equals("SUCCESS")) {
-//				  Message message = new Message(wxUser.getOpenId(), "AFavOESyzBju1s8Wjete1SNVUvJr-YixgR67v6yMxpg"
-//						  , formid, "pages/mine/payment/payment", " 微信支付成功！", orders.getWaterNumber()+"", orders.getId(),
-//						  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), list.get(0).getProductName(),
-//						  "如有疑问请在小程序内联系客服人员！", null, null,
-//						  null, null, null);
-//				  WxGUtil.snedM(message.toJson());
                 String[] formIds = formid.split(",");
                 if (formIds.length < 1){
                     LoggerUtil.logError("order pay formid为空"+ orders.getId());
@@ -136,6 +119,8 @@ public class OrdersController {
             if (status.equals("商家已接手")) {
                 stringRedisTemplate.boundHashOps("SHOP_YJS").delete(id);
             }
+            //取消订单计入缓存
+            redisUtil.cancelRunOrdersAdd(orders.getSchoolId());
             return new ResponseObject(true, "取消订单成功");
         } else {
             return new ResponseObject(false, "请重试");

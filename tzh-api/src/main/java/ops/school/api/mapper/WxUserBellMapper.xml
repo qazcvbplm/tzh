@@ -56,6 +56,13 @@
         </if>
     </sql>
 
+    <!--CreatBy Fang Time:2019/8/5 17:47 |  -->
+    <update id="addSourceByWxId">
+        UPDATE wx_user_bell
+        SET source = source + #{source}
+        WHERE wx_user_id = #{wxUserId}
+    </update>
+
     <!--CreatBy Fang Time:2019/8/4 21:40 |  -->
     <update id="addSenderMoneyByWXId">
         UPDATE wx_user_bell

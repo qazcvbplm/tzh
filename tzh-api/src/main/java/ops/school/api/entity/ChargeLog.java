@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class ChargeLog {
     @TableId(type = IdType.AUTO)
@@ -19,8 +20,10 @@ public class ChargeLog {
 
     private Integer appId;
 
-
-    private Integer wxTradeNo;
+    /**
+     * 微信订单号27位太长了
+     */
+    private String wxTradeNo;
 
 
     public Integer getAppId() {
@@ -84,11 +87,12 @@ public class ChargeLog {
         this.createTime = createTime == null ? null : createTime.trim();
     }
 
-    public Integer getWxTradeNo() {
+
+    public String getWxTradeNo() {
         return wxTradeNo;
     }
 
-    public void setWxTradeNo(Integer wxTradeNo) {
+    public void setWxTradeNo(String wxTradeNo) {
         this.wxTradeNo = wxTradeNo;
     }
 }

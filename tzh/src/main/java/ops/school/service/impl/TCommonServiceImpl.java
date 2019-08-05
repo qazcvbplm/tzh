@@ -3,10 +3,13 @@ package ops.school.service.impl;
 import ops.school.api.dao.TxLogMapper;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.entity.*;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.wx.towallet.WeChatPayUtil;
+import ops.school.constants.NumConstants;
 import ops.school.service.TCommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,7 +90,7 @@ public class TCommonServiceImpl implements TCommonService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public int txAudit(Integer txId, Integer status) {
         // 通过txId查询提现记录表
@@ -108,28 +111,53 @@ public class TCommonServiceImpl implements TCommonService {
                 map.put("phone", sender.getOpenId() + "-" + sender.getPhone());
                 map.put("amount", amount);
                 map.put("schoolId", sender.getSchoolId());
-                int re = wxUserBellMapper.txUpdate(map);
                 // 从配送员余额中扣除提现金额
-                if (re == 1) {
-                    try {
-                        String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                        // 审核成功(提现成功)
-                        log.setIsTx(1);
-                        if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
-                                school.getCertPath(), payId, "127.0.0.1", log.getAmount(), wxUser.getOpenId(),
-                                log) == 1) {
-                            txLogService.updateById(log);
-                            if (schoolService.sendertx(map) == 0) {
-                                LoggerUtil.log("配送员提现学校减少金额失败:" + sender.getOpenId() + ":" + log.getAmount());
-                            }
-                            return 1;
-                        }
-                    } catch (Exception e) {
-                        LoggerUtil.log(sender.getOpenId() + ":" + log.getAmount() + e.getMessage());
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    }
-                    return 2;
+                int re = wxUserBellMapper.txUpdate(map);
+                if (re != NumConstants.INT_NUM_1){
+                    // 扣除失败（提现失败）
+                    LoggerUtil.log("配送员提现学校扣除失败:" + sender.getOpenId() + ":" + log.getAmount()+"-"+txId);
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_ERROR_USER_BELL_FAILED);
                 }
+                //学校减去资金，配送员可提现余额sender_money，配送员累计提现sender_all_tx
+                Map senderTxSchoolChargeMap = new HashMap(map);
+                senderTxSchoolChargeMap.put("amount", log.getAmount());
+                int schoolSenderTXNum = schoolService.sendertx(senderTxSchoolChargeMap);
+                if (schoolSenderTXNum != NumConstants.INT_NUM_1){
+                    LoggerUtil.log("配送员提现学校减少金额失败:" + sender.getOpenId() + ":" + log.getAmount()+"-"+txId);
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_ERROR_SCHOOL_BELL_FAILED);
+                }
+                //修改提现状态
+                // 审核成功(提现成功)
+                log.setIsTx(1);
+                boolean updateTXLogStatusTrue = txLogService.updateById(log);
+                if (!updateTXLogStatusTrue){
+                    LoggerUtil.log("配送员提现学校修改提现状态失败:" + sender.getOpenId() + ":" + log.getAmount()+"-"+txId);
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_ERROR_BACK_FAILED);
+                }
+                //都成功 再微信打钱，回滚跑异常
+                try {
+                    String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                    int wxDoPayNum = WeChatPayUtil.transfers(
+                            school.getWxAppId(),
+                            school.getMchId(),
+                            school.getWxPayId(),
+                            school.getCertPath(),
+                            payId,
+                            "127.0.0.1",
+                            log.getAmount(),
+                            wxUser.getOpenId(),
+                            log);
+                    if (wxDoPayNum == 1) {
+                        return 1;
+                    }else {
+                        LoggerUtil.log("配送员提现学校微信打钱失败:" + sender.getOpenId() + ":" + log.getAmount()+"-"+txId);
+                        DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_ERROR_WX_CHARGE_FAILED);
+                    }
+                } catch (Exception e) {
+                    LoggerUtil.log(sender.getOpenId() + ":" + log.getAmount() + e.getMessage()+e);
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                }
+                return 1;
             } else if (status == 2) {
                 // 审核失败（提现失败）
                 log.setIsTx(2);

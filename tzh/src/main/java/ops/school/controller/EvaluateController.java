@@ -4,11 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.entity.Base;
 import ops.school.api.entity.Evaluate;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.EvaluateService;
 import ops.school.api.service.OrdersService;
 import ops.school.api.service.RunOrdersService;
+import ops.school.api.service.WxUserBellService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
 import ops.school.config.RabbitMQConfig;
@@ -40,17 +44,34 @@ public class EvaluateController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private WxUserBellService wxUserBellService;
+
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
     public ResponseObject add(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid Evaluate evaluate,@RequestParam String userId, BindingResult result) {
         Util.checkParams(result);
         if (ordersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+            //增加用户积分
+            //积分不保存小数位，向下取整
+            Integer addSource = 3;
+            Integer addUserSourceNum = wxUserBellService.addSourceByOpenId(addSource,userId);
+            if (addUserSourceNum != NumConstants.INT_NUM_1){
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
+            }
+            //rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
         }
         if (runOrdersService.pl(evaluate.getOrderid()) == 1) {
             evaluateService.save(evaluate);
-            rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
+            //增加用户积分
+            //积分不保存小数位，向下取整
+            Integer addSource = 3;
+            Integer addUserSourceNum = wxUserBellService.addSourceByOpenId(addSource,userId);
+            if (addUserSourceNum != NumConstants.INT_NUM_1){
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
+            }
+            //rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_WX_USER_BELL, new WxUserAddSourceDTO(userId, 3).toJsonString());
         }
         return new ResponseObject(true, "添加成功");
     }
