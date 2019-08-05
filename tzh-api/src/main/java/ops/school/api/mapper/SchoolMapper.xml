@@ -174,8 +174,10 @@
 
 
     <update id="charge" parameterType="map">
-   update school set user_charge=user_charge+#{charge},
-   user_charge_send=user_charge_send+#{send},user_bell_all=user_bell_all+#{charge}+#{send} where id=#{schoolId}
+   update school set
+   user_charge_send=user_charge_send+#{send},
+   user_bell_all=user_bell_all+#{charge}
+   where id=#{schoolId}
   </update>
 
     <update id="chargeUse" parameterType="map">
@@ -344,6 +346,17 @@
         user_charge_send = user_charge_send + #{userChargeSend},
         user_bell_all = user_bell_all + #{userBellAll}
         WHERE Id = #{id}
+    </update>
+
+    <!--CreatBy Fang Time:2019/8/5 18:41 |  扣除学校余额数据和粮票余额-->
+    <update id="disScUserBellAllAndUserSBellByScId">
+        UPDATE school
+        SET
+        user_bell_all = user_bell_all - #{payPrice},
+        user_charge_send = user_charge_send - #{payFoodCoupon}
+        WHERE Id = #{schoolId}
+        AND user_bell_all >= #{payPrice}
+        AND user_charge_send >=  #{payFoodCoupon}
     </update>
 
 </mapper>

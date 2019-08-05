@@ -598,11 +598,11 @@ public class TOrdersServiceImpl implements TOrdersService {
     public int pay(Orders orders,String formid) {
         Shop shop = shopService.getById(orders.getShopId());
         School school = schoolService.findById(shop.getSchoolId());
-        Application application = applicationService.getById(school.getAppId());
-        if (application.getVipTakeoutDiscountFlag() == 1) {
-            orders.setPayPrice((orders.getPayPrice().multiply(application.getVipTakeoutDiscount())).setScale(2,
-                    BigDecimal.ROUND_HALF_DOWN));
-        }
+        //取消vip
+//        Application application = applicationService.getById(school.getAppId());
+//        if (application.getVipTakeoutDiscountFlag() == 1) {
+//            orders.setPayPrice((orders.getPayPrice().multiply(application.getVipTakeoutDiscount())).setScale(2,BigDecimal.ROUND_HALF_DOWN));
+//        }
         // 余额支付，用户数据更新
         Map<String, Object> map = new HashMap<>();
         WxUser user = wxUserService.findById(orders.getOpenId());
@@ -612,10 +612,14 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (paySuccess(orders.getId(), "余额支付") == 0) {
                 throw new YWException("订单状态异常");
             }
-            WxUser wxUser = wxUserService.findById(orders.getOpenId());
             String[] formIds = formid.split(",");
             if (formIds.length < 1){
                 LoggerUtil.logError("order pay formid为空"+ orders.getId());
+            }
+            //扣除学校余额数据和粮票余额
+            Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(orders.getPayPrice(),orders.getPayFoodCoupon(),school.getId());
+            if (disSCNum != NumConstants.INT_NUM_1){
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
             }
             stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
             stringRedisTemplate.expire("FORMID" + orders.getId(), 1, TimeUnit.DAYS);
@@ -675,12 +679,9 @@ public class TOrdersServiceImpl implements TOrdersService {
                     }
                 }
                 // 当订单内粮票额度不等于0时
-                if (orders.getPayFoodCoupon().compareTo(new BigDecimal("0")) != 0) {
+                if (orders.getPayFoodCoupon().compareTo(new BigDecimal(0)) != 0) {
                     // 订单消费的粮票要退回用户粮票内
                     wxUserBellService.addFoodCoupon(user.getOpenId() + "-" + user.getPhone(), orders.getPayFoodCoupon());
-                    // 取消订单时，将粮票消费的金额退回学校剩余粮票内
-                    school.setUserChargeSend(school.getUserChargeSend().add(orders.getPayFoodCoupon()));
-                    schoolService.updateById(school);
                 }
                 // 如果订单使用优惠券 --> 退还优惠券
                 if (orders.getCouponId() != null && orders.getCouponId() != 0){
@@ -697,15 +698,16 @@ public class TOrdersServiceImpl implements TOrdersService {
                 }
                 if (!temp.equals("待付款")) {
                     if (orders.getPayment().equals("余额支付")) {
-                        // 订单消费的余额要退回用户余额内
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("phone", user.getOpenId() + "-" + user.getPhone());
-                        map.put("amount", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
                         // 取消订单时,将余额支付时的订单金额退回学校余额内
                         Map<String, Object> map1 = new HashMap<>();
                         map1.put("schoolId", user.getSchoolId());
-                        map1.put("charge", orders.getPayPrice().subtract(orders.getPayFoodCoupon()));
+                        map1.put("charge", orders.getPayPrice());
+                        map1.put("send", orders.getPayFoodCoupon());
                         schoolService.charge(map1);
+                        // 订单消费的余额要退回用户余额内
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("phone", user.getOpenId() + "-" + user.getPhone());
+                        map.put("amount", orders.getPayPrice());
                         if (wxUserBellService.charge(map) == 1) {
                             //集合大于0才会扣库存
                             if (productDisStockList.size() > 0 ){
@@ -720,9 +722,14 @@ public class TOrdersServiceImpl implements TOrdersService {
                             throw new YWException("退款失败联系管理员");
                         }
                     } else if (orders.getPayment().equals("微信支付")) {
+                        // 取消订单时,将微信支付时的粮票退回学校余额粮票内
+                        Map<String, Object> map1 = new HashMap<>();
+                        map1.put("schoolId", user.getSchoolId());
+                        map1.put("charge", NumConstants.INT_NUM_0);
+                        map1.put("send", orders.getPayFoodCoupon());
+                        schoolService.charge(map1);
                         String fee = AmountUtils.changeY2F(orders.getPayPrice().subtract(orders.getPayFoodCoupon()).toString());
-                        int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),
-                                school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
+                        int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
                         if (result != 1) {
                             throw new YWException("退款失败联系管理员");
                         } else {

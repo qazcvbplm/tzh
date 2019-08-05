@@ -64,11 +64,11 @@ public class RefundUtil {
             if (result.equals("SUCCESS")) {
                 return 1;
             } else {
-                LoggerUtil.log((String) resultMap.get("err_code_des"));
+                LoggerUtil.log("微信退款失败日志——"+(String) resultMap.get("err_code_des")+result);
             }
         } catch (Exception e) {
             //记录
-            LoggerUtil.log(e.getMessage());
+            LoggerUtil.log("微信退款失败日志——"+e.getMessage());
         }
         return 0;
     }

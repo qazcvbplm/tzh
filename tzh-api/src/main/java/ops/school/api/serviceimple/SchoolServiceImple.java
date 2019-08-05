@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -135,5 +136,22 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
         Assertions.notNull(school.getId(),school.getUserCharge(),school.getUserBellAll(),school.getUserChargeSend());
         Integer updateNum = schoolMapper.rechargeScChargeSendBellByModel(school);
         return updateNum;
+    }
+
+    /**
+     * @date:   2019/8/5 18:40
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   payPrice
+     * @param   payFoodCoupon
+     * @param   schoolId
+     * @Desc:   desc 扣除学校余额数据和粮票余额
+     */
+    @Override
+    public Integer disScUserBellAllAndUserSBellByScId(BigDecimal payPrice, BigDecimal payFoodCoupon, Integer schoolId) {
+        Assertions.notNull(payPrice,payFoodCoupon,schoolId);
+        Integer disSCNum = schoolMapper.disScUserBellAllAndUserSBellByScId(payPrice,payFoodCoupon,schoolId);
+        return disSCNum;
     }
 }

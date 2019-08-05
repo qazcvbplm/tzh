@@ -9,10 +9,13 @@ import ops.school.api.entity.Orders;
 import ops.school.api.entity.School;
 import ops.school.api.entity.WxUser;
 import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.*;
 import ops.school.api.util.*;
 import ops.school.api.wxutil.WXpayUtil;
+import ops.school.constants.NumConstants;
 import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -73,7 +76,6 @@ public class OrdersController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response,
                                String orderId, String payment, String formid) {
         Orders orders = ordersService.findById(orderId);
-        WxUser wxUser = wxUserService.findById(orders.getOpenId());
         if (payment.equals("微信支付")) {
             School school = schoolService.findById(orders.getSchoolId());
             Object msg = WXpayUtil.payrequest(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
@@ -85,18 +87,18 @@ public class OrdersController {
                 if (formIds.length < 1){
                     LoggerUtil.logError("order pay formid为空"+ orders.getId());
                 }
+                //扣除学校余额数据和粮票余额
+                Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(BigDecimal.ZERO,orders.getPayFoodCoupon(),school.getId());
+                if (disSCNum != NumConstants.INT_NUM_1){
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
+                }
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
             }
             return new ResponseObject(true, "ok").push("msg", msg);
         }
         if (payment.equals("余额支付")) {
             if (tOrdersService.pay(orders, formid) == 1) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("schoolId", orders.getSchoolId());
-                map.put("amount", orders.getPayPrice());
-                schoolService.chargeUse(map);
                 //todo 不能判断支付状态是void 在pay里面存redis
-
             }
             return new ResponseObject(true, orderId);
         }
@@ -120,7 +122,7 @@ public class OrdersController {
                 stringRedisTemplate.boundHashOps("SHOP_YJS").delete(id);
             }
             //取消订单计入缓存
-            redisUtil.cancelRunOrdersAdd(orders.getSchoolId());
+            redisUtil.cancelOrdersAdd(orders.getSchoolId());
             return new ResponseObject(true, "取消订单成功");
         } else {
             return new ResponseObject(false, "请重试");

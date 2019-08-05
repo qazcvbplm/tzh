@@ -3,6 +3,7 @@ package ops.school.api.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import ops.school.api.entity.School;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -37,4 +38,16 @@ public interface SchoolService extends IService<School> {
      * @Desc:   desc 增加user_charge，user_bell_all，user_charge_send，by id
      */
     Integer rechargeScChargeSendBellByModel(School rechargeChargeSendBell);
+
+    /**
+     * @date:   2019/8/5 18:40
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   payPrice
+     * @param   payFoodCoupon
+     * @param   id
+     * @Desc:   desc 扣除学校余额数据和粮票余额
+     */
+    Integer disScUserBellAllAndUserSBellByScId(BigDecimal payPrice, BigDecimal payFoodCoupon, Integer id);
 }

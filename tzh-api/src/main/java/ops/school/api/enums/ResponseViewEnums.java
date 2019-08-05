@@ -73,6 +73,10 @@ public enum ResponseViewEnums implements RootEnums{
     TX_ERROR_SCHOOL_BELL_FAILED("1212002","学校负责人账户失败，请重试或者联系后台管理"),
     TX_ERROR_BACK_FAILED("1212003","提现后台失败，请重试或者联系后台管理"),
     TX_ERROR_WX_CHARGE_FAILED("1212004","提现微信交易失败，请重试或者联系后台管理"),
+
+    /**----------13-提现信息错误-----------*/
+    PAY_ERROR_SCHOOL_FAILED("1213001","支付时学校数据操作有误，请重试或者联系后台管理"),
+
     ;
 
     private String errorCode;
