@@ -20,6 +20,9 @@ public class ChargeLog {
     private Integer appId;
 
 
+    private Integer wxTradeNo;
+
+
     public Integer getAppId() {
         return appId;
     }
@@ -79,5 +82,13 @@ public class ChargeLog {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime == null ? null : createTime.trim();
+    }
+
+    public Integer getWxTradeNo() {
+        return wxTradeNo;
+    }
+
+    public void setWxTradeNo(Integer wxTradeNo) {
+        this.wxTradeNo = wxTradeNo;
     }
 }

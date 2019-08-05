@@ -3,7 +3,6 @@ package ops.school.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Charge;
-import ops.school.api.service.ChargeLogService;
 import ops.school.api.service.ChargeService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
@@ -27,8 +26,6 @@ public class ChargeController {
 
     @Autowired
 	private ChargeService chargeService;
-	@Autowired
-	private ChargeLogService chargeLogService;
 	
 	@ApiOperation(value="添加",httpMethod="POST")
 	@PostMapping("add")

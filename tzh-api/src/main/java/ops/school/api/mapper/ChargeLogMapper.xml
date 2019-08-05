@@ -8,6 +8,7 @@
         <result column="open_id" jdbcType="VARCHAR" property="openId"/>
         <result column="app_id" property="appId"/>
         <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="wx_trade_no" jdbcType="BIGINT" property="wxTradeNo"/>
     </resultMap>
     <sql id="Base_Column_List">
     Id, pay, send, open_id, create_time

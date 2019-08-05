@@ -27,4 +27,14 @@ public interface SchoolService extends IService<School> {
     int tx(Map<String, Object> map);
 
     Integer endOrder(Map<String, Object> map);
+
+    /**
+     * @date:   2019/8/5 11:15
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   rechargeChargeSendBell
+     * @Desc:   desc 增加user_charge，user_bell_all，user_charge_send，by id
+     */
+    Integer rechargeScChargeSendBellByModel(School rechargeChargeSendBell);
 }

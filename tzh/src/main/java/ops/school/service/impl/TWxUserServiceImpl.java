@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,31 +88,65 @@ public class TWxUserServiceImpl implements TWxUserService {
         return null;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void chargeSuccess(String orderId, String openId, String attach) {
         WxUser wxUser = wxUserService.findById(openId);
         School school = schoolService.findById(wxUser.getSchoolId());
         Charge charge = chargeService.getById(Integer.valueOf(attach));
-        ChargeLog log = new ChargeLog(orderId, new BigDecimal(charge.getFull()), new BigDecimal(charge.getSend()), openId, wxUser.getAppId());
-        chargeLogService.save(log); // 添加进充值记录
+        //todo 修改支付流水
+        //ChargeLog log = new ChargeLog(orderId, new BigDecimal(charge.getFull()), new BigDecimal(charge.getSend()), openId, wxUser.getAppId());
+        ChargeLog log = new ChargeLog();
+        if (orderId != null){
+            try {
+                log.setOpenId(openId);
+                log.setAppId(wxUser.getAppId());
+                log.setPay(new BigDecimal(charge.getFull()));
+                log.setSend(new BigDecimal(charge.getSend()));
+                //一、获取当前系统时间和日期并格式化输出:
+                //设置日期格式
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                // Formats a Date into a date/time string.
+                String dateTime = df.format(new Date());
+                log.setCreateTime(dateTime);
+                log.setWxTradeNo(Integer.valueOf(orderId));
+                // 添加进充值记录
+                chargeLogService.save(log);
+            }catch (Exception ex){
+                LoggerUtil.logError("微信充值回调错误-orderId"+orderId+"-openId"+openId+"attach"+attach+ex);
+            }
+
+        }else {
+            LoggerUtil.logError("微信充值回调错误-orderId为null-orderId"+orderId+"-openId"+openId+"attach"+attach);
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("phone", wxUser.getOpenId() + "-" + wxUser.getPhone());
         map.put("amount", log.getPay());
-        if (wxUserBellService.charge(map) == 0) {
-            // 把赠送金额存进用户的粮票里面
-            wxUserBellService.addFoodCoupon(wxUser.getOpenId() + "-" + wxUser.getPhone(), log.getSend());
-            LoggerUtil.log("充值失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString()));
-        } else {
-            Map<String, Object> map2 = new HashMap<>();
-            map2.put("schoolId", school.getId());
-            map2.put("charge", log.getPay());
-            map2.put("send", log.getSend());
-            try {
-                schoolService.charge(map2);
-            } catch (Exception e) {
-                logsService.save(new Logs(e.getMessage()));
-            }
+        Integer addBellNum = wxUserBellService.charge(map);
+        if (addBellNum != NumConstants.INT_NUM_1){
+            LoggerUtil.log("充值余额失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString())+"orderId"+orderId+"-openId"+openId+"attach"+attach);
+        }
+        // 把赠送金额存进用户的粮票里面
+        Boolean addFoodTrue = wxUserBellService.addFoodCoupon(wxUser.getOpenId() + "-" + wxUser.getPhone(), log.getSend());
+        if (!addFoodTrue){
+            LoggerUtil.log("充值粮票失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString())+"orderId"+orderId+"-openId"+openId+"attach"+attach);
+        }
+        //学校充值
+        School rechargeChargeSendBell = new School();
+        rechargeChargeSendBell.setUserCharge(BigDecimal.valueOf(charge.getFull()));
+        rechargeChargeSendBell.setUserBellAll(BigDecimal.valueOf(charge.getFull()));
+        rechargeChargeSendBell.setUserChargeSend(BigDecimal.valueOf(charge.getSend()));
+        rechargeChargeSendBell.setId(school.getId());
+        //增加user_charge，user_bell_all，user_charge_send，by id
+        Integer rechargeChargeSendBellNum = 0;
+        try{
+            rechargeChargeSendBellNum = schoolService.rechargeScChargeSendBellByModel(rechargeChargeSendBell);
+        }catch (Exception ex){
+            LoggerUtil.log("充值后学校更新充值数据失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString())+"orderId"+orderId+"-openId"+openId+"attach"+attach+ex);
+        }
+
+        if (rechargeChargeSendBellNum != NumConstants.INT_NUM_1){
+            LoggerUtil.log("充值后学校更新充值数据失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString())+"orderId"+orderId+"-openId"+openId+"attach"+attach);
         }
     }
 

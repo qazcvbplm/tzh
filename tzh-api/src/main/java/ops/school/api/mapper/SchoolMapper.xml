@@ -332,4 +332,14 @@
         where Id = #{id,jdbcType=INTEGER}
     </update>
 
+    <!--CreatBy Fang Time:2019/8/5 11:19 |  增加user_charge，user_bell_all，user_charge_send，by id-->
+    <update id="rechargeScChargeSendBellByModel">
+        UPDATE school
+        SET
+        user_charge = user_charge + #{userCharge},
+        user_charge_send = user_charge_send + #{userChargeSend},
+        user_bell_all = user_bell_all + #{userBellAll}
+        WHERE Id = #{id}
+    </update>
+
 </mapper>

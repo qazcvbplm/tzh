@@ -57,7 +57,7 @@ public class Assertions {
             }
         }
         if (sum > 0){
-            throw new IllegalArgumentException(PublicErrorEnums.PULBIC_EMPTY_PARAM.getErrorMessage()+"{" + message + paramNames +"}");
+            throw new DisplayException(PublicErrorEnums.PULBIC_EMPTY_PARAM.getErrorMessage()+"{" + message + paramNames +"}");
         }
     }
 

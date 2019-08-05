@@ -122,5 +122,18 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
         return schoolMapper.endOrder(map);
     }
 
-
+    /**
+     * @date:   2019/8/5 11:16
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   school
+     * @Desc:   desc 增加user_charge，user_bell_all，user_charge_send，by id
+     */
+    @Override
+    public Integer rechargeScChargeSendBellByModel(School school) {
+        Assertions.notNull(school.getId(),school.getUserCharge(),school.getUserBellAll(),school.getUserChargeSend());
+        Integer updateNum = schoolMapper.rechargeScChargeSendBellByModel(school);
+        return updateNum;
+    }
 }

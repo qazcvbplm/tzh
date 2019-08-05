@@ -37,4 +37,14 @@ public interface SchoolMapper extends BaseMapper<School> {
      * @Desc:   desc 根据学校id查询单个
      */
     School findOneBySCId(School school);
+
+    /**
+     * @date:   2019/8/5 11:18
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   school
+     * @Desc:   desc 增加user_charge，user_bell_all，user_charge_send，by id
+     */
+    Integer rechargeScChargeSendBellByModel(School school);
 }
