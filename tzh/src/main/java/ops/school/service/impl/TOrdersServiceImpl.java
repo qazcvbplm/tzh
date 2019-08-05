@@ -727,6 +727,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                         map1.put("schoolId", user.getSchoolId());
                         map1.put("charge", NumConstants.INT_NUM_0);
                         map1.put("send", orders.getPayFoodCoupon());
+                        //todo 这个方法可能使退款失败
                         schoolService.charge(map1);
                         String fee = AmountUtils.changeY2F(orders.getPayPrice().subtract(orders.getPayFoodCoupon()).toString());
                         int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
