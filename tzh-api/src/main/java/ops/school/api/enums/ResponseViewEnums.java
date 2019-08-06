@@ -39,9 +39,10 @@ public enum ResponseViewEnums implements RootEnums{
 
     /**----------4-微信用户错误-----------*/
     WX_USER_NO_EXIST("1240001","微信用户不存在，更新后操作"),
-    WX_USER_BELL_NEED_ID("1240001","微信用户，余额，粮票的操作，必须有微信用户id"),
-    WX_USER_NEED_USER_ID("1240002","微信用户需要用户id参数"),
-    WX_USER_FAILED_TO_WX("1240002","微信接口繁忙，请重试！"),
+    WX_USER_BELL_NEED_ID("1240002","微信用户，余额，粮票的操作，必须有微信用户id"),
+    WX_USER_NEED_USER_ID("1240003","微信用户需要用户id参数"),
+    WX_USER_FAILED_TO_WX("1240004","微信接口繁忙，请重试！"),
+    WX_TUI_KUAN_ERROR("1240005","微信退款失败，请稍后重试或者请联系后台管理！"),
 
     /**----------5-订单错误-----------*/
     ORDER_DONT_HAVE_PRODUCT("1250001","订单中不存在商品，请点单后下单"),

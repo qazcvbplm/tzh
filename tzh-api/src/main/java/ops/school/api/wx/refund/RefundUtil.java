@@ -19,8 +19,8 @@ public class RefundUtil {
      * @param refund_fee1  计划退款的金额（以“分”为单位）
      * @return
      */
-    public static int wechatRefund1(String appid, String appsecret, String mch_id, String partnerkey, String cert,
-                                    String out_trade_no, String total_fee1, String refund_fee1) {
+    public static int wechatRefund1(String appid, String appsecret, String mch_id, String partnerkey, String cert,String out_trade_no, String total_fee1, String refund_fee1) {
+
         String out_refund_no = out_trade_no;// 退款单号，随机生成 ，但长度应该跟文档一样（32位）(卖家信息校验不一致，请核实后再试)
         String total_fee = total_fee1;//订单的总金额,以分为单位（填错了貌似提示：同一个out_refund_no退款金额要一致）
         String refund_fee = refund_fee1;// 退款金额，以分为单位（填错了貌似提示：同一个out_refund_no退款金额要一致）
@@ -55,20 +55,20 @@ public class RefundUtil {
                 "<refund_fee>" + refund_fee + "</refund_fee>" +
                 "<op_user_id>" + op_user_id + "</op_user_id>" +
                 "</xml>";
-
         try {
             ClientCustomSSL.setPartner(mch_id);
             String refundResult = ClientCustomSSL.doRefund(cert, xml);
             Map<String, Object> resultMap = XMLUtil.doXMLParse(refundResult);
+            LoggerUtil.log("微信退款记录日志——err_code_des"+(String) resultMap.get("-err_code_des-")+resultMap.toString()+"-xml-"+xml);
             String result = (String) resultMap.get("result_code");
             if (result.equals("SUCCESS")) {
                 return 1;
             } else {
-                LoggerUtil.log("微信退款失败日志——"+(String) resultMap.get("err_code_des")+result);
+                LoggerUtil.log("微信退款失败日志-可能证书和订单金额和退款不一致——"+(String) resultMap.get("err_code_des")+result+"-参数appid-"+appid+"-参数appsecret-"+appsecret+"-参数mch_id-"+mch_id+"-参数partnerkey-"+partnerkey+"-参数cert-"+cert+"-参数out_trade_no-"+out_trade_no+"-参数total_fee1-"+total_fee1+"-参数refund_fee1-"+refund_fee1);
             }
         } catch (Exception e) {
             //记录
-            LoggerUtil.log("微信退款失败日志——"+e.getMessage());
+            LoggerUtil.log("微信退款失败日志-可能证书和订单金额和退款不一致——"+"-参数appid-"+appid+"-参数appsecret-"+appsecret+"-参数mch_id-"+mch_id+"-参数partnerkey-"+partnerkey+"-参数cert-"+cert+"-参数out_trade_no-"+out_trade_no+"-参数total_fee1-"+total_fee1+"-参数refund_fee1-"+refund_fee1+e.getMessage());
         }
         return 0;
     }

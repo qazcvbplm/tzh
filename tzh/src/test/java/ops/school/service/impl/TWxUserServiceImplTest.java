@@ -2,6 +2,7 @@ package ops.school.service.impl;
 
 import ops.school.App;
 import ops.school.service.TCommonService;
+import ops.school.service.TOrdersService;
 import ops.school.service.TWxUserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,9 @@ public class TWxUserServiceImplTest {
     @Autowired
     private TCommonService tCommonService;
 
+    @Autowired
+    private TOrdersService tOrdersService;
+
     @Test
     public void chargeSuccess() {
         String attach = "30";
@@ -41,5 +45,11 @@ public class TWxUserServiceImplTest {
         Integer txid = 4566;
         Integer status = 1;
         tCommonService.txAudit(txid,status);
+    }
+
+    @Test
+    public void cancelOrder(){
+        String orderId = "201908052041354162258080205";
+        tOrdersService.cancel(orderId);
     }
 }

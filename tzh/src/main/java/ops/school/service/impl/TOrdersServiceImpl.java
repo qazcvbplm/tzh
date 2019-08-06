@@ -727,12 +727,14 @@ public class TOrdersServiceImpl implements TOrdersService {
                         map1.put("schoolId", user.getSchoolId());
                         map1.put("charge", NumConstants.INT_NUM_0);
                         map1.put("send", orders.getPayFoodCoupon());
-                        //todo 这个方法可能使退款失败
                         schoolService.charge(map1);
-                        String fee = AmountUtils.changeY2F(orders.getPayPrice().subtract(orders.getPayFoodCoupon()).toString());
+                        String fee = AmountUtils.changeY2F(orders.getPayPrice().toString());
+                        if(orders.getPayPrice().multiply(new BigDecimal(100)).compareTo(new BigDecimal(fee)) != NumConstants.INT_NUM_0){
+                            DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_TUI_KUAN_ERROR);
+                        }
                         int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
                         if (result != 1) {
-                            throw new YWException("退款失败联系管理员");
+                            throw new YWException("微信退款失败联系管理员");
                         } else {
                             //集合大于0才会扣库存
                             if (productDisStockList.size() > 0 ){
