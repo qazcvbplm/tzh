@@ -106,7 +106,7 @@ public class TSenderServiceImpl implements TSenderService {
                 WxMessageUtil.wxSendMsg(orders,formIds.get(0));
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
-                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，formid取缓存为空"+orders.getId());
+                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
         return rs;
@@ -201,7 +201,7 @@ public class TSenderServiceImpl implements TSenderService {
                 WxMessageUtil.wxSendMsg(orders,formIds.get(0));
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
-                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，formid取缓存为空"+orders.getId());
+                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
         tOrdersService.orderSettlement(orderId);
@@ -244,7 +244,7 @@ public class TSenderServiceImpl implements TSenderService {
                 WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
-                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，formid取缓存为空"+orders.getId());
+                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
         return rs;
@@ -339,7 +339,7 @@ public class TSenderServiceImpl implements TSenderService {
                 // 删除redis缓存
                 stringRedisTemplate.delete("FORMID" + orders.getId());
             }else {
-                LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
+                LoggerUtil.logError("end run 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
     }

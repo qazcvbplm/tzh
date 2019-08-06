@@ -30,6 +30,7 @@ import ops.school.message.dto.SchoolAddMoneyDTO;
 import ops.school.message.dto.SenderAddMoneyDTO;
 import ops.school.message.dto.WxUserAddSourceDTO;
 import ops.school.service.*;
+import ops.school.util.WxMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -783,7 +784,20 @@ public class TOrdersServiceImpl implements TOrdersService {
                 if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
                     stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.HOURS);
                 }
-                rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
+                // rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
+                List<String> formIds = new ArrayList<>();
+                try {
+                    formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0,-1);
+                }catch (Exception ex){
+                    LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，formid取缓存为空"+orders.getId());
+                }
+                if (formIds.size() > 0){
+                    WxMessageUtil.wxSendMsg(orders,formIds.get(0));
+                    stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+                }else {
+                    LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，发送或者删除redis失败"+orders.getId());
+                }
+
                 return orders.getShopId();
             }
             return 0;
