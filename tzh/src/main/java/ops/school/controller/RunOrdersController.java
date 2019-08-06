@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Api(tags="跑腿订单模块")
@@ -97,6 +98,7 @@ public class RunOrdersController {
 					 LoggerUtil.logError("runOrder pay formid为空"+ orders.getId());
 				 }
 				 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
+				 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(1, TimeUnit.DAYS);
 			 }
 			  return new ResponseObject(true, "ok").push("msg", msg);
 		 } 
@@ -106,6 +108,7 @@ public class RunOrdersController {
 				 map.put("schoolId", orders.getSchoolId());
 				 map.put("amount", orders.getTotalPrice());
 				 schoolService.chargeUse(map);
+				 stringRedisTemplate.delete("SCHOOL_ID_" + orders.getId());
 				 //todo 不能判断支付状态是void 这里redis存是在pay的方法里面
 
 			 }

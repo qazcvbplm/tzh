@@ -40,7 +40,7 @@ public class Assertions {
 
     public static void notNull(Object object, String message) {
         if (object == null) {
-            throw new IllegalArgumentException(message);
+            throw new DisplayException(message);
         }
     }
 
@@ -92,7 +92,7 @@ public class Assertions {
      */
     public static void hasLength(String text, String message) {
         if (!StringUtils.hasLength(text)) {
-            throw new IllegalArgumentException(message);
+            throw new DisplayException(message);
         }
     }
 

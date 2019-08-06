@@ -10,8 +10,10 @@ import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.wx.towallet.WeChatPayUtil;
 import ops.school.constants.NumConstants;
+import ops.school.controller.RichTextController;
 import ops.school.service.TCommonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -42,6 +44,9 @@ public class TCommonServiceImpl implements TCommonService {
     private WxUserBellMapper wxUserBellMapper;
     @Autowired
     private TxLogMapper txLogMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Transactional
     @Override
@@ -126,6 +131,7 @@ public class TCommonServiceImpl implements TCommonService {
                     LoggerUtil.log("配送员提现学校减少金额失败:" + sender.getOpenId() + ":" + log.getAmount()+"-"+txId);
                     DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_ERROR_SCHOOL_BELL_FAILED);
                 }
+                stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                 //修改提现状态
                 // 审核成功(提现成功)
                 log.setIsTx(1);

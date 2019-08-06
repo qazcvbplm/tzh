@@ -106,7 +106,7 @@ public class TSenderServiceImpl implements TSenderService {
                 WxMessageUtil.wxSendMsg(orders,formIds.get(0));
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
-                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
+                LoggerUtil.logError("acceptOrder 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
         return rs;
@@ -116,10 +116,8 @@ public class TSenderServiceImpl implements TSenderService {
     @Override
     public void end(String orderId, boolean end) {
         Orders orders = ordersService.findById(orderId);
-        Sender sender = senderService.findById(orders.getSenderId());
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
         BigDecimal returnPrice = new BigDecimal("0");
-
         if (end) {
             // 已送达到楼上
             orders.setDestination(1);
@@ -147,16 +145,19 @@ public class TSenderServiceImpl implements TSenderService {
                 if (wxUserBellService.addFoodCoupon(wxUser.getOpenId() + "-" + wxUser.getPhone(), returnPrice)) {
                     // 将用户楼下返还金额添加到学校剩余粮票总额内
                     School school = schoolService.findById(orders.getSchoolId());
-                    school.setUserChargeSend(school.getUserChargeSend().add(returnPrice));
-                    schoolService.updateById(school);
+                    School updateSchool = new School();
+                    updateSchool.setId(school.getId());
+                    updateSchool.setUserChargeSend(school.getUserChargeSend().add(returnPrice));
+                    schoolService.updateById(updateSchool);
+                    stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                 }
             } else {
                 return;
             }
         }
         redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
-        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_PRODUCT_ADD, orderId);
         if (orders.getTyp().equals("外卖订单")) {
+            // 微信发送消息需要 这个状态
             orders.setStatus("配送员已接手");
             //发送模板消息
             List<OrderProduct> orderProductList =  orderProductService
@@ -172,11 +173,13 @@ public class TSenderServiceImpl implements TSenderService {
                 WxMessageUtil.wxSendMsg(orders,formIds.get(0));
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
-                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
+                LoggerUtil.logError(" 配送员end订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
-        tOrdersService.orderSettlement(orderId);
-
+        Boolean endTrue = tOrdersService.orderSettlementByOrders(orders);
+        if (!endTrue){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
+        }
     }
 
     @Override
@@ -213,7 +216,7 @@ public class TSenderServiceImpl implements TSenderService {
                 WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
-                LoggerUtil.logError("findorderbyrundjs 配送员接手订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
+                LoggerUtil.logError("acceptOrderRun 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
         return rs;

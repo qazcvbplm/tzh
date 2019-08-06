@@ -111,6 +111,9 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Autowired
     private SchoolMapper schoolMapper;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
     @Transactional
     @Override
     public void addTakeout(Integer[] productIds, Integer[] attributeIndex, Integer[] counts, @Valid Orders orders) {
@@ -622,6 +625,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (disSCNum != NumConstants.INT_NUM_1){
                 DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
             }
+            stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
             stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
             stringRedisTemplate.expire("FORMID" + orders.getId(), 1, TimeUnit.DAYS);
             return 1;
@@ -705,6 +709,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                         map1.put("charge", orders.getPayPrice());
                         map1.put("send", orders.getPayFoodCoupon());
                         schoolService.charge(map1);
+                        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                         // 订单消费的余额要退回用户余额内
                         Map<String, Object> map = new HashMap<>();
                         map.put("phone", user.getOpenId() + "-" + user.getPhone());
@@ -729,6 +734,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                         map1.put("charge", NumConstants.INT_NUM_0);
                         map1.put("send", orders.getPayFoodCoupon());
                         schoolService.charge(map1);
+                        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                         String fee = AmountUtils.changeY2F(orders.getPayPrice().toString());
                         if(orders.getPayPrice().multiply(new BigDecimal(100)).compareTo(new BigDecimal(fee)) != NumConstants.INT_NUM_0){
                             DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_TUI_KUAN_ERROR);
@@ -792,6 +798,12 @@ public class TOrdersServiceImpl implements TOrdersService {
                     LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，formid取缓存为空"+orders.getId());
                 }
                 if (formIds.size() > 0){
+                    // 查询订单商品表信息
+                    QueryWrapper<OrderProduct> productWrapper = new QueryWrapper<>();
+                    productWrapper.lambda().eq(OrderProduct::getOrderId,orderId);
+                    List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
+                    orders.setOp(orderProducts);
+                    orders.setStatus("待接手");
                     WxMessageUtil.wxSendMsg(orders,formIds.get(0));
                     stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
                 }else {
@@ -890,28 +902,53 @@ public class TOrdersServiceImpl implements TOrdersService {
         return result;
     }
 
-    @Transactional
+
     @Override
     public int orderSettlement(String orderId) {
-        QueryWrapper<OrdersComplete> query = new QueryWrapper<>();
-        query.lambda().eq(OrdersComplete::getOrderId,orderId);
-        // 查询订单完成表信息是否存在，存在则不可以结算
-        OrdersComplete orderComplete1 = orderCompleteService.getOne(query);
-        if (orderComplete1 != null){
-            Assertions.notNull(orderComplete1,ResponseViewEnums.ORDERSCOMPLETE_HAD_ERROR);
-        }
+        Assertions.hasLength(orderId);
         // 订单信息
         Orders orders = ordersService.findById(orderId);
+        Assertions.notNull(orders);
         if (!"已完成".equals(orders.getStatus())){
             LoggerUtil.logError("消息队列MQ完成订单异常，订单不是已完成状态：订单id-"+orderId);
             return -1;
         }
+        Boolean endTrue = this.orderSettlementByOrders(orders);
+        if (!endTrue){
+            return -1;
+        }
+        return 1;
+    }
+
+    /**
+     * @date:   2019/8/6 15:40
+     * @author: QinDaoFang
+     * @version:version
+     * @return: int
+     * @param   orderComplete1
+     * @Desc:   desc 二次修改 传orders结算少一个查库
+     */
+    @Transactional
+    @Override
+    public Boolean orderSettlementByOrders(Orders orders) {
+        QueryWrapper<OrdersComplete> query = new QueryWrapper<>();
+        query.lambda().eq(OrdersComplete::getOrderId,orders.getId());
+        // 查询订单完成表信息是否存在，存在则不可以结算
+        OrdersComplete orderComplete1 = orderCompleteService.getOne(query);
+        if (orderComplete1 != null){
+            Assertions.notNull(orderComplete1,ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
+        }
+
         // 对订单进行校验
         Assertions.notNull(orders,ResponseViewEnums.ORDER_PARAM_ERROR);
         // 配送员
         Sender sender = senderService.findById(orders.getSenderId());
+        WxUser senderUser = wxUserService.findById(sender.getOpenId());
         // 对配送员信息进行校验
         Assertions.notNull(sender, ResponseViewEnums.SCHOOL_HAD_CHANGE);
+        Assertions.notNull(senderUser, ResponseViewEnums.SCHOOL_HAD_CHANGE);
+        WxUser orderUser = wxUserService.findById(orders.getOpenId());
+        Assertions.notNull(orderUser);
         // 店铺
         Shop shop = shopService.getById(orders.getShopId());
         // 对店铺信息进行校验
@@ -1027,7 +1064,7 @@ public class TOrdersServiceImpl implements TOrdersService {
          * 负责人抽取店铺金额
          */
         schoolGetshop = schoolGetshop.add(tempPrice.multiply(shop.getRate()));
-        ordersComplete.setSchoolGetShop(schoolGetshop);
+         ordersComplete.setSchoolGetShop(schoolGetshop);
         /**
          * 负责人承担比例金额
          */
@@ -1058,7 +1095,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
         ordersComplete.setSchoolGetTotal(schoolGetTotal);
         // 订单Id
-        ordersComplete.setOrderId(orderId);
+        ordersComplete.setOrderId(orders.getId());
         orderCompleteService.save(ordersComplete);
         senderGetTotal = ordersComplete.getSenderGetTotal();
         /**
@@ -1081,8 +1118,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         /**
          * 将配送员所得金额添加到配送员账户内
          */
-        WxUser wxUser = wxUserService.findById(sender.getOpenId());
-        WxUserBell wxUserBell = wxUserBellService.getById(wxUser.getOpenId()+"-"+wxUser.getPhone());
+
+        WxUserBell wxUserBell = wxUserBellService.getById(senderUser.getOpenId()+"-"+senderUser.getPhone());
         wxUserBell.setMoney(wxUserBell.getMoney().add(ordersComplete.getSenderGetTotal()));
         Map<String,Object> map = new HashMap<>();
         map.put("amount",wxUserBell.getMoney());
@@ -1094,14 +1131,17 @@ public class TOrdersServiceImpl implements TOrdersService {
         //增加用户积分
         //积分不保存小数位，向下取整
         Integer addSource = orders.getPayPrice().setScale( 0, BigDecimal.ROUND_DOWN ).intValue();
-        Integer addUserSourceNum = wxUserBellMapper.addSourceByWxId(addSource,wxUser.getId());
+        Integer addUserSourceNum = wxUserBellMapper.addSourceByWxId(addSource,orderUser.getId());
         if (addUserSourceNum != NumConstants.INT_NUM_1){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
         }
         // 将负责人所得添加到负责人可提现金额内
-        school.setMoney(school.getMoney().add(senderGetTotal));
-        school.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
-        boolean updateSchooleTrue = schoolMapper.updateById(school) != 1 ? false : true;
+        School updateSchool = new School();
+        updateSchool.setId(school.getId());
+        updateSchool.setMoney(school.getMoney().add(ordersComplete.getShopGetTotal().add(ordersComplete.getSchoolGetTotal())));
+        updateSchool.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
+        boolean updateSchooleTrue = schoolMapper.updateById(updateSchool) != 1 ? false : true;
+        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
         if (!updateSchooleTrue){
             logger.error("负责人所得金额为"+schoolGetSender+"配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
             System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
@@ -1113,7 +1153,9 @@ public class TOrdersServiceImpl implements TOrdersService {
             logger.error("店铺所得金额为"+shopGetTotal+"添加失败，请联系负责人");
             System.out.println("店铺所得金额添加失败，请联系负责人");
         }
-        return 0;
+        //加当日总交易额
+        redisUtil.amountadd(school.getId(),orders.getPayPrice());
+        return true;
     }
 
 }

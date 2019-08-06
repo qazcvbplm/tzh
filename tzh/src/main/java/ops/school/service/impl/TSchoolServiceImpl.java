@@ -8,8 +8,10 @@ import ops.school.api.service.LogsService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.TxLogService;
 import ops.school.api.wx.towallet.WeChatPayUtil;
+import ops.school.controller.RichTextController;
 import ops.school.service.TSchoolService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -30,6 +32,9 @@ public class TSchoolServiceImpl implements TSchoolService {
     @Autowired
     private LogsService logsService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @Transactional
     @Override
     public String tx(int schoolId, BigDecimal amount, String openId) {
@@ -44,6 +49,7 @@ public class TSchoolServiceImpl implements TSchoolService {
                 if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(),
                         school.getWxPayId(), school.getCertPath(), payId, "127.0.0.1", amount, openId, log) == 1) {
                     txLogService.save(log);
+                    stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                     return "提现成功";
                 }
             } catch (Exception e) {

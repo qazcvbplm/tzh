@@ -135,6 +135,7 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
     public Integer rechargeScChargeSendBellByModel(School school) {
         Assertions.notNull(school.getId(),school.getUserCharge(),school.getUserBellAll(),school.getUserChargeSend());
         Integer updateNum = schoolMapper.rechargeScChargeSendBellByModel(school);
+        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
         return updateNum;
     }
 
@@ -152,6 +153,7 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
     public Integer disScUserBellAllAndUserSBellByScId(BigDecimal payPrice, BigDecimal payFoodCoupon, Integer schoolId) {
         Assertions.notNull(payPrice,payFoodCoupon,schoolId);
         Integer disSCNum = schoolMapper.disScUserBellAllAndUserSBellByScId(payPrice,payFoodCoupon,schoolId);
+        stringRedisTemplate.delete("SCHOOL_ID_" + schoolId);
         return disSCNum;
     }
 }

@@ -75,6 +75,7 @@ public class SchoolController {
             school.setLoginPassWord(Util.EnCode(school.getLoginPassWord()));
         }
         int i = schoolService.update(school);
+        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
         return new ResponseObject(true, "更新" + i + "条记录");
     }
 

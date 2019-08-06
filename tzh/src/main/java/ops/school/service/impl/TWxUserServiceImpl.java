@@ -10,9 +10,11 @@ import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXpayUtil;
 import ops.school.constants.NumConstants;
+import ops.school.controller.RichTextController;
 import ops.school.service.TWxUserService;
 import ops.school.util.Base64Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,9 @@ public class TWxUserServiceImpl implements TWxUserService {
     private LogsService logsService;
     @Autowired
     private WxUserBellMapper wxUserBellMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public int addSource(String openId, Integer source) {
@@ -151,6 +156,7 @@ public class TWxUserServiceImpl implements TWxUserService {
         if (rechargeChargeSendBellNum != NumConstants.INT_NUM_1){
             LoggerUtil.log("充值后学校更新充值数据失败：" + wxUser.getPhone() + "" + (log.getPay().add(log.getSend()).toString())+"orderId"+orderId+"-openId"+openId+"attach"+attach);
         }
+        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
     }
 
     @Override

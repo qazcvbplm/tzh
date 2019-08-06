@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Api(tags = "订单模块")
@@ -92,7 +93,9 @@ public class OrdersController {
                 if (disSCNum != NumConstants.INT_NUM_1){
                     DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
                 }
+                stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(1, TimeUnit.DAYS);
             }
             return new ResponseObject(true, "ok").push("msg", msg);
         }

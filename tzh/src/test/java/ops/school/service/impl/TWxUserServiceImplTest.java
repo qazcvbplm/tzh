@@ -52,4 +52,10 @@ public class TWxUserServiceImplTest {
         String orderId = "201908052041354162258080205";
         tOrdersService.cancel(orderId);
     }
+
+    @Test
+    public void testOrderComplete(){
+        String orderId = "201908061718417597677171055";
+        tOrdersService.orderSettlement(orderId);
+    }
 }

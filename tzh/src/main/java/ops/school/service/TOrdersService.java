@@ -46,4 +46,14 @@ public interface TOrdersService {
 
     @Transactional
     int orderSettlement(String orderId);
+
+    /**
+     * @date:   2019/8/6 15:39
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   orders
+     * @Desc:   desc 传orders结算少一个查库
+     */
+    Boolean orderSettlementByOrders(Orders orders);
 }
