@@ -236,8 +236,8 @@ public class WxUserController {
         // 对手机号码进行解密，并存进数据库
         int rs = tWxUserService.decryptPhone(decryptData, sessionKey, ivData, openid);
         if (rs == 0) {
-            return new ResponseObject(false, "手机号解密失败");
+            return new ResponseObject(false, "网络错误，请重试");
         }
-        return new ResponseObject(true, "手机号解密成功");
+        return new ResponseObject(true, "手机号绑定成功");
     }
 }
