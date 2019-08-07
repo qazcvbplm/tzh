@@ -170,6 +170,9 @@
         where id = #{id}
     </update>
 
+
+
+
     <!--根据店铺查询用户所有可用的优惠券-->
     <!--<select id="findUserCoupon" resultMap="BaseResultMap">-->
         <!--select <include refid="Rel_Column_List"/>-->
@@ -245,4 +248,30 @@
         AND wx_user_coupon.is_invalid = 0
         ORDER BY wx_user_coupon.failure_time DESC
     </select>
+
+    <!--CreatBy Fang Time:2019/8/7 14:22 |  -->
+    <select id="countInvalidUserCoupon" resultType="java.lang.Integer">
+        select COUNT(1)
+        from <include refid="Table_Name"/>
+        where is_invalid = 0
+        and failure_time <![CDATA[ < ]]> now()
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 14:32 |  -->
+    <select id="limitFindInvalidUserCoupon" resultType="ops.school.api.entity.WxUserCoupon">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE is_invalid = 0
+        AND failure_time <![CDATA[ < ]]> now()
+        LIMIT 0,1000
+    </select>
+
+    <update id="batchUpdateToUnInvalidByIds">
+        UPDATE <include refid="Table_Name"/>
+        SET is_invalid = 2
+        WHERE id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
 </mapper>

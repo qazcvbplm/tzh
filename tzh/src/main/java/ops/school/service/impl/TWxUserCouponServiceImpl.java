@@ -201,4 +201,49 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
         List<Shop> shopList = shopMapper.selectBatchIds(shopIds);
         return shopList;
     }
+
+    /**
+     * @date:   2019/8/7 14:21
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param
+     * @Desc:   desc
+     */
+    @Override
+    public Integer countInvalidUserCoupon() {
+        Integer countNum = wxUserCouponMapper.countInvalidUserCoupon();
+        return countNum;
+    }
+
+    /**
+     * @date:   2019/8/7 14:31
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.WxUserCoupon>
+     * @param
+     * @Desc:   desc
+     */
+    @Override
+    public List<WxUserCoupon> limitFindInvalidUserCoupon() {
+        List<WxUserCoupon> userCoupons = wxUserCouponMapper.limitFindInvalidUserCoupon();
+        return userCoupons;
+    }
+
+    /**
+     * @date:   2019/8/7 14:58
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   idList
+     * @Desc:   desc
+     */
+    @Override
+    public Integer batchUpdateToUnInvalidByIds(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)){
+            return 0;
+        }
+        Integer updateNum = wxUserCouponMapper.batchUpdateToUnInvalidByIds(idList);
+        return updateNum;
+    }
 }

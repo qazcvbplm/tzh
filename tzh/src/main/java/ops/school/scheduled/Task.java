@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -97,7 +98,6 @@ public class Task {
     /**
      * Fang -每天晚上把取消跑腿订单
      */
-    //0 0 10,14,16 * * ?   每天上午10点，下午2点，4点
     @Scheduled(cron = "0 0 0 * * ?")
     public void cancelRunOrdersTask() {
         QueryWrapper<RunOrders> wrapper = new QueryWrapper<>();
@@ -311,12 +311,24 @@ public class Task {
      */
     @Scheduled(cron = "0 0 8,10,14,16,22 * * ?")
     public void wxUserCouponInvalid() {
-
-        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findInvalidUserCoupon();
-        if (wxUserCoupons.size() != 0) {
-            for (WxUserCoupon userCoupon : wxUserCoupons) {
-                userCoupon.setIsInvalid(2);
-                tWxUserCouponService.updateIsInvalid(userCoupon);
+        Integer invalidUserCouponCount = tWxUserCouponService.countInvalidUserCoupon();
+        if (invalidUserCouponCount < NumConstants.INT_NUM_0){
+            return;
+        }
+        // 查出来的总数，每次批量更新1000条数据，循环更新完
+        int cycleNum = invalidUserCouponCount/NumConstants.INT_NUM_1000 + 1;
+        for (int i = 0;i < cycleNum;i++){
+            List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.limitFindInvalidUserCoupon();
+            if (CollectionUtils.isEmpty(wxUserCoupons)){
+                return;
+            }
+            List<Long> idList = PublicUtilS.getValueList(wxUserCoupons,"id");
+            if (CollectionUtils.isEmpty(idList)){
+                return;
+            }
+            Integer updateNum = tWxUserCouponService.batchUpdateToUnInvalidByIds(idList);
+            if (updateNum < NumConstants.INT_NUM_1){
+                LoggerUtil.logError("定时器批量更新失败-优惠券失效-ids-"+idList.toString());
             }
         }
     }

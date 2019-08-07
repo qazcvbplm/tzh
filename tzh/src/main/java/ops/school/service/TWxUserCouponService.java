@@ -70,4 +70,34 @@ public interface TWxUserCouponService {
      * @Desc:   desc 根据优惠券id查询所有优惠券是1，2的店铺
      */
     List<Shop> findALLType12ShopsByUserId(Long userId, Long couponId);
+
+    /**
+     * @date:   2019/8/7 14:21
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param
+     * @Desc:   desc
+     */
+    Integer countInvalidUserCoupon();
+
+    /**
+     * @date:   2019/8/7 14:31
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.WxUserCoupon>
+     * @param
+     * @Desc:   desc
+     */
+    List<WxUserCoupon> limitFindInvalidUserCoupon();
+
+    /**
+     * @date:   2019/8/7 14:58
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   idList
+     * @Desc:   desc
+     */
+    Integer batchUpdateToUnInvalidByIds(List<Long> idList);
 }
