@@ -117,9 +117,9 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
 
             } //for
         }
-        if (SpringUtil.redisCache()){
-            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId.toString(), JSON.toJSONString(resultWXCouponList));
-        }
+//        if (SpringUtil.redisCache()){
+//            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId.toString(), JSON.toJSONString(resultWXCouponList));
+//        }
         return resultWXCouponList;
     }
 

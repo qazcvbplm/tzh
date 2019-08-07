@@ -73,4 +73,33 @@ public interface TCouponService {
      */
     ResponseObject deleteCouponAndShopByCId(Coupon coupon);
 
+    /**
+     * @date:   2019/8/7 15:11
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param
+     * @Desc:   desc
+     */
+    Integer countInvalidCoupon();
+
+    /**
+     * @date:   2019/8/7 15:16
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.Coupon>
+     * @param
+     * @Desc:   desc
+     */
+    List<Coupon> limitFindInvalidUserCoupon();
+
+    /**
+     * @date:   2019/8/7 15:18
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   idList
+     * @Desc:   desc
+     */
+    Integer batchUpdateToUnInvalidByIds(List<Long> idList);
 }

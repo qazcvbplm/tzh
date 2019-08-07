@@ -367,4 +367,46 @@ public class TCouponServiceImpl implements TCouponService {
         }
         return new ResponseObject(true,ResponseViewEnums.DELETE_SUCCESS);
     }
+
+    /**
+     * @date:   2019/8/7 15:12
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param
+     * @Desc:   desc
+     */
+    @Override
+    public Integer countInvalidCoupon() {
+        Integer countNum = couponMapper.countInvalidCoupon();
+        return countNum;
+    }
+
+    /**
+     * @date:   2019/8/7 15:16
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.Coupon>
+     * @param
+     * @Desc:   desc
+     */
+    @Override
+    public List<Coupon> limitFindInvalidUserCoupon() {
+        List<Coupon> couponList = couponMapper.limitFindInvalidUserCoupon();
+        return couponList;
+    }
+
+    /**
+     * @date:   2019/8/7 15:18
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   idList
+     * @Desc:   desc
+     */
+    @Override
+    public Integer batchUpdateToUnInvalidByIds(List<Long> idList) {
+        Integer updateNum = couponMapper.batchUpdateToUnInvalidByIds(idList);
+        return updateNum;
+    }
 }

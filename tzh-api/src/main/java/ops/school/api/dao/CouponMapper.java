@@ -112,4 +112,34 @@ public interface CouponMapper extends BaseMapper<Coupon> {
      * @Desc:   desc 查询所有未失效和未删除的优惠券中已失效的优惠券
      */
     List<Coupon> findInvalidCoupon();
+
+    /**
+     * @date:   2019/8/7 15:12
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param
+     * @Desc:   desc
+     */
+    Integer countInvalidCoupon();
+
+    /**
+     * @date:   2019/8/7 15:17
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.Coupon>
+     * @param
+     * @Desc:   desc
+     */
+    List<Coupon> limitFindInvalidUserCoupon();
+
+    /**
+     * @date:   2019/8/7 15:19
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   list
+     * @Desc:   desc
+     */
+    Integer batchUpdateToUnInvalidByIds(@Param("list") List<Long> list);
 }

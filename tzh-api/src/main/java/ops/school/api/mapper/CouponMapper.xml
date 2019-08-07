@@ -163,6 +163,7 @@
         </foreach>
     </update>
 
+
     <select id="findByIndex" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
@@ -237,4 +238,33 @@
         where is_delete = 0 and is_invalid = 0
         and send_end_time <![CDATA[ < ]]> now()
     </select>
+
+    <!--CreatBy Fang Time:2019/8/7 15:12 |  -->
+    <select id="countInvalidCoupon" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM coupon
+        WHERE is_delete = 0
+        AND is_invalid = 0
+        AND send_end_time <![CDATA[ < ]]> now()
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 15:17 |  -->
+    <select id="limitFindInvalidUserCoupon" resultType="ops.school.api.entity.Coupon">
+        SELECT <include refid="Base_Column_List"/>
+        FROM coupon
+        WHERE is_delete = 0
+        AND is_invalid = 0
+        AND send_end_time <![CDATA[ < ]]> now()
+        LIMIT 0,1000
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 15:23 |  -->
+    <update id="batchUpdateToUnInvalidByIds">
+        UPDATE <include refid="Table_Name"/>
+        SET is_invalid = 1
+        WHERE id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
 </mapper>

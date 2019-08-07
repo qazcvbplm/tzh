@@ -29,4 +29,15 @@ public class ScheduledTaskTest{
     public void cancelRunOrdersTask() {
         task.cancelRunOrdersTask();
     }
+
+    @Test
+    public void couponsTest() {
+        task.couponInvalid();
+    }
+
+    @Test
+    public void wxUserCouponInvalid() {
+        task.wxUserCouponInvalid();
+    }
+
 }

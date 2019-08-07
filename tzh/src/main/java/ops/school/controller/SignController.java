@@ -26,8 +26,6 @@ public class SignController {
 	@Autowired
 	private SignService signService;
 	@Autowired
-	private WxUserService wxUserService;
-	@Autowired
 	private TWxUserService tWxUserService;
 
 

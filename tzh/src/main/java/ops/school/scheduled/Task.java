@@ -189,6 +189,9 @@ public class Task {
         } else {
             ordersList = ordersService.findAllDjs();
         }
+        if (ordersList == null) {
+            return;
+        }
         //TODO
         //服务重启的话缓存会漏单
         /**
@@ -203,21 +206,18 @@ public class Task {
         List<Integer> schoolIdList = PublicUtilS.getValueList(ordersList, "schoolId");
         Collection<School> schoolCollection = schoolService.listByIds(schoolIdList);
         Map<Integer, School> schoolMap = PublicUtilS.listForMapValueE(schoolCollection, "id");
-        if (ordersList == null) {
-            return;
-        }
         for (Orders temp : ordersList) {
             Shop shop = null;
             if (shopMap.get(temp.getShopId()) != null) {
                 shop = shopMap.get(temp.getShopId());
             } else {
-                return;
+                continue;
             }
             School school = null;
             if (schoolMap.get(temp.getSchoolId()) != null) {
                 school = schoolService.findById(temp.getSchoolId());
             } else {
-                return;
+                continue;
             }
             // 获取当前时间
             long current = System.currentTimeMillis();
@@ -252,35 +252,35 @@ public class Task {
         } else {
             orders = ordersService.list(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "商家已接手"));
         }
+        if (orders == null) {
+            return;
+        }
         /**
          * 批量查询school信息
          */
         List<Integer> schoolIdList = PublicUtilS.getValueList(orders, "schoolId");
         Collection<School> schoolCollection = schoolService.listByIds(schoolIdList);
         Map<Integer, School> schoolMap = PublicUtilS.listForMapValueE(schoolCollection, "id");
-        if (orders == null) {
-            return;
-        }
         for (Orders order : orders) {
             School school = null;
             if (schoolMap.get(order.getSchoolId()) != null) {
-                school = schoolService.findById(order.getSchoolId());
+                school = schoolMap.get(order.getSchoolId());
             } else {
-                return;
+                continue;
             }
             long currentTime = System.currentTimeMillis();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String curTime = df.format(currentTime);
             // 获取商家接手时间
             if (order.getShopAcceptTime() == null || order.getShopAcceptTime().length() == 0) {
-                return;
+                continue;
             }
             long differTime = TimeUtilS.dateDiff(order.getShopAcceptTime(), curTime);
             if (differTime > 10) {
                 if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SENDER" + school.getPhone()) == null) {
                     try {
                         Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getPhone(), 372793, "", null);
-                    } catch (HTTPException | IOException | org.json.JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SENDER" + school.getPhone(), "", 5, TimeUnit.MINUTES);
@@ -295,12 +295,24 @@ public class Task {
      */
     @Scheduled(cron = "0 0 10,14,18,22 * * ?")
     public void couponInvalid() {
-
-        List<Coupon> couponList = tCouponService.findInvalidCoupon();
-        if (couponList.size() != 0) {
-            for (Coupon coupon : couponList) {
-                coupon.setIsInvalid(1);
-                couponService.updateById(coupon);
+        Integer invalidUserCouponCount = tCouponService.countInvalidCoupon();
+        if (invalidUserCouponCount < NumConstants.INT_NUM_1){
+            return;
+        }
+        // 查出来的总数，每次批量更新1000条数据，循环更新完
+        int cycleNum = invalidUserCouponCount/NumConstants.INT_NUM_1000 + 1;
+        for (int i = 0;i < cycleNum;i++){
+            List<Coupon> couponList = tCouponService.limitFindInvalidUserCoupon();
+            if (CollectionUtils.isEmpty(couponList)){
+                return;
+            }
+            List<Long> idList = PublicUtilS.getValueList(couponList,"id");
+            if (CollectionUtils.isEmpty(idList)){
+                return;
+            }
+            Integer updateNum = tCouponService.batchUpdateToUnInvalidByIds(idList);
+            if (updateNum < NumConstants.INT_NUM_1){
+                LoggerUtil.logError("定时器批量更新失败-优惠券失效-ids-"+idList.toString());
             }
         }
     }
@@ -312,7 +324,7 @@ public class Task {
     @Scheduled(cron = "0 0 8,10,14,16,22 * * ?")
     public void wxUserCouponInvalid() {
         Integer invalidUserCouponCount = tWxUserCouponService.countInvalidUserCoupon();
-        if (invalidUserCouponCount < NumConstants.INT_NUM_0){
+        if (invalidUserCouponCount < NumConstants.INT_NUM_1){
             return;
         }
         // 查出来的总数，每次批量更新1000条数据，循环更新完
@@ -328,7 +340,7 @@ public class Task {
             }
             Integer updateNum = tWxUserCouponService.batchUpdateToUnInvalidByIds(idList);
             if (updateNum < NumConstants.INT_NUM_1){
-                LoggerUtil.logError("定时器批量更新失败-优惠券失效-ids-"+idList.toString());
+                LoggerUtil.logError("定时器批量更新失败-用户优惠券失效-ids-"+idList.toString());
             }
         }
     }
