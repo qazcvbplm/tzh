@@ -782,7 +782,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             update.setShopId(orders.getShopId());
             update.setId(orderId);
             update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
-        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
+        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 0L).intValue();
         orders.setWaterNumber(water + 1);
         update.setWaterNumber(water + 1);
             int res = ordersService.shopAcceptOrderById(update);

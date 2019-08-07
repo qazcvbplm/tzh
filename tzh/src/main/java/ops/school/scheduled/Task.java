@@ -52,8 +52,6 @@ public class Task {
     @Autowired
     private TCouponService tCouponService;
     @Autowired
-    private CouponService couponService;
-    @Autowired
     private TWxUserCouponService tWxUserCouponService;
 
     @Autowired

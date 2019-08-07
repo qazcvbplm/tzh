@@ -440,6 +440,14 @@
             where status=#{orderBy}
             and floor_id in (${floorIds}) and shop_id in (${shopIds}) and typ ='外卖订单'
         </if>
+        <if test="orderBy=='已取消'">
+            where status=#{orderBy}
+            and sender_id =#{id}
+            and floor_id in (${floorIds})
+            and shop_id in (${shopIds})
+            and typ ='外卖订单'
+            order by create_time desc
+        </if>
         <if test="orderBy=='配送员已接手' or orderBy=='已完成'">
             where sender_id =#{id} and status=#{orderBy} and typ ='外卖订单'
             <if test="orderBy=='已完成'">
