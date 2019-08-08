@@ -59,6 +59,32 @@ public class TxLogController {
 	}
 
 	/**
+	 * @date:   2019/8/8 17:38
+	 * @author: QinDaoFang
+	 * @version:version
+	 * @return: ops.school.api.util.ResponseObject
+	 * @param   shopId
+	 * @param   page
+	 * @param   size
+	 * @Desc:   desc
+	 */
+	@ApiOperation(value = "按照商家查询", httpMethod = "POST")
+	@RequestMapping(value = "/shop/find",method = RequestMethod.POST)
+	public ResponseObject shopFind(Integer shopId, int page, int size) {
+		if (shopId == null || shopId <= 0) {
+			return new ResponseObject(false, "shopId有误");
+		}
+		QueryWrapper<TxLog> query = new QueryWrapper<>();
+		query.lambda().eq(TxLog::getTxerId, shopId);
+		query.lambda().eq(TxLog::getType, "商家提现");
+		query.lambda().eq(TxLog::getIshow, "0");
+		query.select("id", "txer_id", "type", "create_time", "amount","result","ishow","is_tx","dz_openid","tx_name");
+		query.lambda().orderByDesc(TxLog::getCreateTime);
+		IPage<TxLog> rs = txLogService.page(PageUtil.getPage(page, size), query);
+		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
+	}
+
+	/**
 	 * 提现申请
 	 * @param amount 提现金额
 	 * @param shopid 店铺id
