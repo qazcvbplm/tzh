@@ -61,7 +61,7 @@ public class MyInterceptor implements HandlerInterceptor {
         }
         Long endTime = System.currentTimeMillis();
         System.out.println("拦截器pre处理时间(ms)：" + (endTime - startTime));
-        new ResultUtil().error(request, response, PublicErrorEnums.LOGIN_TIME_OUT.getErrorMessage());
+        new ResultUtil().error(request, response, "1100");
         return false;
     }
 
