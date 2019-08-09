@@ -30,7 +30,7 @@ public class FileController {
     @PostMapping("/upfile")
     public String fileup(HttpServletRequest request, MultipartFile file) {
         if (file.getSize() > 500 * 1024) {
-            return "图片不可超过100KB";
+            return "图片不可超过500KB";
         }
         FileInputStream inputStream;
         try {
