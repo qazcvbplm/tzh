@@ -135,7 +135,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             // Todo
             // 计算商品折扣
             // 商品表里有discount字段，需要判断discount是否小于1，小于1即开启
-            if (pt.getDiscount().compareTo(new BigDecimal(1)) == -1){
+            if (pt.getDiscount().compareTo(new BigDecimal(1)) == -1) {
                 orders.setDiscountType("商品折扣");
                 // 优惠金额(1-折扣) * 规格价格
                 discountPrice = pa.getPrice().multiply(new BigDecimal(1).subtract(pt.getDiscount()));
@@ -161,49 +161,50 @@ public class TOrdersServiceImpl implements TOrdersService {
                 boxcount);
         ordersService.save(orders);
     }
+
     /**
-     * @date:   2019/7/19 18:16
+     * @param productOrderDTOS --> 商品ID productId 商品规格ID attributeId 商品数量 count
+     * @param orders           包含微信用户openid，学校id，店铺id，楼栋id，订单类型type,
+     *                         配送费sendPrice, 餐盒费boxPrice, 用户优惠券ID wxUserCouponId, 实付款金额payPrice
+     * @date: 2019/7/19 18:16
      * @author: QinDaoFang
      * @version:version
      * @return: ops.school.api.util.ResponseObject
-     * @param   productOrderDTOS --> 商品ID productId 商品规格ID attributeId 商品数量 count
-     * @param   orders 包含微信用户openid，学校id，店铺id，楼栋id，订单类型type,
-     *          配送费sendPrice, 餐盒费boxPrice, 用户优惠券ID wxUserCouponId, 实付款金额payPrice
-     * @Desc:   desc 用户提交订单
+     * @Desc: desc 用户提交订单
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ResponseObject addOrder2(List<ProductOrderDTO> productOrderDTOS, @Valid Orders orders) {
 //        Long startOrderTime = System.currentTimeMillis();
         //判断商品为空
-        Assertions.notEmpty(productOrderDTOS,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+        Assertions.notEmpty(productOrderDTOS, ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
         //判断用户有
         WxUser wxUser = wxUserService.findById(orders.getOpenId());
         //根据用户的openid和phone查找用户和用户余额 todo
         // WxUser wxUser1 = wxUserService.findUserAndBellOrCache(orders.getOpenId(),orders.getWxUserPhone());
-        Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST);
+        Assertions.notNull(wxUser, ResponseViewEnums.WX_USER_NO_EXIST);
         //判断学校是否是有，并且是当前学校
         School school = schoolService.findById(wxUser.getSchoolId());
-        Assertions.notNull(school,ResponseViewEnums.SCHOOL_HAD_CHANGE);
+        Assertions.notNull(school, ResponseViewEnums.SCHOOL_HAD_CHANGE);
         //判断店铺有，暂时不做
         Shop shop = shopService.getById(orders.getShopId());
-        Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
+        Assertions.notNull(shop, ResponseViewEnums.SHOP_HAD_CHANGE);
         //楼栋判断
         Floor floor = floorService.getById(orders.getFloorId());
-        Assertions.notNull(floor,ResponseViewEnums.FLOOR_SELECT_NULL);
+        Assertions.notNull(floor, ResponseViewEnums.FLOOR_SELECT_NULL);
         //判断商品有并且库存够，批量id查询
-        Map pIdAndAIdMap = PublicUtilS.listForMap(productOrderDTOS,"attributeId","productId");
+        Map pIdAndAIdMap = PublicUtilS.listForMap(productOrderDTOS, "attributeId", "productId");
         //根据商品id和商品规格id批量查询商品及规格
         List<ProductAndAttributeDTO> productAndAttributeS = productService.batchFindProdAttributeByIdS(pIdAndAIdMap);
-        Map proAttributeSelectMap =  PublicUtilS.listForMapValueE(productAndAttributeS,"attributeId");
+        Map proAttributeSelectMap = PublicUtilS.listForMapValueE(productAndAttributeS, "attributeId");
         //假如前端传3个商品，查出来两个，有一个就没有，报错
-        if (productAndAttributeS.size() < productOrderDTOS.size()){
+        if (productAndAttributeS.size() < productOrderDTOS.size()) {
             //报错 商品信息变化
             DisplayException.throwMessageWithEnum(ResponseViewEnums.PRODUCT_HAD_CHANGE);
         }
         // 判断订单备注是否有表情内容
         String remarkOrder = CheckUtils.checkEmoji(orders.getRemark());
-        if (remarkOrder != null){
+        if (remarkOrder != null) {
             orders.setRemark(remarkOrder);
         }
         //生成订单id
@@ -263,7 +264,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersSaveTemp.setId(generatorOrderId);
         //校验商品
         //检查库存
-        Map paramProductIdCountMap = PublicUtilS.listForMap(productOrderDTOS,"productId","count");
+        Map paramProductIdCountMap = PublicUtilS.listForMap(productOrderDTOS, "productId", "count");
         // 标识商品信息是否错误（库存不够），是否需要抛异常
         Boolean throwErrorNoStockYes = false;
         // 标识商品信息库存是否需要去修改），是否需要抛异常
@@ -275,35 +276,35 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 用于扣库存 临时存储product
         Product updateStockTempProduct = null;
         ProductAndAttributeDTO productAndAttributeDTOTemp = null;
-        for (ProductOrderDTO productOrder:productOrderDTOS) {
+        for (ProductOrderDTO productOrder : productOrderDTOS) {
             /**
              * 商品校验逻辑
              */
-            productAndAttributeDTOTemp = (ProductAndAttributeDTO)proAttributeSelectMap.get(productOrder.getAttributeId());
+            productAndAttributeDTOTemp = (ProductAndAttributeDTO) proAttributeSelectMap.get(productOrder.getAttributeId());
             product = productAndAttributeDTOTemp.getProduct();
             productAttribute = productAndAttributeDTOTemp.getProductAttribute();
-            Assertions.notNull(product,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
-            Assertions.notNull(productAttribute,ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+            Assertions.notNull(product, ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
+            Assertions.notNull(productAttribute, ResponseViewEnums.ORDER_DONT_HAVE_PRODUCT);
             //如果 商品id 属性id 计数不能空或者计数不能0 商品不能空
-            if (productOrder.getProductId() == null || productOrder.getAttributeId() == null || productOrder.getCount() == null || productOrder.getCount() == 0){
+            if (productOrder.getProductId() == null || productOrder.getAttributeId() == null || productOrder.getCount() == null || productOrder.getCount() == 0) {
                 DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_PARAM_ERROR);
             }
 //            假如前端传3个商品，查出来两个，有一个就没有，报错
-            if (paramProductIdCountMap.get(product.getId()) == null){
+            if (paramProductIdCountMap.get(product.getId()) == null) {
                 throwErrorNoStockYes = true;
                 noStockProdctNames += product.getProductName();
                 //跳出循环，这个商品就不做逻辑处理
                 continue;
                 //如果参数查询的product的id在参数map中（一定在），并且商品开启库存
-            }else if (product.getStockFlag().intValue() == ProductConstants.PRODUCT_STOCK_FLAG_YES){
+            } else if (product.getStockFlag().intValue() == ProductConstants.PRODUCT_STOCK_FLAG_YES) {
                 needToDisProductStockYes = true;
                 //那么比较库存够不够，不够
-                if (product.getStock() < (Integer) paramProductIdCountMap.get(product.getId())){
+                if (product.getStock() < (Integer) paramProductIdCountMap.get(product.getId())) {
                     throwErrorNoStockYes = true;
                     noStockProdctNames += product.getProductName();
                     //跳出循环，这个商品就不做逻辑处理
                     continue;
-                }else {
+                } else {
                     // 库存够，需要取修改库存
                     updateStockTempProduct = product;
                     updateStockTempProduct.setStock(product.getStock() - (Integer) paramProductIdCountMap.get(product.getId()));
@@ -320,15 +321,15 @@ public class TOrdersServiceImpl implements TOrdersService {
              * 计算订单内所有商品商品规格价格+配送费+餐盒费之和
              * 订单内所有商品的商品折扣之后的价格+配送费+餐盒费之和
              */
-            if (productAttribute != null && count != 0){
+            if (productAttribute != null && count != 0) {
                 originalPrice = originalPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
                 afterDiscountPrice = afterDiscountPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
                 productPrice = productPrice.add(productAttribute.getPrice().multiply(new BigDecimal(count)));
-                if (product != null){
+                if (product != null) {
                     // 订单商品表
                     OrderProduct orderProduct = new OrderProduct();
                     // 如果商品折扣小于1，即商品有折扣
-                    if (product.getDiscount().compareTo(new BigDecimal(1)) == -1){
+                    if (product.getDiscount().compareTo(new BigDecimal(1)) == -1) {
                         ordersSaveTemp.setDiscountType("商品折扣");
                         // 优惠折扣已使用，店铺满减无法再使用
                         isDiscount = true;
@@ -347,14 +348,14 @@ public class TOrdersServiceImpl implements TOrdersService {
                     // 商品总数累加
                     totalcount += count;
                     // 餐盒数累加
-                    if (product.getBoxPriceFlag() == 1){
+                    if (product.getBoxPriceFlag() == 1) {
                         boxcount += count;
                     }
                     // 修改商品销量 + count
-                    product.setSale(product.getSale()+count);
+                    product.setSale(product.getSale() + count);
                     boolean rs = productService.updateById(product);
-                    if (!rs){
-                        logger.error("商品销量更新失败，商品id为："+ product.getId());
+                    if (!rs) {
+                        logger.error("商品销量更新失败，商品id为：" + product.getId());
                     }
                     orderProduct.setOrderId(generatorOrderId);
                     orderProduct.setAttributeName(productAttribute.getName());
@@ -368,16 +369,16 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
         }
         //校验商品完成判断是否需要抛异常
-        if (throwErrorNoStockYes){
-            DisplayException.throwMessage(noStockProdctNames+"卖完啦！");
+        if (throwErrorNoStockYes) {
+            DisplayException.throwMessage(noStockProdctNames + "卖完啦！");
         }
         /**
          * 餐盒费之和
          */
         // 餐盒费之和
-        if (orders.getTyp().equals("外卖订单") || orders.getTyp().equals("自取订单")){
+        if (orders.getTyp().equals("外卖订单") || orders.getTyp().equals("自取订单")) {
             boxPrice = boxPrice.add(shop.getBoxPrice().multiply(new BigDecimal(boxcount)));
-        }else {
+        } else {
             //其他的（堂食订单）数值还是要置为0
             boxPrice = new BigDecimal(0);
         }
@@ -385,7 +386,7 @@ public class TOrdersServiceImpl implements TOrdersService {
          * 配送费
          */
         // 配送费-->按物品件数增加配送费
-        if (orders.getTyp().equals("外卖订单")){
+        if (orders.getTyp().equals("外卖订单")) {
             if (shop.getSendPriceAddByCountFlag() == 1) {
                 sendAddCountPrice = sendAddCountPrice.add(new BigDecimal((totalcount - 1)).multiply(shop.getSendPriceAdd()));
             }
@@ -397,20 +398,20 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             // 最终配送费-->基础配送费+额外距离配送费+额外件数配送费
             sendPrice = sendPrice.add(shop.getSendPrice()).add(sendAddCountPrice).add(sendAddDistancePrice);
-        }else {
+        } else {
             // 其他的（堂食订单，自取订单）数值还是要置为0
             sendPrice = new BigDecimal(0);
         }
         // 如果商品折扣未使用-->店铺满减
-        if (!isDiscount){
+        if (!isDiscount) {
             // 查询商家所有满减规则（从最大满减额度开始）
-            List<FullCut> fullCuts =  fullCutService.findByShopId(orders.getShopId());
-            if (fullCuts.size() != 0){
-                for (FullCut shopFullCut:fullCuts) {
+            List<FullCut> fullCuts = fullCutService.findByShopId(orders.getShopId());
+            if (fullCuts.size() != 0) {
+                for (FullCut shopFullCut : fullCuts) {
                     // 当原菜价满足店铺满减条件时 （>=）todo
-                    if (originalPrice.compareTo(new BigDecimal(shopFullCut.getFull())) != -1){
+                    if (originalPrice.compareTo(new BigDecimal(shopFullCut.getFull())) != -1) {
                         // 店铺满减之后的优惠价格 --> 如果原菜价 >= 折扣价格时
-                        if (originalPrice.subtract(new BigDecimal(shopFullCut.getCut())).compareTo(BigDecimal.ZERO) != -1){
+                        if (originalPrice.subtract(new BigDecimal(shopFullCut.getCut())).compareTo(BigDecimal.ZERO) != -1) {
                             // 优惠之后的折后价格
                             afterDiscountPrice = afterDiscountPrice.subtract(new BigDecimal(shopFullCut.getCut()));
                             discountPrice = discountPrice.add(new BigDecimal(shopFullCut.getCut()));
@@ -437,27 +438,27 @@ public class TOrdersServiceImpl implements TOrdersService {
         payPrice = beforeCouponPrice;
         //优惠券id是wx的wxCouponId
         WxUserCoupon wxUserCoupon = null;
-        if (orders.getCouponId() != null && orders.getCouponId() != 0){
+        if (orders.getCouponId() != null && orders.getCouponId() != 0) {
             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
             // 当前时间戳
             Long currentTime = System.currentTimeMillis();
             // 用户优惠券失效 >= 当前时间
-            if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime){
+            if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime) {
                 //注释
                 Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
                 //判断优惠券类型是
-                if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_SHOP || coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME){
+                if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_SHOP || coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME) {
                     // 判断优惠卷只能在某个店铺使用
-                    List<ShopCoupon> shopCouponList = tShopCouponService.findShopCouponBySIdAndCId(orders.getShopId(),coupon.getId());
-                    if (shopCouponList == null || shopCouponList.size() == 0){
+                    List<ShopCoupon> shopCouponList = tShopCouponService.findShopCouponBySIdAndCId(orders.getShopId(), coupon.getId());
+                    if (shopCouponList == null || shopCouponList.size() == 0) {
                         DisplayException.throwMessageWithEnum(ResponseViewEnums.COUPON_CANT_USE_THIS_SHOP);
                     }
                 }
-                if (coupon != null){
+                if (coupon != null) {
                     // 折后价格+餐盒费 >= 优惠券满减使用条件
-                    if (beforeCouponPrice.compareTo(new BigDecimal(coupon.getFullAmount())) != -1){
+                    if (beforeCouponPrice.compareTo(new BigDecimal(coupon.getFullAmount())) != -1) {
                         //  并且 折后价格+餐盒费 >= 优惠券满减金额时
-                        if (beforeCouponPrice.subtract(new BigDecimal(coupon.getCutAmount())).compareTo(BigDecimal.ZERO) != -1){
+                        if (beforeCouponPrice.subtract(new BigDecimal(coupon.getCutAmount())).compareTo(BigDecimal.ZERO) != -1) {
                             payPrice = payPrice.subtract(new BigDecimal(coupon.getCutAmount()));
                         } else {
                             payPrice = new BigDecimal(0.00);
@@ -471,7 +472,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                         try {
                             // 优惠券使用时间
                             wxUserCoupon.setUseTime(df.parse(df.format(new Date())));
-                        } catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         // tWxUserCouponService.updateIsInvalid(wxUserCoupon);
@@ -487,12 +488,12 @@ public class TOrdersServiceImpl implements TOrdersService {
         payPrice = payPrice.add(sendPrice);
         // 减去粮票
         QueryWrapper<WxUserBell> query = new QueryWrapper<>();
-        query.lambda().eq(WxUserBell::getPhone,wxUser.getOpenId()+"-"+wxUser.getPhone());
+        query.lambda().eq(WxUserBell::getPhone, wxUser.getOpenId() + "-" + wxUser.getPhone());
         WxUserBell wxUserBell = wxUserBellService.getOne(query);
-        if (wxUserBell != null){
-            if (wxUserBell.getFoodCoupon().compareTo(BigDecimal.ZERO) == 1){
+        if (wxUserBell != null) {
+            if (wxUserBell.getFoodCoupon().compareTo(BigDecimal.ZERO) == 1) {
                 // 折后价格-优惠券+餐盒费+配送费 >= 粮票
-                if (payPrice.subtract(wxUserBell.getFoodCoupon()).compareTo(BigDecimal.ZERO) == -1){
+                if (payPrice.subtract(wxUserBell.getFoodCoupon()).compareTo(BigDecimal.ZERO) == -1) {
                     // 支付价格（除粮票外）小于 粮票--> 支付价格为  0
                     payPrice = new BigDecimal(0);
                     // 用户粮票修改为 --> 用户粮票余额 - 支付金额（除粮票外）
@@ -510,13 +511,13 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
         }
         // 前端传来的数据对象
-        OrderTempDTO tempDTO = new OrderTempDTO(orders.getSendPrice(),orders.getBoxPrice(),orders.getPayPrice(),orders.getProductPrice(),
-                orders.getDiscountPrice(),orders.getPayFoodCoupon());
+        OrderTempDTO tempDTO = new OrderTempDTO(orders.getSendPrice(), orders.getBoxPrice(), orders.getPayPrice(), orders.getProductPrice(),
+                orders.getDiscountPrice(), orders.getPayFoodCoupon());
         // 后端计算的数据对象
-        OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice,boxPrice,payPrice.setScale(2,BigDecimal.ROUND_HALF_UP),
-                productPrice,discountPrice.setScale(2,BigDecimal.ROUND_HALF_UP),payFoodCoupon.setScale(2,BigDecimal.ROUND_HALF_UP));
-        if (!tempDTO.thisCompareToTempTrue(orderTempDTO)){
-            return new ResponseObject(false,"订单金额有问题，请负责人进行核实!");
+        OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice, boxPrice, payPrice.setScale(2, BigDecimal.ROUND_HALF_UP),
+                productPrice, discountPrice.setScale(2, BigDecimal.ROUND_HALF_UP), payFoodCoupon.setScale(2, BigDecimal.ROUND_HALF_UP));
+        if (!tempDTO.thisCompareToTempTrue(orderTempDTO)) {
+            return new ResponseObject(false, "订单金额有问题，请负责人进行核实!");
         }
         ordersSaveTemp.setDiscountPrice(discountPrice);
         ordersSaveTemp.setAddressDetail(orders.getAddressDetail());
@@ -556,50 +557,50 @@ public class TOrdersServiceImpl implements TOrdersService {
 
         //保存订单逻辑
         boolean saveOrderSuccess = ordersService.save(ordersSaveTemp);
-        if (!saveOrderSuccess){
+        if (!saveOrderSuccess) {
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_SAVE_ERROR);
         }
         // 修改用户粮票余额
         boolean rs = wxUserBellService.updateById(wxUserBell);
-        if (!rs){
-            logger.error("修改用户粮票金额失败，用户手机号为:"+wxUser.getPhone());
+        if (!rs) {
+            logger.error("修改用户粮票金额失败，用户手机号为:" + wxUser.getPhone());
         }
         //保存订单商品逻辑，不行就要自己写接口
         boolean saveOPSuccess = orderProductService.saveBatch(orderProductSaveList);
-        if(!saveOPSuccess){
+        if (!saveOPSuccess) {
             logger.error("订单商品保存失败，商品信息：" + PublicUtilS.getCollectionToString(orderProductSaveList));
         }
         //下单完成后扣库存
-        if (needToDisProductStockYes){
+        if (needToDisProductStockYes) {
             boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-            if (!disProductStockSuccess){
+            if (!disProductStockSuccess) {
                 // 这里想的扣库存失败还是可以下单
-                logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
+                logger.error("商品扣库存失败，商品信息：" + PublicUtilS.getCollectionToString(productDisStockList));
             }
         }
         //下单后领优惠券 新页面新接口
         //用户优惠券失效逻辑,如果用户的优惠券是生效的IsInvalid=0
-        if (wxUserCoupon != null){
+        if (wxUserCoupon != null) {
             // 优惠券
             Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
-            if (coupon != null && coupon.getIsInvalid() != 1){
+            if (coupon != null && coupon.getIsInvalid() != 1) {
                 wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NO);
                 int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
-                if (updateUserCouponNum != NumConstants.INT_NUM_1){
-                    logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
+                if (updateUserCouponNum != NumConstants.INT_NUM_1) {
+                    logger.error("修改优惠券失效失败，用户优惠券id" + orders.getCouponId());
                 }
             }
         }
         Map resultMap = new HashMap();
-        resultMap.put("orderId",generatorOrderId);
+        resultMap.put("orderId", generatorOrderId);
 //        Long endOrderTime = System.currentTimeMillis();
 //        System.out.println(endOrderTime - startOrderTime);
-        return new ResponseObject(true,"创建订单成功！",resultMap);
+        return new ResponseObject(true, "创建订单成功！", resultMap);
     }
 
     @Transactional
     @Override
-    public int pay(Orders orders,String formid) {
+    public int pay(Orders orders, String formid) {
         Shop shop = shopService.getById(orders.getShopId());
         School school = schoolService.findById(shop.getSchoolId());
         //取消vip
@@ -617,12 +618,12 @@ public class TOrdersServiceImpl implements TOrdersService {
                 throw new YWException("订单状态异常");
             }
             String[] formIds = formid.split(",");
-            if (formIds.length < 1){
-                LoggerUtil.logError("order pay formid为空"+ orders.getId());
+            if (formIds.length < 1) {
+                LoggerUtil.logError("order pay formid为空" + orders.getId());
             }
             //扣除学校余额数据和粮票余额
-            Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(orders.getPayPrice(),orders.getPayFoodCoupon(),school.getId());
-            if (disSCNum != NumConstants.INT_NUM_1){
+            Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(orders.getPayPrice(), orders.getPayFoodCoupon(), school.getId());
+            if (disSCNum != NumConstants.INT_NUM_1) {
                 DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
             }
             stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
@@ -662,7 +663,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         Orders orders = ordersService.findById(id);
         // 查询订单商品表信息
         QueryWrapper<OrderProduct> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(OrderProduct::getOrderId,id);
+        queryWrapper.lambda().eq(OrderProduct::getOrderId, id);
         List<OrderProduct> orderProducts = orderProductService.list(queryWrapper);
         WxUser user = wxUserService.findById(orders.getOpenId());
         School school = schoolService.findById(user.getSchoolId());
@@ -673,101 +674,101 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
         }
         String temp = orders.getStatus();
-            if (ordersService.cancel(id) == 1) {
-                if (orderProducts != null || orderProducts.size() > 0){
-                    for (OrderProduct orderProduct:orderProducts) {
-                        Product product = productService.getById(orderProduct.getProductId());
-                        if (product.getStockFlag() == 1){
-                            product.setStock(product.getStock() + orderProduct.getProductCount());
-                            productDisStockList.add(product);
-                        }
+        if (ordersService.cancel(id) == 1) {
+            if (orderProducts != null || orderProducts.size() > 0) {
+                for (OrderProduct orderProduct : orderProducts) {
+                    Product product = productService.getById(orderProduct.getProductId());
+                    if (product.getStockFlag() == 1) {
+                        product.setStock(product.getStock() + orderProduct.getProductCount());
+                        productDisStockList.add(product);
                     }
                 }
-                // 当订单内粮票额度不等于0时
-                if (orders.getPayFoodCoupon().compareTo(new BigDecimal(0)) != 0) {
-                    // 订单消费的粮票要退回用户粮票内
-                    wxUserBellService.addFoodCoupon(user.getOpenId() + "-" + user.getPhone(), orders.getPayFoodCoupon());
-                }
-                // 如果订单使用优惠券 --> 退还优惠券
-                if (orders.getCouponId() != null && orders.getCouponId() != 0){
-                    // 用户优惠券
-                    WxUserCoupon wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
-                    if (wxUserCoupon != null){
-                        // 修改状态为0
-                        wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NOT_USED);
-                        int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
-                        if (updateUserCouponNum != NumConstants.INT_NUM_1){
-                            logger.error("修改优惠券失效失败，用户优惠券id"+orders.getCouponId());
-                        }
-                    }
-                }
-                if (!temp.equals("待付款")) {
-                    if (orders.getPayment().equals("余额支付")) {
-                        // 取消订单时,将余额支付时的订单金额退回学校余额内
-                        Map<String, Object> map1 = new HashMap<>();
-                        map1.put("schoolId", user.getSchoolId());
-                        map1.put("charge", orders.getPayPrice());
-                        map1.put("send", orders.getPayFoodCoupon());
-                        schoolService.charge(map1);
-                        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
-                        // 订单消费的余额要退回用户余额内
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("phone", user.getOpenId() + "-" + user.getPhone());
-                        map.put("amount", orders.getPayPrice());
-                        if (wxUserBellService.charge(map) == 1) {
-                            //集合大于0才会扣库存
-                            if (productDisStockList.size() > 0 ){
-                                boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-                                if (!disProductStockSuccess){
-                                    // 这里想的扣库存失败还是可以下单
-                                    logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
-                                }
-                            }
-                            return orders.getShopId();
-                        } else {
-                            throw new YWException("退款失败联系管理员");
-                        }
-                    } else if (orders.getPayment().equals("微信支付")) {
-                        // 取消订单时,将微信支付时的粮票退回学校余额粮票内
-                        Map<String, Object> map1 = new HashMap<>();
-                        map1.put("schoolId", user.getSchoolId());
-                        map1.put("charge", NumConstants.INT_NUM_0);
-                        map1.put("send", orders.getPayFoodCoupon());
-                        schoolService.charge(map1);
-                        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
-                        String fee = AmountUtils.changeY2F(orders.getPayPrice().toString());
-                        if(orders.getPayPrice().multiply(new BigDecimal(100)).compareTo(new BigDecimal(fee)) != NumConstants.INT_NUM_0){
-                            DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_TUI_KUAN_ERROR);
-                        }
-                        int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(),school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
-                        if (result != 1) {
-                            throw new YWException("微信退款失败联系管理员");
-                        } else {
-                            //集合大于0才会扣库存
-                            if (productDisStockList.size() > 0 ){
-                                boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-                                if (!disProductStockSuccess){
-                                    // 这里想的扣库存失败还是可以下单
-                                    logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
-                                }
-                            }
-                            return orders.getShopId();
-                        }
-                    }
-                } else {
-                    //待付款
-                    //集合大于0才会扣库存 开启库存
-                    if (productDisStockList.size() > 0 ){
-                        boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
-                        if (!disProductStockSuccess){
-                            // 这里想的扣库存失败还是可以下单
-                            logger.error("商品扣库存失败，商品信息："+PublicUtilS.getCollectionToString(productDisStockList));
-                        }
-                    }
-                    return orders.getShopId();
-                }
-
             }
+            // 当订单内粮票额度不等于0时
+            if (orders.getPayFoodCoupon().compareTo(new BigDecimal(0)) != 0) {
+                // 订单消费的粮票要退回用户粮票内
+                wxUserBellService.addFoodCoupon(user.getOpenId() + "-" + user.getPhone(), orders.getPayFoodCoupon());
+            }
+            // 如果订单使用优惠券 --> 退还优惠券
+            if (orders.getCouponId() != null && orders.getCouponId() != 0) {
+                // 用户优惠券
+                WxUserCoupon wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+                if (wxUserCoupon != null) {
+                    // 修改状态为0
+                    wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NOT_USED);
+                    int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);
+                    if (updateUserCouponNum != NumConstants.INT_NUM_1) {
+                        logger.error("修改优惠券失效失败，用户优惠券id" + orders.getCouponId());
+                    }
+                }
+            }
+            if (!temp.equals("待付款")) {
+                if (orders.getPayment().equals("余额支付")) {
+                    // 取消订单时,将余额支付时的订单金额退回学校余额内
+                    Map<String, Object> map1 = new HashMap<>();
+                    map1.put("schoolId", user.getSchoolId());
+                    map1.put("charge", orders.getPayPrice());
+                    map1.put("send", orders.getPayFoodCoupon());
+                    schoolService.charge(map1);
+                    stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+                    // 订单消费的余额要退回用户余额内
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("phone", user.getOpenId() + "-" + user.getPhone());
+                    map.put("amount", orders.getPayPrice());
+                    if (wxUserBellService.charge(map) == 1) {
+                        //集合大于0才会扣库存
+                        if (productDisStockList.size() > 0) {
+                            boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                            if (!disProductStockSuccess) {
+                                // 这里想的扣库存失败还是可以下单
+                                logger.error("商品扣库存失败，商品信息：" + PublicUtilS.getCollectionToString(productDisStockList));
+                            }
+                        }
+                        return orders.getShopId();
+                    } else {
+                        throw new YWException("退款失败联系管理员");
+                    }
+                } else if (orders.getPayment().equals("微信支付")) {
+                    // 取消订单时,将微信支付时的粮票退回学校余额粮票内
+                    Map<String, Object> map1 = new HashMap<>();
+                    map1.put("schoolId", user.getSchoolId());
+                    map1.put("charge", NumConstants.INT_NUM_0);
+                    map1.put("send", orders.getPayFoodCoupon());
+                    schoolService.charge(map1);
+                    stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+                    String fee = AmountUtils.changeY2F(orders.getPayPrice().toString());
+                    if (orders.getPayPrice().multiply(new BigDecimal(100)).compareTo(new BigDecimal(fee)) != NumConstants.INT_NUM_0) {
+                        DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_TUI_KUAN_ERROR);
+                    }
+                    int result = RefundUtil.wechatRefund1(school.getWxAppId(), school.getWxSecret(), school.getMchId(), school.getWxPayId(), school.getCertPath(), orders.getId(), fee, fee);
+                    if (result != 1) {
+                        throw new YWException("微信退款失败联系管理员");
+                    } else {
+                        //集合大于0才会扣库存
+                        if (productDisStockList.size() > 0) {
+                            boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                            if (!disProductStockSuccess) {
+                                // 这里想的扣库存失败还是可以下单
+                                logger.error("商品扣库存失败，商品信息：" + PublicUtilS.getCollectionToString(productDisStockList));
+                            }
+                        }
+                        return orders.getShopId();
+                    }
+                }
+            } else {
+                //待付款
+                //集合大于0才会扣库存 开启库存
+                if (productDisStockList.size() > 0) {
+                    boolean disProductStockSuccess = productService.saveOrUpdateBatch(productDisStockList);
+                    if (!disProductStockSuccess) {
+                        // 这里想的扣库存失败还是可以下单
+                        logger.error("商品扣库存失败，商品信息：" + PublicUtilS.getCollectionToString(productDisStockList));
+                    }
+                }
+                return orders.getShopId();
+            }
+
+        }
         return 0;
     }
 
@@ -775,44 +776,49 @@ public class TOrdersServiceImpl implements TOrdersService {
     @Override
     public int shopAcceptOrderById(String orderId) {
         QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Orders::getId,orderId);
+        queryWrapper.lambda().eq(Orders::getId, orderId);
         Orders orders = ordersService.getOne(queryWrapper);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Orders update = new Orders();
-            update.setShopId(orders.getShopId());
-            update.setId(orderId);
-            update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
-        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 0L).intValue();
-        orders.setWaterNumber(water + 1);
-        update.setWaterNumber(water + 1);
-            int res = ordersService.shopAcceptOrderById(update);
-            if (res == 1) {
-                if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
-                    stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.HOURS);
-                }
-                // rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
-                List<String> formIds = new ArrayList<>();
-                try {
-                    formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0,-1);
-                }catch (Exception ex){
-                    LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，formid取缓存为空"+orders.getId());
-                }
-                if (formIds.size() > 0){
-                    // 查询订单商品表信息
-                    QueryWrapper<OrderProduct> productWrapper = new QueryWrapper<>();
-                    productWrapper.lambda().eq(OrderProduct::getOrderId,orderId);
-                    List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
-                    orders.setOp(orderProducts);
-                    orders.setStatus("待接手");
-                    WxMessageUtil.wxSendMsg(orders,formIds.get(0));
-                    stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
-                }else {
-                    LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，发送或者删除redis失败"+orders.getId());
-                }
+        Orders update = new Orders();
+        update.setShopId(orders.getShopId());
+        update.setId(orderId);
+        update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
 
-                return orders.getShopId();
+        Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(orders.getShopId().toString());
+        if (!haskey){
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(orders.getShopId().toString(),"0");
+        }
+        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
+        orders.setWaterNumber(water);
+        update.setWaterNumber(water);
+        int res = ordersService.shopAcceptOrderById(update);
+        if (res == 1) {
+            if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
+                stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.HOURS);
             }
-            return 0;
+            // rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
+            List<String> formIds = new ArrayList<>();
+            try {
+                formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0, -1);
+            } catch (Exception ex) {
+                LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，formid取缓存为空" + orders.getId());
+            }
+            if (formIds.size() > 0) {
+                // 查询订单商品表信息
+                QueryWrapper<OrderProduct> productWrapper = new QueryWrapper<>();
+                productWrapper.lambda().eq(OrderProduct::getOrderId, orderId);
+                List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
+                orders.setOp(orderProducts);
+                orders.setStatus("待接手");
+                WxMessageUtil.wxSendMsg(orders, formIds.get(0));
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
+            } else {
+                LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，发送或者删除redis失败" + orders.getId());
+            }
+
+            return orders.getShopId();
+        }
+        return 0;
     }
 
 
@@ -840,65 +846,65 @@ public class TOrdersServiceImpl implements TOrdersService {
         //查询楼栋
         QueryWrapper<Floor> queryWrapperFloor = new QueryWrapper<>();
         queryWrapperFloor.select("id");
-        queryWrapperFloor.eq("Id",buildId);
+        queryWrapperFloor.eq("Id", buildId);
         Floor floor = floorService.getOne(queryWrapperFloor);
         Assertions.notNull(floor, ResponseViewEnums.FLOOR_SELECT_NULL);
         //外卖订单
         QueryWrapper<Orders> queryWrapperTakeOut = new QueryWrapper<>();
         queryWrapperTakeOut
-                .eq("floor_id",buildId)
+                .eq("floor_id", buildId)
                 .eq("typ", OrderConstants.orderTypeTakeOut)
-                .ge("create_time",beginTime)
-                .le("create_time",endTime);
+                .ge("create_time", beginTime)
+                .le("create_time", endTime);
         Integer allOrdersTakeOut = ordersService.count(queryWrapperTakeOut);
         //堂食订单
         QueryWrapper<Orders> queryWrapperEatHere = new QueryWrapper<>();
         queryWrapperEatHere
-                .eq("floor_id",buildId)
+                .eq("floor_id", buildId)
                 .eq("typ", OrderConstants.queryWrapperEatHere)
-                .ge("create_time",beginTime)
-                .le("create_time",endTime);
+                .ge("create_time", beginTime)
+                .le("create_time", endTime);
         Integer allOrdersEatHere = ordersService.count(queryWrapperEatHere);
         //跑腿订单
         QueryWrapper<RunOrders> queryWrapperRunning = new QueryWrapper<>();
         queryWrapperRunning
-                .eq("floor_id",buildId)
+                .eq("floor_id", buildId)
                 .eq("typ", OrderConstants.orderTypeRunning)
-                .between("create_time",beginTime,endTime);
+                .between("create_time", beginTime, endTime);
         Integer allOrdersRunning = runOrdersService.count(queryWrapperRunning);
         //自取订单
         QueryWrapper<Orders> queryWrapperGetSelf = new QueryWrapper<>();
         queryWrapperGetSelf
-                .eq("floor_id",buildId)
+                .eq("floor_id", buildId)
                 .eq("typ", OrderConstants.queryWrapperGetSelf)
-                .between("create_time",beginTime,endTime);
+                .between("create_time", beginTime, endTime);
         Integer allOrdersGetSelf = ordersService.count(queryWrapperGetSelf);
         //订单总数
         Integer allOrders = allOrdersTakeOut + allOrdersEatHere + allOrdersRunning + allOrdersGetSelf;
         //营业额
         // 商品订单总营业额
-        Map<String,Object> map = new HashMap<>();
-        map.put("floorId",buildId);
-        map.put("beginTime",beginTime);
-        map.put("endTime",endTime);
+        Map<String, Object> map = new HashMap<>();
+        map.put("floorId", buildId);
+        map.put("beginTime", beginTime);
+        map.put("endTime", endTime);
         BigDecimal ordersCountPayPrice = BigDecimal.ZERO;
-        if (ordersMapper.countPayPriceByFloor(map) != null){
+        if (ordersMapper.countPayPriceByFloor(map) != null) {
             ordersCountPayPrice = ordersMapper.countPayPriceByFloor(map);
         }
         // 跑腿订单总营业额
         BigDecimal runOrdersCountTotalPrice = BigDecimal.ZERO;
 
-        if (tRunOrdersService.countTotalPriceByFloor(buildId,beginTime,endTime) != null){
-            runOrdersCountTotalPrice = tRunOrdersService.countTotalPriceByFloor(buildId,beginTime,endTime);
+        if (tRunOrdersService.countTotalPriceByFloor(buildId, beginTime, endTime) != null) {
+            runOrdersCountTotalPrice = tRunOrdersService.countTotalPriceByFloor(buildId, beginTime, endTime);
         }
         BigDecimal ordersAllMoney = ordersCountPayPrice.add(runOrdersCountTotalPrice);
         Map result = new HashMap();
-        result.put("allOrders",allOrders);
-        result.put("allOrdersTakeOut",allOrdersTakeOut);
-        result.put("allOrdersEatHere",allOrdersEatHere);
-        result.put("allOrdersRunning",allOrdersRunning);
-        result.put("allOrdersGetSelf",allOrdersGetSelf);
-        result.put("ordersAllMoney",ordersAllMoney);
+        result.put("allOrders", allOrders);
+        result.put("allOrdersTakeOut", allOrdersTakeOut);
+        result.put("allOrdersEatHere", allOrdersEatHere);
+        result.put("allOrdersRunning", allOrdersRunning);
+        result.put("allOrdersGetSelf", allOrdersGetSelf);
+        result.put("ordersAllMoney", ordersAllMoney);
         return result;
     }
 
@@ -909,38 +915,38 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 订单信息
         Orders orders = ordersService.findById(orderId);
         Assertions.notNull(orders);
-        if (!"已完成".equals(orders.getStatus())){
-            LoggerUtil.logError("消息队列MQ完成订单异常，订单不是已完成状态：订单id-"+orderId);
+        if (!"已完成".equals(orders.getStatus())) {
+            LoggerUtil.logError("消息队列MQ完成订单异常，订单不是已完成状态：订单id-" + orderId);
             return -1;
         }
         Boolean endTrue = this.orderSettlementByOrders(orders);
-        if (!endTrue){
+        if (!endTrue) {
             return -1;
         }
         return 1;
     }
 
     /**
-     * @date:   2019/8/6 15:40
+     * @param
+     * @date: 2019/8/6 15:40
      * @author: QinDaoFang
      * @version:version
      * @return: int
-     * @param   orderComplete1
-     * @Desc:   desc 二次修改 传orders结算少一个查库
+     * @Desc: desc 二次修改 传orders结算少一个查库
      */
     @Transactional
     @Override
     public Boolean orderSettlementByOrders(Orders orders) {
         QueryWrapper<OrdersComplete> query = new QueryWrapper<>();
-        query.lambda().eq(OrdersComplete::getOrderId,orders.getId());
+        query.lambda().eq(OrdersComplete::getOrderId, orders.getId());
         // 查询订单完成表信息是否存在，存在则不可以结算
         OrdersComplete orderComplete1 = orderCompleteService.getOne(query);
-        if (orderComplete1 != null){
-            Assertions.notNull(orderComplete1,ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
+        if (orderComplete1 != null) {
+            Assertions.notNull(orderComplete1, ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
         }
 
         // 对订单进行校验
-        Assertions.notNull(orders,ResponseViewEnums.ORDER_PARAM_ERROR);
+        Assertions.notNull(orders, ResponseViewEnums.ORDER_PARAM_ERROR);
         // 配送员
         Sender sender = senderService.findById(orders.getSenderId());
         WxUser senderUser = wxUserService.findById(sender.getOpenId());
@@ -952,7 +958,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 店铺
         Shop shop = shopService.getById(orders.getShopId());
         // 对店铺信息进行校验
-        Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
+        Assertions.notNull(shop, ResponseViewEnums.SHOP_HAD_CHANGE);
         // 学校
         School school = schoolService.findById(orders.getSchoolId());
         // 对学校信息进行校验
@@ -994,7 +1000,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         Boolean isCoupon = false;
         // 负责人抽成配送员百分比
         // 如果配送员为空
-        if (orders.getSenderId() == 0 || orders.getSenderId() == null){
+        if (orders.getSenderId() == 0 || orders.getSenderId() == null) {
             ordersComplete.setSchoolGetSenderRate(BigDecimal.ZERO);
             /**
              * 配送员所得
@@ -1042,7 +1048,7 @@ public class TOrdersServiceImpl implements TOrdersService {
          */
         ordersComplete.setAppGetTotal(appGetTotal);
         // 如果使用了优惠券
-        if (orders.getCouponId() != 0 && orders.getCouponId() != null){
+        if (orders.getCouponId() != 0 && orders.getCouponId() != null) {
             isCoupon = true;
             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
             coupon = couponService.getById(wxUserCoupon.getCouponId());
@@ -1050,11 +1056,11 @@ public class TOrdersServiceImpl implements TOrdersService {
             couponAmount = couponAmount.add(new BigDecimal(coupon.getCutAmount()));
         }
         // 如果使用了店铺满减
-        if (orders.getFullCutId() != null && orders.getFullCutId() != 0){
+        if (orders.getFullCutId() != null && orders.getFullCutId() != 0) {
             shopFullCut = shopFullCutService.getById(orders.getFullCutId());
             // 店铺满减优惠金额
             fullCutAmount = fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
-        } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1){
+        } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1) {
             // 商品折扣金额
             discountAmount = discountAmount.add(orders.getDiscountPrice());
         }
@@ -1064,13 +1070,13 @@ public class TOrdersServiceImpl implements TOrdersService {
          * 负责人抽取店铺金额
          */
         schoolGetshop = schoolGetshop.add(tempPrice.multiply(shop.getRate()));
-         ordersComplete.setSchoolGetShop(schoolGetshop);
+        ordersComplete.setSchoolGetShop(schoolGetshop);
         /**
          * 负责人承担比例金额
          */
-        if (isCoupon){
+        if (isCoupon) {
             // 如果优惠券类型为2 --> 负责人承担所有优惠券金额
-            if (coupon.getCouponType() == 2){
+            if (coupon.getCouponType() == 2) {
                 schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
                         .add(couponAmount)
                         .add(discountAmount.multiply(shop.getDiscountRate()));
@@ -1119,20 +1125,20 @@ public class TOrdersServiceImpl implements TOrdersService {
          * 将配送员所得金额添加到配送员账户内
          */
 
-        WxUserBell wxUserBell = wxUserBellService.getById(senderUser.getOpenId()+"-"+senderUser.getPhone());
+        WxUserBell wxUserBell = wxUserBellService.getById(senderUser.getOpenId() + "-" + senderUser.getPhone());
         wxUserBell.setMoney(wxUserBell.getMoney().add(ordersComplete.getSenderGetTotal()));
-        Map<String,Object> map = new HashMap<>();
-        map.put("amount",wxUserBell.getMoney());
-        map.put("phone",wxUserBell.getPhone());
-        if (wxUserBellMapper.txUpdate(map) == 0){
-            logger.error("配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+        Map<String, Object> map = new HashMap<>();
+        map.put("amount", wxUserBell.getMoney());
+        map.put("phone", wxUserBell.getPhone());
+        if (wxUserBellMapper.txUpdate(map) == 0) {
+            logger.error("配送员所得金额为" + senderGetTotal + "添加失败，请联系负责人");
             System.out.println("配送员所得金额添加失败，请联系负责人");
         }
         //增加用户积分
         //积分不保存小数位，向下取整
-        Integer addSource = orders.getPayPrice().setScale( 0, BigDecimal.ROUND_DOWN ).intValue();
-        Integer addUserSourceNum = wxUserBellMapper.addSourceByWxId(addSource,orderUser.getId());
-        if (addUserSourceNum != NumConstants.INT_NUM_1){
+        Integer addSource = orders.getPayPrice().setScale(0, BigDecimal.ROUND_DOWN).intValue();
+        Integer addUserSourceNum = wxUserBellMapper.addSourceByWxId(addSource, orderUser.getId());
+        if (addUserSourceNum != NumConstants.INT_NUM_1) {
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
         }
         // 将负责人所得添加到负责人可提现金额内
@@ -1142,19 +1148,19 @@ public class TOrdersServiceImpl implements TOrdersService {
         updateSchool.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
         boolean updateSchooleTrue = schoolMapper.updateById(updateSchool) != 1 ? false : true;
         stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
-        if (!updateSchooleTrue){
-            logger.error("负责人所得金额为"+schoolGetSender+"配送员所得金额为"+senderGetTotal+"添加失败，请联系负责人");
+        if (!updateSchooleTrue) {
+            logger.error("负责人所得金额为" + schoolGetSender + "配送员所得金额为" + senderGetTotal + "添加失败，请联系负责人");
             System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
         }
         // 将店铺所得添加到店铺可提现金额内
         shop.setTxAmount(shop.getTxAmount().add(shopGetTotal));
         boolean rs = shopService.updateById(shop);
-        if (!rs){
-            logger.error("店铺所得金额为"+shopGetTotal+"添加失败，请联系负责人");
+        if (!rs) {
+            logger.error("店铺所得金额为" + shopGetTotal + "添加失败，请联系负责人");
             System.out.println("店铺所得金额添加失败，请联系负责人");
         }
         //加当日总交易额
-        redisUtil.amountadd(school.getId(),orders.getPayPrice());
+        redisUtil.amountadd(school.getId(), orders.getPayPrice());
         return true;
     }
 
