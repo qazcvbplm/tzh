@@ -10,6 +10,7 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,7 @@ public class FileController {
     @CrossOrigin
     @PostMapping("/upfile")
     public String fileup(HttpServletRequest request, MultipartFile file) {
-        if (file.getSize() > 100 * 1024) {
+        if (file.getSize() > 500 * 1024) {
             return "图片不可超过100KB";
         }
         FileInputStream inputStream;
