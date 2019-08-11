@@ -39,7 +39,7 @@ public class ShopPrintController {
      */
     @ApiOperation(value="添加",httpMethod="POST")
     @ResponseBody
-    @RequestMapping(value = "/save",method = RequestMethod.POST)
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
     public ResponseObject saveOneShopFeiEByDTO(ShopPrintDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(dto.getYesPrintGpr(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
@@ -101,6 +101,23 @@ public class ShopPrintController {
     public ResponseObject findOneShopFeiEById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
         ShopPrint resultVO = shopPrintService.findOneShopFeiEById(id);
+        return new ResponseObject(true, ResponseViewEnums.FIND_SUCCESS).push("shopPrint",resultVO);
+    }
+
+    /**
+     * @date:
+     * @author: Fang
+     * @version:version
+     * @return: cn.fang.result.ResponseObject
+     * @param   shopId
+     * @Desc:   desc 通过id查询一个
+     */
+    @ApiOperation(value="通过店铺id查询一个",httpMethod="POST")
+    @ResponseBody
+    @RequestMapping(value = "/find",method = RequestMethod.POST)
+    public ResponseObject findOneShopFeiEByShopId(Long shopId){
+        Assertions.notNull(shopId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        List<ShopPrint> resultVO = shopPrintService.findOneShopFeiEByShopId(shopId);
         return new ResponseObject(true, ResponseViewEnums.FIND_SUCCESS).push("shopPrint",resultVO);
     }
 

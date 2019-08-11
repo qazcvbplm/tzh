@@ -58,9 +58,10 @@ public class WxUserController {
 
     /**
      * 微信用户登录
+     *
      * @param request
      * @param response
-     * @param code 小程序端传来的code码，用于获取openid和sessionKey
+     * @param code     小程序端传来的code码，用于获取openid和sessionKey
      * @param schoolId 学校Id
      * @return
      */
@@ -173,7 +174,7 @@ public class WxUserController {
 
     @ApiOperation(value = "绑定手机", httpMethod = "POST")
     @PostMapping("bind")
-    public ResponseObject bind(HttpServletRequest request, HttpServletResponse response, @RequestParam String phone, @RequestParam String codes,Long wxId) {
+    public ResponseObject bind(HttpServletRequest request, HttpServletResponse response, @RequestParam String phone, @RequestParam String codes, Long wxId) {
         Assertions.notNull(wxId, ResponseViewEnums.WX_USER_FAILED_TO_WX);
         String code = stringRedisTemplate.opsForValue().get(phone);
         if (code != null) {
@@ -185,7 +186,7 @@ public class WxUserController {
                 wxUser.setId(wxId);
                 stringRedisTemplate.delete(phone);
                 WxUser user = wxUserService.update(wxUser);
-                return new ResponseObject(true, "绑定成功").push("user",user);
+                return new ResponseObject(true, "绑定成功").push("user", user);
             } else {
                 return new ResponseObject(false, "验证码错误");
             }
@@ -224,6 +225,7 @@ public class WxUserController {
 
     /**
      * 对加密手机号进行解密
+     *
      * @param decryptData 敏感参数
      * @param sessionKey  session_key
      * @param ivData      iv

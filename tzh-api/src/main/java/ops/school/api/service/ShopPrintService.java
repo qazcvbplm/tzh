@@ -64,4 +64,13 @@ public interface ShopPrintService {
      */
     List<ShopPrint> batchFindShopFeiEByIds(List<Long> ids);
 
+    /**
+     * @date:   2019/8/11 20:57
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.ShopPrint
+     * @param   shopId
+     * @Desc:   desc
+     */
+    List<ShopPrint> findOneShopFeiEByShopId(Long shopId);
 }

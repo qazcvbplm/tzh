@@ -3,6 +3,7 @@ package ops.school.api.serviceimple;
 import java.util.List;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dao.ShopMapper;
 import ops.school.api.dao.ShopPrintMapper;
@@ -54,6 +55,14 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         Assertions.notNull(saveDTO, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Shop shop = shopMapper.selectById(saveDTO.getShopId());
         Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
+        //添加时一个店铺只对应一个一个 打印机
+        QueryWrapper<ShopPrint> wrapper = new QueryWrapper<>();
+        wrapper.eq("shop_id",saveDTO.getShopId());
+        wrapper.eq("print_brand",saveDTO.getPrintBrand());
+        List<ShopPrint> shopPrints = shopPrintMapper.selectList(wrapper);
+        if (shopPrints != null && shopPrints.size() > 0){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.SHOP_ONE_HAVE_ONE_TYPE_PRINT);
+        }
         //设置日期格式
         saveDTO.setCreateTime(new Date());
         saveDTO.setUpdateTime(new Date());
@@ -138,5 +147,20 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         return batchFindVOSByIds;
     }
 
-
+    /**
+     * @date:   2019/8/11 20:57
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.ShopPrint
+     * @param   shopId
+     * @Desc:   desc
+     */
+    @Override
+    public List<ShopPrint> findOneShopFeiEByShopId(Long shopId) {
+        Assertions.notNull(shopId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        QueryWrapper<ShopPrint> wrapper = new QueryWrapper<>();
+        wrapper.eq("shop_id",shopId);
+        List<ShopPrint> shopPrints = shopPrintMapper.selectList(wrapper);
+        return shopPrints;
+    }
 }
