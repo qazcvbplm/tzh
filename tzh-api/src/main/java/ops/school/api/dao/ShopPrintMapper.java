@@ -3,12 +3,12 @@ package ops.school.api.dao;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import ops.school.api.dto.ShopFeiEDTO;
-import ops.school.api.entity.ShopFeiE;
+import ops.school.api.dto.ShopPrintDTO;
+import ops.school.api.entity.ShopPrint;
 import org.apache.ibatis.annotations.Param;
 
 
-public interface ShopFeiEMapper extends BaseMapper<ShopFeiE> {
+public interface ShopPrintMapper extends BaseMapper<ShopPrint> {
 
     /**
      * @date:
@@ -18,7 +18,7 @@ public interface ShopFeiEMapper extends BaseMapper<ShopFeiE> {
      * @param   dto
      * @Desc:   desc 分页查询统计
      */
-    Integer countLimitByDTO(ShopFeiEDTO dto);
+    Integer countLimitByDTO(ShopPrintDTO dto);
 
     /**
      * @date:
@@ -28,7 +28,7 @@ public interface ShopFeiEMapper extends BaseMapper<ShopFeiE> {
      * @param   dto
      * @Desc:   desc 分页查询
      */
-    List<ShopFeiE> selectLimitByDTO(ShopFeiEDTO dto);
+    List<ShopPrint> selectLimitByDTO(ShopPrintDTO dto);
 
     /**
      * @date:
@@ -38,7 +38,7 @@ public interface ShopFeiEMapper extends BaseMapper<ShopFeiE> {
      * @param   ids
      * @Desc:   desc 批量查询
      */
-    List<ShopFeiE> batchFindByIds(@Param("list") List<Long> ids);
+    List<ShopPrint> batchFindByIds(@Param("list") List<Long> ids);
 
 
 }

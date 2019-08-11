@@ -1,10 +1,9 @@
 package ops.school.api.service;
 
 import java.util.List;
-import java.util.Map;
 
-import ops.school.api.dto.ShopFeiEDTO;
-import ops.school.api.entity.ShopFeiE;
+import ops.school.api.dto.ShopPrintDTO;
+import ops.school.api.entity.ShopPrint;
 import ops.school.api.util.ResponseObject;
 
 /**
@@ -12,7 +11,7 @@ import ops.school.api.util.ResponseObject;
  * @date:   2019/8/11 18:20
  * @desc:
  */
-public interface ShopFeiEService {
+public interface ShopPrintService {
 
 
     /**
@@ -23,7 +22,7 @@ public interface ShopFeiEService {
      * @param   dto
      * @Desc:   desc 通过DTO新增
      */
-    ResponseObject saveOneShopFeiEByDTO(ShopFeiEDTO dto);
+    ResponseObject saveOneShopFeiEByDTO(ShopPrintDTO dto);
 
     /**
      * @date:
@@ -33,7 +32,7 @@ public interface ShopFeiEService {
      * @param   dto
      * @Desc:   desc 通过DTO更新
      */
-    ResponseObject updateOneShopFeiEByDTO(ShopFeiEDTO dto);
+    ResponseObject updateOneShopFeiEByDTO(ShopPrintDTO dto);
 
     /**
      * @date:
@@ -53,7 +52,7 @@ public interface ShopFeiEService {
      * @param   id
      * @Desc:   desc 通过id查询一个
      */
-    ShopFeiE findOneShopFeiEById(Long id);
+    ShopPrint findOneShopFeiEById(Long id);
 
     /**
      * @date:
@@ -63,6 +62,6 @@ public interface ShopFeiEService {
      * @param   ids
      * @Desc:   desc 通过id集合查询
      */
-    List<ShopFeiE> batchFindShopFeiEByIds(List<Long> ids);
+    List<ShopPrint> batchFindShopFeiEByIds(List<Long> ids);
 
 }

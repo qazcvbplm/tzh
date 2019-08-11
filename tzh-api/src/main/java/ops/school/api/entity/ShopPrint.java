@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @date:   2019/8/11 18:13
  * @desc:   
  */
-public class ShopFeiE implements Serializable {
+public class ShopPrint implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -20,34 +20,26 @@ public class ShopFeiE implements Serializable {
      */
     @TableId(type = IdType.AUTO)
     private Long id;
-    /**
-     * 店铺id
-     */
+
+    /**店铺id*/
     private Long shopId;
-    /**
-     * 店铺是否开启飞鹅GPRS打印 0-不开启，1-开启
-     */
+    /**店铺是否开启飞鹅GPRS打印 0-不开启，1-开启*/
     private Integer yesPrintGpr;
-    /**
-     * 店铺是否开启飞鹅GPRS打印 0-不开启，1-开启
-     */
-    private Integer feiESn;
-    /**
-     * 创建人id
-     */
+    /**打印机品牌 1-飞鹅，2-其他*/
+    private Integer printBrand;
+    /**店铺打印机的sn码*/
+    private String feiESn;
+    /**店铺打印机的key码*/
+    private String feiEKey;
+    /**创建人id*/
     private Long createId;
-    /**
-     * 修改人id
-     */
+    /**修改人id*/
     private Long updateId;
-    /**
-     * 创建时间
-     */
+    /**创建时间*/
     private Date createTime;
-    /**
-     * 修改时间
-     */
+    /**修改时间*/
     private Date updateTime;
+
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -77,12 +69,28 @@ public class ShopFeiE implements Serializable {
         this.yesPrintGpr = yesPrintGpr;
     }
 
-    public Integer getFeiESn() {
+    public Integer getPrintBrand() {
+        return printBrand;
+    }
+
+    public void setPrintBrand(Integer printBrand) {
+        this.printBrand = printBrand;
+    }
+
+    public String getFeiESn() {
         return feiESn;
     }
 
-    public void setFeiESn(Integer feiESn) {
+    public void setFeiESn(String feiESn) {
         this.feiESn = feiESn;
+    }
+
+    public String getFeiEKey() {
+        return feiEKey;
+    }
+
+    public void setFeiEKey(String feiEKey) {
+        this.feiEKey = feiEKey;
     }
 
     public Long getCreateId() {

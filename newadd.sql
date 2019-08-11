@@ -1,15 +1,18 @@
-CREATE TABLE `shop_fei_e` (
+CREATE TABLE `shop_print` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `shop_id` bigint(20) NOT NULL COMMENT '店铺id',
   `yes_print_gpr` int(4) NOT NULL COMMENT '店铺是否开启飞鹅GPRS打印 0-不开启，1-开启',
-  `fei_e_sn` int(4) NOT NULL COMMENT '店铺是否开启飞鹅GPRS打印 0-不开启，1-开启',
+  `print_brand` int(4) NOT NULL COMMENT '打印机品牌 1-飞鹅，2-其他',
+  `fei_e_sn` VARCHAR(64) NOT NULL COMMENT '店铺打印机的sn码',
+  `fei_e_key` VARCHAR(64) NOT NULL COMMENT '店铺打印机的key码',
+
   `create_id` bigint(20) NOT NULL COMMENT '创建人id',
   `update_id` bigint(20) DEFAULT '0' COMMENT '修改人id',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`),
   KEY `normal_index_shop_id` (`shop_id`) USING BTREE COMMENT '店铺id索引'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='店铺飞鹅打印机表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='店铺打印机表';
 
 
 insert into shop (

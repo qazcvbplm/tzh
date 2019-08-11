@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="ops.school.api.dao.ShopFeiEMapper" >
-<resultMap id="BaseResultMap" type="ops.school.api.entity.ShopFeiE" >
+<mapper namespace="ops.school.api.dao.ShopPrintMapper" >
+<resultMap id="BaseResultMap" type="ops.school.api.entity.ShopPrint" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="shop_id" property="shopId" jdbcType="BIGINT" />
     <result column="yes_print_gpr" property="yesPrintGpr" jdbcType="INTEGER" />
-    <result column="fei_e_sn" property="feiESn" jdbcType="INTEGER" />
+    <result column="print_brand" property="printBrand" jdbcType="INTEGER" />
+    <result column="fei_e_sn" property="feiESn" jdbcType="VARCHAR" />
+    <result column="fei_e_key" property="feiEKey" jdbcType="VARCHAR" />
     <result column="create_id" property="createId" jdbcType="BIGINT" />
     <result column="update_id" property="updateId" jdbcType="BIGINT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -13,10 +15,12 @@
 </resultMap>
 
     <sql id="Base_Column_List" >
-        id,
+         id,
         shop_id,
         yes_print_gpr,
+        print_brand,
         fei_e_sn,
+        fei_e_key,
         create_id,
         update_id,
         create_time,
@@ -27,33 +31,39 @@
         shop_fei_e
     </sql>
 
-<sql id="Select_Limit_State">
-    1=1
-    <if test="id != null and id != '' ">
-        AND id = #{id}
-    </if>
-    <if test="shopId != null and shopId != '' ">
-        AND shop_id = #{shopId}
-    </if>
-    <if test="yesPrintGpr != null and yesPrintGpr != '' ">
-        AND yes_print_gpr = #{yesPrintGpr}
-    </if>
-    <if test="feiESn != null and feiESn != '' ">
-        AND fei_e_sn = #{feiESn}
-    </if>
-    <if test="createId != null and createId != '' ">
-        AND create_id = #{createId}
-    </if>
-    <if test="updateId != null and updateId != '' ">
-        AND update_id = #{updateId}
-    </if>
-    <if test="createTime != null and createTime != '' ">
-        AND create_time = #{createTime}
-    </if>
-    <if test="updateTime != null and updateTime != '' ">
-        AND update_time = #{updateTime}
-    </if>
-</sql>
+    <sql id="Select_Limit_State">
+        1=1
+        <if test="id != null and id != '' ">
+            AND id = #{id}
+        </if>
+        <if test="shopId != null and shopId != '' ">
+            AND shop_id = #{shopId}
+        </if>
+        <if test="yesPrintGpr != null and yesPrintGpr != '' ">
+            AND yes_print_gpr = #{yesPrintGpr}
+        </if>
+        <if test="printBrand != null and printBrand != '' ">
+            AND print_brand = #{printBrand}
+        </if>
+        <if test="feiESn != null and feiESn != '' ">
+            AND fei_e_sn = #{feiESn}
+        </if>
+        <if test="feiEKey != null and feiEKey != '' ">
+            AND fei_e_key = #{feiEKey}
+        </if>
+        <if test="createId != null and createId != '' ">
+            AND create_id = #{createId}
+        </if>
+        <if test="updateId != null and updateId != '' ">
+            AND update_id = #{updateId}
+        </if>
+        <if test="createTime != null and createTime != '' ">
+            AND create_time = #{createTime}
+        </if>
+        <if test="updateTime != null and updateTime != '' ">
+            AND update_time = #{updateTime}
+        </if>
+    </sql>
 
 <!--CreatBy Fang Time: |  分页查询统计-->
 <select id="countLimitByDTO" resultType="java.lang.Integer">

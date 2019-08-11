@@ -1,5 +1,7 @@
 package ops.school.api.dto;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.dto.project.BaseDTO;
 
 import java.io.Serializable;
@@ -10,17 +12,26 @@ import java.util.Date;
  * @date:   2019/8/11 18:12 
  * @desc:   
  */
-public class ShopFeiEDTO extends BaseDTO implements Serializable {
-    
+public class ShopPrintDTO extends BaseDTO implements Serializable {
+
+
     private static final long serialVersionUID = 1L;
-    /**主键id*/
+    /**
+     * 主键id
+     */
+    @TableId(type = IdType.AUTO)
     private Long id;
+
     /**店铺id*/
     private Long shopId;
     /**店铺是否开启飞鹅GPRS打印 0-不开启，1-开启*/
     private Integer yesPrintGpr;
-    /**店铺是否开启飞鹅GPRS打印 0-不开启，1-开启*/
-    private Integer feiESn;
+    /**打印机品牌 1-飞鹅，2-其他*/
+    private Integer printBrand;
+    /**店铺打印机的sn码*/
+    private String feiESn;
+    /**店铺打印机的key码*/
+    private String feiEKey;
     /**创建人id*/
     private Long createId;
     /**修改人id*/
@@ -58,12 +69,28 @@ public class ShopFeiEDTO extends BaseDTO implements Serializable {
         this.yesPrintGpr = yesPrintGpr;
     }
 
-    public Integer getFeiESn() {
+    public Integer getPrintBrand() {
+        return printBrand;
+    }
+
+    public void setPrintBrand(Integer printBrand) {
+        this.printBrand = printBrand;
+    }
+
+    public String getFeiESn() {
         return feiESn;
     }
 
-    public void setFeiESn(Integer feiESn) {
+    public void setFeiESn(String feiESn) {
         this.feiESn = feiESn;
+    }
+
+    public String getFeiEKey() {
+        return feiEKey;
+    }
+
+    public void setFeiEKey(String feiEKey) {
+        this.feiEKey = feiEKey;
     }
 
     public Long getCreateId() {
