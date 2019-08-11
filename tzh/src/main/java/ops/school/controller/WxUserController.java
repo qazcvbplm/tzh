@@ -146,7 +146,7 @@ public class WxUserController {
 
     @ApiOperation(value = "查询微信用户", httpMethod = "POST")
     @PostMapping("find")
-    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, WxUser wxUser) {
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, @RequestBody WxUser wxUser) {
         wxUser.setQueryType(request.getAttribute("role").toString());
         wxUser.setQuery(request.getAttribute("Id").toString());
         wxUser.setPage((wxUser.getPage() - 1) * wxUser.getSize());
