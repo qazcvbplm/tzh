@@ -21,10 +21,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * CreatebyFang
@@ -276,12 +283,18 @@ public class ShopPrintUtils {
     }
 
     public static void main(String[] args) throws Exception {
-        //ShopPrintUtils.feiYinGetToken();
-       //ShopPrintUtils.feiYinAddPrinter("544545");
-        ShopPrintUtils.feiEAddPrinter("444444");
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(9);
+        System.out.println("开始任务");
 
-        FeyinClient feyinClient = new FeyinClient(ShopPrintConfigConstants.FE_YIN_2_0_USER_MEMBER_CODE,ShopPrintConfigConstants.FE_YIN_2_0_API_KEY);
-        FeyinResponse feyinResponse = feyinClient.bindPrinter("555555");
-        System.out.println(feyinResponse);
+        //延时3秒执行
+        executor.schedule(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("执行任务");
+            }
+        }, 2, TimeUnit.SECONDS);
+        System.out.println("本程序存在5秒后自动退出------------");
+        executor.shutdown();
+        return;
     }
 }

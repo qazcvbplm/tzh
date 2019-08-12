@@ -4,18 +4,25 @@ package ops.school.controller;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.dto.ShopPrintDTO;
+import ops.school.api.dto.print.PrintDataDTO;
 import ops.school.api.entity.ShopPrint;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.ShopPrintService;
 import ops.school.api.util.ResponseObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: QinDaoFang
@@ -26,8 +33,13 @@ import java.util.List;
 @RequestMapping("/ops/shop/print")
 public class ShopPrintController {
 
-    @Resource
+    @Autowired
     private ShopPrintService shopPrintService;
+
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
 
     /**
      * @date:
@@ -135,6 +147,17 @@ public class ShopPrintController {
         Assertions.notEmpty(ids,PublicErrorEnums.PULBIC_EMPTY_PARAM);
         List<ShopPrint> resultVO = shopPrintService.batchFindShopFeiEByIds(ids);
         return new ResponseObject(true, ResponseViewEnums.FIND_SUCCESS).push("list",resultVO);
+    }
+
+
+    @ApiOperation(value="保存飞印打印后生成的id和orderId",httpMethod="POST")
+    @ResponseBody
+    @RequestMapping(value = "/save",method = RequestMethod.POST)
+    public ResponseObject save(PrintDataDTO printDataDTO){
+        Assertions.notNull(printDataDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(printDataDTO.getOurOrderId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
 }

@@ -9,10 +9,12 @@ import ops.school.api.util.ResponseObject;
 import ops.school.service.TOrdersService;
 import ops.school.util.Base64Util;
 import ops.school.util.ImageUtil;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -25,7 +27,7 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = App.class)
 @WebAppConfiguration
-public class Test {
+public class TestAll {
 
     @Autowired
     private TxLogService txLogService;
@@ -36,18 +38,24 @@ public class Test {
     @Autowired
     private ShopService shopService;
 
-    /*@org.junit.Test
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+
+    @Test
     public void test(){
-//        try {
-//             Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", "18857818257", 372755, "123123,ghuighiu", null);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        } catch (HTTPException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }*/
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("延迟任务");
+            }
+        });
+    }
 
     @org.junit.Test
     public void addOrderTest(){
