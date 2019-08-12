@@ -83,6 +83,8 @@ public class Shop {
 
     private Long sort;
 
+    private Integer printType;
+
     @TableField(exist = false)
     private BigDecimal minDiscount;
     @TableField(exist = false)
@@ -458,6 +460,14 @@ public class Shop {
 
     public void setSort(Long sort) {
         this.sort = sort;
+    }
+
+    public Integer getPrintType() {
+        return printType;
+    }
+
+    public void setPrintType(Integer printType) {
+        this.printType = printType;
     }
 
     @Override

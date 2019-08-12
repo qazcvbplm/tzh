@@ -24,7 +24,7 @@ public class ShopPrint implements Serializable {
     /**店铺id*/
     private Long shopId;
     /**店铺是否开启飞鹅GPRS打印 0-不开启，1-开启*/
-    private Integer yesPrintGpr;
+/*    private Integer yesPrintGpr;*/
     /**打印机品牌 1-飞鹅，2-其他*/
     private Integer printBrand;
     /**店铺打印机的sn码*/
@@ -39,6 +39,7 @@ public class ShopPrint implements Serializable {
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
+
 
 
     public static long getSerialVersionUID() {
@@ -59,14 +60,6 @@ public class ShopPrint implements Serializable {
 
     public void setShopId(Long shopId) {
         this.shopId = shopId;
-    }
-
-    public Integer getYesPrintGpr() {
-        return yesPrintGpr;
-    }
-
-    public void setYesPrintGpr(Integer yesPrintGpr) {
-        this.yesPrintGpr = yesPrintGpr;
     }
 
     public Integer getPrintBrand() {

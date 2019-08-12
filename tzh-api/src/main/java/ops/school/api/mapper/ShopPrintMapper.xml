@@ -4,7 +4,6 @@
 <resultMap id="BaseResultMap" type="ops.school.api.entity.ShopPrint" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="shop_id" property="shopId" jdbcType="BIGINT" />
-    <result column="yes_print_gpr" property="yesPrintGpr" jdbcType="INTEGER" />
     <result column="print_brand" property="printBrand" jdbcType="INTEGER" />
     <result column="fei_e_sn" property="feiESn" jdbcType="VARCHAR" />
     <result column="fei_e_key" property="feiEKey" jdbcType="VARCHAR" />
@@ -17,7 +16,6 @@
     <sql id="Base_Column_List" >
          id,
         shop_id,
-        yes_print_gpr,
         print_brand,
         fei_e_sn,
         fei_e_key,
@@ -28,7 +26,7 @@
     </sql>
 
     <sql id="Table_Name">
-        shop_fei_e
+        shop_print
     </sql>
 
     <sql id="Select_Limit_State">
