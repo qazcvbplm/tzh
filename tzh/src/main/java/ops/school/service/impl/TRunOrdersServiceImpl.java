@@ -1,8 +1,6 @@
 package ops.school.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import ops.school.api.dao.RunOrdersMapper;
-import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.*;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
@@ -10,8 +8,7 @@ import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
-import ops.school.api.wxutil.WxGUtil;
-import ops.school.constants.NumConstants;
+import ops.school.api.constants.NumConstants;
 import ops.school.service.TRunOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

@@ -167,6 +167,13 @@
             <version>2.6</version>
             <scope>compile</scope>
         </dependency>
+        <!--飞印打印机-->
+        <dependency>
+            <groupId>net.feyin.api</groupId>
+            <artifactId>feyin-api</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+
     </dependencies>
     <build>
 <!--        <resources>-->

@@ -42,9 +42,8 @@ public class ShopPrintController {
     @RequestMapping(value = "/add",method = RequestMethod.POST)
     public ResponseObject saveOneShopFeiEByDTO(ShopPrintDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-
         Assertions.notNull(dto.getPrintBrand(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(dto.getCreateId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(dto.getCreateId(),ResponseViewEnums.CREATE_ID_CANT_NULL);
         Assertions.notNull(dto.getFeiESn(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(dto.getFeiEKey(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(dto,dto.getShopId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);

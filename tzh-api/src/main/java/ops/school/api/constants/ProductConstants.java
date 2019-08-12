@@ -1,4 +1,4 @@
-package ops.school.constants;
+package ops.school.api.constants;
 
 /**
  * CreatebyFang

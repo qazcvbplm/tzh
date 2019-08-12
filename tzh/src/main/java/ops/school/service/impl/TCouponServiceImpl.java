@@ -1,7 +1,6 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import ops.school.api.dao.CouponMapper;
@@ -19,13 +18,11 @@ import ops.school.api.exception.Assertions;
 import ops.school.api.service.CouponService;
 import ops.school.api.service.ShopCouponService;
 import ops.school.api.util.*;
-import ops.school.config.RedisConfig;
-import ops.school.constants.NumConstants;
+import ops.school.api.constants.NumConstants;
 import ops.school.service.TCouponService;
 import ops.school.service.TShopCouponService;
 import ops.school.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

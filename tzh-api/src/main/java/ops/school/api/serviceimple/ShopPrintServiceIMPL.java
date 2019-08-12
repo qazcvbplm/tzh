@@ -3,11 +3,13 @@ package ops.school.api.serviceimple;
 import java.util.List;
 import java.util.Date;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import ops.school.api.constants.NumConstants;
+import ops.school.api.constants.ShopPrintConfigConstants;
 import ops.school.api.dao.ShopMapper;
 import ops.school.api.dao.ShopPrintMapper;
 import ops.school.api.dto.ShopPrintDTO;
+import ops.school.api.dto.print.ShopPrintFeiEDTO;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopPrint;
 import ops.school.api.enums.PublicErrorEnums;
@@ -15,7 +17,9 @@ import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.DisplayException;
 import ops.school.api.service.ShopPrintService;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ResponseObject;
+import ops.school.api.util.ShopPrintUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 
@@ -50,9 +54,12 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
      */
     @Override
     public ResponseObject saveOneShopFeiEByDTO(@Valid ShopPrintDTO saveDTO) {
-        Assertions.notNull(saveDTO,saveDTO.getShopId());
-        Assertions.notNull(saveDTO.getCreateId(),"创建人不能为空");
-        Assertions.notNull(saveDTO, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO.getPrintBrand(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO.getCreateId(),ResponseViewEnums.CREATE_ID_CANT_NULL);
+        Assertions.notNull(saveDTO.getFeiESn(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO.getFeiEKey(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO.getShopId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Shop shop = shopMapper.selectById(saveDTO.getShopId());
         Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
         //添加时一个店铺只对应一个一个 打印机
@@ -69,9 +76,24 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         saveDTO.setUpdateId(saveDTO.getCreateId());
         ShopPrint shopPrint = new ShopPrint();
         BeanUtils.copyProperties(saveDTO, shopPrint);
-        shopPrintMapper.insert(shopPrint);
+        int addNum = shopPrintMapper.insert(shopPrint);
+        if (addNum != NumConstants.INT_NUM_1){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.FAILED);
+        }
+        // 添加到第三方打印机管理
+        // 如果是飞鹅的打印
+        if (saveDTO.getPrintBrand().intValue() == ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E){
+            //sn key "sn1#key1#remark1#carnum1\nsn2#key2#remark2#carnum2";
+            String snList = ""+saveDTO.getFeiESn() + "#" + saveDTO.getFeiEKey() + "#" + shop.getShopName()+"飞鹅打印机";
+            ShopPrintFeiEDTO addFeiE = ShopPrintUtils.feiEAddPrinter(snList);
+            if (!addFeiE.isSuccess()){
+                LoggerUtil.logError("系统记录-添加飞鹅打印机失败-saveOneShopFeiEByDTO-日志"+addFeiE.getErrorMessage());
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.SHOP_ADD_FEI_FAILED);
+            }
+        }
         return new ResponseObject(true, ResponseViewEnums.SUCCESS);
     }
+
 
     /**
      * @date:

@@ -22,6 +22,8 @@ public enum ResponseViewEnums implements RootEnums{
 
     /**操作失败*/
     FIND_FAILED("1210006","查询失败"),
+    /**创建人不能为空*/
+    CREATE_ID_CANT_NULL("1210007","创建人不能为空"),
 
 
     /**----------2-楼栋错误-----------*/
@@ -59,6 +61,7 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------8-店铺信息错误-----------*/
     SHOP_HAD_CHANGE("1280001","店铺信息发生变化，请联系后台管理"),
     SHOP_ONE_HAVE_ONE_TYPE_PRINT("1280002","一个店铺每一种品牌的打印机只能拥有一个"),
+    SHOP_ADD_FEI_FAILED("1280003","飞鹅平台添加打印机失败，请稍后重试或者联系管理员"),
 
     /**----------9-配送员信息错误-----------*/
     SENDER_HAD_CHANGE("1290001","配送员信息发生变化，请联系后台管理"),

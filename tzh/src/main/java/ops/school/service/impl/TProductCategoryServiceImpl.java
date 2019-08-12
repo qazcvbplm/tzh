@@ -1,7 +1,6 @@
 package ops.school.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ops.school.api.dao.ProductCategoryMapper;
 import ops.school.api.dao.ProductMapper;
 import ops.school.api.entity.Product;
@@ -10,7 +9,7 @@ import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.ResponseObject;
-import ops.school.constants.NumConstants;
+import ops.school.api.constants.NumConstants;
 import ops.school.service.TProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

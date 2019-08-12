@@ -3,7 +3,6 @@ package ops.school.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
-import ops.school.api.dao.AddressMapper;
 import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dao.SchoolMapper;
 import ops.school.api.dao.WxUserBellMapper;
@@ -21,14 +20,10 @@ import ops.school.api.service.*;
 import ops.school.api.util.*;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
-import ops.school.config.RabbitMQConfig;
-import ops.school.constants.CouponConstants;
-import ops.school.constants.NumConstants;
-import ops.school.constants.OrderConstants;
-import ops.school.constants.ProductConstants;
-import ops.school.message.dto.SchoolAddMoneyDTO;
-import ops.school.message.dto.SenderAddMoneyDTO;
-import ops.school.message.dto.WxUserAddSourceDTO;
+import ops.school.api.constants.CouponConstants;
+import ops.school.api.constants.NumConstants;
+import ops.school.api.constants.OrderConstants;
+import ops.school.api.constants.ProductConstants;
 import ops.school.service.*;
 import ops.school.util.WxMessageUtil;
 import org.slf4j.Logger;
@@ -614,17 +609,19 @@ public class TOrdersServiceImpl implements TOrdersService {
         map.put("phone", user.getOpenId() + "-" + user.getPhone());
         map.put("amount", orders.getPayPrice());
         if (wxUserBellService.pay(map) == 1) {
+            //扣除学校余额数据和粮票余额
+            Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(orders.getPayPrice(), orders.getPayFoodCoupon(), school.getId());
+            if (disSCNum != NumConstants.INT_NUM_1) {
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
+            }
             if (paySuccess(orders.getId(), "余额支付") == 0) {
+                stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).delete(orders.getId().toString());
+                stringRedisTemplate.boundHashOps("ALL_DJS").delete(orders.getId().toString());
                 throw new YWException("订单状态异常");
             }
             String[] formIds = formid.split(",");
             if (formIds.length < 1) {
                 LoggerUtil.logError("order pay formid为空" + orders.getId());
-            }
-            //扣除学校余额数据和粮票余额
-            Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(orders.getPayPrice(), orders.getPayFoodCoupon(), school.getId());
-            if (disSCNum != NumConstants.INT_NUM_1) {
-                DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
             }
             stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
             stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
@@ -651,7 +648,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             orders.setPayTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).put(orderId, JSON.toJSONString(orders));
             stringRedisTemplate.boundHashOps("ALL_DJS").put(orderId, JSON.toJSONString(orders));
-            stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
+            //stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
             //stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
         }
         return rs;

@@ -34,9 +34,9 @@ public class Api_java_demo {
 			//错误：{"msg":"参数错误 : 该帐号未注册.","ret":-2,"data":null,"serverExecutedTime":37}
 
 			//提示：打印机编号(必填) # 打印机识别码(必填) # 备注名称(选填) # 流量卡号码(选填)，多台打印机请换行（\n）添加新打印机信息，每次最多100行(台)。
-//			String snlist = "sn1#key1#remark1#carnum1\nsn2#key2#remark2#carnum2";
-//			String method = addprinter(snlist);
-//			System.out.println(method);
+			String snlist = "sn1#key1#remark1#carnum1\nsn2#key2#remark2#carnum2";
+			String method = addprinter(snlist);
+			System.out.println(method);
 			
 			
 			

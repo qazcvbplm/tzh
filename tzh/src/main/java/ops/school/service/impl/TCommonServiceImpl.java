@@ -9,8 +9,7 @@ import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.wx.towallet.WeChatPayUtil;
-import ops.school.constants.NumConstants;
-import ops.school.controller.RichTextController;
+import ops.school.api.constants.NumConstants;
 import ops.school.service.TCommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -23,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 @Service
 public class TCommonServiceImpl implements TCommonService {

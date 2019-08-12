@@ -3,7 +3,6 @@ package ops.school.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ReplyTextMsg;
 import ops.school.api.entity.WxUser;
 import ops.school.api.enums.ResponseViewEnums;
@@ -12,9 +11,7 @@ import ops.school.api.service.WxUserBellService;
 import ops.school.api.service.WxUserService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.wxutil.XMLUtil;
-import ops.school.config.RabbitMQConfig;
-import ops.school.constants.NumConstants;
-import ops.school.message.dto.WxUserAddSourceDTO;
+import ops.school.api.constants.NumConstants;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +23,6 @@ import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

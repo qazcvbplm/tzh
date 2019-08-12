@@ -7,7 +7,7 @@ import ops.school.api.entity.Notice;
 import ops.school.api.service.NoticeService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
-import ops.school.constants.NumConstants;
+import ops.school.api.constants.NumConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;

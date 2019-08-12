@@ -2,31 +2,24 @@ package ops.school.scheduled;
 
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.qcloudsms.httpclient.HTTPException;
-import ops.school.api.dao.OrdersMapper;
-import ops.school.api.dao.RunOrdersMapper;
 import ops.school.api.dto.RunOrdersTj;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
 import ops.school.api.util.*;
-import ops.school.constants.NumConstants;
+import ops.school.api.constants.NumConstants;
 import ops.school.controller.SignController;
 import ops.school.service.TCouponService;
 import ops.school.service.TOrdersService;
 import ops.school.service.TWxUserCouponService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;

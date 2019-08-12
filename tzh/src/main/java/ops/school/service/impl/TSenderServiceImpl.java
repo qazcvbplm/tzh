@@ -1,8 +1,5 @@
 package ops.school.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.SenderTj;
@@ -13,11 +10,7 @@ import ops.school.api.exception.DisplayException;
 import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisUtil;
-import ops.school.config.RabbitMQConfig;
-import ops.school.constants.NumConstants;
-import ops.school.message.dto.SchoolAddMoneyDTO;
-import ops.school.message.dto.SenderAddMoneyDTO;
-import ops.school.message.dto.WxUserAddSourceDTO;
+import ops.school.api.constants.NumConstants;
 import ops.school.service.TOrdersService;
 import ops.school.service.TSenderService;
 import ops.school.util.WxMessageUtil;
