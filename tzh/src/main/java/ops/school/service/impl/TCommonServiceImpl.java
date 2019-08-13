@@ -185,7 +185,10 @@ public class TCommonServiceImpl implements TCommonService {
                                 school.getCertPath(), payId, "127.0.0.1", log.getAmount(), wxUser.getOpenId(),
                                 log) == 1) {
                             txLogService.updateById(log);
-                            if (schoolService.sendertx(map) == 0) {
+                            Map schoolMap = new HashMap();
+                            schoolMap.put("schoolId",shop.getSchoolId());
+                            schoolMap.put("amount",log.getAmount());
+                            if (schoolService.tx(schoolMap) == 0) {
                                 LoggerUtil.log("配送员提现学校减少金额失败:" + log.getTxerId() + ":" + log.getAmount());
                             }
                             return 1;

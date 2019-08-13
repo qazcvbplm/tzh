@@ -546,6 +546,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersSaveTemp.setShopName(shop.getShopName());
         ordersSaveTemp.setShopPhone(shop.getShopPhone());
         ordersSaveTemp.setAfterDiscountPrice(afterDiscountPrice);
+        ordersSaveTemp.setCreateTime(new Date());
         /**
          * 支付金额计算逻辑
          */
@@ -588,6 +589,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         Map resultMap = new HashMap();
         resultMap.put("orderId", generatorOrderId);
+        resultMap.put("createTime",ordersSaveTemp.getCreateTime());
 //        Long endOrderTime = System.currentTimeMillis();
 //        System.out.println(endOrderTime - startOrderTime);
         return new ResponseObject(true, "创建订单成功！", resultMap);
