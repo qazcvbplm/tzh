@@ -1,13 +1,12 @@
 package ops.school.api.util;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.feyin.api.FeyinClient;
 import com.feyin.api.FeyinResponse;
 import ops.school.api.constants.NumConstants;
 import ops.school.api.constants.ShopPrintConfigConstants;
 import ops.school.api.dto.print.FeiERsultData;
-import ops.school.api.dto.print.ShopPrintFeiEDTO;
+import ops.school.api.dto.print.ShopPrintResultDTO;
 import ops.school.api.enums.ResponseViewEnums;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.*;
@@ -21,15 +20,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ShopPrintUtils {
 
-    public static ShopPrintFeiEDTO feiEAddPrinter(String snList) {
+    public static ShopPrintResultDTO<FeiERsultData> feiEAddPrinter(String snList) {
 
         //通过POST请求，发送打印信息到服务器
         RequestConfig requestConfig = RequestConfig.custom()
@@ -66,7 +60,7 @@ public class ShopPrintUtils {
         nvps.add(new BasicNameValuePair("printerContent", snList));
 
         CloseableHttpResponse response = null;
-        ShopPrintFeiEDTO feiEDTO = null;
+        ShopPrintResultDTO<FeiERsultData> feiEDTO = null;
         try {
             post.setEntity(new UrlEncodedFormEntity(nvps, "utf-8"));
             response = httpClient.execute(post);
@@ -75,7 +69,7 @@ public class ShopPrintUtils {
                 //请求体内容
                 String responseContent = EntityUtils.toString(response.getEntity(), "UTF-8");
                 //转化成json对象然后返回accessToken属性的值
-                 feiEDTO = JSONObject.parseObject(responseContent,ShopPrintFeiEDTO.class);
+                 feiEDTO = JSONObject.parseObject(responseContent, ShopPrintResultDTO.class);
                 //如果返回的参数有no
                 if (feiEDTO != null && feiEDTO.getData().getNo().size() != NumConstants.INT_NUM_0){
                     //截取错误信息
@@ -88,18 +82,175 @@ public class ShopPrintUtils {
                     feiEDTO.setSuccess(false);
                     return feiEDTO;
                 }else if (feiEDTO == null){
-                    return new ShopPrintFeiEDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
+                    return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
                 }else {
                     feiEDTO.setSuccess(true);
                 }
-                HttpEntity httpentity = response.getEntity();
-                if (httpentity != null) {
-                    //服务器返回的JSON字符串，建议要当做日志记录起来
-                    String result = EntityUtils.toString(httpentity);
-                    LoggerUtil.log("系统记录-添加飞鹅打印机-saveOneShopFeiEByDTO-日志" + result);
-                }
+
             } else {
-                return new ShopPrintFeiEDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
+                return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LoggerUtil.logError(e.getMessage());
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                post.abort();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                httpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return feiEDTO;
+
+    }
+
+    /**
+     * @date:   2019/8/13 13:40
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.dto.print.ShopPrintResultDTO<java.lang.Boolean>
+     * @param   feiEPrintId
+     * @Desc:   desc 查询打印结果，是否打印成功
+     */
+    public static ShopPrintResultDTO<Boolean> feiEGetPrintStatusYes(String feiEPrintId) {
+        //通过POST请求，发送打印信息到服务器
+        RequestConfig requestConfig = RequestConfig.custom()
+                //读取超时
+                .setSocketTimeout(3000)
+                //连接超时
+                .setConnectTimeout(3000)
+                .build();
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+
+        HttpPost post = new HttpPost(ShopPrintConfigConstants.FEI_E_URL);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("user", ShopPrintConfigConstants.FEI_E_USER));
+        String STIME = String.valueOf(System.currentTimeMillis() / 1000);
+        nvps.add(new BasicNameValuePair("stime", STIME));
+        nvps.add(new BasicNameValuePair("sig", signature(ShopPrintConfigConstants.FEI_E_USER, ShopPrintConfigConstants.FEI_E_UKEY, STIME)));
+        nvps.add(new BasicNameValuePair("apiname", "Open_printerAddlist"));//固定值,不需要修改
+        nvps.add(new BasicNameValuePair("orderid", feiEPrintId));
+
+        CloseableHttpResponse response = null;
+        ShopPrintResultDTO<Boolean> feiEDTO = null;
+        try {
+            post.setEntity(new UrlEncodedFormEntity(nvps, "utf-8"));
+            response = httpClient.execute(post);
+            int statecode = response.getStatusLine().getStatusCode();
+            if (statecode == 200) {
+                //请求体内容
+                String responseContent = EntityUtils.toString(response.getEntity(), "UTF-8");
+                //转化成json对象然后返回accessToken属性的值
+                feiEDTO = JSONObject.parseObject(responseContent, ShopPrintResultDTO.class);
+                //如果返回的参数有no
+                if (feiEDTO == null){
+                    return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
+                }else if (feiEDTO.getRet().intValue() == 0 && feiEDTO.getData() != null && feiEDTO.getData()){
+                    feiEDTO.setSuccess(true);
+                }else {
+                    feiEDTO.setSuccess(false);
+                }
+
+            } else {
+                return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LoggerUtil.logError(e.getMessage());
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                post.abort();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                httpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return feiEDTO;
+
+    }
+
+    /**
+     * @date:   2019/8/13 13:46
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.dto.print.ShopPrintResultDTO<java.lang.String>
+     * @param
+     * @Desc:   desc 查询打印机状态
+     */
+    public static ShopPrintResultDTO<String> feiEQueryPrinterStatus(String sn) {
+        //通过POST请求，发送打印信息到服务器
+        RequestConfig requestConfig = RequestConfig.custom()
+                //读取超时
+                .setSocketTimeout(3000)
+                //连接超时
+                .setConnectTimeout(3000)
+                .build();
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+
+        HttpPost post = new HttpPost(ShopPrintConfigConstants.FEI_E_URL);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("user", ShopPrintConfigConstants.FEI_E_USER));
+        String STIME = String.valueOf(System.currentTimeMillis() / 1000);
+        nvps.add(new BasicNameValuePair("stime", STIME));
+        nvps.add(new BasicNameValuePair("sig", signature(ShopPrintConfigConstants.FEI_E_USER, ShopPrintConfigConstants.FEI_E_UKEY, STIME)));
+        nvps.add(new BasicNameValuePair("apiname", "Open_printerAddlist"));//固定值,不需要修改
+        nvps.add(new BasicNameValuePair("sn",sn));
+
+        CloseableHttpResponse response = null;
+        ShopPrintResultDTO<String> feiEDTO = null;
+        try {
+            post.setEntity(new UrlEncodedFormEntity(nvps, "utf-8"));
+            response = httpClient.execute(post);
+            int statecode = response.getStatusLine().getStatusCode();
+            if (statecode == 200) {
+                //请求体内容
+                String responseContent = EntityUtils.toString(response.getEntity(), "UTF-8");
+                //转化成json对象然后返回accessToken属性的值
+                feiEDTO = JSONObject.parseObject(responseContent, ShopPrintResultDTO.class);
+                //如果返回的参数有no
+                if (feiEDTO == null){
+                    return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
+                }else if (feiEDTO.getRet().intValue() != NumConstants.INT_NUM_0){
+                    //不等于0才是失败的
+                    feiEDTO.setSuccess(false);
+                }
+                //飞鹅返回只能根据字符串判断，垃圾
+                if("在线，工作状态正常".equals(feiEDTO.getData())){
+                    feiEDTO.setSuccess(true);
+                }
+                feiEDTO.setSuccess(false);
+
+            } else {
+                return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -275,6 +426,10 @@ public class ShopPrintUtils {
 
     }
 
+    public static ShopPrintResultDTO<Boolean> feiYinGetPrintStatusYes(String feiEPrintId) {
+        return null;
+    }
+
 
     //生成签名字符串
     private static String signature(String USER, String UKEY, String STIME) {
@@ -297,4 +452,6 @@ public class ShopPrintUtils {
         executor.shutdown();
         return;
     }
+
+
 }

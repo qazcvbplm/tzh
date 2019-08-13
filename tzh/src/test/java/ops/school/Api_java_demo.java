@@ -55,8 +55,8 @@ public class Api_java_demo {
 		 	//成功：{"msg":"ok","ret":0,"data":true,"serverExecutedTime":2}//data:true为已打印,false为未打印
 			//失败：{"msg":"错误描述","ret":非0, "data":null,"serverExecutedTime":7}
 			
-//			String orderid = "xxxxxxx_xxxxxxxx_xxxxxxxx";//订单ID，从方法1返回值data获取
-//			String method2 = queryOrderState(orderid);
+			String orderid = "xxxxxxx_xxxxxxxx_xxxxxxxx";//订单ID，从方法1返回值data获取
+			String method2 = queryOrderState(orderid);
 //			System.out.println(method2);
 			
 			

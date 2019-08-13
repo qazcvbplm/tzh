@@ -1,6 +1,5 @@
 package ops.school.api.dto.print;
 
-import io.swagger.models.auth.In;
 import ops.school.api.entity.Orders;
 
 /**
@@ -16,7 +15,7 @@ public class PrintDataDTO {
 
     private Integer ourShopId;
 
-    private String plateOrderId;
+    private String platePrintOrderId;
 
     private String platePrintSn;
 
@@ -25,6 +24,8 @@ public class PrintDataDTO {
     private Integer yesPrintTrue;
 
     private Integer printBrand;
+
+    private Integer waterNumber;
 
     private Orders realOrder;
 
@@ -45,12 +46,12 @@ public class PrintDataDTO {
         this.ourShopId = ourShopId;
     }
 
-    public String getPlateOrderId() {
-        return plateOrderId;
+    public String getPlatePrintOrderId() {
+        return platePrintOrderId;
     }
 
-    public void setPlateOrderId(String plateOrderId) {
-        this.plateOrderId = plateOrderId;
+    public void setPlatePrintOrderId(String platePrintOrderId) {
+        this.platePrintOrderId = platePrintOrderId;
     }
 
     public String getPlatePrintSn() {
@@ -91,5 +92,13 @@ public class PrintDataDTO {
 
     public void setRealOrder(Orders realOrder) {
         this.realOrder = realOrder;
+    }
+
+    public Integer getWaterNumber() {
+        return waterNumber;
+    }
+
+    public void setWaterNumber(Integer waterNumber) {
+        this.waterNumber = waterNumber;
     }
 }

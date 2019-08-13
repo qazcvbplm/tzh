@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.dto.ShopPrintDTO;
 import ops.school.api.dto.print.PrintDataDTO;
+import ops.school.api.entity.Orders;
 import ops.school.api.entity.ShopPrint;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
@@ -158,6 +159,19 @@ public class ShopPrintController {
         Assertions.notNull(printDataDTO.getOurOrderId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
+    }
+
+
+    @ApiOperation(value="保存飞印打印后生成的id和orderId",httpMethod="POST")
+    @ResponseBody
+    @RequestMapping(value = "/water",method = RequestMethod.POST)
+    public ResponseObject waterGetNum(String shopId){
+        Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(shopId);
+        if (!haskey){
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(shopId,"0");
+        }
+        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(shopId, 1L).intValue();
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("waterNumber",water);
     }
 
 }

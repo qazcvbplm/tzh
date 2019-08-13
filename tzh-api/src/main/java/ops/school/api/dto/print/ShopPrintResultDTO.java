@@ -9,13 +9,13 @@ import java.util.List;
  * 16:51
  * #
  */
-public class ShopPrintFeiEDTO {
+public class ShopPrintResultDTO<T> {
 
     private String msg;
 
     private Integer ret;
 
-    private FeiERsultData data;
+    private T data;
 
     private Long serverExecutedTime;
 
@@ -29,15 +29,16 @@ public class ShopPrintFeiEDTO {
      */
     private boolean success;
 
-    public ShopPrintFeiEDTO() {
+
+    public ShopPrintResultDTO() {
     }
 
-    public ShopPrintFeiEDTO(boolean success , String errorMessage) {
+    public ShopPrintResultDTO(boolean success , String errorMessage) {
         this.errorMessage = errorMessage;
         this.success = success;
     }
 
-    public ShopPrintFeiEDTO(String msg, Integer ret, FeiERsultData data, Long serverExecutedTime, String errorMessage, boolean success) {
+    public ShopPrintResultDTO(String msg, Integer ret, T data, Long serverExecutedTime, String errorMessage, boolean success) {
         this.msg = msg;
         this.ret = ret;
         this.data = data;
@@ -62,11 +63,11 @@ public class ShopPrintFeiEDTO {
         this.ret = ret;
     }
 
-    public FeiERsultData getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(FeiERsultData data) {
+    public void setData(T data) {
         this.data = data;
     }
 

@@ -9,7 +9,7 @@ import ops.school.api.constants.ShopPrintConfigConstants;
 import ops.school.api.dao.ShopMapper;
 import ops.school.api.dao.ShopPrintMapper;
 import ops.school.api.dto.ShopPrintDTO;
-import ops.school.api.dto.print.ShopPrintFeiEDTO;
+import ops.school.api.dto.print.ShopPrintResultDTO;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopPrint;
 import ops.school.api.enums.PublicErrorEnums;
@@ -85,7 +85,7 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         if (saveDTO.getPrintBrand().intValue() == ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E){
             //sn key "sn1#key1#remark1#carnum1\nsn2#key2#remark2#carnum2";
             String snList = ""+saveDTO.getFeiESn() + "#" + saveDTO.getFeiEKey() + "#" + shop.getShopName()+"飞鹅打印机";
-            ShopPrintFeiEDTO addFeiE = ShopPrintUtils.feiEAddPrinter(snList);
+            ShopPrintResultDTO addFeiE = ShopPrintUtils.feiEAddPrinter(snList);
             if (!addFeiE.isSuccess()){
                 LoggerUtil.logError("系统记录-添加飞鹅打印机失败-saveOneShopFeiEByDTO-日志"+addFeiE.getErrorMessage());
                 DisplayException.throwMessageWithEnum(ResponseViewEnums.SHOP_ADD_FEI_FAILED);

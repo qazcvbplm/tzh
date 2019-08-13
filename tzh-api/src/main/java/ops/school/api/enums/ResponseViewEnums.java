@@ -82,6 +82,10 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------13-提现信息错误-----------*/
     PAY_ERROR_SCHOOL_FAILED("1213001","支付时学校数据操作有误，请重试或者联系后台管理"),
 
+    /**----------14-发送微信信息错误-----------*/
+    SEND_WX_MESSAGE_ERROR("1214001","发送微信消息错误"),
+    SEND_WX_MESSAGE_ERROR_NO_PARAMS("1214002","发送微信消息错误,缺少参数"),
+
     ;
 
     private String errorCode;

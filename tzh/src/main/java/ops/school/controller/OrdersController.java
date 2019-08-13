@@ -127,7 +127,7 @@ public class OrdersController {
             redisUtil.cancelOrdersAdd(orders.getSchoolId());
             return new ResponseObject(true, "取消订单成功");
         } else {
-            return new ResponseObject(false, "请重试");
+            return new ResponseObject(true, "请重试");
         }
     }
 
