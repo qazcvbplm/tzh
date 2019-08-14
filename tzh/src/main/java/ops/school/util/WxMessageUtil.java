@@ -13,20 +13,18 @@ import ops.school.api.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+
 public class WxMessageUtil {
 
-    @Autowired
-    private static StringRedisTemplate stringRedisTemplate;
-
-    @Autowired
-    private static OrderProductService orderProductService;
 
     private static final String templateId = "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o";
 
@@ -57,35 +55,8 @@ public class WxMessageUtil {
     // 积分查收
     private static final String sourceAccept = "的积分奖励，请注意查收";
 
-    public static Boolean wxSendOrderMsgByOrder(Orders orders) {
-        Assertions.notNull(orders, ResponseViewEnums.SEND_WX_MESSAGE_ERROR_NO_PARAMS);
-        Assertions.notNull(orders.getId(), ResponseViewEnums.SEND_WX_MESSAGE_ERROR_NO_PARAMS);
-        List<String> formIds = new ArrayList<>();
-        try {
-            formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0, -1);
-        } catch (Exception ex) {
-            LoggerUtil.logError("发送微信模板消息-商家接手类-wxSendOrderMsg-完成发送消息失败，formid取缓存为空" + orders.getId());
-            return false;
-        }
-        if (formIds.size() > 0) {
-            // 查询订单商品表信息
-            QueryWrapper<OrderProduct> productWrapper = new QueryWrapper<>();
-            productWrapper.lambda().eq(OrderProduct::getOrderId, orders.getId());
-            List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
-            orders.setOp(orderProducts);
-            orders.setStatus("待接手");
-            WxMessageUtil.wxSendMsg(orders, formIds.get(0));
-            stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
-        } else {
-            LoggerUtil.logError("发送微信模板消息-商家接手类-wxSendOrderMsg-完成发送消息失败，发送或者删除redis失败" + orders.getId());
-            return false;
-        }
-        return true;
-    }
-
 
     public static void wxSendMsg(Orders orders, String formid) {
-
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Message message = new Message();
         message.setToUser(orders.getOpenId());
@@ -214,4 +185,5 @@ public class WxMessageUtil {
         }
 
     }
+
 }

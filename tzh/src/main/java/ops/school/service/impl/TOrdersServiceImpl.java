@@ -788,6 +788,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(orders.getShopId().toString());
         if (!haskey){
             stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(orders.getShopId().toString(),"0");
+            Date entTime = TimeUtilS.getDayEnd();
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").expireAt(entTime);
         }
         int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
         orders.setWaterNumber(water);

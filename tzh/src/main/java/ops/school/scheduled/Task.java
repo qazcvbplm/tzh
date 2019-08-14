@@ -3,6 +3,7 @@ package ops.school.scheduled;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import ops.school.api.constants.RedisConstants;
 import ops.school.api.dto.RunOrdersTj;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
@@ -53,7 +54,6 @@ public class Task {
     /**
      * 每天晚上把待付款的改成取消的
      */
-    //0 0 10,14,16 * * ?   每天上午10点，下午2点，4点
     @Scheduled(cron = "0 0 0 * * ?")
     public void task() {
         //订单流水号重置
@@ -88,9 +88,12 @@ public class Task {
 
     /**
      * Fang -每天晚上把取消跑腿订单
+     * 每天晚上0点0分0秒逻辑
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void cancelRunOrdersTask() {
+        //流水号置为0
+
         QueryWrapper<RunOrders> wrapper = new QueryWrapper<>();
         wrapper.eq("status","待付款");
         List<RunOrders> runOrdersList =  runOrdersService.list(wrapper);
@@ -335,4 +338,5 @@ public class Task {
             }
         }
     }
+
 }

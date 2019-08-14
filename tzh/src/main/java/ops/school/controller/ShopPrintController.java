@@ -18,12 +18,14 @@ import ops.school.api.service.ShopPrintService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisClient;
 import ops.school.api.util.ResponseObject;
+import ops.school.api.util.TimeUtilS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -177,6 +179,8 @@ public class ShopPrintController {
         Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(shopId);
         if (!haskey){
             stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(shopId,"0");
+            Date entTime = TimeUtilS.getDayEnd();
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").expireAt(entTime);
         }
         int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(shopId, 1L).intValue();
         return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("waterNumber",water);

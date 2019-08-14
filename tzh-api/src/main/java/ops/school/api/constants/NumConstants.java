@@ -17,6 +17,10 @@ public class NumConstants {
     public final static int INT_NUM_1 = 1;
     public final static int INT_NUM_2 = 2;
     public final static int INT_NUM_10 = 10;
+    public final static int INT_NUM_20 = 20;
+    public final static int INT_NUM_50 = 50;
+    public final static int INT_NUM_60 = 60;
+
     public final static int INT_NUM_1000 = 1000;
 
     public final static Long Long_NUM_0 = Long.valueOf(0);
