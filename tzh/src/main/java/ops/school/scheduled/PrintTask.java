@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import ops.school.api.constants.NumConstants;
+import ops.school.api.constants.RedisConstants;
 import ops.school.api.constants.ShopPrintConfigConstants;
 import ops.school.api.dto.print.PrintDataDTO;
 import ops.school.api.dto.print.ShopPrintResultDTO;
 import ops.school.api.entity.Orders;
 import ops.school.api.service.OrdersService;
+import ops.school.api.serviceimple.OrdersServiceImple;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ShopPrintUtils;
 import ops.school.util.WxMessageUtil;
@@ -18,7 +20,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * CreatebyFang
@@ -39,11 +44,13 @@ public class PrintTask {
     @Autowired
     private OrdersService ordersService;
 
+
     /**
      * 每隔1分钟查询打印一次
      */
     @Scheduled(cron = "0 */1 * * * ?")
     public void doPrintAndAcceptOrder() {
+
         while (true) {
             Long redisSize = stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").size();
             if (redisSize < NumConstants.INT_NUM_1){
@@ -58,6 +65,9 @@ public class PrintTask {
                 continue;
             }
             String findOrder = stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").rightPop();
+            if (findOrder == null){
+                return;
+            }
             PrintDataDTO printDataDTO = JSONObject.parseObject(findOrder,PrintDataDTO.class);
             //先去查询店铺redis待接手
             Object getRedisOrder = stringRedisTemplate.boundHashOps("SHOP_DJS" + printDataDTO.getOurShopId()).get(printDataDTO.getOurOrderId());
@@ -71,39 +81,96 @@ public class PrintTask {
                     continue;
                 }
             }
+            orders.setWaterNumber(printDataDTO.getWaterNumber());
             //订单待接手状态，需要处理
             if (printDataDTO.getPrintBrand().intValue() == ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E){
                 //查询飞鹅打印
                 ShopPrintResultDTO<Boolean> printResult = ShopPrintUtils.feiEGetPrintStatusYes(printDataDTO.getPlatePrintOrderId());
                 if (printResult == null || !printResult.isSuccess()){
-                    LoggerUtil.logError("系统记录-定时器查询飞鹅打印机-doPrintAndAcceptOrder-日志" + printResult.getErrorMessage()+printDataDTO.getOurOrderId()+"飞鹅id"+printDataDTO.getPlatePrintOrderId());
+                    LoggerUtil.logError("系统记录-定时器查询飞鹅打印机-doPrintAndAcceptOrder-日志" + printResult.getMsg()+printDataDTO.toString());
                 }
                 //如果已打印变成状态
                 if (printResult.isSuccess()){
                     Boolean updateTrue = this.changeOrderStatusToJS(printDataDTO);
                     if (!updateTrue){
-                        //如果更改订单状态失败
-                        LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态失败-"+printDataDTO.getOurOrderId());
-                        stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+                        Orders ordersSelect2 = ordersService.findById(printDataDTO.getOurOrderId());
+                        if (ordersSelect2 == null && "商家已接手".equals(ordersSelect2.getStatus())){
+                            //如果更改订单状态失败
+                            LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态失败-"+printDataDTO.getOurOrderId());
+                            stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+                        }else if ("已取消".equals(ordersSelect2.getStatus()) || "已完成".equals(ordersSelect2.getStatus())){
+                            //同时尝试删除缓存待接手
+                            Long delNum = stringRedisTemplate.boundHashOps("SHOP_DJS" + printDataDTO.getOurShopId()).delete(printDataDTO.getOurOrderId());
+                            Long delALLNum = stringRedisTemplate.boundHashOps("ALL_DJS").delete(printDataDTO.getOurOrderId().toString());
+                            continue;
+                        }
                         continue;
                     }
                     //修改成功商家已接手 推送用户消息
                     Boolean sendTrue = WxMessageUtil.wxSendOrderMsgByOrder(orders);
                     if (!sendTrue){
+                        //发送失败是不会重新循环处理的
                         LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态后发送模板消息失败-"+printDataDTO.getOurOrderId());
                     }
                     continue;
 
                 }else {
-                    //如果未打印，跳过
-                    stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+                    //如果未打印，跳过,放入失败队列，没两分钟回来再查询,只能循环20次
+                    if (printDataDTO.getCycleRedisCount() < NumConstants.INT_NUM_10 ){
+                        printDataDTO.setCycleRedisCount(printDataDTO.getCycleRedisCount() + NumConstants.INT_NUM_1);
+                        Long listIndex = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
+                    }
                     continue;
                 }
             }else if (printDataDTO.getPrintBrand().intValue() == ShopPrintConfigConstants.PRINT_BRAND_DB_FE_YIN){
-                stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+                LoggerUtil.logError("系统记录-定时器查询打印机-此订单是飞印打印不能处理-信息-"+printDataDTO.toString());
                 continue;
             }
         }
+    }
+
+
+    /**
+     * 每隔2分钟全部放入重新打印队列一次
+     */
+    @Scheduled(cron = "0 */2 * * * ?")
+    public void doFailedPrintToWaitQueue() {
+        Long listSize = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).size();
+        if (listSize < NumConstants.INT_NUM_1){
+            return;
+        }
+        String[] allList = new String[listSize.intValue()];
+        for (int i = 0; i < listSize; i++) {
+            String pop = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).rightPop();
+            allList[i] = pop;
+        }
+        if (allList == null || allList.length < NumConstants.INT_NUM_1){
+            return;
+        }
+        stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPushAll(allList);
+        System.out.println("每隔2分钟全部放入重新打印队列一次");
+    }
+
+
+    /**
+     * 每隔1分钟全部放入等待打印队列
+     */
+    @Scheduled(cron = "0/30 * * * * ?")
+    public void doFirstQueuePrintToWaitQueue() {
+        Long listSize = stringRedisTemplate.boundListOps(RedisConstants.Shop_First_Print_OId_List).size();
+        if (listSize < NumConstants.INT_NUM_1){
+            return;
+        }
+        String[] allList = new String[listSize.intValue()];
+        for (int i = 0; i < listSize; i++) {
+            String pop = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).rightPop();
+            allList[i] = pop;
+        }
+        if (allList == null || allList.length < NumConstants.INT_NUM_1){
+            return;
+        }
+        stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPushAll(allList);
+        System.out.println("每隔1分钟全部放入等待打印队列");
     }
 
     /**
@@ -123,15 +190,7 @@ public class PrintTask {
         Integer updateNum = ordersService.shopAcceptOrderById(update);
         if (updateNum != NumConstants.INT_NUM_1){
             //如果失败
-            //查询状态
-            Orders orders = ordersService.findById(printDataDTO.getOurOrderId());
-            if (orders != null && "商家已接手".equals(orders.getStatus())){
-                return true;
-            }else if ("待接手".equals(orders.getStatus())){
-                return false;
-            }else if ("已取消".equals(orders.getStatus()) || "已完成".equals(orders.getStatus())){
-                return true;
-            }
+            return false;
         }
         //再改redis
         Long delNum = stringRedisTemplate.boundHashOps("SHOP_DJS" + printDataDTO.getOurShopId()).delete(printDataDTO.getOurOrderId());

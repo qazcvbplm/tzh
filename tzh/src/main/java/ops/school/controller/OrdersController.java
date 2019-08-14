@@ -115,20 +115,19 @@ public class OrdersController {
         // 临时存储订单状态
         String status = orders.getStatus();
         int i = tOrdersService.cancel(id);
-        if (i > 2) {
-            if (status.equals("待接手")) {
-                stringRedisTemplate.boundHashOps("SHOP_DJS" + i).delete(id);
-                stringRedisTemplate.boundHashOps("ALL_DJS").delete(id);
-            }
-            if (status.equals("商家已接手")) {
-                stringRedisTemplate.boundHashOps("SHOP_YJS").delete(id);
-            }
-            //取消订单计入缓存
-            redisUtil.cancelOrdersAdd(orders.getSchoolId());
-            return new ResponseObject(true, "取消订单成功");
-        } else {
-            return new ResponseObject(true, "取消订单成功");
+        if (i == 0){
+            return new ResponseObject(false, "取消订单失败");
         }
+        if (status.equals("待接手")) {
+            stringRedisTemplate.boundHashOps("SHOP_DJS" + i).delete(id);
+            stringRedisTemplate.boundHashOps("ALL_DJS").delete(id);
+        }
+        if (status.equals("商家已接手")) {
+            stringRedisTemplate.boundHashOps("SHOP_YJS").delete(id);
+        }
+        //取消订单计入缓存
+        redisUtil.cancelOrdersAdd(orders.getSchoolId());
+        return new ResponseObject(true, "取消订单成功");
     }
 
     /**

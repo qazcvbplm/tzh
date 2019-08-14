@@ -143,7 +143,7 @@ public class ShopPrintUtils {
         String STIME = String.valueOf(System.currentTimeMillis() / 1000);
         nvps.add(new BasicNameValuePair("stime", STIME));
         nvps.add(new BasicNameValuePair("sig", signature(ShopPrintConfigConstants.FEI_E_USER, ShopPrintConfigConstants.FEI_E_UKEY, STIME)));
-        nvps.add(new BasicNameValuePair("apiname", "Open_printerAddlist"));//固定值,不需要修改
+        nvps.add(new BasicNameValuePair("apiname", "Open_queryOrderState"));//固定值,不需要修改
         nvps.add(new BasicNameValuePair("orderid", feiEPrintId));
 
         CloseableHttpResponse response = null;
@@ -222,7 +222,7 @@ public class ShopPrintUtils {
         String STIME = String.valueOf(System.currentTimeMillis() / 1000);
         nvps.add(new BasicNameValuePair("stime", STIME));
         nvps.add(new BasicNameValuePair("sig", signature(ShopPrintConfigConstants.FEI_E_USER, ShopPrintConfigConstants.FEI_E_UKEY, STIME)));
-        nvps.add(new BasicNameValuePair("apiname", "Open_printerAddlist"));//固定值,不需要修改
+        nvps.add(new BasicNameValuePair("apiname", "Open_queryPrinterStatus"));//固定值,不需要修改
         nvps.add(new BasicNameValuePair("sn",sn));
 
         CloseableHttpResponse response = null;

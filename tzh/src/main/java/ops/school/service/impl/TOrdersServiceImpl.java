@@ -674,6 +674,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         String temp = orders.getStatus();
         if (ordersService.cancel(id) == 1) {
+            stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).delete(id);
+            stringRedisTemplate.boundHashOps("ALL_DJS").delete(id);
             if (orderProducts != null || orderProducts.size() > 0) {
                 for (OrderProduct orderProduct : orderProducts) {
                     Product product = productService.getById(orderProduct.getProductId());

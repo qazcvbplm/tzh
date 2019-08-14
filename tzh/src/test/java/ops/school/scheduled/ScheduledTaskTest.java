@@ -19,6 +19,9 @@ public class ScheduledTaskTest{
     @Resource(name = "scheduledTask")
     private Task task;
 
+    @Autowired
+    private PrintTask printTask;
+
 
     @Test
     public void task() {
@@ -39,5 +42,11 @@ public class ScheduledTaskTest{
     public void wxUserCouponInvalid() {
         task.wxUserCouponInvalid();
     }
+
+//    @Test
+//    public void printTask(){
+//        printTask.doFailedPrintToWaitQueue();
+//    }
+
 
 }

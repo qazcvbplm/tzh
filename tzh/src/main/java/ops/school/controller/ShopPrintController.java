@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.constants.RedisConstants;
 import ops.school.api.dto.ShopPrintDTO;
 import ops.school.api.dto.print.PrintDataDTO;
 import ops.school.api.entity.Orders;
@@ -14,6 +15,8 @@ import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.ShopPrintService;
+import ops.school.api.util.LoggerUtil;
+import ops.school.api.util.RedisClient;
 import ops.school.api.util.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +44,8 @@ public class ShopPrintController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    private static CountDownLatch countDownLatch = new CountDownLatch(10);
 
 
     /**
@@ -157,7 +163,8 @@ public class ShopPrintController {
     public ResponseObject save(PrintDataDTO printDataDTO){
         Assertions.notNull(printDataDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(printDataDTO.getOurOrderId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+        stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
+        stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
@@ -172,6 +179,35 @@ public class ShopPrintController {
         }
         int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(shopId, 1L).intValue();
         return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("waterNumber",water);
+    }
+
+    class DelaySendToRedis implements Runnable{
+
+        private PrintDataDTO printData;
+
+        public DelaySendToRedis(PrintDataDTO printDataDTO) {
+            this.printData = printDataDTO;
+        }
+
+        @Override
+        public synchronized void run() {
+            try {
+                //等待主线程执行完毕，获得开始执行信号...
+                countDownLatch.await();
+                //完成预期工作，发出完成信号...
+                System.out.println("进入新的异步线程等待发送缓存");
+                Thread.sleep(4000);
+                System.out.println("发送缓存");
+                stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printData));
+                stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").leftPush(JSON.toJSONString(printData));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                LoggerUtil.logError(e.getMessage());
+            }finally {
+                countDownLatch.countDown();
+            }
+
+        }
     }
 
 }

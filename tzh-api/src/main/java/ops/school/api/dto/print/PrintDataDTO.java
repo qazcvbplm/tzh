@@ -29,6 +29,8 @@ public class PrintDataDTO {
 
     private Orders realOrder;
 
+    private Integer cycleRedisCount = 0;
+
 
     public String getOurOrderId() {
         return ourOrderId;
@@ -100,5 +102,29 @@ public class PrintDataDTO {
 
     public void setWaterNumber(Integer waterNumber) {
         this.waterNumber = waterNumber;
+    }
+
+    public Integer getCycleRedisCount() {
+        return cycleRedisCount;
+    }
+
+    public void setCycleRedisCount(Integer cycleRedisCount) {
+        this.cycleRedisCount = cycleRedisCount;
+    }
+
+    @Override
+    public String toString() {
+        return "PrintDataDTO{" +
+                "ourOrderId='" + ourOrderId + '\'' +
+                ", ourShopId=" + ourShopId +
+                ", platePrintOrderId='" + platePrintOrderId + '\'' +
+                ", platePrintSn='" + platePrintSn + '\'' +
+                ", platePrintKey='" + platePrintKey + '\'' +
+                ", yesPrintTrue=" + yesPrintTrue +
+                ", printBrand=" + printBrand +
+                ", waterNumber=" + waterNumber +
+                ", realOrder=" + realOrder +
+                ", cycleRedisCount=" + cycleRedisCount +
+                '}';
     }
 }
