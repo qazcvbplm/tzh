@@ -165,6 +165,7 @@ public class ShopPrintController {
         Assertions.notNull(printDataDTO.getOurOrderId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
         stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+        stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").expire(1,TimeUnit.DAYS);
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
