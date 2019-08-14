@@ -96,9 +96,9 @@ public class PrintTask {
                 ShopPrintResultDTO<Boolean> printResult = ShopPrintUtils.feiEGetPrintStatusYes(printDataDTO.getPlatePrintOrderId());
 
                 //如果已打印变成状态
-                if (printResult != null && !printResult.isSuccess()){
+                if (printResult != null && printResult.isSuccess()){
                     Boolean updateTrue = this.changeOrderStatusToJS(printDataDTO);
-                    if (updateTrue){
+                    if (!updateTrue){
                         Orders ordersSelect2 = ordersService.findById(printDataDTO.getOurOrderId());
                         if (ordersSelect2 == null && "商家已接手".equals(ordersSelect2.getStatus())){
                             //如果更改订单状态失败
@@ -122,11 +122,11 @@ public class PrintTask {
 
                 }else {
                     //记录日志，只记第一次或者最后一次
-                    if (printDataDTO.getCycleRedisCount() == 1 || printDataDTO.getCycleRedisCount() == NumConstants.INT_NUM_60){
+                    if (printDataDTO.getCycleRedisCount() == 0 || printDataDTO.getCycleRedisCount() == NumConstants.INT_NUM_60){
                         LoggerUtil.logError("系统记录-定时器查询飞鹅打印机-doPrintAndAcceptOrder-日志" + printResult.getMsg()+printDataDTO.toString());
                     }
                     //如果未打印，跳过,放入失败队列，没两分钟回来再查询,只能循环20次
-                    if (printDataDTO.getCycleRedisCount() < NumConstants.INT_NUM_60 ){
+                    if (printDataDTO.getCycleRedisCount() <= NumConstants.INT_NUM_60 ){
                         try {
                             //没有订单等xs
                             Thread.sleep(20*1000);
