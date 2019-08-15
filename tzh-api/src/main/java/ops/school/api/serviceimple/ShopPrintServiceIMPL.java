@@ -27,6 +27,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
  * @date:   2019/8/11 18:20 
  * @desc:   
  */
+@Transactional(rollbackFor = {Exception.class,DisplayException.class})
 @Service(value = "shopPrintService")
 public class ShopPrintServiceIMPL implements ShopPrintService {
     
@@ -52,6 +54,7 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
      * @param   saveDTO
      * @Desc:   desc 通过DTO新增
      */
+
     @Override
     public ResponseObject saveOneShopFeiEByDTO(@Valid ShopPrintDTO saveDTO) {
         Assertions.notNull(saveDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
@@ -60,6 +63,9 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         Assertions.notNull(saveDTO.getFeiESn(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(saveDTO.getFeiEKey(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(saveDTO.getShopId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        if (saveDTO.getId() != null && saveDTO.getId() > NumConstants.INT_NUM_0){
+            return new ResponseObject(false,ResponseViewEnums.SHOP_PRINT_ERROR_OPTIONS);
+        }
         Shop shop = shopMapper.selectById(saveDTO.getShopId());
         Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
         //添加时一个店铺只对应一个一个 打印机
@@ -88,7 +94,7 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
             ShopPrintResultDTO addFeiE = ShopPrintUtils.feiEAddPrinter(snList);
             if (!addFeiE.isSuccess()){
                 LoggerUtil.logError("系统记录-添加飞鹅打印机失败-saveOneShopFeiEByDTO-日志"+addFeiE.getErrorMessage());
-                DisplayException.throwMessageWithEnum(ResponseViewEnums.SHOP_ADD_FEI_FAILED);
+                DisplayException.throwMessage(ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage()+addFeiE.getErrorMessage());
             }
         }
         return new ResponseObject(true, ResponseViewEnums.SUCCESS);
@@ -106,19 +112,26 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
     @Override
     public ResponseObject updateOneShopFeiEByDTO(ShopPrintDTO updateDTO) {
         Assertions.notNull(updateDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(updateDTO.getId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        //设置日期格式
-        updateDTO.setCreateTime(new Date());
-        updateDTO.setUpdateTime(new Date());
-        ShopPrint updateEntity = new ShopPrint();
-        BeanUtils.copyProperties(updateDTO,updateEntity);
-        QueryWrapper<ShopPrint> wrapper = new QueryWrapper<>();
-        wrapper.eq("id",updateEntity.getId());
-        int updateNum = shopPrintMapper.update(updateEntity,wrapper);
-        if (updateNum < 1){
-            DisplayException.throwMessageWithEnum(PublicErrorEnums.PUBLIC_DO_FAILED);
+        //编辑
+        if (updateDTO.getId() != null && updateDTO.getId() > NumConstants.INT_NUM_0 ){
+            Assertions.notNull(updateDTO.getId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+            //设置日期格式
+            updateDTO.setCreateTime(new Date());
+            updateDTO.setUpdateTime(new Date());
+            ShopPrint updateEntity = new ShopPrint();
+            BeanUtils.copyProperties(updateDTO,updateEntity);
+            QueryWrapper<ShopPrint> wrapper = new QueryWrapper<>();
+            wrapper.eq("id",updateEntity.getId());
+            int updateNum = shopPrintMapper.update(updateEntity,wrapper);
+            if (updateNum < 1){
+                DisplayException.throwMessageWithEnum(PublicErrorEnums.PUBLIC_DO_FAILED);
+            }
+            return new ResponseObject(true, ResponseViewEnums.SUCCESS);
         }
-        return new ResponseObject(true, ResponseViewEnums.SUCCESS);
+        //新增
+        else {
+            return this.saveOneShopFeiEByDTO(updateDTO);
+        }
     }
     /**
      * @date:

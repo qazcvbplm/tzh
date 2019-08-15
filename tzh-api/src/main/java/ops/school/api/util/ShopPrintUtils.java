@@ -1,6 +1,7 @@
 package ops.school.api.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.feyin.api.FeyinClient;
 import com.feyin.api.FeyinResponse;
 import ops.school.api.constants.NumConstants;
@@ -69,7 +70,7 @@ public class ShopPrintUtils {
                 //请求体内容
                 String responseContent = EntityUtils.toString(response.getEntity(), "UTF-8");
                 //转化成json对象然后返回accessToken属性的值
-                 feiEDTO = JSONObject.parseObject(responseContent, ShopPrintResultDTO.class);
+                 feiEDTO = JSONObject.parseObject(responseContent, new TypeReference<ShopPrintResultDTO<FeiERsultData>>(){});
                 //如果返回的参数有no
                 if (feiEDTO != null && feiEDTO.getData().getNo().size() != NumConstants.INT_NUM_0){
                     //截取错误信息

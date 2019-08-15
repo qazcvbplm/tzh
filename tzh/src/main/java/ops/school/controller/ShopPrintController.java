@@ -85,7 +85,6 @@ public class ShopPrintController {
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     public ResponseObject updateOneShopFeiEByDTO(ShopPrintDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(dto.getId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         ResponseObject view = shopPrintService.updateOneShopFeiEByDTO(dto);
         return view;
     }
