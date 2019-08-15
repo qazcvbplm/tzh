@@ -28,6 +28,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 
 /**
@@ -35,8 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @date:   2019/8/11 18:20 
  * @desc:   
  */
-@Transactional(rollbackFor = {Exception.class,DisplayException.class})
 @Service(value = "shopPrintService")
+@Transactional(rollbackFor = {Exception.class,DisplayException.class})
 public class ShopPrintServiceIMPL implements ShopPrintService {
     
     @Autowired
@@ -54,7 +55,6 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
      * @param   saveDTO
      * @Desc:   desc 通过DTO新增
      */
-
     @Override
     public ResponseObject saveOneShopFeiEByDTO(@Valid ShopPrintDTO saveDTO) {
         Assertions.notNull(saveDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
