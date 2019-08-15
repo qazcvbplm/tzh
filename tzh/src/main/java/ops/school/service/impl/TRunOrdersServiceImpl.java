@@ -111,7 +111,7 @@ public class TRunOrdersServiceImpl implements TRunOrdersService {
                 LoggerUtil.logError("runOrder pay formid为空"+ orders.getId());
             }
             stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
-            stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(1, TimeUnit.DAYS);
+            stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(24, TimeUnit.HOURS);
             /*wxUserService.sendWXGZHM(user.getPhone(), new Message(null, "JlaWQafk6M4M2FIh6s7kn30yPdy2Cd9k2qtG6o4SuDk",
                     null, null
                     + orders.getId() + "&typ=" + orders.getTyp(),

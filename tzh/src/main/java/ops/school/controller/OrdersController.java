@@ -94,7 +94,7 @@ public class OrdersController {
                 }
                 stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
-                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(1, TimeUnit.DAYS);
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(24, TimeUnit.HOURS);
             }
             return new ResponseObject(true, "ok").push("msg", msg);
         }

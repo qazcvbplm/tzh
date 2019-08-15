@@ -98,7 +98,7 @@ public class RunOrdersController {
 					 LoggerUtil.logError("runOrder pay formid为空"+ orders.getId());
 				 }
 				 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
-				 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(1, TimeUnit.DAYS);
+				 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(24, TimeUnit.HOURS);
 			 }
 			  return new ResponseObject(true, "ok").push("msg", msg);
 		 } 
