@@ -107,7 +107,7 @@ public class PrintTask {
                 Long listIndex = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
                 continue;
             }
-            String[] params = new String[1];
+            String[] params = new String[2];
             params[0] = orders.getShopName();
             params[1] = orders.getShopPhone();
             try {

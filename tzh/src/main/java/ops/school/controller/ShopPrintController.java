@@ -163,20 +163,6 @@ public class ShopPrintController {
     }
 
 
-    @ApiOperation(value="保存飞印打印后生成的id和orderId",httpMethod="POST")
-    @ResponseBody
-    @RequestMapping(value = "/save",method = RequestMethod.POST)
-    public ResponseObject save(PrintDataDTO printDataDTO){
-        Assertions.notNull(printDataDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(printDataDTO.getOurOrderId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
-        Date entTime = TimeUtilS.getDayEnd();
-        stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).expireAt(entTime);
-        stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
-        stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").expire(1,TimeUnit.DAYS);
-        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
-    }
-
     @ApiOperation(value="根据订单号打印订单和接手订单",httpMethod="POST")
     @ResponseBody
     @RequestMapping(value = "/accept",method = RequestMethod.POST)

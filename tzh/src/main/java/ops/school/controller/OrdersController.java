@@ -1,6 +1,7 @@
 package ops.school.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -91,6 +92,15 @@ public class OrdersController {
                 Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(BigDecimal.ZERO,orders.getPayFoodCoupon(),school.getId());
                 if (disSCNum != NumConstants.INT_NUM_1){
                     DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
+                }
+                //获取订单op
+                String shopDjs = (String) stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).get(orderId);
+                Orders ordersTemp = null;
+                if (shopDjs != null){
+                    ordersTemp = JSONObject.parseObject(shopDjs,Orders.class);
+                }
+                if (ordersTemp.getOp() != null && ordersTemp.getOp().size() > 0){
+                    orders.setOp(ordersTemp.getOp());
                 }
                 stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);

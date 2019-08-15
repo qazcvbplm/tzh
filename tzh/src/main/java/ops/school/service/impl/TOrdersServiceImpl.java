@@ -2,6 +2,7 @@ package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.constants.*;
 import ops.school.api.dao.OrdersMapper;
@@ -550,6 +551,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersSaveTemp.setShopPhone(shop.getShopPhone());
         ordersSaveTemp.setAfterDiscountPrice(afterDiscountPrice);
         ordersSaveTemp.setCreateTime(new Date());
+        ordersSaveTemp.setOp(orderProductSaveList);
         /**
          * 支付金额计算逻辑
          */
@@ -593,6 +595,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         Map resultMap = new HashMap();
         resultMap.put("orderId", generatorOrderId);
         resultMap.put("createTime",ordersSaveTemp.getCreateTime());
+        stringRedisTemplate.boundHashOps("SHOP_DJS" + ordersSaveTemp.getShopId()).put(ordersSaveTemp.getId(), JSON.toJSONString(ordersSaveTemp));
+        stringRedisTemplate.boundHashOps("ALL_DJS").put(ordersSaveTemp.getId(), JSON.toJSONString(ordersSaveTemp));
 //        Long endOrderTime = System.currentTimeMillis();
 //        System.out.println(endOrderTime - startOrderTime);
         return new ResponseObject(true, "创建订单成功！", resultMap);
@@ -603,11 +607,6 @@ public class TOrdersServiceImpl implements TOrdersService {
     public int pay(Orders orders, String formid) {
         Shop shop = shopService.getById(orders.getShopId());
         School school = schoolService.findById(shop.getSchoolId());
-        //取消vip
-//        Application application = applicationService.getById(school.getAppId());
-//        if (application.getVipTakeoutDiscountFlag() == 1) {
-//            orders.setPayPrice((orders.getPayPrice().multiply(application.getVipTakeoutDiscount())).setScale(2,BigDecimal.ROUND_HALF_DOWN));
-//        }
         // 余额支付，用户数据更新
         Map<String, Object> map = new HashMap<>();
         WxUser user = wxUserService.findById(orders.getOpenId());
@@ -651,6 +650,15 @@ public class TOrdersServiceImpl implements TOrdersService {
             String ordersStr = JSON.toJSONString(orders);
             orders.setStatus("待接手");
             orders.setPayTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            //获取订单op
+            String shopDjs = (String) stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).get(orderId);
+            Orders ordersTemp = null;
+            if (shopDjs != null){
+                ordersTemp = JSONObject.parseObject(shopDjs,Orders.class);
+            }
+            if (ordersTemp.getOp() != null && ordersTemp.getOp().size() > 0){
+                orders.setOp(ordersTemp.getOp());
+            }
             stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).put(orderId, JSON.toJSONString(orders));
             stringRedisTemplate.boundHashOps("ALL_DJS").put(orderId, JSON.toJSONString(orders));
             //stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
@@ -1230,6 +1238,8 @@ public class TOrdersServiceImpl implements TOrdersService {
             return new ResponseObject(false,ResponseViewEnums.ORDER_PRINT_ACCEPT_ERROR);
         }
         //2-打印信息
+        int water = (Integer) responseObject.getParams().get("water");
+        orders.setWaterNumber(water);
         String content = this.getOrderPrintContent(orders);
         List<ShopPrint> shopPrintList = shopPringService.findOneShopFeiEByShopId(shopId);
         if (shopPrintList.size() < NumConstants.INT_NUM_1){
@@ -1249,7 +1259,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         printDataDTO.setPlatePrintKey(shopPrint.getFeiEKey());
         printDataDTO.setPlatePrintOrderId(printResult.getData());
         printDataDTO.setPrintBrand(ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E);
-        printDataDTO.setWaterNumber((Integer) responseObject.getParams().get("water"));
+        printDataDTO.setWaterNumber(orders.getWaterNumber());
         printDataDTO.setYesPrintTrue(NumConstants.INTEGER_NUM_1);
         orders.setStatus("商家已接手");
         printDataDTO.setRealOrder(orders);
@@ -1262,6 +1272,12 @@ public class TOrdersServiceImpl implements TOrdersService {
     }
 
     private String getOrderPrintContent(Orders orders) {
+        if (orders.getOp() == null || orders.getOp().size() < 1){
+            QueryWrapper<OrderProduct> wrapper = new QueryWrapper<>();
+            wrapper.eq("order_id",orders.getId());
+            List<OrderProduct> orderProductList = orderProductService.list(wrapper);
+            orders.setOp(orderProductList);
+        }
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("<CB>#" + orders.getWaterNumber() + orders.getTyp() + "</CB><BR>");
         stringBuffer.append(orders.getId() + "<BR>");
@@ -1278,10 +1294,10 @@ public class TOrdersServiceImpl implements TOrdersService {
         stringBuffer.append("餐盒费：" + "<RIGHT>" + orders.getBoxPrice() + "</RIGHT><BR>");
         stringBuffer.append("配送费：" + "<RIGHT>" + orders.getSendPrice() + "</RIGHT><BR>");
         if ("满减优惠".equals(orders.getDiscountType())){
-            stringBuffer.append("满减优惠：" + "<RIGHT>" + "-"+ orders.getDiscountPrice() + "</RIGHT><BR>";
+            stringBuffer.append("满减优惠：" + "<RIGHT>" + "-"+ orders.getDiscountPrice() + "</RIGHT><BR>"
 );
         }else if("商品折扣".equals(orders.getDiscountType())){
-            stringBuffer.append("折扣优惠：" + "<RIGHT>" + "-"+ orders.getDiscountPrice() + "</RIGHT><BR>";
+            stringBuffer.append("折扣优惠：" + "<RIGHT>" + "-"+ orders.getDiscountPrice() + "</RIGHT><BR>"
 );
         }
         if (orders.getCouponId().intValue() > NumConstants.INT_NUM_0 ){
