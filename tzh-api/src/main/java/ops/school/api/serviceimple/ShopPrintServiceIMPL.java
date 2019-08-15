@@ -1,31 +1,45 @@
 package ops.school.api.serviceimple;
 
+import java.awt.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.constants.NumConstants;
 import ops.school.api.constants.ShopPrintConfigConstants;
 import ops.school.api.dao.ShopMapper;
 import ops.school.api.dao.ShopPrintMapper;
 import ops.school.api.dto.ShopPrintDTO;
+import ops.school.api.dto.print.FeiERsultData;
 import ops.school.api.dto.print.ShopPrintResultDTO;
+import ops.school.api.dto.project.ProductOrderDTO;
+import ops.school.api.entity.OrderProduct;
+import ops.school.api.entity.Orders;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopPrint;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.DisplayException;
+import ops.school.api.service.OrderProductService;
+import ops.school.api.service.OrdersService;
 import ops.school.api.service.ShopPrintService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.ShopPrintUtils;
+import ops.school.api.util.TimeUtilS;
+import ops.school.api.wxutil.WxMessageUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -45,6 +59,16 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
 
     @Autowired
     private ShopMapper shopMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private OrdersService ordersService;
+
+    @Autowired
+    private OrderProductService orderProductService;
+
 
 
     /**
@@ -198,4 +222,5 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         List<ShopPrint> shopPrints = shopPrintMapper.selectList(wrapper);
         return shopPrints;
     }
+
 }

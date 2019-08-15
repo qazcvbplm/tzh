@@ -13,7 +13,7 @@ import ops.school.api.util.RedisUtil;
 import ops.school.api.constants.NumConstants;
 import ops.school.service.TOrdersService;
 import ops.school.service.TSenderService;
-import ops.school.util.WxMessageUtil;
+import ops.school.api.wxutil.WxMessageUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -59,10 +59,6 @@ public class TWxUserServiceImplTest {
         tOrdersService.orderSettlement(orderId);
     }
 
-    @Test
-    public void testShopAcceptOrderById(){
-        String orderId = "201908082234316916616547877";
-        tOrdersService.shopAcceptOrderById(orderId);
-    }
+
 
 }

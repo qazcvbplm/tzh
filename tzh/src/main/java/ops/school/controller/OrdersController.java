@@ -189,21 +189,33 @@ public class OrdersController {
     @ApiOperation(value = "商家接手订单", httpMethod = "POST")
     @PostMapping("android/acceptorder")
     public ResponseObject android_findDjs(HttpServletRequest request, HttpServletResponse response, String orderId) {
-        int i = tOrdersService.shopAcceptOrderById(orderId);
-        Orders orders = ordersService.findById(orderId);
-        if (i > 0) {
-            if (SpringUtil.redisCache()) {
-                stringRedisTemplate.boundHashOps("SHOP_DJS" + i).delete(orderId);
-                // 从所有待接手订单中删除
-                stringRedisTemplate.boundHashOps("ALL_DJS").delete(orderId);
-                // 新建所有商家已接手的订单缓存
-                stringRedisTemplate.boundHashOps("SHOP_YJS").put(orderId, JSON.toJSONString(orders));
-            }
-            return new ResponseObject(true, "接手成功").push("order", Util.toJson(ordersService.findById(orderId)));
-        } else {
-            return new ResponseObject(false, "已经接手");
+        ResponseObject responseObject = tOrdersService.shopAcceptOrderById2(orderId);
+        if (responseObject.isCode()){
+            Orders orders = ordersService.findById(orderId);
+            return new ResponseObject(true, "接手成功").push("order", JSON.toJSONString(orders));
+        }else {
+            return new ResponseObject(false, "接手失败");
         }
     }
+
+//    @ApiOperation(value = "商家接手订单", httpMethod = "POST")
+//    @PostMapping("android/acceptorder")
+//    public ResponseObject android_findDjs(HttpServletRequest request, HttpServletResponse response, String orderId) {
+//        int i = tOrdersService.shopAcceptOrderById(orderId);
+//        Orders orders = ordersService.findById(orderId);
+//        if (i > 0) {
+//            if (SpringUtil.redisCache()) {
+//                stringRedisTemplate.boundHashOps("SHOP_DJS" + i).delete(orderId);
+//                // 从所有待接手订单中删除
+//                stringRedisTemplate.boundHashOps("ALL_DJS").delete(orderId);
+//                // 新建所有商家已接手的订单缓存
+//                stringRedisTemplate.boundHashOps("SHOP_YJS").put(orderId, JSON.toJSONString(orders));
+//            }
+//            return new ResponseObject(true, "接手成功").push("order", Util.toJson(ordersService.findById(orderId)));
+//        } else {
+//            return new ResponseObject(false, "已经接手");
+//        }
+//    }
 
 
     /////////////////////////////////////////////////////////////android/////////////////////////////////////////////////////////////////

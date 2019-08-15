@@ -5,6 +5,7 @@ package ops.school.controller;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.constants.RedisConstants;
 import ops.school.api.dto.ShopPrintDTO;
@@ -19,6 +20,7 @@ import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.RedisClient;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.TimeUtilS;
+import ops.school.service.TOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -48,6 +50,9 @@ public class ShopPrintController {
     private StringRedisTemplate stringRedisTemplate;
 
     private static CountDownLatch countDownLatch = new CountDownLatch(10);
+
+    @Autowired
+    private TOrdersService tOrderService;
 
 
     /**
@@ -172,48 +177,16 @@ public class ShopPrintController {
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
-
-    @ApiOperation(value="保存飞印打印后生成的id和orderId",httpMethod="POST")
+    @ApiOperation(value="根据订单号打印订单和接手订单",httpMethod="POST")
     @ResponseBody
-    @RequestMapping(value = "/water",method = RequestMethod.POST)
-    public ResponseObject waterGetNum(String shopId){
-        Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(shopId);
-        if (!haskey){
-            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(shopId,"0");
-            Date entTime = TimeUtilS.getDayEnd();
-            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").expireAt(entTime);
-        }
-        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(shopId, 1L).intValue();
-        return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("waterNumber",water);
-    }
-
-    class DelaySendToRedis implements Runnable{
-
-        private PrintDataDTO printData;
-
-        public DelaySendToRedis(PrintDataDTO printDataDTO) {
-            this.printData = printDataDTO;
-        }
-
-        @Override
-        public synchronized void run() {
-            try {
-                //等待主线程执行完毕，获得开始执行信号...
-                countDownLatch.await();
-                //完成预期工作，发出完成信号...
-                System.out.println("进入新的异步线程等待发送缓存");
-                Thread.sleep(4000);
-                System.out.println("发送缓存");
-                stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(printData));
-                stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").leftPush(JSON.toJSONString(printData));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                LoggerUtil.logError(e.getMessage());
-            }finally {
-                countDownLatch.countDown();
-            }
-
-        }
+    @RequestMapping(value = "/accept",method = RequestMethod.POST)
+    public ResponseObject printAndAcceptOrder(String orderId,Long shopId){
+        Assertions.notNull(orderId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(shopId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        String orderRedis = (String) stringRedisTemplate.boundHashOps("SHOP_DJS"+shopId.toString()).get(orderId);
+        Assertions.notNull(orderRedis,PublicErrorEnums.PUBLIC_DATA_ERROR);
+        ResponseObject view = tOrderService.printAndAcceptOneOrderByOId(orderId,shopId);
+        return view;
     }
 
 }

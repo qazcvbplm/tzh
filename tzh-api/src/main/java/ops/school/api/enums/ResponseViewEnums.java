@@ -51,6 +51,8 @@ public enum ResponseViewEnums implements RootEnums{
     ORDER_SAVE_ERROR("1250002","订单下单失败，请稍后重新下单"),
     ORDER_PARAM_ERROR("1250003","订单信息错误，请稍后重新下单或者请联系后台管理"),
     ORDER_COMPLETE_SOURCE_ERROR("1250004","订单完结增加积分错误，请稍后重试或者请联系后台管理"),
+    ORDER_PRINT_NO_PRINTER("1250005","打印订单时店铺没有关联打印机"),
+    ORDER_PRINT_ACCEPT_ERROR("1250006","打印订单接手失败"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),
@@ -63,6 +65,9 @@ public enum ResponseViewEnums implements RootEnums{
     SHOP_ONE_HAVE_ONE_TYPE_PRINT("1280002","一个店铺每一种品牌的打印机只能拥有一个"),
     SHOP_ADD_FEI_FAILED("1280003","飞鹅平台添加打印机失败，请稍后重试或者联系管理员"),
     SHOP_PRINT_ERROR_OPTIONS("1280004","飞鹅平台添加打印机失败，新增操作不能传入id参数，请校验"),
+    SHOP_PRINT_ERROR_HTTP("1280004","飞鹅平台打印机请求失败，请校验"),
+    SHOP_PRINT_ERROR("1280004","飞鹅平台打印失败，请校验"),
+    SHOP_PRINT_ERROR_NOT_ORDER_ID("1280004","飞鹅平台打印失败,没有返回打印id，请校验"),
 
     /**----------9-配送员信息错误-----------*/
     SENDER_HAD_CHANGE("1290001","配送员信息发生变化，请联系后台管理"),

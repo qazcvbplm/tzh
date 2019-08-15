@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.github.qcloudsms.httpclient.HTTPException;
+import ops.school.api.constants.WechatConfigConstants;
+import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import org.json.JSONException;
 import org.springframework.validation.BindingResult;
@@ -223,5 +225,23 @@ public class Util {
         if (result.result != 0) {
             throw new YWException(result.errMsg);
         }
+    }
+
+    /**
+     * @date:   2019/8/15 17:06
+     * @author: QinDaoFang
+     * @version:version
+     * @return: void
+     * @param   phoneNumber
+     * @param   templateId
+     * @param   params
+     * @Desc:   desc
+     */
+    public static void qqSmsNoConfig( String phoneNumber, int templateId, String[] params) throws HTTPException, IOException {
+        Assertions.notNull(phoneNumber);
+        Assertions.notNull(templateId);
+        Assertions.notEmpty(params);
+        SmsSingleSender sender = new SmsSingleSender(WechatConfigConstants.Tencent_Message_NOT_App_Id,WechatConfigConstants.Tencent_Message_App_key);
+        SmsSingleSenderResult result = sender.sendWithParam("86", phoneNumber, templateId, params, null, "", "");
     }
 }

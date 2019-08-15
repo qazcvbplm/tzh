@@ -1,4 +1,4 @@
-package ops.school.util;
+package ops.school.api.wxutil;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.dto.wxgzh.Message;

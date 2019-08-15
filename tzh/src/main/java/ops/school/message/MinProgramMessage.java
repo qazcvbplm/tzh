@@ -7,7 +7,7 @@
 //import ops.school.api.entity.Orders;
 //import ops.school.api.service.OrderProductService;
 //import ops.school.config.RabbitMQConfig;
-//import ops.school.util.WxMessageUtil;
+//import ops.school.api.wxutil.WxMessageUtil;
 //import org.springframework.amqp.core.Message;
 //import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 //import org.springframework.amqp.rabbit.annotation.RabbitListener;

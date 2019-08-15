@@ -1,12 +1,15 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import ops.school.api.config.Server;
+import ops.school.api.constants.*;
 import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dao.SchoolMapper;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ShopTj;
+import ops.school.api.dto.print.PrintDataDTO;
+import ops.school.api.dto.print.ShopPrintResultDTO;
 import ops.school.api.dto.project.OrderTempDTO;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.ProductOrderDTO;
@@ -17,15 +20,12 @@ import ops.school.api.exception.Assertions;
 import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
+import ops.school.api.serviceimple.ShopPrintServiceIMPL;
 import ops.school.api.util.*;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
-import ops.school.api.constants.CouponConstants;
-import ops.school.api.constants.NumConstants;
-import ops.school.api.constants.OrderConstants;
-import ops.school.api.constants.ProductConstants;
 import ops.school.service.*;
-import ops.school.util.WxMessageUtil;
+import ops.school.api.wxutil.WxMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -108,6 +108,9 @@ public class TOrdersServiceImpl implements TOrdersService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private ShopPrintService shopPringService;
 
     @Transactional
     @Override
@@ -1167,4 +1170,159 @@ public class TOrdersServiceImpl implements TOrdersService {
         return true;
     }
 
+    /**
+     * @date:   2019/8/15 15:55
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   orderId
+     * @Desc:   desc 接手订单
+     */
+    @Override
+    public ResponseObject shopAcceptOrderById2(String orderId) {
+        QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Orders::getId, orderId);
+        Orders orders = ordersService.getOne(queryWrapper);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Orders update = new Orders();
+        update.setShopId(orders.getShopId());
+        update.setId(orderId);
+        update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
+        Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(orders.getShopId().toString());
+        if (!haskey){
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(orders.getShopId().toString(),"0");
+            Date entTime = TimeUtilS.getDayEnd();
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").expireAt(entTime);
+        }
+        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
+        orders.setWaterNumber(water);
+        update.setWaterNumber(water);
+        int res = ordersService.shopAcceptOrderById(update);
+        if (res != 1) {
+            return new ResponseObject(false,ResponseViewEnums.FAILED);
+        }
+        //1-删redis
+        stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).delete(orderId);
+        // 从所有待接手订单中删除
+        stringRedisTemplate.boundHashOps("ALL_DJS").delete(orderId);
+        // 新建所有商家已接手的订单缓存
+        stringRedisTemplate.boundHashOps("SHOP_YJS").put(orderId, JSON.toJSONString(orders));
+        if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
+            stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.HOURS);
+        }
+        //发送微信消息
+        this.wxSendOrderMsgByOrder(orders);
+        //查询
+        return new ResponseObject(true,PublicErrorEnums.SUCCESS).push("water",water);
+    }
+
+    @Override
+    public ResponseObject printAndAcceptOneOrderByOId(String orderId,Long shopId) {
+        Assertions.notNull(orderId,PublicErrorEnums.PUBLIC_DATA_ERROR);
+        String orderRedis = (String) stringRedisTemplate.boundHashOps("SHOP_DJS"+shopId).get(orderId);
+        Assertions.notNull(orderRedis,PublicErrorEnums.PUBLIC_DATA_ERROR);
+        Orders orders = JSONObject.parseObject(orderRedis,Orders.class);
+        Assertions.notNull(orders);
+        //1-先接手订单
+        ResponseObject responseObject = this.shopAcceptOrderById2(orderId);
+        if (!responseObject.isCode()){
+            LoggerUtil.logError("打印接手订单失败-printAndAcceptOneOrderByOId-订单号-"+orderId+ResponseViewEnums.ORDER_PRINT_ACCEPT_ERROR.getErrorMessage());
+            return new ResponseObject(false,ResponseViewEnums.ORDER_PRINT_ACCEPT_ERROR);
+        }
+        //2-打印信息
+        String content = this.getOrderPrintContent(orders);
+        List<ShopPrint> shopPrintList = shopPringService.findOneShopFeiEByShopId(shopId);
+        if (shopPrintList.size() < NumConstants.INT_NUM_1){
+            DisplayException.throwMessage(ResponseViewEnums.ORDER_PRINT_NO_PRINTER.getErrorMessage()+"订单号"+orderId);
+        }
+        ShopPrint shopPrint = shopPrintList.get(0);
+        ShopPrintResultDTO<String> printResult = ShopPrintUtils.feiESendMsgAndPrint(shopPrint.getFeiESn(),content);
+        if (printResult == null || !printResult.isSuccess()){
+            //发送打印失败,不管了
+            LoggerUtil.logError("打印接手订单失败-printAndAcceptOneOrderByOId-订单号-"+orderId+"打印-"+printResult.getMsg()+printResult.getRet());
+        }
+        //3-放入打印查询队列
+        PrintDataDTO printDataDTO = new PrintDataDTO();
+        printDataDTO.setOurOrderId(orders.getId());
+        printDataDTO.setOurShopId(orders.getShopId());
+        printDataDTO.setPlatePrintSn(shopPrint.getFeiESn());
+        printDataDTO.setPlatePrintKey(shopPrint.getFeiEKey());
+        printDataDTO.setPlatePrintOrderId(printResult.getData());
+        printDataDTO.setPrintBrand(ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E);
+        printDataDTO.setWaterNumber((Integer) responseObject.getParams().get("water"));
+        printDataDTO.setYesPrintTrue(NumConstants.INTEGER_NUM_1);
+        orders.setStatus("商家已接手");
+        printDataDTO.setRealOrder(orders);
+        stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
+        Date entTime = TimeUtilS.getDayEnd();
+        stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).expireAt(entTime);
+        stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").leftPush(JSON.toJSONString(printDataDTO));
+        stringRedisTemplate.boundListOps("Shop_Test_Print_OId_List").expire(1,TimeUnit.DAYS);
+        return new ResponseObject(true,PublicErrorEnums.SUCCESS);
+    }
+
+    private String getOrderPrintContent(Orders orders) {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("<CB>#" + orders.getWaterNumber() + orders.getTyp() + "</CB><BR>");
+        stringBuffer.append(orders.getId() + "<BR>");
+        stringBuffer.append("<B>" + orders.getShopName() + "</B><BR>");
+        stringBuffer.append(orders.getCreateTime() + "<BR>");
+        stringBuffer.append("<C>-------------商品-------------</C><BR>");
+        for (OrderProduct product : orders.getOp()) {
+            stringBuffer.append("<B>" + product.getProductName() + "(" +product.getAttributeName() + ")<BR>");
+            stringBuffer.append("x" + product.getProductCount() + "    " + product.getAttributePrice() + "</B><BR>");
+
+        }
+        stringBuffer.append( "<C>-------------计价-------------</C><BR>");
+        stringBuffer.append("商品原价：" + "<RIGHT>" + orders.getOriginalPrice() + "</RIGHT><BR>");
+        stringBuffer.append("餐盒费：" + "<RIGHT>" + orders.getBoxPrice() + "</RIGHT><BR>");
+        stringBuffer.append("配送费：" + "<RIGHT>" + orders.getSendPrice() + "</RIGHT><BR>");
+        if ("满减优惠".equals(orders.getDiscountType())){
+            stringBuffer.append("满减优惠：" + "<RIGHT>" + "-"+ orders.getDiscountPrice() + "</RIGHT><BR>";
+);
+        }else if("商品折扣".equals(orders.getDiscountType())){
+            stringBuffer.append("折扣优惠：" + "<RIGHT>" + "-"+ orders.getDiscountPrice() + "</RIGHT><BR>";
+);
+        }
+        if (orders.getCouponId().intValue() > NumConstants.INT_NUM_0 ){
+            stringBuffer.append("优惠券优惠：" + "<RIGHT>" + "-"+ orders.getCouponUsedAmount() + "</RIGHT><BR>");
+        }
+        if (orders.getPayFoodCoupon().compareTo(new BigDecimal(0)) > NumConstants.INT_NUM_0){
+            stringBuffer.append("粮票优惠：" + "<RIGHT>" + "-"+ orders.getPayFoodCoupon() + "</RIGHT><BR>");
+        }
+        stringBuffer.append("<BOLD>实际支付：" + "<RIGHT>" +orders.getPayPrice() + "</RIGHT></BOLD><BR>");
+        stringBuffer.append("<C>-------------用户-------------</C><BR>");
+        stringBuffer.append("<B>备注：" + orders.getRemark() + "<BR>");
+        stringBuffer.append("<BR>");
+        stringBuffer.append(orders.getAddressDetail() + "，" + orders.getAddressPhone() + "，" + orders.getAddressName() + "</B>");
+        return stringBuffer.toString();
+    }
+
+    public  Boolean wxSendOrderMsgByOrder(Orders orders) {
+        Assertions.notNull(orders, ResponseViewEnums.SEND_WX_MESSAGE_ERROR_NO_PARAMS);
+        Assertions.notNull(orders.getId(), ResponseViewEnums.SEND_WX_MESSAGE_ERROR_NO_PARAMS);
+        List<String> formIds = new ArrayList<>();
+        try {
+            Long redisSize = stringRedisTemplate.opsForList().size("FORMID" + orders.getId());
+            formIds = stringRedisTemplate.opsForList().range("FORMID" + orders.getId(),0,-1);
+        } catch (Exception ex) {
+            LoggerUtil.logError("发送微信模板消息-商家接手类-wxSendOrderMsg-完成发送消息失败，formid取缓存为空" + orders.getId());
+            return false;
+        }
+        if (formIds.size() > 0) {
+            // 查询订单商品表信息
+            QueryWrapper<OrderProduct> productWrapper = new QueryWrapper<>();
+            productWrapper.lambda().eq(OrderProduct::getOrderId, orders.getId());
+            List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
+            orders.setOp(orderProducts);
+            orders.setStatus("待接手");
+            WxMessageUtil.wxSendMsg(orders, formIds.get(0));
+            stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
+        } else {
+            LoggerUtil.logError("发送微信模板消息-商家接手类-wxSendOrderMsg-完成发送消息失败，发送或者删除redis失败" + orders.getId());
+           //微信发送模板消息失败算接手成功
+            return false;
+        }
+        return true;
+    }
 }

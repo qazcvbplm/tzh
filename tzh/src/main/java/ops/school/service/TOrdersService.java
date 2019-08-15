@@ -56,4 +56,24 @@ public interface TOrdersService {
      * @Desc:   desc 传orders结算少一个查库
      */
     Boolean orderSettlementByOrders(Orders orders);
+
+    /**
+     * @date:   2019/8/15 15:54
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   orderId
+     * @Desc:   desc 接手订单
+     */
+    ResponseObject shopAcceptOrderById2(String orderId);
+
+    /**
+     * @date:   2019/8/15 14:01
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   orderId
+     * @Desc:   desc
+     */
+    ResponseObject printAndAcceptOneOrderByOId(String orderId,Long shopId);
 }

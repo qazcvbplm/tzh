@@ -73,4 +73,5 @@ public interface ShopPrintService {
      * @Desc:   desc
      */
     List<ShopPrint> findOneShopFeiEByShopId(Long shopId);
+
 }

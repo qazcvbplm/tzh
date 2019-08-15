@@ -9,6 +9,7 @@ import ops.school.api.constants.ShopPrintConfigConstants;
 import ops.school.api.dto.print.FeiERsultData;
 import ops.school.api.dto.print.ShopPrintResultDTO;
 import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
@@ -252,6 +253,89 @@ public class ShopPrintUtils {
 
             } else {
                 return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LoggerUtil.logError(e.getMessage());
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                post.abort();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                httpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return feiEDTO;
+
+    }
+
+    public static ShopPrintResultDTO<String> feiESendMsgAndPrint(String sn,String content) {
+        Assertions.notNull(sn);
+        Assertions.notNull(content);
+        //通过POST请求，发送打印信息到服务器
+        RequestConfig requestConfig = RequestConfig.custom()
+                //读取超时
+                .setSocketTimeout(3000)
+                //连接超时
+                .setConnectTimeout(3000)
+                .build();
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+
+        HttpPost post = new HttpPost(ShopPrintConfigConstants.FEI_E_URL);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("user", ShopPrintConfigConstants.FEI_E_USER));
+        String STIME = String.valueOf(System.currentTimeMillis() / 1000);
+        nvps.add(new BasicNameValuePair("stime", STIME));
+        nvps.add(new BasicNameValuePair("sig", signature(ShopPrintConfigConstants.FEI_E_USER, ShopPrintConfigConstants.FEI_E_UKEY, STIME)));
+        //固定值,不需要修改
+        nvps.add(new BasicNameValuePair("apiname", ShopPrintConfigConstants.FEI_E_Open_printMsg));
+        nvps.add(new BasicNameValuePair("sn",sn));
+        nvps.add(new BasicNameValuePair("content",content));
+        //打印联数
+        nvps.add(new BasicNameValuePair("times","1"));
+
+        CloseableHttpResponse response = null;
+        ShopPrintResultDTO<String> feiEDTO = null;
+        try {
+            post.setEntity(new UrlEncodedFormEntity(nvps, "utf-8"));
+            response = httpClient.execute(post);
+            int statecode = response.getStatusLine().getStatusCode();
+            if (statecode == 200) {
+                //请求体内容
+                String responseContent = EntityUtils.toString(response.getEntity(), "UTF-8");
+                //转化成json对象然后返回accessToken属性的值
+                feiEDTO = JSONObject.parseObject(responseContent, new TypeReference<ShopPrintResultDTO<String>>(){});
+                //如果返回的参数有no
+                if (feiEDTO == null){
+                    return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_PRINT_ERROR.getErrorMessage());
+                }else if (feiEDTO.getRet().intValue() != NumConstants.INT_NUM_0){
+                    //不等于0才是失败的
+                    feiEDTO.setSuccess(false);
+                }else if (feiEDTO.getData() == null){
+                    //返回的orderid是空
+                    feiEDTO.setSuccess(false);
+                    feiEDTO.setErrorMessage(ResponseViewEnums.SHOP_PRINT_ERROR_NOT_ORDER_ID.getErrorMessage());
+                }
+                //飞鹅返回只能根据字符串判断，垃圾
+                feiEDTO.setSuccess(true);
+
+            } else {
+                LoggerUtil.logError(response.getEntity().toString());
+                return new ShopPrintResultDTO(false, ResponseViewEnums.SHOP_PRINT_ERROR_HTTP.getErrorMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
