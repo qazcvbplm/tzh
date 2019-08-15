@@ -88,6 +88,7 @@ public class RunOrdersController {
 		 WxUser wxUser = wxUserService.findById(orders.getOpenId());
 		 if(payment.equals("微信支付")){
 			 School school=schoolService.findById(orders.getSchoolId());
+
 			  Object msg= WXpayUtil.payrequest(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
 					  "椰子-w", orders.getId(),orders.getTotalPrice().multiply(new BigDecimal(100)).intValue()+"", orders.getOpenId(),
 					  request.getRemoteAddr(), "", OrdersNotify.URL+"notify/run");
