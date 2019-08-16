@@ -13,7 +13,7 @@ public class WechatConfigConstants {
 
     public final static int Tencent_Message_NOT_App_Id = 1400169549;
 
-    public final static int Tencent_Message_NOT_Print_Template = 397468;
+    public final static int Tencent_Message_NOT_Print_Template = 398632;
 
 
 }

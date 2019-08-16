@@ -106,20 +106,18 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         saveDTO.setUpdateId(saveDTO.getCreateId());
         ShopPrint shopPrint = new ShopPrint();
         BeanUtils.copyProperties(saveDTO, shopPrint);
+        shopPrint.setId(null);
         int addNum = shopPrintMapper.insert(shopPrint);
         if (addNum != NumConstants.INT_NUM_1){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.FAILED);
         }
         // 添加到第三方打印机管理
         // 如果是飞鹅的打印
-        if (saveDTO.getPrintBrand().intValue() == ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E){
-            //sn key "sn1#key1#remark1#carnum1\nsn2#key2#remark2#carnum2";
-            String snList = ""+saveDTO.getFeiESn() + "#" + saveDTO.getFeiEKey() + "#" + shop.getShopName()+"飞鹅打印机";
-            ShopPrintResultDTO addFeiE = ShopPrintUtils.feiEAddPrinter(snList);
-            if (!addFeiE.isSuccess()){
-                LoggerUtil.logError("系统记录-添加飞鹅打印机失败-saveOneShopFeiEByDTO-日志"+addFeiE.getErrorMessage());
-                DisplayException.throwMessage(ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage()+addFeiE.getErrorMessage());
-            }
+        saveDTO.setShopName(shop.getShopName());
+        ShopPrintResultDTO addFeiE = this.addThirdPlatformPrinter(saveDTO);
+        if (!addFeiE.isSuccess()){
+            LoggerUtil.logError("系统记录-添加飞鹅打印机失败-saveOneShopFeiEByDTO-日志"+addFeiE.getErrorMessage());
+            DisplayException.throwMessage(ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage()+addFeiE.getErrorMessage());
         }
         return new ResponseObject(true, ResponseViewEnums.SUCCESS);
     }
@@ -139,24 +137,59 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
         //编辑
         if (updateDTO.getId() != null && updateDTO.getId() > NumConstants.INT_NUM_0 ){
             Assertions.notNull(updateDTO.getId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+            //1-先查是不是有记录了
+            ShopPrint shopPrint = shopPrintMapper.selectById(updateDTO.getId());
+            //如果传了id查不出来，新增
+            if (shopPrint == null && shopPrint.getId() == null){
+                ResponseObject view = this.saveOneShopFeiEByDTO(updateDTO);
+                return view;
+            }
+            //2-查店铺有没有
+            Shop shop = shopMapper.selectById(shopPrint.getShopId());
+            Assertions.notNull(shop,ResponseViewEnums.SHOP_NOT_EXISTS);
             //设置日期格式
-            updateDTO.setCreateTime(new Date());
+
             updateDTO.setUpdateTime(new Date());
             ShopPrint updateEntity = new ShopPrint();
             BeanUtils.copyProperties(updateDTO,updateEntity);
+            //shopid不能更新
+            updateEntity.setShopId(null);
             QueryWrapper<ShopPrint> wrapper = new QueryWrapper<>();
             wrapper.eq("id",updateEntity.getId());
             int updateNum = shopPrintMapper.update(updateEntity,wrapper);
             if (updateNum < 1){
                 DisplayException.throwMessageWithEnum(PublicErrorEnums.PUBLIC_DO_FAILED);
             }
+            //判断是否更新机器码
+            boolean addPrintTrue = shopPrint.getFeiESn().equals(updateDTO.getFeiESn());
+            if (addPrintTrue){
+                return new ResponseObject(true, ResponseViewEnums.SUCCESS);
+            }
+            // 添加到第三方打印机管理
+            // 如果是飞鹅的打印
+            updateDTO.setShopName(shop.getShopName());
+            ShopPrintResultDTO addFeiE = this.addThirdPlatformPrinter(updateDTO);
+            if (!addFeiE.isSuccess()){
+                LoggerUtil.logError("系统记录-更新飞鹅打印机失败-updateOneShopFeiEByDTO-日志"+addFeiE.getErrorMessage());
+                DisplayException.throwMessage(ResponseViewEnums.SHOP_ADD_FEI_FAILED.getErrorMessage()+addFeiE.getErrorMessage());
+            }
             return new ResponseObject(true, ResponseViewEnums.SUCCESS);
         }
         //新增
-        else {
-            return this.saveOneShopFeiEByDTO(updateDTO);
-        }
+        return this.saveOneShopFeiEByDTO(updateDTO);
     }
+
+    private ShopPrintResultDTO addThirdPlatformPrinter(ShopPrintDTO dto) {
+        //逻辑判断在前面判断好
+        ShopPrintResultDTO result = null;
+        if (dto.getPrintBrand().intValue() == ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E){
+            //sn key "sn1#key1#remark1#carnum1\nsn2#key2#remark2#carnum2";
+            String snList = ""+dto.getFeiESn() + "#" + dto.getFeiEKey() + "#" + dto.getShopName()+"飞鹅打印机";
+            result = ShopPrintUtils.feiEAddPrinter(snList);
+        }
+        return result;
+    }
+
     /**
      * @date:
      * @author: Fang

@@ -1,6 +1,7 @@
 package ops.school.api.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.dto.project.BaseDTO;
 
@@ -40,6 +41,9 @@ public class ShopPrintDTO extends BaseDTO implements Serializable {
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
+
+    @TableField(exist = false)
+    private String shopName;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -116,5 +120,13 @@ public class ShopPrintDTO extends BaseDTO implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
     }
 }

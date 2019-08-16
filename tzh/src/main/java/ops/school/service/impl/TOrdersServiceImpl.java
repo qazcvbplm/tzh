@@ -1282,7 +1282,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         stringBuffer.append("<CB>#" + orders.getWaterNumber() + orders.getTyp() + "</CB><BR>");
         stringBuffer.append(orders.getId() + "<BR>");
         stringBuffer.append("<B>" + orders.getShopName() + "</B><BR>");
-        stringBuffer.append(orders.getCreateTime() + "<BR>");
+        stringBuffer.append(TimeUtilS.dateFormat(orders.getCreateTime()) + "<BR>");
         stringBuffer.append("<C>-------------商品-------------</C><BR>");
         for (OrderProduct product : orders.getOp()) {
             stringBuffer.append("<B>" + product.getProductName() + "(" +product.getAttributeName() + ")<BR>");

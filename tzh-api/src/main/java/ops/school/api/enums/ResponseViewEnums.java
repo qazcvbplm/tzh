@@ -65,9 +65,10 @@ public enum ResponseViewEnums implements RootEnums{
     SHOP_ONE_HAVE_ONE_TYPE_PRINT("1280002","一个店铺每一种品牌的打印机只能拥有一个"),
     SHOP_ADD_FEI_FAILED("1280003","飞鹅平台添加打印机失败，请稍后重试或者联系管理员"),
     SHOP_PRINT_ERROR_OPTIONS("1280004","飞鹅平台添加打印机失败，新增操作不能传入id参数，请校验"),
-    SHOP_PRINT_ERROR_HTTP("1280004","飞鹅平台打印机请求失败，请校验"),
-    SHOP_PRINT_ERROR("1280004","飞鹅平台打印失败，请校验"),
-    SHOP_PRINT_ERROR_NOT_ORDER_ID("1280004","飞鹅平台打印失败,没有返回打印id，请校验"),
+    SHOP_PRINT_ERROR_HTTP("1280005","飞鹅平台打印机请求失败，请校验"),
+    SHOP_PRINT_ERROR("1280006","飞鹅平台打印失败，请校验"),
+    SHOP_PRINT_ERROR_NOT_ORDER_ID("1280007","飞鹅平台打印失败,没有返回打印id，请校验"),
+    SHOP_NOT_EXISTS("1280008","店铺不存在，请校验"),
 
     /**----------9-配送员信息错误-----------*/
     SENDER_HAD_CHANGE("1290001","配送员信息发生变化，请联系后台管理"),

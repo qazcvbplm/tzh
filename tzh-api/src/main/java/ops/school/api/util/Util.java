@@ -244,4 +244,15 @@ public class Util {
         SmsSingleSender sender = new SmsSingleSender(WechatConfigConstants.Tencent_Message_NOT_App_Id,WechatConfigConstants.Tencent_Message_App_key);
         SmsSingleSenderResult result = sender.sendWithParam("86", phoneNumber, templateId, params, null, "", "");
     }
+
+    public static void main(String[] args) {
+        try {
+            String strings = new String();
+            qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e","17671464410", 372793, "strings", null);
+        } catch (HTTPException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

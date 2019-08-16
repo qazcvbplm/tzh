@@ -418,6 +418,12 @@ public class TimeUtilS {
         return cal.getTime();
     }
 
+    public static Date getNextDayNextTime(Date date, int nextDay,int hour,int minutes,int seconds) {
+        Calendar cal=new GregorianCalendar();
+        cal.setTime(date);
+        cal.set(getNowYear(),getNowMonth(),cal.get(Calendar.DATE)+nextDay,hour,minutes,seconds);
+        return cal.getTime();
+    }
 
     /**
      * 返回某个日期前几天的日期
@@ -895,7 +901,10 @@ public class TimeUtilS {
 
 
     public static void main(String[] args) {
+
         System.out.println(getNo(8));
+        System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDayNextTime(new Date(),2,24,0,0 )));
+
     }
 }
 

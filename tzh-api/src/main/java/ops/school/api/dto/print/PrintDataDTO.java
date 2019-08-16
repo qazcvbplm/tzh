@@ -2,6 +2,9 @@ package ops.school.api.dto.print;
 
 import ops.school.api.entity.Orders;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * CreatebyFang
  * fangfor@outlook.com
@@ -30,6 +33,10 @@ public class PrintDataDTO {
     private Orders realOrder;
 
     private Integer cycleRedisCount = 0;
+
+    private String[] sendMsg3Params = new String[3];
+
+    private String schoolLeaderPhone;
 
 
     public String getOurOrderId() {
@@ -112,6 +119,22 @@ public class PrintDataDTO {
         this.cycleRedisCount = cycleRedisCount;
     }
 
+    public String[] getSendMsg3Params() {
+        return sendMsg3Params;
+    }
+
+    public void setSendMsg3Params(String[] sendMsg3Params) {
+        this.sendMsg3Params = sendMsg3Params;
+    }
+
+    public String getSchoolLeaderPhone() {
+        return schoolLeaderPhone;
+    }
+
+    public void setSchoolLeaderPhone(String schoolLeaderPhone) {
+        this.schoolLeaderPhone = schoolLeaderPhone;
+    }
+
     @Override
     public String toString() {
         return "PrintDataDTO{" +
@@ -125,6 +148,8 @@ public class PrintDataDTO {
                 ", waterNumber=" + waterNumber +
                 ", realOrder=" + realOrder +
                 ", cycleRedisCount=" + cycleRedisCount +
+                ", sendMsg3Params=" + Arrays.toString(sendMsg3Params) +
+                ", schoolLeaderPhone='" + schoolLeaderPhone + '\'' +
                 '}';
     }
 }

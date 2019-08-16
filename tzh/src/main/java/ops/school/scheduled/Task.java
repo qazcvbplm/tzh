@@ -229,63 +229,12 @@ public class Task {
                     stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SHOP" + school.getPhone(), "", 5, TimeUnit.MINUTES);
                 }
             }
-        }
-    }
-
-    /**
-     * 每1分钟执行一次，隔5分钟提醒一次
-     * 提醒学校负责人，配送员有超时未接手订单
-     */
-    @Scheduled(cron = "0 */5 * * * ?")
-    public void remindDistributor() {
-
-        // 查询所有商家已接手订单
-        List<Orders> orders;
-        if (SpringUtil.redisCache()) {
-            orders = JSON.parseArray(stringRedisTemplate.boundHashOps("SHOP_YJS").values().toString(), Orders.class);
-        } else {
-            orders = ordersService.list(new QueryWrapper<Orders>().lambda().eq(Orders::getStatus, "商家已接手"));
-        }
-        if (orders == null) {
-            return;
-        }
-        /**
-         * 批量查询school信息
-         */
-        List<Integer> schoolIdList = PublicUtilS.getValueList(orders, "schoolId");
-        Collection<School> schoolCollection = schoolService.listByIds(schoolIdList);
-        Map<Integer, School> schoolMap = PublicUtilS.listForMapValueE(schoolCollection, "id");
-        for (Orders order : orders) {
-            School school = null;
-            if (schoolMap.get(order.getSchoolId()) != null) {
-                school = schoolMap.get(order.getSchoolId());
-            } else {
-                continue;
-            }
-            long currentTime = System.currentTimeMillis();
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String curTime = df.format(currentTime);
-            // 获取商家接手时间
-            if (order.getShopAcceptTime() == null || order.getShopAcceptTime().length() == 0) {
-                continue;
-            }
-            long differTime = TimeUtilS.dateDiff(order.getShopAcceptTime(), curTime);
-            if (differTime > 10) {
-                if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SENDER" + school.getPhone()) == null) {
-                    try {
-                        Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getPhone(), 372793, "", null);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SENDER" + school.getPhone(), "", 5, TimeUnit.MINUTES);
-                }
-            }
-        }
+        }//for
     }
 
     /**
      * 判断学校优惠券是否失效
-     * 每天上午10点,下午14点,18点,晚上22点执行一次
+     * 每天上午10点,下午14点,18点,晚上22点执行一次+
      */
     @Scheduled(cron = "0 0 10,14,18,22 * * ?")
     public void couponInvalid() {
