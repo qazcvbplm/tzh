@@ -5,7 +5,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   profiles:
-    active: dev
+    active: prod
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     driverClassName: com.mysql.jdbc.Driver
@@ -53,6 +53,5 @@ server:
 mybatis-plus:
   mapper-locations: ops/school/api/mapper/*.xml
   type-enums-package: ops/school/api/entity/enums
-chuyin:
-  white: "/ops/aaaa"
+
 

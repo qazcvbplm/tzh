@@ -24,9 +24,6 @@ import java.util.Properties;
 @Component
 public class MyInterceptor implements HandlerInterceptor {
 
-    @Value("${chuyin.white}")
-    private static String whiteString;
-
     private static Map<String, String> authMap = new HashMap<>();
 
     private final static String whitePropertiesName = "authWhiteList";
