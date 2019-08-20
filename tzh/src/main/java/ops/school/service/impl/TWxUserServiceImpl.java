@@ -1,6 +1,8 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.entity.*;
@@ -177,8 +179,20 @@ public class TWxUserServiceImpl implements TWxUserService {
                 if (wxUser.getPhone() == null || wxUser.getPhone().length() == 0){
                     if (phoneNumber != null || phoneNumber != ""){
                         // 手机号加openid存进去
-
-                        int addNum = wxUserBellMapper.insert(new WxUserBell(openid + "-" + phoneNumber,wxUser.getId()));
+                        QueryWrapper<WxUserBell> wrapper = new QueryWrapper<>();
+                        wrapper.eq("wx_user_id",wxUser.getId());
+                        WxUserBell wxUserBellHad = wxUserBellMapper.selectOne(wrapper);
+                        if (wxUserBellHad == null){
+                            //新增
+                            int addNum = wxUserBellMapper.insert(new WxUserBell(openid + "-" + phoneNumber,wxUser.getId()));
+                        }else {
+                            //更新
+                            String updatePhone = openid + "-" + phoneNumber;
+                            int updateNum = wxUserBellMapper.updatePhoneById(updatePhone,wxUserBellHad.getId());
+                            if (updateNum < 1){
+                                return 0;
+                            }
+                        }
                         // 手机号存进去
                         wxUser.setPhone(phoneNumber);
                         // 修改用户信息

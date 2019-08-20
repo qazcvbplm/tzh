@@ -59,4 +59,6 @@ public interface WxUserBellMapper extends BaseMapper<WxUserBell> {
      * @Desc:   desc
      */
     Integer addSourceByWxId(@Param("source") Integer source, @Param("wxUserId") Long wxUserId);
+
+    int updatePhoneById(@Param("phone") String updatePhone, @Param("id") Long id);
 }
