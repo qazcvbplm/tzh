@@ -66,7 +66,6 @@ public class PrintTask {
     @Scheduled(cron = "* */5 * * * ?")
     public void doPrintAndAcceptOrder() {
         List<PrintDataDTO> failedPrintList = new ArrayList<>();
-        Map<Long,String> moreShopSendOneMap = new HashMap<>();
         Set<Integer> set = new HashSet();
         List<PrintDataDTO> sendMsgList = new ArrayList<>();
         while (true) {
@@ -143,7 +142,6 @@ public class PrintTask {
             School school = schoolService.findById(orders.getSchoolId());
             if (school.getPhone() == null || orders.getShopName() == null || orders.getShopPhone() == null) {
                 LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态后发送负责人短信失败-订单" + orders.getId() + "负责人电话" + school.getPhone() + "店铺名称" + orders.getShopName() + "店铺电话" + orders.getShopPhone());
-                //如果不能发送，跳过,放入失败队列
                 printDataDTO.setCycleRedisCount(printDataDTO.getCycleRedisCount() + NumConstants.INT_NUM_1);
                 Long listIndex = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
                 Long outTime = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).getExpire();

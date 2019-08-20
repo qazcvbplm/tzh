@@ -50,4 +50,16 @@ public interface SchoolService extends IService<School> {
      * @Desc:   desc 扣除学校余额数据和粮票余额
      */
     Integer disScUserBellAllAndUserSBellByScId(BigDecimal payPrice, BigDecimal payFoodCoupon, Integer id);
+
+    /**
+     * @date:   2019/8/19 14:53
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   payPrice
+     * @param   payFoodCoupon
+     * @param   id
+     * @Desc:   desc
+     */
+    Integer disScUserBellAllAndUserSBellByScIdCan0(BigDecimal payPrice, BigDecimal payFoodCoupon, Integer schoolId);
 }

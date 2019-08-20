@@ -148,7 +148,6 @@ public class ShopPrintServiceIMPL implements ShopPrintService {
             Shop shop = shopMapper.selectById(shopPrint.getShopId());
             Assertions.notNull(shop,ResponseViewEnums.SHOP_NOT_EXISTS);
             //设置日期格式
-
             updateDTO.setUpdateTime(new Date());
             ShopPrint updateEntity = new ShopPrint();
             BeanUtils.copyProperties(updateDTO,updateEntity);

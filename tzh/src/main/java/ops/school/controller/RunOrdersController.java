@@ -110,7 +110,6 @@ public class RunOrdersController {
 				 schoolService.chargeUse(map);
 				 stringRedisTemplate.delete("SCHOOL_ID_" + orders.getId());
 				 //todo 不能判断支付状态是void 这里redis存是在pay的方法里面
-
 			 }
 			 return new ResponseObject(true, orderId);
 		 }

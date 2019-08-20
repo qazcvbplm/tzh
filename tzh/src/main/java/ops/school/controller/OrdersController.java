@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ops.school.api.constants.RedisConstants;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.School;
@@ -74,7 +75,7 @@ public class OrdersController {
 
     @ApiOperation(value = "支付订单", httpMethod = "POST")
     @PostMapping("pay")
-    public ResponseObject find(HttpServletRequest request, HttpServletResponse response,
+    public ResponseObject pay(HttpServletRequest request, HttpServletResponse response,
                                String orderId, String payment, String formid) {
         Orders orders = ordersService.findById(orderId);
         if (payment.equals("微信支付")) {
@@ -84,33 +85,21 @@ public class OrdersController {
                     request.getRemoteAddr(), "", OrdersNotify.URL + "notify/takeout");
             HashMap<String, String> map = (HashMap<String, String>) msg;
             if (map.get("return_code").equals("SUCCESS")) {
+                //发送微信模板消息
                 String[] formIds = formid.split(",");
                 if (formIds.length < 1){
                     LoggerUtil.logError("order pay formid为空"+ orders.getId());
                 }
-                //扣除学校余额数据和粮票余额
-                Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(BigDecimal.ZERO,orders.getPayFoodCoupon(),school.getId());
-                if (disSCNum != NumConstants.INT_NUM_1){
-                    DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
-                }
-                //获取订单op
-                String shopDjs = (String) stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).get(orderId);
-                Orders ordersTemp = null;
-                if (shopDjs != null){
-                    ordersTemp = JSONObject.parseObject(shopDjs,Orders.class);
-                }
-                if (ordersTemp.getOp() != null && ordersTemp.getOp().size() > 0){
-                    orders.setOp(ordersTemp.getOp());
-                }
-                stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+                //微信支付会回调支付成功接口，不用存待接手
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).leftPushAll(formIds);
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).expire(24, TimeUnit.HOURS);
+
             }
             return new ResponseObject(true, "ok").push("msg", msg);
         }
         if (payment.equals("余额支付")) {
             if (tOrdersService.pay(orders, formid) == 1) {
-                //todo 不能判断支付状态是void 在pay里面存redis
+                //不能判断支付状态是void 在pay里面存redis
             }
             return new ResponseObject(true, orderId);
         }
@@ -119,7 +108,7 @@ public class OrdersController {
 
     @ApiOperation(value = "取消订单", httpMethod = "POST")
     @PostMapping("cancel")
-    public ResponseObject find(HttpServletRequest request, HttpServletResponse response,
+    public ResponseObject cancel(HttpServletRequest request, HttpServletResponse response,
                                String id) {
         Orders orders = ordersService.findById(id);
         // 临时存储订单状态
@@ -200,12 +189,7 @@ public class OrdersController {
     @PostMapping("android/acceptorder")
     public ResponseObject android_findDjs(HttpServletRequest request, HttpServletResponse response, String orderId) {
         ResponseObject responseObject = tOrdersService.shopAcceptOrderById2(orderId);
-        if (responseObject.isCode()){
-            Orders orders = ordersService.findById(orderId);
-            return new ResponseObject(true, "接手成功").push("order", JSON.toJSONString(orders));
-        }else {
-            return new ResponseObject(false, "接手失败");
-        }
+        return responseObject;
     }
 
 //    @ApiOperation(value = "商家接手订单", httpMethod = "POST")

@@ -246,13 +246,16 @@ public class Util {
     }
 
     public static void main(String[] args) {
-        try {
-            String strings = new String();
-            qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e","17671464410", 372793, "strings", null);
-        } catch (HTTPException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            String strings = new String();
+//            qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e","17671464410", 372793, "strings", null);
+//        } catch (HTTPException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        String a = EnCode("208595");
+        System.out.println(a);
+
     }
 }

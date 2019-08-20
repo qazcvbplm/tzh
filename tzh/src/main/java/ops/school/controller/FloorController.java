@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.entity.Floor;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.FloorService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
@@ -42,22 +45,25 @@ public class FloorController {
     @ApiOperation(value = "查询", httpMethod = "POST")
     @PostMapping("find")
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Floor floor) {
+        Assertions.notNull(floor, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(floor.getSchoolId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
         floor.setQuery(request.getAttribute("Id").toString());
         floor.setQueryType(request.getAttribute("role").toString());
         QueryWrapper<Floor> query = new QueryWrapper<Floor>();
         query.lambda().eq(Floor::getIsDelete, 0);
-        switch (floor.getQueryType()) {
-            case "wxuser":
-                if (floor.getSchoolId() == null) {
-                    query.lambda().eq(Floor::getSchoolId, Integer.valueOf(floor.getQuery()));
-                }
-                break;
-            case "ops":
-                query.lambda().eq(Floor::getSchoolId, Integer.valueOf(floor.getQuery()));
-                break;
-            case "admin":
-                break;
-        }
+        query.lambda().eq(Floor::getSchoolId, floor.getSchoolId());
+//        switch (floor.getQueryType()) {
+//            case "wxuser":
+//                if (floor.getSchoolId() == null) {
+//                    query.lambda().eq(Floor::getSchoolId, Integer.valueOf(floor.getQuery()));
+//                }
+//                break;
+//            case "ops":
+//                query.lambda().eq(Floor::getSchoolId, Integer.valueOf(floor.getQuery()));
+//                break;
+//            case "admin":
+//                break;
+//        }
         query.orderByDesc("sort");
         IPage<Floor> floorIPage = floorService.page(PageUtil.getPage(floor.getPage(), floor.getSize()), query);
         return new ResponseObject(true, "ok").push("list", floorIPage.getRecords()).

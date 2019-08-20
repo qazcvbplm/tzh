@@ -156,4 +156,22 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
         stringRedisTemplate.delete("SCHOOL_ID_" + schoolId);
         return disSCNum;
     }
+
+    /**
+     * @date:   2019/8/19 14:54
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   payPrice
+     * @param   payFoodCoupon
+     * @param   id
+     * @Desc:   desc
+     */
+    @Override
+    public Integer disScUserBellAllAndUserSBellByScIdCan0(BigDecimal payPrice, BigDecimal payFoodCoupon, Integer schoolId) {
+        Assertions.notNull(payPrice,payFoodCoupon,schoolId);
+        Integer disSCNum = schoolMapper.disScUserBellAllAndUserSBellByScIdCan0(payPrice,payFoodCoupon,schoolId);
+        stringRedisTemplate.delete("SCHOOL_ID_" + schoolId);
+        return disSCNum;
+    }
 }

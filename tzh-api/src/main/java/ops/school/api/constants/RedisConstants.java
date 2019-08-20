@@ -14,4 +14,10 @@ public class RedisConstants {
     public final static  String Shop_Wait_Print_OId_List = "Shop_Wait_Print_OId_List";
 
     public final static  String Shop_Failed_Print_OId_List = "Shop_Failed_Print_OId_List";
+
+    public final static  String Shop_Need_Pay_Product = "Shop_Need_Pay_Product" ;
+
+    public final static  String SHOP_DJS = "SHOP_DJS" ;
+
+
 }

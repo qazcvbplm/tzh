@@ -595,8 +595,10 @@ public class TOrdersServiceImpl implements TOrdersService {
         Map resultMap = new HashMap();
         resultMap.put("orderId", generatorOrderId);
         resultMap.put("createTime",ordersSaveTemp.getCreateTime());
-        stringRedisTemplate.boundHashOps("SHOP_DJS" + ordersSaveTemp.getShopId()).put(ordersSaveTemp.getId(), JSON.toJSONString(ordersSaveTemp));
-        stringRedisTemplate.boundHashOps("ALL_DJS").put(ordersSaveTemp.getId(), JSON.toJSONString(ordersSaveTemp));
+        //订单商品存缓存
+        stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product+ ordersSaveTemp.getShopId()).put(ordersSaveTemp.getId(), JSON.toJSONString(ordersSaveTemp));
+        //当天晚上缓存过期
+        stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product+ ordersSaveTemp.getShopId()).expireAt(TimeUtilS.getDayEnd());
 //        Long endOrderTime = System.currentTimeMillis();
 //        System.out.println(endOrderTime - startOrderTime);
         return new ResponseObject(true, "创建订单成功！", resultMap);
@@ -614,13 +616,16 @@ public class TOrdersServiceImpl implements TOrdersService {
         map.put("amount", orders.getPayPrice());
         if (wxUserBellService.pay(map) == 1) {
             //扣除学校余额数据和粮票余额
-            Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScId(orders.getPayPrice(), orders.getPayFoodCoupon(), school.getId());
+            Integer disSCNum = schoolService.disScUserBellAllAndUserSBellByScIdCan0(orders.getPayPrice(), orders.getPayFoodCoupon(), school.getId());
             if (disSCNum != NumConstants.INT_NUM_1) {
-                DisplayException.throwMessageWithEnum(ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED);
+                logger.error("系统异常- {},订单id{}，支付价格{}，粮票{}，学校id{}",ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED.getErrorMessage(),orders.getId(),orders.getPayPrice(), orders.getPayFoodCoupon(), school.getId());
+
             }
             if (paySuccess(orders.getId(), "余额支付") == 0) {
                 stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).delete(orders.getId().toString());
                 stringRedisTemplate.boundHashOps("ALL_DJS").delete(orders.getId().toString());
+                //删除订单product
+                Long delNum = stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product + orders.getShopId().toString()).delete(orders.getId());
                 throw new YWException("订单状态异常");
             }
             String[] formIds = formid.split(",");
@@ -651,18 +656,17 @@ public class TOrdersServiceImpl implements TOrdersService {
             orders.setStatus("待接手");
             orders.setPayTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             //获取订单op
-            String shopDjs = (String) stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).get(orderId);
+            String shopDjs = (String) stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product + orders.getShopId().toString()).get(orderId);
             Orders ordersTemp = null;
             if (shopDjs != null){
                 ordersTemp = JSONObject.parseObject(shopDjs,Orders.class);
+                Long delNum = stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product + orders.getShopId().toString()).delete(orderId);
             }
             if (ordersTemp.getOp() != null && ordersTemp.getOp().size() > 0){
                 orders.setOp(ordersTemp.getOp());
             }
             stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).put(orderId, JSON.toJSONString(orders));
             stringRedisTemplate.boundHashOps("ALL_DJS").put(orderId, JSON.toJSONString(orders));
-            //stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
-            //stringRedisTemplate.convertAndSend(Server.SOCKET, ordersStr);
         }
         return rs;
     }
@@ -1209,6 +1213,17 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (res != 1) {
             return new ResponseObject(false,ResponseViewEnums.FAILED);
         }
+        //获取订单op
+        String opOrdersString = (String) stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).get(orderId);
+        Orders opOrders = JSONObject.parseObject(opOrdersString,Orders.class);
+        if (opOrders != null && opOrders.getOp().size() < NumConstants.INT_NUM_1){
+            //如果缓存op是空查数据库
+            QueryWrapper<OrderProduct> wrapper = new QueryWrapper<>();
+            wrapper.eq("order_id",orderId);
+            List<OrderProduct> products = orderProductService.list(wrapper);
+            opOrders.setOp(products);
+
+        }
         //1-删redis
         stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).delete(orderId);
         // 从所有待接手订单中删除
@@ -1221,13 +1236,15 @@ public class TOrdersServiceImpl implements TOrdersService {
         //发送微信消息
         this.wxSendOrderMsgByOrder(orders);
         //查询
-        return new ResponseObject(true,PublicErrorEnums.SUCCESS).push("water",water);
+        return new ResponseObject(true,PublicErrorEnums.SUCCESS)
+                .push("water",water)
+                .push("order",JSON.toJSONString(opOrders));
     }
 
     @Override
     public ResponseObject printAndAcceptOneOrderByOId(String orderId,Long shopId) {
         Assertions.notNull(orderId,PublicErrorEnums.PUBLIC_DATA_ERROR);
-        String orderRedis = (String) stringRedisTemplate.boundHashOps("SHOP_DJS"+shopId).get(orderId);
+        String orderRedis = (String) stringRedisTemplate.boundHashOps(RedisConstants.SHOP_DJS+shopId).get(orderId);
         Assertions.notNull(orderRedis,PublicErrorEnums.PUBLIC_DATA_ERROR);
         Orders orders = JSONObject.parseObject(orderRedis,Orders.class);
         Assertions.notNull(orders);
@@ -1290,7 +1307,7 @@ public class TOrdersServiceImpl implements TOrdersService {
 
         }
         stringBuffer.append( "<C>-------------计价-------------</C><BR>");
-        stringBuffer.append("商品原价：" + "<RIGHT>" + orders.getOriginalPrice() + "</RIGHT><BR>");
+        stringBuffer.append("商品原价：" + "<RIGHT>" + orders.getProductPrice() + "</RIGHT><BR>");
         stringBuffer.append("餐盒费：" + "<RIGHT>" + orders.getBoxPrice() + "</RIGHT><BR>");
         stringBuffer.append("配送费：" + "<RIGHT>" + orders.getSendPrice() + "</RIGHT><BR>");
         if ("满减优惠".equals(orders.getDiscountType())){

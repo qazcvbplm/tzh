@@ -359,4 +359,13 @@
         AND user_charge_send >=  #{payFoodCoupon}
     </update>
 
+    <!--CreatBy Fang Time:2019/8/19 14:55 |  -->
+    <update id="disScUserBellAllAndUserSBellByScIdCan0">
+        UPDATE school
+        SET
+        user_bell_all = user_bell_all - #{payPrice},
+        user_charge_send = user_charge_send - #{payFoodCoupon}
+        WHERE Id = #{schoolId}
+    </update>
+
 </mapper>

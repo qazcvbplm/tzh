@@ -61,4 +61,16 @@ public interface SchoolMapper extends BaseMapper<School> {
      * @Desc:   desc 扣除学校余额数据和粮票余额
      */
     Integer disScUserBellAllAndUserSBellByScId(@Param("payPrice") BigDecimal payPrice, @Param("payFoodCoupon") BigDecimal payFoodCoupon, @Param("schoolId") Integer schoolId);
+
+    /**
+     * @date:   2019/8/19 14:55
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   payPrice
+     * @param   payFoodCoupon
+     * @param   schoolId
+     * @Desc:   desc
+     */
+    Integer disScUserBellAllAndUserSBellByScIdCan0(@Param("payPrice") BigDecimal payPrice, @Param("payFoodCoupon") BigDecimal payFoodCoupon, @Param("schoolId") Integer schoolId);
 }
