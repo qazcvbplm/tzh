@@ -176,11 +176,9 @@ public class TWxUserServiceImpl implements TWxUserService {
                 System.out.println("-------"+wxUser.getPhone() + "------");
                 if (wxUser.getPhone() == null || wxUser.getPhone().length() == 0){
                     if (phoneNumber != null || phoneNumber != ""){
-//                        if (wxUserBellMapper.findByPhone(openid + "-" + phoneNumber) == 0) {
-//                            wxUserBellMapper.insert(new WxUserBell(openid + "-" + phoneNumber,wxUser.getId()));
-//                        }
                         // 手机号加openid存进去
-                        wxUserBellMapper.insert(new WxUserBell(openid + "-" + phoneNumber,wxUser.getId()));
+
+                        int addNum = wxUserBellMapper.insert(new WxUserBell(openid + "-" + phoneNumber,wxUser.getId()));
                         // 手机号存进去
                         wxUser.setPhone(phoneNumber);
                         // 修改用户信息
@@ -206,7 +204,6 @@ public class TWxUserServiceImpl implements TWxUserService {
                                 return 0;
                             }
                         }
-
                         // 修改用户手机号
                         wxUser.setPhone(phoneNumber);
                         wxUserService.updateById(wxUser);
@@ -217,6 +214,7 @@ public class TWxUserServiceImpl implements TWxUserService {
             }
         } catch (Exception e){
             e.printStackTrace();
+            LoggerUtil.logError("decryptPhone"+e.getMessage());
         }
         return 1;
     }

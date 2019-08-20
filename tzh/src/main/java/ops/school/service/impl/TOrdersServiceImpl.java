@@ -1222,7 +1222,6 @@ public class TOrdersServiceImpl implements TOrdersService {
             wrapper.eq("order_id",orderId);
             List<OrderProduct> products = orderProductService.list(wrapper);
             opOrders.setOp(products);
-
         }
         //1-删redis
         stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).delete(orderId);
@@ -1236,6 +1235,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         //发送微信消息
         this.wxSendOrderMsgByOrder(orders);
         //查询
+        opOrders.setWaterNumber(water);
         return new ResponseObject(true,PublicErrorEnums.SUCCESS)
                 .push("water",water)
                 .push("order",JSON.toJSONString(opOrders));

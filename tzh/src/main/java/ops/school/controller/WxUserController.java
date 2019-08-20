@@ -84,13 +84,6 @@ public class WxUserController {
             sessionKey = (String) map.get("sessionKey");
             String token = JWTUtil.sign(openid, "wx", "wxuser");
             user = wxUserService.login(openid, sid, school.getAppId(), "微信小程序");
-//            WxUserBell wxUserBell = tWxUserService.getbell(openid);
-            //todo 去掉login请求bell
-//            if (wxUserBell == null){
-//                user.setBell(new WxUserBell(NumConstants.INT_NUM_0,BigDecimal.ZERO,BigDecimal.ZERO));
-//            }
-            // user.setBell(wxUserBell);
-            // logsMapper.insert(new Logs(request.getHeader("X-Real-IP") + "," + user.getNickName()));
             cache.userCountadd(sid);
             return new ResponseObject(true, "ok").push("token", token).push("user", user).push("sessionKey", sessionKey);
         } else {
@@ -172,7 +165,7 @@ public class WxUserController {
         return new ResponseObject(true, "ok");
     }
 
-    @ApiOperation(value = "绑定手机", httpMethod = "POST")
+    @ApiOperation(value = "绑定手机(用户已废弃，配送员生效)", httpMethod = "POST")
     @PostMapping("bind")
     public ResponseObject bind(HttpServletRequest request, HttpServletResponse response, @RequestParam String phone, @RequestParam String codes, Long wxId) {
         Assertions.notNull(wxId, ResponseViewEnums.WX_USER_FAILED_TO_WX);
