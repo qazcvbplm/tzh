@@ -53,6 +53,9 @@ public enum ResponseViewEnums implements RootEnums{
     ORDER_COMPLETE_SOURCE_ERROR("1250004","订单完结增加积分错误，请稍后重试或者请联系后台管理"),
     ORDER_PRINT_NO_PRINTER("1250005","打印订单时店铺没有关联打印机"),
     ORDER_PRINT_ACCEPT_ERROR("1250006","打印订单接手失败"),
+    ORDER_MESSAGE_NULL_ORDER_ID("1250007","发送微信模板消息订单id为空"),
+    ORDER_MESSAGE_NULL_SCHOOL("1250008","发送微信模板消息学校信息空需要appid"),
+    ORDER_MESSAGE_NULL_SCHOOL_ID("1250009","发送微信模板消息学校信息空需要学校id"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),

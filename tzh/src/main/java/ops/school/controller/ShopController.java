@@ -74,18 +74,6 @@ public class ShopController {
         return new ResponseObject(true, "ok")
         .push("list",shopList)
         .push("total",countNum);
-//	public ResponseObject add(HttpServletRequest request, HttpServletResponse response, Shop shop) {
-
-
-//		QueryWrapper<Shop> query = new QueryWrapper<Shop>().setEntity(shop);
-//		return new ResponseObject(true, "ok")
-//				.push("list", shopService.page(new Page<>(pageQueryDTO.getPage(), pageQueryDTO.getSize()), query))
-//				.push("total",shopService.count(query));
-//
-//		ResponseObject responseObject = shopService.findShopWithFullCutOBTime(shop,pageQueryDTO);
-//		return responseObject;
-//				.push("list", shopService.find(shop))
-//				.push("total", shopService.count(new QueryWrapper<Shop>().setEntity(shop)));
 }
 	
 	@ApiOperation(value="更新",httpMethod="POST")

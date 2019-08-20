@@ -42,6 +42,8 @@ public class School extends Base implements Serializable {
     @NotBlank
     private String wxAppId;
     @NotBlank
+    private String wxMessageTemplateId;
+    @NotBlank
     private String wxSecret;
     @NotBlank
     private String mchId;
@@ -331,5 +333,13 @@ public class School extends Base implements Serializable {
 
     public void setEnableCoupon(Integer enableCoupon) {
         this.enableCoupon = enableCoupon;
+    }
+
+    public String getWxMessageTemplateId() {
+        return wxMessageTemplateId;
+    }
+
+    public void setWxMessageTemplateId(String wxMessageTemplateId) {
+        this.wxMessageTemplateId = wxMessageTemplateId;
     }
 }

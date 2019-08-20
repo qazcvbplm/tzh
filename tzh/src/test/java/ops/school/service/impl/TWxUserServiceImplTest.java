@@ -3,6 +3,9 @@ package ops.school.service.impl;
 
 
 import ops.school.App;
+import ops.school.api.entity.Orders;
+import ops.school.api.entity.School;
+import ops.school.api.wxutil.WxMessageUtil;
 import ops.school.service.TCommonService;
 import ops.school.service.TOrdersService;
 import ops.school.service.TWxUserService;
@@ -34,6 +37,9 @@ public class TWxUserServiceImplTest {
     @Autowired
     private TOrdersService tOrdersService;
 
+    @Autowired
+    private WxMessageUtil wxMessageUtil;
+
     @Test
     public void chargeSuccess() {
         String attach = "30";
@@ -60,6 +66,16 @@ public class TWxUserServiceImplTest {
         String orderId = "201908061718417597677171055";
         tOrdersService.orderSettlement(orderId);
     }
+
+    @Test
+    public void testWxMessageUtil(){
+        Orders orders = new Orders();
+        School school = new School();
+        orders.setSchoolId(27);
+        wxMessageUtil.wxSendMsg(orders,"",orders.getSchoolId());
+    }
+
+
 
 
 

@@ -5,9 +5,12 @@ import ops.school.api.dto.wxgzh.Message;
 import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.RunOrders;
+import ops.school.api.entity.School;
+import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.service.OrderProductService;
+import ops.school.api.service.SchoolService;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.wxutil.WxGUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +26,25 @@ import java.util.Date;
 import java.util.List;
 
 
+
+@Component
 public class WxMessageUtil {
 
+    @Autowired
+    private SchoolService schoolService;
+
+    private static WxMessageUtil wxMessageUtil;
+
+    public void setSchoolService(SchoolService targetInfoService) {
+        this.schoolService = targetInfoService;
+    }
+
+
+    @PostConstruct
+    public void init() {
+        wxMessageUtil = this;
+        wxMessageUtil.schoolService = this.schoolService;
+    }
 
     private static final String templateId = "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o";
 
@@ -56,11 +76,13 @@ public class WxMessageUtil {
     private static final String sourceAccept = "的积分奖励，请注意查收";
 
 
-    public static void wxSendMsg(Orders orders, String formid) {
+    public static void wxSendMsg(Orders orders, String formid,Integer schoolId) {
+        Assertions.notNull(schoolId,ResponseViewEnums.ORDER_MESSAGE_NULL_SCHOOL_ID);
+        School findSchool = wxMessageUtil.schoolService.findById(schoolId);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Message message = new Message();
         message.setToUser(orders.getOpenId());
-        message.setTemplateId(templateId);
+        message.setTemplateId(findSchool.getWxMessageTemplateId());
         // 订单编号
         message.setDataKeyWord3(orders.getId());
         // 更新时间
@@ -116,7 +138,7 @@ public class WxMessageUtil {
             // 发送消息模板
             // 发送消息模板
             try{
-                WxGUtil.snedM(message.toJson());
+                WxGUtil.sendMsgByAppIdAndSecert(message.toJson(),findSchool.getWxAppId(),findSchool.getWxSecret());
             }catch (Exception ex){
                 LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
             }
@@ -141,7 +163,7 @@ public class WxMessageUtil {
                 // 发送消息模板
                 // 发送消息模板
                 try{
-                    WxGUtil.snedM(message.toJson());
+                    WxGUtil.sendMsgByAppIdAndSecert(message.toJson(),findSchool.getWxAppId(),findSchool.getWxSecret());
                 }catch (Exception ex){
                     LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
                 }
@@ -150,11 +172,13 @@ public class WxMessageUtil {
         }
     }
 
-    public static void wxRunOrderSendMsg(RunOrders runOrders, String openid, String formid){
+    public static void wxRunOrderSendMsg(RunOrders runOrders, String openid, String formid,Integer schoolId){
+        Assertions.notNull(schoolId,ResponseViewEnums.ORDER_MESSAGE_NULL_SCHOOL_ID);
+        School findSchool = wxMessageUtil.schoolService.findById(schoolId);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Message message = new Message();
         message.setToUser(openid);
-        message.setTemplateId(templateId);
+        message.setTemplateId(findSchool.getWxMessageTemplateId());
         // 订单编号
         message.setDataKeyWord3(runOrders.getId());
         // 更新时间
@@ -179,7 +203,7 @@ public class WxMessageUtil {
         }
         // 发送消息模板
         try{
-            WxGUtil.snedM(message.toJson());
+            WxGUtil.sendMsgByAppIdAndSecert(message.toJson(),findSchool.getWxAppId(),findSchool.getWxSecret());
         }catch (Exception ex){
             LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
         }

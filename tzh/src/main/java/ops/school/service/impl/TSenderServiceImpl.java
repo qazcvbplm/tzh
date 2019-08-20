@@ -96,7 +96,7 @@ public class TSenderServiceImpl implements TSenderService {
                 LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
             if (formIds.size() > 0){
-                WxMessageUtil.wxSendMsg(orders,formIds.get(0));
+                WxMessageUtil.wxSendMsg(orders,formIds.get(0),orders.getSchoolId());
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
                 LoggerUtil.logError("acceptOrder 完成发送消息失败，发送或者删除redis失败"+orders.getId());
@@ -163,7 +163,7 @@ public class TSenderServiceImpl implements TSenderService {
                 LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
             if (formIds.size() > 0){
-                WxMessageUtil.wxSendMsg(orders,formIds.get(0));
+                WxMessageUtil.wxSendMsg(orders,formIds.get(0),orders.getSchoolId());
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
                 LoggerUtil.logError(" 配送员end订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
@@ -206,7 +206,7 @@ public class TSenderServiceImpl implements TSenderService {
                 LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
             if (formIds.size() > 0){
-                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0),orders.getSchoolId());
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
             }else {
                 LoggerUtil.logError("acceptOrderRun 完成发送消息失败，发送或者删除redis失败"+orders.getId());
@@ -300,7 +300,7 @@ public class TSenderServiceImpl implements TSenderService {
             if (formIds.size() > 0){
                 orders.setStatus("配送员已接手");
                 // 发送微信信息模板
-                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0));
+                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0),orders.getSchoolId());
                 // 删除redis缓存
                 stringRedisTemplate.delete("FORMID" + orders.getId());
             }else {

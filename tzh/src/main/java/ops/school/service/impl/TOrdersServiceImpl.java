@@ -814,7 +814,6 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
                 stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.HOURS);
             }
-            // rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_MIN_PROGRAM_MESSAGE, JSON.toJSONString(orders));
             List<String> formIds = new ArrayList<>();
             try {
                 formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0, -1);
@@ -828,7 +827,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                 List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
                 orders.setOp(orderProducts);
                 orders.setStatus("待接手");
-                WxMessageUtil.wxSendMsg(orders, formIds.get(0));
+                WxMessageUtil.wxSendMsg(orders, formIds.get(0),orders.getSchoolId());
                 stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
             } else {
                 LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，发送或者删除redis失败" + orders.getId());
@@ -1349,7 +1348,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
             orders.setOp(orderProducts);
             orders.setStatus("待接手");
-            WxMessageUtil.wxSendMsg(orders, formIds.get(0));
+            WxMessageUtil.wxSendMsg(orders, formIds.get(0),orders.getSchoolId());
             stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
         } else {
             LoggerUtil.logError("发送微信模板消息-商家接手类-wxSendOrderMsg-完成发送消息失败，发送或者删除redis失败" + orders.getId());

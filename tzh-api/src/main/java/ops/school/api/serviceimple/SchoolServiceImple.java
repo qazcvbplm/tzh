@@ -44,7 +44,7 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
                 school.setQuery("id,name");
                 break;
             case "school":
-                school.setQuery("*");
+                school.setQuery("x");
                 break;
             default:
                 return null;

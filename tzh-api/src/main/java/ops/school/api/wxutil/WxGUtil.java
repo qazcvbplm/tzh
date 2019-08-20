@@ -45,9 +45,15 @@ public class WxGUtil {
         LoggerUtil.log(rs);
     }
 
+    public static void sendMsgByAppIdAndSecert(JSONObject output,String appId,String secert) {
+        //发送模板消息
+        String access_token = getAccessToken(appId, secert);
+        String rs = PayUtil.httpRequest(msurl + access_token, "POST", output.toString());
+        LoggerUtil.log(rs);
+    }
+
     public static boolean checkGz(String openid) {
         String access_token = getAccessToken("wx5b97919ccae6d986", "21ffc5cd23e1efa82bb26ee79af691ac");
-//        String rs = HttpRequest.sendGet(gz, "lang=zh_CN&access_token=" + access_token + "&openid=oZUxM1LBsaU2R5cY9huIUaG8TGZM");
         String rs = HttpRequest.sendGet(gz, "lang=zh_CN&access_token=" + access_token + "&openid=" + openid);
         JSONObject json = JSON.parseObject(rs, JSONObject.class);
         if (json.getInteger("subscribe") == 1) {

@@ -15,6 +15,8 @@
         <result column="send_per_out" property="sendPerOut" jdbcType="INTEGER" />
         <result column="send_per_money" property="sendPerMoney" jdbcType="DECIMAL" />
         <result column="wx_app_id" property="wxAppId" jdbcType="VARCHAR" />
+        <result column="wx_message_template_id" property="wxMessageTemplateId" jdbcType="VARCHAR" />
+
         <result column="wx_secret" property="wxSecret" jdbcType="VARCHAR" />
         <result column="mch_id" property="mchId" jdbcType="VARCHAR" />
         <result column="wx_pay_id" property="wxPayId" jdbcType="VARCHAR" />
@@ -50,6 +52,7 @@
         send_per_out,
         send_per_money,
         wx_app_id,
+        wx_message_template_id,
         wx_secret,
         mch_id,
         wx_pay_id,
@@ -69,107 +72,6 @@
         middle_min_amount,
         large_min_amount,
         extra_large_min_amount
-    </sql>
-
-
-    <sql id="Select_Limit_State">
-        1=1
-        <if test="id != null and id != '' ">
-            AND Id = #{id}
-        </if>
-        <if test="appId != null and appId != '' ">
-            AND app_id = #{appId}
-        </if>
-        <if test="name != null and name != '' ">
-            AND name = #{name}
-        </if>
-        <if test="loginName != null and loginName != '' ">
-            AND login_name = #{loginName}
-        </if>
-        <if test="loginPassWord != null and loginPassWord != '' ">
-            AND login_pass_word = #{loginPassWord}
-        </if>
-        <if test="rate != null and rate != '' ">
-            AND rate = #{rate}
-        </if>
-        <if test="money != null and money != '' ">
-            AND money = #{money}
-        </if>
-        <if test="sort != null and sort != '' ">
-            AND sort = #{sort}
-        </if>
-        <if test="senderMoney != null and senderMoney != '' ">
-            AND sender_money = #{senderMoney}
-        </if>
-        <if test="sendMaxDistance != null and sendMaxDistance != '' ">
-            AND send_max_distance = #{sendMaxDistance}
-        </if>
-        <if test="sendPerOut != null and sendPerOut != '' ">
-            AND send_per_out = #{sendPerOut}
-        </if>
-        <if test="sendPerMoney != null and sendPerMoney != '' ">
-            AND send_per_money = #{sendPerMoney}
-        </if>
-        <if test="wxAppId != null and wxAppId != '' ">
-            AND wx_app_id = #{wxAppId}
-        </if>
-        <if test="wxSecret != null and wxSecret != '' ">
-            AND wx_secret = #{wxSecret}
-        </if>
-        <if test="mchId != null and mchId != '' ">
-            AND mch_id = #{mchId}
-        </if>
-        <if test="wxPayId != null and wxPayId != '' ">
-            AND wx_pay_id = #{wxPayId}
-        </if>
-        <if test="certPath != null and certPath != '' ">
-            AND cert_path = #{certPath}
-        </if>
-        <if test="topDown != null and topDown != '' ">
-            AND top_down = #{topDown}
-        </if>
-        <if test="isDelete != null and isDelete != '' ">
-            AND is_delete = #{isDelete}
-        </if>
-        <if test="createTime != null and createTime != '' ">
-            AND create_time = #{createTime}
-        </if>
-        <if test="enableTakeout != null and enableTakeout != '' ">
-            AND enable_takeout = #{enableTakeout}
-        </if>
-        <if test="enableCoupon != null and enableCoupon != '' ">
-            AND enable_coupon = #{enableCoupon}
-        </if>
-        <if test="phone != null and phone != '' ">
-            AND phone = #{phone}
-        </if>
-        <if test="senderAllTx != null and senderAllTx != '' ">
-            AND sender_all_tx = #{senderAllTx}
-        </if>
-        <if test="userCharge != null and userCharge != '' ">
-            AND user_charge = #{userCharge}
-        </if>
-        <if test="userBellAll != null and userBellAll != '' ">
-            AND user_bell_all = #{userBellAll}
-        </if>
-        <if test="userChargeSend != null and userChargeSend != '' ">
-            AND user_charge_send = #{userChargeSend}
-        </if>
-        <if test="pageLayout != null and pageLayout != '' ">
-            AND page_layout = #{pageLayout}
-        </if>
-        <if test="smallMinAmount != null and smallMinAmount != '' ">
-            AND small_min_amount = #{smallMinAmount}
-        </if>
-        <if test="middleMinAmount != null and middleMinAmount != '' ">
-            AND middle_min_amount = #{middleMinAmount}
-        </if>
-        <if test="largeMinAmount != null and largeMinAmount != '' ">
-            AND large_min_amount = #{largeMinAmount}
-        </if>
-        <if test="extraLargeMinAmount != null and extraLargeMinAmount != '' ">
-            AND extra_large_min_amount = #{extraLargeMinAmount}
-        </if>
     </sql>
 
 
@@ -282,6 +184,9 @@
             </if>
             <if test="wxAppId != null">
                 wx_app_id = #{wxAppId,jdbcType=VARCHAR},
+            </if>
+            <if test="wxMessageTemplateId != null">
+                wx_message_template_id = #{wxMessageTemplateId,jdbcType=VARCHAR},
             </if>
             <if test="wxSecret != null">
                 wx_secret = #{wxSecret,jdbcType=VARCHAR},
