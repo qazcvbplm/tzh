@@ -57,6 +57,17 @@ public interface TOrdersService {
      */
     Boolean orderSettlementByOrders(Orders orders);
 
+
+    /**
+     * @date:   2019/8/21 14:38
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   orders
+     * @Desc:   desc
+     */
+    Boolean orderSettlementByOrdersNoSender(Orders orders);
+
     /**
      * @date:   2019/8/15 15:54
      * @author: QinDaoFang

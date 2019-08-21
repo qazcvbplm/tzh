@@ -96,8 +96,12 @@ public class TSenderServiceImpl implements TSenderService {
                 LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
             if (formIds.size() > 0){
-                WxMessageUtil.wxSendMsg(orders,formIds.get(0),orders.getSchoolId());
-                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+                try{
+                    WxMessageUtil.wxSendMsg(orders,formIds.get(0),orders.getSchoolId());
+                    stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+                }catch (Exception ex){
+                    LoggerUtil.logError("wx发送消息失败-acceptOrder-"+ex.getMessage());
+                }
             }else {
                 LoggerUtil.logError("acceptOrder 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
@@ -163,13 +167,74 @@ public class TSenderServiceImpl implements TSenderService {
                 LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
             if (formIds.size() > 0){
-                WxMessageUtil.wxSendMsg(orders,formIds.get(0),orders.getSchoolId());
-                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+                try{
+                    WxMessageUtil.wxSendMsg(orders,formIds.get(0),orders.getSchoolId());
+                    stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+                }catch (Exception ex){
+                    LoggerUtil.logError("wx发送消息失败-end-"+ex.getMessage());
+                }
             }else {
                 LoggerUtil.logError(" 配送员end订单 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
         }
         Boolean endTrue = tOrdersService.orderSettlementByOrders(orders);
+        if (!endTrue){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
+        }
+    }
+
+
+    /**
+     * @date:   2019/8/21 14:44
+     * @author: QinDaoFang
+     * @version:version
+     * @return: void
+     * @param   orderId
+     * @param   end
+     * @Desc:   desc 自取堂食订单没有配送员
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void tsTakeOutOrdersEnd(String orderId, boolean end) {
+        Orders orders = ordersService.findById(orderId);
+        WxUser wxUser = wxUserService.findById(orders.getOpenId());
+        BigDecimal returnPrice = new BigDecimal("0");
+        if (end) {
+            // 已送达到楼上
+            orders.setDestination(1);
+            if (ordersService.end(orders) == 1) {
+            } else {
+                return;
+            }
+        } else {
+            // 放置楼下
+            orders.setDestination(0);
+            // 配送费 < 楼上楼下差价
+            if (orders.getSendPrice().compareTo(orders.getSchoolTopDownPrice()) == -1) {
+                // 配送费设为0，返还粮票为0
+                orders.setSendPrice(new BigDecimal(0));
+                returnPrice = orders.getSendPrice();
+            } else {
+                returnPrice = orders.getSchoolTopDownPrice();
+            }
+            // 楼下取餐会获得楼下返还
+            if (ordersService.end(orders) == 1) {
+                // 将楼下返还金额充值到用户的粮票内
+                if (wxUserBellService.addFoodCoupon(wxUser.getOpenId() + "-" + wxUser.getPhone(), returnPrice)) {
+                    // 将用户楼下返还金额添加到学校剩余粮票总额内
+                    School school = schoolService.findById(orders.getSchoolId());
+                    School updateSchool = new School();
+                    updateSchool.setId(school.getId());
+                    updateSchool.setUserChargeSend(school.getUserChargeSend().add(returnPrice));
+                    schoolService.updateById(updateSchool);
+                    stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+                }
+            } else {
+                return;
+            }
+        }
+        redisUtil.takeoutCountSuccessadd(orders.getSchoolId());
+        Boolean endTrue = tOrdersService.orderSettlementByOrdersNoSender(orders);
         if (!endTrue){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
         }
@@ -206,8 +271,12 @@ public class TSenderServiceImpl implements TSenderService {
                 LoggerUtil.logError("end run 完成发送消息失败，formid取缓存为空"+orders.getId());
             }
             if (formIds.size() > 0){
-                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0),orders.getSchoolId());
-                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+                try{
+                    WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0),orders.getSchoolId());
+                    stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1,formIds.get(0));
+                }catch (Exception ex){
+                    LoggerUtil.logError("跑腿消息发送失败-acceptOrderRun"+ex.getMessage());
+                }
             }else {
                 LoggerUtil.logError("acceptOrderRun 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }
@@ -300,9 +369,14 @@ public class TSenderServiceImpl implements TSenderService {
             if (formIds.size() > 0){
                 orders.setStatus("配送员已接手");
                 // 发送微信信息模板
-                WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0),orders.getSchoolId());
-                // 删除redis缓存
-                stringRedisTemplate.delete("FORMID" + orders.getId());
+                try{
+                    WxMessageUtil.wxRunOrderSendMsg(orders,wxUser.getOpenId(),formIds.get(0),orders.getSchoolId());
+                    // 删除redis缓存
+                    stringRedisTemplate.delete("FORMID" + orders.getId());
+                }catch (Exception ex){
+                    LoggerUtil.logError("跑腿消息发送失败-endRun"+ex.getMessage());
+                }
+
             }else {
                 LoggerUtil.logError("end run 完成发送消息失败，发送或者删除redis失败"+orders.getId());
             }

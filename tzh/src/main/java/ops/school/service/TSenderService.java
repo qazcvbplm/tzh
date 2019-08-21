@@ -15,8 +15,10 @@ public interface TSenderService {
 
     Integer sendergetorder(String orderId);
 
-    @Transactional
     void end(String orderId, boolean end);
+
+
+    void tsTakeOutOrdersEnd(String orderId, boolean end);
 
     List<RunOrders> findorderbyrundjs(int senderId, int page, int size, String status);
 

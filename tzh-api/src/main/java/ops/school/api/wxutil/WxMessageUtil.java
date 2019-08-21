@@ -147,7 +147,7 @@ public class WxMessageUtil {
             /**
              * 自取或堂食订单
              */
-            if (orders.getStatus().equals("待接手")){
+            if (orders.getStatus().equals("商家已接手")){
                 // 订单状态
                 message.setDataKeyWord1("已完成");
 
@@ -167,8 +167,26 @@ public class WxMessageUtil {
                 }catch (Exception ex){
                     LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
                 }
-            }
+            }else if (orders.getStatus().equals("待接手")){
+                // 订单状态
+                message.setDataKeyWord1("商家已接手");
 
+                // 订单流水号
+                message.setDataKeyWord2(orders.getWaterNumber()+"");
+                // 订单内容
+                message.setDataKeyWord5(list.get(0).getProductName()+"等");
+                // 订单备注
+                message.setDataKeyWord6(shopAcceptRemark);
+                // 跳转页面
+                message.setMinPath(null);
+                // 发送消息模板
+                // 发送消息模板
+                try{
+                    WxGUtil.sendMsgByAppIdAndSecert(message.toJson(),findSchool.getWxAppId(),findSchool.getWxSecret());
+                }catch (Exception ex){
+                    LoggerUtil.logError("微信发送模板消息报错："+ex.getMessage());
+                }
+            }
         }
     }
 

@@ -93,7 +93,6 @@ public class Task {
     @Scheduled(cron = "0 0 0 * * ?")
     public void cancelRunOrdersTask() {
         //流水号置为0
-
         QueryWrapper<RunOrders> wrapper = new QueryWrapper<>();
         wrapper.eq("status","待付款");
         List<RunOrders> runOrdersList =  runOrdersService.list(wrapper);

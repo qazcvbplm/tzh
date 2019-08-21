@@ -813,6 +813,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (res == 1) {
             if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
                 stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.HOURS);
+                ///stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.MINUTES);
             }
             List<String> formIds = new ArrayList<>();
             try {
@@ -827,8 +828,12 @@ public class TOrdersServiceImpl implements TOrdersService {
                 List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
                 orders.setOp(orderProducts);
                 orders.setStatus("待接手");
-                WxMessageUtil.wxSendMsg(orders, formIds.get(0),orders.getSchoolId());
-                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
+                try{
+                    WxMessageUtil.wxSendMsg(orders, formIds.get(0),orders.getSchoolId());
+                    stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
+                }catch (Exception ex){
+                    LoggerUtil.logError("wx发送消息失败-shopAcceptOrderById-"+ex.getMessage());
+                }
             } else {
                 LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，发送或者删除redis失败" + orders.getId());
             }
@@ -933,7 +938,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         Orders orders = ordersService.findById(orderId);
         Assertions.notNull(orders);
         if (!"已完成".equals(orders.getStatus())) {
-            LoggerUtil.logError("消息队列MQ完成订单异常，订单不是已完成状态：订单id-" + orderId);
+            LoggerUtil.logError("完成订单异常，订单不是已完成状态：订单id-" + orderId);
             return -1;
         }
         Boolean endTrue = this.orderSettlementByOrders(orders);
@@ -1181,6 +1186,206 @@ public class TOrdersServiceImpl implements TOrdersService {
         return true;
     }
 
+    @Transactional
+    @Override
+    public Boolean orderSettlementByOrdersNoSender(Orders orders) {
+        QueryWrapper<OrdersComplete> query = new QueryWrapper<>();
+        query.lambda().eq(OrdersComplete::getOrderId, orders.getId());
+        // 查询订单完成表信息是否存在，存在则不可以结算
+        OrdersComplete orderComplete1 = orderCompleteService.getOne(query);
+        if (orderComplete1 != null) {
+            Assertions.notNull(orderComplete1, ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
+        }
+
+        // 对订单进行校验
+        Assertions.notNull(orders, ResponseViewEnums.ORDER_PARAM_ERROR);
+        // 配送员
+        WxUser orderUser = wxUserService.findById(orders.getOpenId());
+        Assertions.notNull(orderUser);
+        // 店铺
+        Shop shop = shopService.getById(orders.getShopId());
+        // 对店铺信息进行校验
+        Assertions.notNull(shop, ResponseViewEnums.SHOP_HAD_CHANGE);
+        // 学校
+        School school = schoolService.findById(orders.getSchoolId());
+        // 对学校信息进行校验
+        Assertions.notNull(school, ResponseViewEnums.SCHOOL_HAD_CHANGE);
+        // 对订单进行结算
+        OrdersComplete ordersComplete = new OrdersComplete();
+        // 平台抽负责人百分比
+        ordersComplete.setAppGetSchoolRate(school.getRate());
+        // 负责人抽成店铺百分比
+        ordersComplete.setSchoolGetShopRate(shop.getRate());
+        // 用户优惠券
+        WxUserCoupon wxUserCoupon = new WxUserCoupon();
+        Coupon coupon = new Coupon();
+        // 店铺满减
+        ShopFullCut shopFullCut = new ShopFullCut();
+        // 优惠券金额
+        BigDecimal couponAmount = BigDecimal.ZERO;
+        // 店铺满减金额
+        BigDecimal fullCutAmount = BigDecimal.ZERO;
+        // 商品折扣金额
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        // (餐盒费＋菜价 - 优惠券 - 满减额 - 折扣额）
+        BigDecimal tempPrice = BigDecimal.ZERO;
+        // 配送员所得金额
+        BigDecimal senderGetTotal = BigDecimal.ZERO;
+        // 店铺所得金额
+        BigDecimal shopGetTotal = BigDecimal.ZERO;
+        // 负责人抽取配送员金额
+        BigDecimal schoolGetSender = BigDecimal.ZERO;
+        // 负责人抽取店铺金额
+        BigDecimal schoolGetshop = BigDecimal.ZERO;
+        // 负责人所得
+        BigDecimal schoolGetTotal = BigDecimal.ZERO;
+        // 负责人承担比例金额之和
+        BigDecimal schoolUnderTakeAmount = BigDecimal.ZERO;
+        // 楼下返还金额
+        BigDecimal downStairs = BigDecimal.ZERO;
+        // 是否有优惠券
+        Boolean isCoupon = false;
+        // 负责人抽成配送员百分比
+        // 如果配送员为空
+        if (orders.getSenderId() == 0 || orders.getSenderId() == null) {
+            ordersComplete.setSchoolGetSenderRate(BigDecimal.ZERO);
+            /**
+             * 配送员所得
+             */
+            ordersComplete.setSenderGetTotal(senderGetTotal);
+            /**
+             * 负责人抽取配送员金额
+             */
+            ordersComplete.setSchoolGetSender(schoolGetSender);
+        } else {
+            ordersComplete.setSchoolGetSenderRate(BigDecimal.valueOf(0));
+            // 配送员所得
+            // 如果时楼上送达 --> 配送费 * （1-学校抽成）
+            if (orders.getDestination() == 1) {
+                /**
+                 * 配送员所得 0
+                 */
+                ordersComplete.setSenderGetTotal(BigDecimal.valueOf(0));
+                /**
+                 * 负责人抽取配送员所得 0
+                 */
+                schoolGetSender = schoolGetSender.add(BigDecimal.valueOf(0));
+                ordersComplete.setSchoolGetSender(schoolGetSender);
+            } else {
+                // 楼下送达，要返还楼上楼下差价 --> （配送费-楼下返还） * （1-学校抽成）
+                // 楼下返还金额
+                downStairs = downStairs.add(orders.getSchoolTopDownPrice());
+                /**
+                 * 配送员所得 0
+                 */
+                ordersComplete.setSenderGetTotal(BigDecimal.valueOf(0));
+                /**
+                 * 负责人抽取配送员所得 0
+                 */
+                schoolGetSender = schoolGetSender.add(BigDecimal.valueOf(0));
+                ordersComplete.setSchoolGetSender(schoolGetSender);
+            }
+        }
+        // 超级后台所得对应金额 --> (原价－粮票 - 优惠券 - 满减额 - 折扣额）＊  比例
+        BigDecimal appGetTotal = orders.getPayPrice().multiply(school.getRate());
+        /**
+         * 超级后台所得
+         */
+        ordersComplete.setAppGetTotal(appGetTotal);
+        // 如果使用了优惠券
+        if (orders.getCouponId() != 0 && orders.getCouponId() != null) {
+            isCoupon = true;
+            wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
+            coupon = couponService.getById(wxUserCoupon.getCouponId());
+            // 优惠券优惠金额
+            couponAmount = couponAmount.add(new BigDecimal(coupon.getCutAmount()));
+        }
+        // 如果使用了店铺满减
+        if (orders.getFullCutId() != null && orders.getFullCutId() != 0) {
+            shopFullCut = shopFullCutService.getById(orders.getFullCutId());
+            // 店铺满减优惠金额
+            fullCutAmount = fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+        } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1) {
+            // 商品折扣金额
+            discountAmount = discountAmount.add(orders.getDiscountPrice());
+        }
+        tempPrice = tempPrice.add(orders.getBoxPrice().add(orders.getProductPrice())
+                .subtract(couponAmount).subtract(fullCutAmount).subtract(discountAmount));
+        /**
+         * 负责人抽取店铺金额
+         */
+        schoolGetshop = schoolGetshop.add(tempPrice.multiply(shop.getRate()));
+        ordersComplete.setSchoolGetShop(schoolGetshop);
+        /**
+         * 负责人承担比例金额
+         */
+        if (isCoupon) {
+            // 如果优惠券类型为2 --> 负责人承担所有优惠券金额
+            if (coupon.getCouponType() == 2) {
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
+                        .add(couponAmount)
+                        .add(discountAmount.multiply(shop.getDiscountRate()));
+            } else {
+                // 否则为店铺优惠券 --> 负责人承担一定比例
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
+                        .add(couponAmount.multiply(shop.getCouponRate()))
+                        .add(discountAmount.multiply(shop.getDiscountRate()));
+            }
+        }
+        /**
+         * 店铺所得
+         */
+        shopGetTotal = shopGetTotal.add(tempPrice
+                .multiply(new BigDecimal(1).subtract(shop.getRate()))
+                .add(schoolUnderTakeAmount));
+        ordersComplete.setShopGetTotal(shopGetTotal);
+        /**
+         * 负责人所得
+         */
+        schoolGetTotal = schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(appGetTotal)
+                .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
+        ordersComplete.setSchoolGetTotal(schoolGetTotal);
+        // 订单Id
+        ordersComplete.setOrderId(orders.getId());
+        orderCompleteService.save(ordersComplete);
+        senderGetTotal = ordersComplete.getSenderGetTotal();
+        /**
+         * 对配送员所得存储
+         */
+        //stringRedisTemplate.boundListOps("JR").rightPush(JSON.toJSONString(orders));
+        /**
+         * 将配送员所得金额添加到配送员账户内,不需要了0
+         */
+        //增加用户积分
+        //积分不保存小数位，向下取整
+        Integer addSource = orders.getPayPrice().setScale(0, BigDecimal.ROUND_DOWN).intValue();
+        Integer addUserSourceNum = wxUserBellMapper.addSourceByWxId(addSource, orderUser.getId());
+        if (addUserSourceNum != NumConstants.INT_NUM_1) {
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_COMPLETE_SOURCE_ERROR);
+        }
+        // 将负责人所得添加到负责人可提现金额内
+        School updateSchool = new School();
+        updateSchool.setId(school.getId());
+        updateSchool.setMoney(school.getMoney().add(ordersComplete.getShopGetTotal().add(ordersComplete.getSchoolGetTotal())));
+        updateSchool.setSenderMoney(school.getSenderMoney().add(senderGetTotal));
+        boolean updateSchooleTrue = schoolMapper.updateById(updateSchool) != 1 ? false : true;
+        stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+        if (!updateSchooleTrue) {
+            logger.error("负责人所得金额为" + schoolGetSender + "配送员所得金额为" + senderGetTotal + "添加失败，请联系负责人");
+            System.out.println("负责人和配送员所得金额添加失败，请联系负责人");
+        }
+        // 将店铺所得添加到店铺可提现金额内
+        shop.setTxAmount(shop.getTxAmount().add(shopGetTotal));
+        boolean rs = shopService.updateById(shop);
+        if (!rs) {
+            logger.error("店铺所得金额为" + shopGetTotal + "添加失败，请联系负责人");
+            System.out.println("店铺所得金额添加失败，请联系负责人");
+        }
+        //加当日总交易额
+        redisUtil.amountadd(school.getId(), orders.getPayPrice());
+        return true;
+    }
+
     /**
      * @date:   2019/8/15 15:55
      * @author: QinDaoFang
@@ -1230,6 +1435,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         stringRedisTemplate.boundHashOps("SHOP_YJS").put(orderId, JSON.toJSONString(orders));
         if (orders.getTyp().equals("堂食订单") || orders.getTyp().equals("自取订单")) {
             stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.HOURS);
+            //stringRedisTemplate.opsForValue().set("tsout," + orderId, "1", 2, TimeUnit.MINUTES);
         }
         //发送微信消息
         this.wxSendOrderMsgByOrder(orders);
@@ -1348,8 +1554,12 @@ public class TOrdersServiceImpl implements TOrdersService {
             List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
             orders.setOp(orderProducts);
             orders.setStatus("待接手");
-            WxMessageUtil.wxSendMsg(orders, formIds.get(0),orders.getSchoolId());
-            stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
+            try{
+                WxMessageUtil.wxSendMsg(orders, formIds.get(0),orders.getSchoolId());
+                stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
+            }catch (Exception ex){
+                LoggerUtil.logError("wx发送消息失败-printAndAcceptOneOrderByOId-"+ex.getMessage());
+            }
         } else {
             LoggerUtil.logError("发送微信模板消息-商家接手类-wxSendOrderMsg-完成发送消息失败，发送或者删除redis失败" + orders.getId());
            //微信发送模板消息失败算接手成功

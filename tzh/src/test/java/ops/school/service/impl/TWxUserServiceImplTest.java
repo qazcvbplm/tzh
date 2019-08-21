@@ -72,7 +72,7 @@ public class TWxUserServiceImplTest {
         Orders orders = new Orders();
         School school = new School();
         orders.setSchoolId(27);
-        wxMessageUtil.wxSendMsg(orders,"",orders.getSchoolId());
+        //wxMessageUtil.wxSendMsg(orders,"",orders.getSchoolId());
     }
 
 
