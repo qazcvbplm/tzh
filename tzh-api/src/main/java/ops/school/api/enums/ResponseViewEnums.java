@@ -95,6 +95,10 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------14-发送微信信息错误-----------*/
     SEND_WX_MESSAGE_ERROR("1214001","发送微信消息错误"),
     SEND_WX_MESSAGE_ERROR_NO_PARAMS("1214002","发送微信消息错误,缺少参数"),
+    /**----------15-发送微信信息错误-----------*/
+    INDEX_FIND_NO_SCHOOL("1215001","首页查询没有区分学校"),
+    INDEX_ADD_NO_SCHOOL("1215002","首页展示设置没有区分学校"),
+    INDEX_ADD_ERROR_NULL("1215003","首页展示设置未选择任何店铺和商品，请检查"),
 
     ;
 

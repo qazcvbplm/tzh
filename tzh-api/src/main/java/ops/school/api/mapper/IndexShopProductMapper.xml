@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ops.school.api.dao.IndexShopProductMapper">
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.IndexShopProduct">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="shop_id" property="shopId" jdbcType="BIGINT"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="school_id" property="schoolId" jdbcType="BIGINT"/>
+        <result column="create_id" property="createId" jdbcType="BIGINT"/>
+        <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        shop_id,
+        product_id,
+        school_id,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+    </sql>
+
+    <sql id="Table_Name">
+        index_shop_product
+    </sql>
+
+    <sql id="Select_Limit_State">
+        1=1
+        <if test="id != null and id != '' ">
+            AND id = #{id}
+        </if>
+        <if test="shopId != null and shopId != '' ">
+            AND shop_id = #{shopId}
+        </if>
+        <if test="productId != null and productId != '' ">
+            AND product_id = #{productId}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND school_id = #{schoolId}
+        </if>
+        <if test="createId != null and createId != '' ">
+            AND create_id = #{createId}
+        </if>
+        <if test="updateId != null and updateId != '' ">
+            AND update_id = #{updateId}
+        </if>
+        <if test="createTime != null and createTime != '' ">
+            AND create_time = #{createTime}
+        </if>
+        <if test="updateTime != null and updateTime != '' ">
+            AND update_time = #{updateTime}
+        </if>
+    </sql>
+
+    <!--CreatBy Fang Time: |  分页查询统计-->
+    <select id="countLimitByDTO" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM
+        <include refid="Table_Name"/>
+        WHERE
+        <include refid="Select_Limit_State"/>
+    </select>
+
+    <!--CreatBy Fang Time: |  分页查询-->
+    <select id="selectLimitByDTO" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Table_Name"/>
+        WHERE
+        <include refid="Select_Limit_State"/>
+        LIMIT #{startNum},#{sizeNum}
+    </select>
+
+    <!--CreatBy Fang Time: | 批量查询-->
+    <select id="batchFindByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Table_Name"/>
+        WHERE id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/22 15:17 |  -->
+    <select id="findIndexShopProBySchoolId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Table_Name"/>
+        WHERE school_id = #{schoolId}
+    </select>
+
+
+    <!--CreatBy Fang Time:2019/8/22 16:38 |  -->
+    <insert id="batchInsert">
+        INSERT INTO <include refid="Table_Name"/>
+        (
+        shop_id,
+        product_id,
+        school_id,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" open=" " separator="," close=" ">
+            (
+            #{item.shopId},
+            #{item.productId},
+            #{item.schoolId},
+            #{item.createId},
+            #{item.updateId},
+            #{item.createTime},
+            #{item.updateTime})
+        </foreach>
+    </insert>
+
+</mapper>

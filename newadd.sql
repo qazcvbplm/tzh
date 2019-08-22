@@ -15,6 +15,21 @@ CREATE TABLE `shop_print` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='店铺打印机表';
 
 
+CREATE TABLE `index_shop_product` (
+	`id` BIGINT (20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+	`shop_id` BIGINT (20) DEFAULT 0 COMMENT '店铺id',
+	`product_id` BIGINT (20) DEFAULT 0 COMMENT '商品id',
+	`school_id` BIGINT (20) NOT NULL COMMENT '学校id',
+	`create_id` BIGINT (20) NOT NULL COMMENT '创建人id',
+	`update_id` BIGINT (20) DEFAULT '0' COMMENT '修改人id',
+	`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+	`update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+	PRIMARY KEY (`id`)
+) ENGINE = INNODB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8 COMMENT = '首页展示推荐店铺商品表';
+
+
+
+
 insert into shop (
         shop.school_id,
         shop.shop_name,
