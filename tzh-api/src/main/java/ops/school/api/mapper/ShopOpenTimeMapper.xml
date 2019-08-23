@@ -9,4 +9,29 @@
         <result column="end_time" jdbcType="VARCHAR" property="endTime"/>
         <result column="shop_id" jdbcType="INTEGER" property="shopId"/>
     </resultMap>
+
+
+    <sql id="Base_Column_List" >
+        start_time,
+        end_time_long,
+        start_time_long,
+        end_time,
+        shop_id,
+        id
+    </sql>
+
+    <sql id="Table_Name">
+        shop_open_time
+    </sql>
+
+
+    <!--CreatBy Fang Time:2019/8/23 11:38 |  -->
+    <select id="batchFindByShopIds" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE shop_id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

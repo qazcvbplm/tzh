@@ -8,6 +8,18 @@
         <result column="cut" jdbcType="INTEGER" property="cut"/>
     </resultMap>
 
+    <sql id="Base_Column_List" >
+        Id,
+        shop_id,
+        full,
+        cut
+    </sql>
+
+    <sql id="Table_Name">
+        full_cut
+    </sql>
+
+
     <select id="findByShop" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     *
@@ -15,6 +27,17 @@
     where shop_id = #{shopId,jdbcType=INTEGER}
     order by full desc
   </select>
+
+    <!--CreatBy Fang Time:2019/8/23 11:38 |  -->
+    <select id="batchFindByShopIds" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE shop_id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
 
     <update id="deleteOne" parameterType="int">
     update full_cut

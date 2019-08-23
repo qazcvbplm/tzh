@@ -1,6 +1,7 @@
 package ops.school.api.util;
 
 import com.alibaba.fastjson.JSON;
+import io.swagger.models.auth.In;
 import ops.school.api.entity.Coupon;
 import ops.school.api.entity.ShopCoupon;
 import org.apache.commons.collections.CollectionUtils;
@@ -325,6 +326,18 @@ public class PublicUtilS {
         list.addAll(result);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T[] removeDuplicate(T[] array) {
+        HashSet<T> set = new HashSet<T>(array.length);
+//        T[] result = (T[]) new Object[array.length];
+        for (int i = 0; i < array.length; i++) {
+            if(set.add((T) array[i])){
+                //result[i] = (T) array[i];
+            }
+        }
+       return (T[]) set.toArray();
+    }
+
 
     /**
      * java通过UUID生成16位唯一订单号
@@ -435,6 +448,15 @@ public class PublicUtilS {
 
         map2.get(Long.valueOf(2));
         map2.get(1);
+
+
+        String[] array = {"1","2","4","1","1","4","5",};
+        int[] intarray = {1,2,3,1,2,4};
+        Integer[] tegArray = {1,2,3,1,2,4,5};
+        Object[] result = removeDuplicate(array);
+        array = (String[]) result;
+        System.out.println(result);
+        System.out.println(array);
 
     }
 
