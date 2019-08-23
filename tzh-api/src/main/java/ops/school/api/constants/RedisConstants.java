@@ -19,5 +19,9 @@ public class RedisConstants {
 
     public final static  String SHOP_DJS = "SHOP_DJS" ;
 
+    public final static  String Index_Shop_Product_Hash = "Index_Shop_Product_Hash" ;
+
+    public final static  String Index_Second_Hand_Shop_Hash= "Index_Second_Hand_Shop_Hash" ;
+
 
 }

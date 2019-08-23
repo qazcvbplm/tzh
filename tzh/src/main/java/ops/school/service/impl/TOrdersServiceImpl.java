@@ -995,7 +995,6 @@ public class TOrdersServiceImpl implements TOrdersService {
         WxUserCoupon wxUserCoupon = new WxUserCoupon();
         Coupon coupon = new Coupon();
         // 店铺满减
-        ShopFullCut shopFullCut = new ShopFullCut();
         // 优惠券金额
         BigDecimal couponAmount = BigDecimal.ZERO;
         // 店铺满减金额
@@ -1079,9 +1078,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         // 如果使用了店铺满减
         if (orders.getFullCutId() != null && orders.getFullCutId() != 0) {
-            shopFullCut = shopFullCutService.getById(orders.getFullCutId());
             // 店铺满减优惠金额
-            fullCutAmount = fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+            fullCutAmount = fullCutAmount.add(orders.getFullUsedAmount());
         } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1) {
             // 商品折扣金额
             discountAmount = discountAmount.add(orders.getDiscountPrice());
@@ -1302,9 +1300,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         // 如果使用了店铺满减
         if (orders.getFullCutId() != null && orders.getFullCutId() != 0) {
-            shopFullCut = shopFullCutService.getById(orders.getFullCutId());
             // 店铺满减优惠金额
-            fullCutAmount = fullCutAmount.add(new BigDecimal(shopFullCut.getCutAmount()));
+            fullCutAmount = fullCutAmount.add(orders.getFullUsedAmount());
         } else if (orders.getDiscountPrice().compareTo(BigDecimal.ZERO) == 1) {
             // 商品折扣金额
             discountAmount = discountAmount.add(orders.getDiscountPrice());

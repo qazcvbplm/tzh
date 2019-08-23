@@ -1,12 +1,15 @@
 package ops.school.api.util;
 
+import ops.school.api.constants.NumConstants;
 import ops.school.api.dto.SchoolIndexDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class RedisUtil {
@@ -90,4 +93,19 @@ public class RedisUtil {
     }
 
 
+    public boolean keyNoExpireThenSetTime(String key, int time, TimeUnit timeUnit) {
+        Long exporeTime = schoolCache.boundHashOps(key).getExpire();
+        if (exporeTime != null && exporeTime.intValue() > NumConstants.INT_NUM_0){
+            return true;
+        }
+        return schoolCache.boundHashOps(key).expire(time,timeUnit);
+    }
+
+    public boolean keyNoExpireThenSetTimeAt(String key, Date date) {
+        Long exporeTime = schoolCache.boundHashOps(key).getExpire();
+        if (exporeTime != null && exporeTime.intValue() > NumConstants.INT_NUM_0){
+            return true;
+        }
+        return schoolCache.boundHashOps(key).expireAt(date);
+    }
 }

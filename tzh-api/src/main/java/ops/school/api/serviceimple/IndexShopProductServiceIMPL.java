@@ -1,9 +1,13 @@
 package ops.school.api.serviceimple;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.constants.NumConstants;
+import ops.school.api.constants.RedisConstants;
 import ops.school.api.dao.*;
+import ops.school.api.dto.project.IndexShopProductRedisDTO;
 import ops.school.api.entity.*;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
@@ -12,13 +16,16 @@ import ops.school.api.service.FullCutService;
 import ops.school.api.service.IndexShopProductService;
 import ops.school.api.service.ShopOpenTimeService;
 import ops.school.api.util.PublicUtilS;
+import ops.school.api.util.RedisUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.TimeUtilS;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * CreatebyFang
@@ -45,6 +52,12 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
     @Autowired
     private FullCutService fullCutService;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     /**
      * @date:   2019/8/22 15:10
      * @author: QinDaoFang
@@ -56,6 +69,18 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
     @Override
     public ResponseObject findIndexShopProBySchoolId(Long schoolId) {
         Assertions.notNull(schoolId, ResponseViewEnums.INDEX_FIND_NO_SCHOOL);
+        //1-先查缓存
+        Object redisGet = stringRedisTemplate.boundHashOps(RedisConstants.Index_Shop_Product_Hash).get(schoolId.toString());
+        IndexShopProductRedisDTO redisGetDTO = null;
+        if (redisGet != null){
+            redisGetDTO = JSONObject.parseObject((String) redisGet,IndexShopProductRedisDTO.class);
+        }
+        if (redisGetDTO != null){
+            return new ResponseObject(true, PublicErrorEnums.SUCCESS)
+                    .push("shopList",redisGetDTO.getShopList())
+                    .push("productList",redisGetDTO.getProductList());
+        }
+        //2-再查数据库
         List<IndexShopProduct> indexShopProducts = indexShopProductMapper.findIndexShopProBySchoolId(schoolId);
         if (indexShopProducts.size() < NumConstants.INT_NUM_1){
             return new ResponseObject(true, PublicErrorEnums.SUCCESS)
@@ -107,6 +132,13 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
         if (productIds.size() > NumConstants.INT_NUM_0){
             productList = productMapper.selectBatchIds(productIds);
         }
+        IndexShopProductRedisDTO redisDTO = new IndexShopProductRedisDTO();
+        redisDTO.setIndexShopProductList(indexShopProducts);
+        redisDTO.setProductList(productList);
+        redisDTO.setShopList(shopList);
+        redisDTO.setSchoolId(schoolId);
+        stringRedisTemplate.boundHashOps(RedisConstants.Index_Shop_Product_Hash).put(schoolId.toString(), JSON.toJSONString(redisDTO));
+        redisUtil.keyNoExpireThenSetTimeAt(RedisConstants.Index_Shop_Product_Hash,TimeUtilS.getDayEnd());
         return new ResponseObject(true, PublicErrorEnums.SUCCESS)
                 .push("shopList",shopList)
                 .push("productList",productList);
@@ -157,6 +189,8 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
         int deleteNum = indexShopProductMapper.delete(wrapper);
         //再新增
         int addNum = indexShopProductMapper.batchInsert(indexShopProducts);
+        //最后删除缓存
+        stringRedisTemplate.boundHashOps(RedisConstants.Index_Shop_Product_Hash).delete(schoolId.toString());
         return new ResponseObject(true,PublicErrorEnums.SUCCESS);
     }
 
