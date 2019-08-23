@@ -2,16 +2,21 @@ package ops.school.api.serviceimple;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import ops.school.api.constants.NumConstants;
 import ops.school.api.dao.ShopMapper;
 import ops.school.api.entity.PageQueryDTO;
 import ops.school.api.entity.Shop;
+import ops.school.api.entity.ShopOpenTime;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.ShopService;
+import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.ResponseObject;
+import ops.school.api.util.TimeUtilS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -120,5 +125,31 @@ public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements S
         Assertions.notNull(shop,shop.getSchoolId());
         List<Shop> shopList = shopMapper.findShopWithFullCutOBTime(shop,pageQueryDTO);
         return new ResponseObject(true,"ok").push("list",shopList);
+    }
+
+    /**
+     * @date:   2019/8/23 18:46
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   shopOpenTimeList
+     * @param   shopId
+     * @Desc:   desc
+     */
+    @Override
+    public Boolean ShopNowIsOpen(List<ShopOpenTime> shopOpenTimeList,Integer shopId) throws ParseException {
+        if (shopOpenTimeList == null ||shopOpenTimeList.size() < NumConstants.INT_NUM_1){
+            return false;
+        }
+        if (shopOpenTimeList.size() < NumConstants.INT_NUM_1){
+            return false;
+        }
+        for (ShopOpenTime openTime : shopOpenTimeList) {
+            Boolean yesOpen = TimeUtilS.isEffectiveDate(openTime.getStartTime(),openTime.getEndTime());
+            if (yesOpen){
+                return true;
+            }
+        }
+        return false;
     }
 }

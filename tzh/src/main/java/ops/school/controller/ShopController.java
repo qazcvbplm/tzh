@@ -9,11 +9,15 @@ import ops.school.api.entity.FullCut;
 import ops.school.api.entity.School;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopOpenTime;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.FullCutService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.ShopOpenTimeService;
 import ops.school.api.service.ShopService;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ResponseObject;
+import ops.school.api.util.TimeUtilS;
 import ops.school.api.util.Util;
 import ops.school.api.wxutil.WXUtil;
 import ops.school.api.constants.NumConstants;
@@ -29,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -120,10 +125,18 @@ public class ShopController {
 	@PostMapping("add/openTime")
 	public ResponseObject openTime(HttpServletRequest request,HttpServletResponse response,@ModelAttribute @Valid ShopOpenTime time,BindingResult result){
 		Util.checkParams(result);
+		try {
+			time.setStartTimeLong(TimeUtilS.get1970YearDateLong(time.getStartTime()).getTime());
+			time.setEndTimeLong(TimeUtilS.get1970YearDateLong(time.getEndTime()).getTime());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			LoggerUtil.logError(e.getMessage());
+			DisplayException.throwMessageWithEnum(ResponseViewEnums.SHOP_ADD_TIME_ERROR);
+		}
 		shopOpenTimeService.save(time);
 		return new ResponseObject(true, "ok");
 	}
-	
+
 	@ApiOperation(value="删除营业时间",httpMethod="POST")
 	@PostMapping("delete/deleteopenTime")
 	public ResponseObject deleteopenTime(HttpServletRequest request,HttpServletResponse response,int id){

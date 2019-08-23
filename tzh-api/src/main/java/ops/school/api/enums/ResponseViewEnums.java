@@ -72,6 +72,7 @@ public enum ResponseViewEnums implements RootEnums{
     SHOP_PRINT_ERROR("1280006","飞鹅平台打印失败，请校验"),
     SHOP_PRINT_ERROR_NOT_ORDER_ID("1280007","飞鹅平台打印失败,没有返回打印id，请校验"),
     SHOP_NOT_EXISTS("1280008","店铺不存在，请校验"),
+    SHOP_ADD_TIME_ERROR("1280009","时间添加失败，请校验输入必须是21:21格式，英文冒号:"),
 
     /**----------9-配送员信息错误-----------*/
     SENDER_HAD_CHANGE("1290001","配送员信息发生变化，请联系后台管理"),

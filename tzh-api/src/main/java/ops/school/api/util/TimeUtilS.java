@@ -425,6 +425,32 @@ public class TimeUtilS {
         return cal.getTime();
     }
 
+    public static Date getDateByEvery(int year,int month, int day,int hour,int minutes,int seconds) {
+        Calendar cal=new GregorianCalendar();
+        cal.set(year,month,day,hour,minutes,seconds);
+        return cal.getTime();
+    }
+
+    /**
+     * @date:   2019/8/23 17:37
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Long
+     * @Desc:   desc 21:29返回时间戳 是1970
+     */
+    public static Date get1970YearDateLong(String hourMinutes) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        Date date = simpleDateFormat.parse(hourMinutes);
+        return date;
+    }
+
+    public static Date testHourMinutesTranToData(String hourMinutes) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        Date date = simpleDateFormat.parse(hourMinutes);
+        return date;
+    }
+
+
     /**
      * 返回某个日期前几天的日期
      * @param date
@@ -567,7 +593,7 @@ public class TimeUtilS {
         if(startDate == null || endDate == null){
             return false;
         }
-        long currentTime = new Date().getTime();
+        long currentTime = System.currentTimeMillis();
         if(currentTime >= startDate.getTime()
                 && currentTime <= endDate.getTime()){
             return true;
@@ -575,6 +601,28 @@ public class TimeUtilS {
         return false;
     }
 
+    /**
+     * 判断当前日期是否在[startDate, endDate]区间
+     *
+     * @param startHourMinutes 开始时间 21:21
+     * @param endHourMinutes 结束时间 21:21
+     * @author a
+     * @return
+     */
+    public static boolean isEffectiveDate(String startHourMinutes, String endHourMinutes) throws ParseException {
+        if(startHourMinutes == null || endHourMinutes == null){
+            return false;
+        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        Date startTime = simpleDateFormat.parse(startHourMinutes);
+        Date endTime = simpleDateFormat.parse(endHourMinutes);
+        Date currentTime = new Date();
+        Date now = simpleDateFormat.parse(currentTime.getHours()+":"+currentTime.getMinutes());
+        if(now.getTime() >= startTime.getTime() && now.getTime() <= endTime.getTime()){
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 得到二个日期间的间隔天数
@@ -904,6 +952,16 @@ public class TimeUtilS {
 
         System.out.println(getNo(8));
         System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDayNextTime(new Date(),2,24,0,0 )));
+
+        try {
+            Date a = get1970YearDateLong("25:00");
+            System.out.println(a);
+
+            boolean yes = isEffectiveDate("21:00","21:21");
+            System.out.println(yes);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
     }
 }

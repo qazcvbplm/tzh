@@ -15,15 +15,14 @@ import ops.school.api.exception.Assertions;
 import ops.school.api.service.FullCutService;
 import ops.school.api.service.IndexShopProductService;
 import ops.school.api.service.ShopOpenTimeService;
-import ops.school.api.util.PublicUtilS;
-import ops.school.api.util.RedisUtil;
-import ops.school.api.util.ResponseObject;
-import ops.school.api.util.TimeUtilS;
+import ops.school.api.service.ShopService;
+import ops.school.api.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +56,9 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private ShopService shopService;
 
     /**
      * @date:   2019/8/22 15:10
@@ -112,14 +114,23 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
         }
         //封装开业时间,满减
         if (shopList.size() > NumConstants.INT_NUM_1){
-            Map<Integer,ShopOpenTime> openTimeMap = PublicUtilS.listForMapValueE(shopOpenTimeList,"shopId");
+            Map<Integer,List<ShopOpenTime>> openTimeMap = PublicUtilS.listforEqualKeyListMap(shopOpenTimeList,"shopId");
             Map<Integer,List<FullCut>> fullCutMap = PublicUtilS.listforEqualKeyListMap(fullCutList,"shopId");
             for (Shop shop : shopList) {
-                if (openTimeMap.get(shop.getId()) != null){
-                    boolean isEffectiveDate = TimeUtilS.isEffectiveDate(new Date(openTimeMap.get(shop.getId()).getStartTimeLong()),new Date(openTimeMap.get(shop.getId()).getEndTimeLong()));
-                    int openFlag = isEffectiveDate ? 1 : 0;
-                    shop.setOpenFlag(openFlag);
+                //封装开启店铺
+                Boolean shopOpenTrue = false;
+                if (openTimeMap.get(shop.getId()) != null && openTimeMap.get(shop.getId()).size() > NumConstants.INT_NUM_0){
+                    try {
+                        shopOpenTrue = shopService.ShopNowIsOpen(openTimeMap.get(shop.getId()),shop.getId());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        shopOpenTrue = false;
+                        LoggerUtil.logError(e.getMessage());
+                    }
                 }
+                int openFlag = shopOpenTrue ? 1 : 0;
+                shop.setOpenFlag(openFlag);
+                //封装满减
                 if (fullCutMap.get(shop.getId()) != null){
                     shop.setFullCut(fullCutMap.get(shop.getId()));
                 }else {
