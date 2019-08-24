@@ -12,6 +12,7 @@ import ops.school.api.entity.*;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.FullCutService;
 import ops.school.api.service.IndexShopProductService;
 import ops.school.api.service.ShopOpenTimeService;
@@ -89,6 +90,17 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
                     .push("shopList",new ArrayList<>())
                     .push("productList",new ArrayList<>());
         }
+        Map<Integer,IndexShopProduct> indexShopMap = new HashMap<>();
+        Map<Integer,IndexShopProduct> indexProductMap = new HashMap<>();
+        for (IndexShopProduct index : indexShopProducts) {
+            if (index.getShopId() != null){
+                indexShopMap.put(index.getShopId().intValue(),index);
+            }
+            if (index.getProductId() != null){
+                indexProductMap.put(index.getProductId().intValue(),index);
+            }
+        }
+
         List<Long> shopIds = new ArrayList<>();
         List<Long> productIds = new ArrayList<>();
         for (IndexShopProduct index : indexShopProducts) {
@@ -137,12 +149,30 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
                     shop.setFullCut(new ArrayList<>());
                 }
 
+                shop.setShopWeight(indexShopMap.get(shop.getId()).getShopWeight());
             }
         }
         List<Product> productList = new ArrayList<>();
         if (productIds.size() > NumConstants.INT_NUM_0){
             productList = productMapper.selectBatchIds(productIds);
         }
+        if (productList.size() > NumConstants.INT_NUM_0){
+            for (Product product : productList) {
+                product.setProductWeight(indexProductMap.get(product.getId()).getProductWeight());
+            }
+        }
+        Collections.sort(shopList, new Comparator<Shop>() {
+            @Override
+            public int compare(Shop o1, Shop o2) {
+                return o1.getShopWeight().compareTo(o2.getShopWeight());
+            }
+        });
+        Collections.sort(productList, new Comparator<Product>() {
+            @Override
+            public int compare(Product o1, Product o2) {
+                return o1.getProductWeight().compareTo(o2.getProductWeight());
+            }
+        });
         IndexShopProductRedisDTO redisDTO = new IndexShopProductRedisDTO();
         redisDTO.setIndexShopProductList(indexShopProducts);
         redisDTO.setProductList(productList);
@@ -171,9 +201,29 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
         String regex = ",+|，+|\\s+";
         String[] shopArr = shops.split(regex);
         String[] productArr = products.split(regex);
-        Object[] shopArray = PublicUtilS.removeDuplicate(shopArr);
-        Object[] productArray = PublicUtilS.removeDuplicate(productArr);
-        int len = Math.max(shopArray.length, productArray.length);
+        List<Long> shopWeight = new ArrayList<>();
+        for (int i = 0; i < shopArr.length; i++) {
+            try {
+                Long sId = Long.valueOf(shopArr[i]);
+                shopWeight.add(sId);
+            }catch (Exception ex){
+                ex.printStackTrace();
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.INDEX_ADD_ERROR_PARAMS);
+            }
+        }
+        List<Long> productWeight = new ArrayList<>();
+        for (int i = 0; i < productArr.length; i++) {
+            try {
+                Long pId = Long.valueOf(productArr[i]);
+                productWeight.add(pId);
+            }catch (Exception ex){
+                ex.printStackTrace();
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.INDEX_ADD_ERROR_PARAMS);
+            }
+        }
+        PublicUtilS.removeDuplicate(shopWeight);
+        PublicUtilS.removeDuplicate(productWeight);
+        int len = Math.max(shopWeight.size(), productWeight.size());
         List<IndexShopProduct> indexShopProducts = new ArrayList<>(len);
         for (int i = 0; i < len ;i++) {
             IndexShopProduct index = new IndexShopProduct();
@@ -182,13 +232,15 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
             index.setCreateTime(new Date());
             index.setUpdateTime(new Date());
             index.setSchoolId(Long.valueOf(schoolId));
-            if (i < shopArray.length && !StringUtils.isBlank(String.valueOf(shopArray[i]))){
-                index.setShopId(Long.valueOf(String.valueOf(shopArray[i])));
-            }
-            if (i < productArray.length && !StringUtils.isBlank(String.valueOf(productArray[i]))){
-                index.setProductId(Long.valueOf(String.valueOf(productArray[i])));
-            }
+            if (i < shopWeight.size() && shopWeight.get(i) != null){
+                index.setShopId(shopWeight.get(i));
+                index.setShopWeight(i+1);
 
+            }
+            if (i < productWeight.size() && productWeight.get(i) != null){
+                index.setProductId(productWeight.get(i));
+                index.setProductWeight(i+1);
+            }
             indexShopProducts.add(index);
         }
         if (indexShopProducts.size() < NumConstants.INT_NUM_1){

@@ -40,6 +40,9 @@ public class Product extends Base {
 
     private Integer stockFlag;
 
+    @TableField(exist = false)
+    private Integer productWeight;
+
 
     public Integer getStock() {
         return stock;
@@ -151,5 +154,13 @@ public class Product extends Base {
 
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public Integer getProductWeight() {
+        return productWeight;
+    }
+
+    public void setProductWeight(Integer productWeight) {
+        this.productWeight = productWeight;
     }
 }

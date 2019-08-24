@@ -108,6 +108,10 @@ public class Shop {
     @TableField(exist = false)
     private String queryType;
 
+    @TableField(exist = false)
+    private Integer shopWeight;
+
+
     @Transient
     public String getQueryType() {
         return queryType;
@@ -468,6 +472,14 @@ public class Shop {
 
     public void setPrintType(Integer printType) {
         this.printType = printType;
+    }
+
+    public Integer getShopWeight() {
+        return shopWeight;
+    }
+
+    public void setShopWeight(Integer shopWeight) {
+        this.shopWeight = shopWeight;
     }
 
     @Override

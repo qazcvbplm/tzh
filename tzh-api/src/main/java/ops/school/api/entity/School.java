@@ -78,6 +78,8 @@ public class School extends Base implements Serializable {
 
     private BigDecimal extraLargeMinAmount;
 
+    private Integer yesWaterOne;
+
     public BigDecimal getSmallMinAmount() {
         return smallMinAmount;
     }
@@ -340,6 +342,15 @@ public class School extends Base implements Serializable {
     }
 
     public void setWxMessageTemplateId(String wxMessageTemplateId) {
+
         this.wxMessageTemplateId = wxMessageTemplateId;
+    }
+
+    public Integer getYesWaterOne() {
+        return yesWaterOne;
+    }
+
+    public void setYesWaterOne(Integer yesWaterOne) {
+        this.yesWaterOne = yesWaterOne;
     }
 }

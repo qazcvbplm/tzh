@@ -18,7 +18,9 @@ CREATE TABLE `shop_print` (
 CREATE TABLE `index_shop_product` (
 	`id` BIGINT (20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
 	`shop_id` BIGINT (20) DEFAULT 0 COMMENT '店铺id',
+	`shop_weight` INT (4) DEFAULT 100 COMMENT '首页店铺排序权重，1排第一位',
 	`product_id` BIGINT (20) DEFAULT 0 COMMENT '商品id',
+	`product_weight` INT (4) DEFAULT 100 COMMENT '首页店铺排序权重，1排第一位',
 	`school_id` BIGINT (20) NOT NULL COMMENT '学校id',
 	`create_id` BIGINT (20) NOT NULL COMMENT '创建人id',
 	`update_id` BIGINT (20) DEFAULT '0' COMMENT '修改人id',

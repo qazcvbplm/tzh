@@ -41,6 +41,11 @@ public class IndexShopProductDTO extends BaseDTO implements Serializable {
      */
     private Date updateTime;
 
+    /**首页店铺排序权重，1排第一位*/
+    private Integer shopWeight;
+    /**首页店铺排序权重，1排第一位*/
+    private Integer productWeight;
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -107,5 +112,21 @@ public class IndexShopProductDTO extends BaseDTO implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getShopWeight() {
+        return shopWeight;
+    }
+
+    public void setShopWeight(Integer shopWeight) {
+        this.shopWeight = shopWeight;
+    }
+
+    public Integer getProductWeight() {
+        return productWeight;
+    }
+
+    public void setProductWeight(Integer productWeight) {
+        this.productWeight = productWeight;
     }
 }

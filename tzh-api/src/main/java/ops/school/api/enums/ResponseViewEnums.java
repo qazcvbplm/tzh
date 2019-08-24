@@ -101,6 +101,7 @@ public enum ResponseViewEnums implements RootEnums{
     INDEX_FIND_NO_SCHOOL("1215001","首页查询没有区分学校"),
     INDEX_ADD_NO_SCHOOL("1215002","首页展示设置没有区分学校"),
     INDEX_ADD_ERROR_NULL("1215003","首页展示设置未选择任何店铺和商品，请检查"),
+    INDEX_ADD_ERROR_PARAMS("1215004","首页展示设置格式错误，请检查，必须是1,2,3格式"),
 
 
     ;

@@ -36,6 +36,8 @@
         <result column="middle_min_amount" property="middleMinAmount" jdbcType="DECIMAL" />
         <result column="large_min_amount" property="largeMinAmount" jdbcType="DECIMAL" />
         <result column="extra_large_min_amount" property="extraLargeMinAmount" jdbcType="DECIMAL" />
+
+        <result column="yes_water_one" property="yesWaterOne" jdbcType="INTEGER" />
     </resultMap>
 
     <sql id="Base_Column_List" >
@@ -71,7 +73,8 @@
         small_min_amount,
         middle_min_amount,
         large_min_amount,
-        extra_large_min_amount
+        extra_large_min_amount,
+        yes_water_one
     </sql>
 
 
@@ -238,6 +241,10 @@
             <if test="extraLargeMinAmount != null">
                  extra_large_min_amount = #{extraLargeMinAmount},
             </if>
+            <if test="yesWaterOne != null">
+                yes_water_one = #{yesWaterOne},
+            </if>
+
             middle_min_amount = #{middleMinAmount}
         </set>
         where Id = #{id,jdbcType=INTEGER}

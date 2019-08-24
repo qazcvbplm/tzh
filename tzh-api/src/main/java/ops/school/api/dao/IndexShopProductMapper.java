@@ -15,26 +15,6 @@ public interface IndexShopProductMapper extends BaseMapper<IndexShopProduct> {
      * @date:
      * @author: Fang
      * @version:version
-     * @return: java.lang.Integer
-     * @param   dto
-     * @Desc:   desc 分页查询统计
-     */
-    Integer countLimitByDTO(IndexShopProductDTO dto);
-
-    /**
-     * @date:
-     * @author: Fang
-     * @version:version
-     * @return: cn.fang.result.LimitTableData<IndexShopProduct>
-     * @param   dto
-     * @Desc:   desc 分页查询
-     */
-    List<IndexShopProduct> selectLimitByDTO(IndexShopProductDTO dto);
-
-    /**
-     * @date:
-     * @author: Fang
-     * @version:version
      * @return: cn.fang.result.LimitTableData<IndexShopProduct>
      * @param   ids
      * @Desc:   desc 批量查询

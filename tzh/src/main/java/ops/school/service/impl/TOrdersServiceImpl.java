@@ -799,8 +799,9 @@ public class TOrdersServiceImpl implements TOrdersService {
         update.setShopId(orders.getShopId());
         update.setId(orderId);
         update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
+        School school = schoolMapper.selectById(orders.getSchoolId());
         //流水号
-        Integer water = this.getWaterByRedis(orders.getShopId());
+        Integer water = this.getWaterByRedis(orders.getShopId(),school.getYesWaterOne(),orders.getSchoolId());
         orders.setWaterNumber(water);
         update.setWaterNumber(water);
         int res = ordersService.shopAcceptOrderById(update);
@@ -1395,8 +1396,9 @@ public class TOrdersServiceImpl implements TOrdersService {
         update.setShopId(orders.getShopId());
         update.setId(orderId);
         update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
+        School school = schoolMapper.selectById(orders.getSchoolId());
         //流水号
-        Integer water = this.getWaterByRedis(orders.getShopId());
+        Integer water = this.getWaterByRedis(orders.getShopId(),school.getYesWaterOne(),orders.getSchoolId());
         orders.setWaterNumber(water);
         update.setWaterNumber(water);
         int res = ordersService.shopAcceptOrderById(update);
@@ -1440,7 +1442,19 @@ public class TOrdersServiceImpl implements TOrdersService {
      * @param
      * @Desc:   desc
      */
-    private synchronized Integer getWaterByRedis(Integer shopId) {
+    private synchronized Integer getWaterByRedis(Integer shopId,Integer yesWaterOne,Integer schoolId) {
+        if (yesWaterOne != null && yesWaterOne != NumConstants.INT_NUM_0){
+            //学校
+            Boolean haskey = stringRedisTemplate.boundHashOps("SCHOOL_WATER_NUMBER").hasKey(schoolId.toString());
+            if (!haskey){
+                stringRedisTemplate.boundHashOps("SCHOOL_WATER_NUMBER").put(schoolId.toString(),"0");
+                Date entTime = TimeUtilS.getDayEnd();
+                stringRedisTemplate.boundHashOps("SCHOOL_WATER_NUMBER").expireAt(entTime);
+            }
+            int water = stringRedisTemplate.boundHashOps("SCHOOL_WATER_NUMBER").increment(schoolId.toString(), 1L).intValue();
+            return water;
+        }
+        //店铺
         Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(shopId.toString());
         if (!haskey){
             stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(shopId.toString(),"0");

@@ -453,10 +453,17 @@ public class PublicUtilS {
         String[] array = {"1","2","4","1","1","4","5",};
         int[] intarray = {1,2,3,1,2,4};
         Integer[] tegArray = {1,2,3,1,2,4,5};
-        Object[] result = removeDuplicate(array);
-        array = (String[]) result;
-        System.out.println(result);
-        System.out.println(array);
+
+        List<Long> longList = new ArrayList<>();
+        longList.add(Long.valueOf(2));
+        longList.add(Long.valueOf(1));
+        longList.add(Long.valueOf(5));
+        longList.add(Long.valueOf(1));
+        longList.add(Long.valueOf(7));
+        longList.add(Long.valueOf(6));
+        System.out.println(longList);
+        removeDuplicate(longList);
+        System.out.println(longList);
 
     }
 
