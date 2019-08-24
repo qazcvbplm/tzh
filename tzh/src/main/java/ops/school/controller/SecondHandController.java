@@ -57,13 +57,26 @@ public class SecondHandController {
     @ApiOperation(value = "查询", httpMethod = "POST")
     @RequestMapping("find")
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, SecondHand secondHand) {
+        secondHand.setIsDelete(NumConstants.DB_TABLE_IS_DELETE_NO);
+        QueryWrapper<SecondHand> query = new QueryWrapper<SecondHand>().setEntity(secondHand).orderByDesc("create_time");
+        IPage<SecondHand> iPage = secondHandService.page(new Page<>(secondHand.getPage(), secondHand.getSize()), query);
+        List<SecondHand> secondHandList = iPage.getRecords();
+        return new ResponseObject(true, "ok")
+                .push("list", secondHandList)
+                .push("total", iPage.getTotal());
+    }
+
+
+    @ApiOperation(value = "首页查询", httpMethod = "POST")
+    @RequestMapping("index")
+    public ResponseObject findIndex(HttpServletRequest request, HttpServletResponse response, SecondHand secondHand) {
         //先查缓存
         Object redisGet = stringRedisTemplate.boundHashOps(RedisConstants.Index_Second_Hand_Shop_Hash).get("all");
         Page<SecondHand> redisIPage = null;
         if (redisGet != null) {
             redisIPage = JSONObject.parseObject((String) redisGet, new TypeReference<Page<SecondHand>>(){});
         }
-        if (redisIPage != null) {
+        if (redisIPage != null && redisIPage.getTotal() > NumConstants.INT_NUM_0 && redisIPage.getRecords().size() > NumConstants.INT_NUM_0) {
             return new ResponseObject(true, "ok")
                     .push("list", redisIPage.getRecords())
                     .push("total", redisIPage.getTotal());

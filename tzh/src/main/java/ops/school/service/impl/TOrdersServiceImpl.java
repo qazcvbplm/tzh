@@ -799,14 +799,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         update.setShopId(orders.getShopId());
         update.setId(orderId);
         update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
-
-        Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(orders.getShopId().toString());
-        if (!haskey){
-            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(orders.getShopId().toString(),"0");
-            Date entTime = TimeUtilS.getDayEnd();
-            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").expireAt(entTime);
-        }
-        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
+        //流水号
+        Integer water = this.getWaterByRedis(orders.getShopId());
         orders.setWaterNumber(water);
         update.setWaterNumber(water);
         int res = ordersService.shopAcceptOrderById(update);
@@ -1401,13 +1395,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         update.setShopId(orders.getShopId());
         update.setId(orderId);
         update.setPayTime(df.format(orders.getCreateTime()).substring(0, 10) + "%");
-        Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(orders.getShopId().toString());
-        if (!haskey){
-            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(orders.getShopId().toString(),"0");
-            Date entTime = TimeUtilS.getDayEnd();
-            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").expireAt(entTime);
-        }
-        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(orders.getShopId().toString(), 1L).intValue();
+        //流水号
+        Integer water = this.getWaterByRedis(orders.getShopId());
         orders.setWaterNumber(water);
         update.setWaterNumber(water);
         int res = ordersService.shopAcceptOrderById(update);
@@ -1441,6 +1430,25 @@ public class TOrdersServiceImpl implements TOrdersService {
         return new ResponseObject(true,PublicErrorEnums.SUCCESS)
                 .push("water",water)
                 .push("order",JSON.toJSONString(opOrders));
+    }
+
+    /**
+     * @date:   2019/8/23 19:57
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param
+     * @Desc:   desc
+     */
+    private synchronized Integer getWaterByRedis(Integer shopId) {
+        Boolean haskey = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").hasKey(shopId.toString());
+        if (!haskey){
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").put(shopId.toString(),"0");
+            Date entTime = TimeUtilS.getDayEnd();
+            stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").expireAt(entTime);
+        }
+        int water = stringRedisTemplate.boundHashOps("SHOP_WATER_NUMBER").increment(shopId.toString(), 1L).intValue();
+        return water;
     }
 
     @Override
