@@ -52,6 +52,10 @@ public class FloorController {
         QueryWrapper<Floor> query = new QueryWrapper<Floor>();
         query.lambda().eq(Floor::getIsDelete, 0);
         query.lambda().eq(Floor::getSchoolId, floor.getSchoolId());
+        if (floor.getId() != null){
+            query.lambda().eq(Floor::getId, floor.getId());
+        }
+
 //        switch (floor.getQueryType()) {
 //            case "wxuser":
 //                if (floor.getSchoolId() == null) {
