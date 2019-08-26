@@ -81,7 +81,8 @@ public class Shop {
 
     private Integer isDelete;
 
-    private Long sort;
+    /**排序字段*/
+    private BigDecimal sort;
 
     private Integer printType;
 
@@ -458,11 +459,11 @@ public class Shop {
         this.isDelete = isDelete;
     }
 
-    public Long getSort() {
+    public BigDecimal getSort() {
         return sort;
     }
 
-    public void setSort(Long sort) {
+    public void setSort(BigDecimal sort) {
         this.sort = sort;
     }
 

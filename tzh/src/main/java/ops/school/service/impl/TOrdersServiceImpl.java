@@ -1512,6 +1512,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         return new ResponseObject(true,PublicErrorEnums.SUCCESS);
     }
 
+
     private String getOrderPrintContent(Orders orders) {
         if (orders.getOp() == null || orders.getOp().size() < 1){
             QueryWrapper<OrderProduct> wrapper = new QueryWrapper<>();

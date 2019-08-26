@@ -29,7 +29,7 @@
         <result column="send_price_add_by_count_flag" jdbcType="INTEGER" property="sendPriceAddByCountFlag"/>
         <result column="send_price_add" jdbcType="DECIMAL" property="sendPriceAdd"/>
         <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
-        <result column="sort" jdbcType="BIGINT" property="sort"/>
+        <result column="sort" jdbcType="DECIMAL" property="sort"/>
         <result column="shop_tx_flag" property="shopTxFlag"/>
         <result column="shop_code_image" property="shopCodeImage"/>
         <result column="print_type" property="printType"/>
@@ -69,7 +69,7 @@
         <result column="send_price_add_by_count_flag" jdbcType="INTEGER" property="sendPriceAddByCountFlag"/>
         <result column="send_price_add" jdbcType="DECIMAL" property="sendPriceAdd"/>
         <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
-        <result column="sort" jdbcType="BIGINT" property="sort"/>
+        <result column="sort" jdbcType="DECIMAL" property="sort"/>
         <result column="shop_tx_flag" property="shopTxFlag"/>
         <result column="print_type" property="printType"/>
     </resultMap>
@@ -183,7 +183,7 @@
             </if>
             and shop.is_delete=0
         </where>
-        order by open_flag desc,sort desc
+        order by open_flag desc,sort ASC
         <if test="page!=null and size!=null">
             limit #{page},#{size}
         </if>
@@ -302,7 +302,7 @@
                 is_delete = #{isDelete,jdbcType=INTEGER},
             </if>
             <if test="sort != null">
-                sort = #{sort,jdbcType=BIGINT},
+                sort = #{sort},
             </if>
         </set>
         where Id = #{id,jdbcType=INTEGER}

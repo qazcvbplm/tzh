@@ -16,6 +16,7 @@ import ops.school.api.util.TimeUtilS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements S
     @Override
     public void add(Shop shop) {
         if (shopMapper.checkByLoginName(shop.getShopLoginName()) == null) {
-            shop.setSort(System.currentTimeMillis());
+            shop.setSort(BigDecimal.valueOf(100));
             shopMapper.insert(shop);
         } else {
             throw new YWException("登录名重复请重新 输入");

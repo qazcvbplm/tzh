@@ -56,6 +56,8 @@ public enum ResponseViewEnums implements RootEnums{
     ORDER_MESSAGE_NULL_ORDER_ID("1250007","发送微信模板消息订单id为空"),
     ORDER_MESSAGE_NULL_SCHOOL("1250008","发送微信模板消息学校信息空需要appid"),
     ORDER_MESSAGE_NULL_SCHOOL_ID("1250009","发送微信模板消息学校信息空需要学校id"),
+    ORDER_PARAM_NULL("1250010","订单信息错误，请稍后重新下单"),
+    ORDER_PARAM_TIME_BEFORE("1250011","预定订单时间太早，请稍后重新下单"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),

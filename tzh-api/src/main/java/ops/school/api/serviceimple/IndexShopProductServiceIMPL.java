@@ -202,23 +202,27 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
         String[] shopArr = shops.split(regex);
         String[] productArr = products.split(regex);
         List<Long> shopWeight = new ArrayList<>();
-        for (int i = 0; i < shopArr.length; i++) {
-            try {
-                Long sId = Long.valueOf(shopArr[i]);
-                shopWeight.add(sId);
-            }catch (Exception ex){
-                ex.printStackTrace();
-                DisplayException.throwMessageWithEnum(ResponseViewEnums.INDEX_ADD_ERROR_PARAMS);
+        List<Long> productWeight = new ArrayList<>();
+        if(!StringUtils.isBlank(shops) && !"null".equals(shops) && !"0".equals(shops)){
+            for (int i = 0; i < shopArr.length; i++) {
+                try {
+                    Long sId = Long.valueOf(shopArr[i]);
+                    shopWeight.add(sId);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.INDEX_ADD_ERROR_PARAMS);
+                }
             }
         }
-        List<Long> productWeight = new ArrayList<>();
-        for (int i = 0; i < productArr.length; i++) {
-            try {
-                Long pId = Long.valueOf(productArr[i]);
-                productWeight.add(pId);
-            }catch (Exception ex){
-                ex.printStackTrace();
-                DisplayException.throwMessageWithEnum(ResponseViewEnums.INDEX_ADD_ERROR_PARAMS);
+        if (!StringUtils.isBlank(products) && !"null".equals(products) && !"0".equals(products)){
+            for (int i = 0; i < productArr.length; i++) {
+                try {
+                    Long pId = Long.valueOf(productArr[i]);
+                    productWeight.add(pId);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.INDEX_ADD_ERROR_PARAMS);
+                }
             }
         }
         PublicUtilS.removeDuplicate(shopWeight);
@@ -243,13 +247,13 @@ public class IndexShopProductServiceIMPL implements IndexShopProductService {
             }
             indexShopProducts.add(index);
         }
-        if (indexShopProducts.size() < NumConstants.INT_NUM_1){
-            return new ResponseObject(true,ResponseViewEnums.INDEX_ADD_ERROR_NULL);
-        }
         //先删除
         QueryWrapper<IndexShopProduct> wrapper = new QueryWrapper<>();
         wrapper.eq("school_id",schoolId);
         int deleteNum = indexShopProductMapper.delete(wrapper);
+        if (indexShopProducts.size() == NumConstants.INT_NUM_0){
+            return new ResponseObject(true,PublicErrorEnums.SUCCESS);
+        }
         //再新增
         int addNum = indexShopProductMapper.batchInsert(indexShopProducts);
         //最后删除缓存

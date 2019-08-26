@@ -181,6 +181,8 @@ public class TSenderServiceImpl implements TSenderService {
         if (!endTrue){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
         }
+        // 从所有商家已接手订单中删除
+        stringRedisTemplate.boundHashOps("SHOP_YJS").delete(orderId);
     }
 
 
@@ -238,6 +240,8 @@ public class TSenderServiceImpl implements TSenderService {
         if (!endTrue){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
         }
+        // 从所有商家已接手订单中删除
+        stringRedisTemplate.boundHashOps("SHOP_YJS").delete(orderId);
     }
 
     @Override
