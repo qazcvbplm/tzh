@@ -112,6 +112,8 @@ public class Shop {
     @TableField(exist = false)
     private Integer shopWeight;
 
+    private String openDescription;
+
 
     @Transient
     public String getQueryType() {
@@ -481,6 +483,15 @@ public class Shop {
 
     public void setShopWeight(Integer shopWeight) {
         this.shopWeight = shopWeight;
+    }
+
+
+    public String getOpenDescription() {
+        return openDescription;
+    }
+
+    public void setOpenDescription(String openDescription) {
+        this.openDescription = openDescription;
     }
 
     @Override

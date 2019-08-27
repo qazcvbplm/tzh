@@ -33,6 +33,9 @@
         <result column="shop_tx_flag" property="shopTxFlag"/>
         <result column="shop_code_image" property="shopCodeImage"/>
         <result column="print_type" property="printType"/>
+        <result column="open_description" jdbcType="VARCHAR" property="openDescription"/>
+
+
         <collection property="fullCut" ofType="ops.school.api.entity.FullCut"
                     select="ops.school.api.dao.FullCutMapper.findByShop" column="id">
             <result column="full" jdbcType="INTEGER" property="full"/>
@@ -72,6 +75,8 @@
         <result column="sort" jdbcType="DECIMAL" property="sort"/>
         <result column="shop_tx_flag" property="shopTxFlag"/>
         <result column="print_type" property="printType"/>
+        <result column="open_description" jdbcType="VARCHAR" property="openDescription"/>
+
     </resultMap>
 
     <sql id="fd">
@@ -114,7 +119,8 @@
         shop.tx_amount,
         shop.all_tx_amount,
         shop.shop_code_image,
-        shop.print_type
+        shop.print_type,
+        shop.open_description
     </sql>
     <select id="count" resultType="int" parameterType="ops.school.api.entity.Shop">
         select count(*) from shop
@@ -166,6 +172,7 @@
         shop.tx_amount,
         shop.all_tx_amount,
         shop.print_type,
+        shop.open_description,
         <!-- (select min(discount) from product where shop_id=shop.id and is_delete=0 and is_show=1 and discount!=1) as min_discount, -->
         if(shop.open_flag=1,
         (select count(*) from shop_open_time where shop_id = shop.id and DATE_FORMAT(now(),'%H:%i') between start_time
