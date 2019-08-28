@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Product;
+import ops.school.api.entity.Shop;
+import ops.school.api.util.ResponseObject;
 
 import java.util.List;
 import java.util.Map;
@@ -31,4 +33,14 @@ public interface ProductService extends IService<Product> {
      * @Desc:   desc 根据商品id和商品规格id批量查询商品及规格
      */
     List<ProductAndAttributeDTO> batchFindProdAttributeByIdS(Map<Long,Long> pIdAndAIdMap);
+
+    /**
+     * @date:   2019/8/28 22:58
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   product
+     * @Desc:   desc
+     */
+    ResponseObject getAllNeedChooseAndNoDelPros(Product product);
 }

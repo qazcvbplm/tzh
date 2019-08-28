@@ -3,10 +3,13 @@ package ops.school.api.serviceimple;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ops.school.api.constants.NumConstants;
+import ops.school.api.dao.ProductMapper;
 import ops.school.api.dao.ShopMapper;
 import ops.school.api.entity.PageQueryDTO;
+import ops.school.api.entity.Product;
 import ops.school.api.entity.Shop;
 import ops.school.api.entity.ShopOpenTime;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.ShopService;
@@ -26,6 +29,9 @@ public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements S
 
     @Autowired
     private ShopMapper shopMapper;
+
+    @Autowired
+    private ProductMapper productMapper;
 
 
     @Override
@@ -152,5 +158,25 @@ public class ShopServiceImple extends ServiceImpl<ShopMapper, Shop> implements S
             }
         }
         return false;
+    }
+
+    /**
+     * @date:   2019/8/28 22:32
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   shopId
+     * @param   discount
+     * @Desc:   desc
+     */
+    @Override
+    public ResponseObject discountAllProductBySId(Integer shopId, BigDecimal discount) {
+        Assertions.notNull(shopId, ResponseViewEnums.SHOP_DISCOUNT_ALL_PARAMS_NULL);
+        Assertions.notNull(discount,ResponseViewEnums.SHOP_DISCOUNT_ALL_PARAMS_ID_NULL);
+        Integer discountNum = productMapper.discountAllProductBySId(shopId,discount);
+        if (discountNum < NumConstants.INT_NUM_1){
+            return new ResponseObject(false,ResponseViewEnums.FAILED);
+        }
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS_NUM.getErrorMessage()+discountNum);
     }
 }

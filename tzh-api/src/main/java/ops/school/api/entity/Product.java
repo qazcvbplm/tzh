@@ -33,15 +33,24 @@ public class Product extends Base {
 
     private Integer isDelete;
 
-    @TableField(exist = false)
-    private List<ProductAttribute> attribute;
-
     private Integer stock;
 
     private Integer stockFlag;
 
+    /**
+     * 店铺中商品下单是否必选 0-非必选 1-必选
+     */
+    private Integer needChoose;
+
+    @TableField(exist = false)
+    private List<ProductAttribute> attribute;
+
+
+
     @TableField(exist = false)
     private Integer productWeight;
+
+
 
 
     public Integer getStock() {
@@ -162,5 +171,14 @@ public class Product extends Base {
 
     public void setProductWeight(Integer productWeight) {
         this.productWeight = productWeight;
+    }
+
+
+    public Integer getNeedChoose() {
+        return needChoose;
+    }
+
+    public void setNeedChoose(Integer needChoose) {
+        this.needChoose = needChoose;
     }
 }

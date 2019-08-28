@@ -11,6 +11,7 @@ package ops.school.api.enums;
 public enum ResponseViewEnums implements RootEnums{
     /**操作成功*/
     SUCCESS("1210001","操作成功"),
+    SUCCESS_NUM("1210002","操作成功,操作的条数"),
     /**操作失败*/
     FAILED("1210002","操作失败"),
     /**操作失败*/
@@ -75,9 +76,13 @@ public enum ResponseViewEnums implements RootEnums{
     SHOP_PRINT_ERROR_NOT_ORDER_ID("1280007","飞鹅平台打印失败,没有返回打印id，请校验"),
     SHOP_NOT_EXISTS("1280008","店铺不存在，请校验"),
     SHOP_ADD_TIME_ERROR("1280009","时间添加失败，请校验输入必须是21:21格式，英文冒号:"),
+    SHOP_DISCOUNT_ALL_PARAMS_NULL("1280010","添加店铺所有商品折扣，必选店铺"),
+    SHOP_DISCOUNT_ALL_PARAMS_ID_NULL("1280011","添加店铺所有商品折扣，必填折扣"),
+    SHOP_NEED_TO_ID("1280012","店铺操作必选择一个店铺"),
 
     /**----------9-配送员信息错误-----------*/
     SENDER_HAD_CHANGE("1290001","配送员信息发生变化，请联系后台管理"),
+    SENDER_NEED_PHONE("1290002","配送员查询需要电话"),
 
     /**----------10-订单完成表信息错误-----------*/
     ORDERS_COMPLETE_HAD_ERROR("1210001","订单完成信息错误，请联系后台管理"),

@@ -7,6 +7,7 @@ import ops.school.api.entity.ShopOpenTime;
 import ops.school.api.util.ResponseObject;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -45,4 +46,15 @@ public interface ShopService extends IService<Shop> {
      * @Desc:   desc
      */
     Boolean ShopNowIsOpen(List<ShopOpenTime> shopOpenTimeList,Integer shopId) throws ParseException;
+
+    /**
+     * @date:   2019/8/28 22:32
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   shopId
+     * @param   discount
+     * @Desc:   desc
+     */
+    ResponseObject discountAllProductBySId(Integer shopId, BigDecimal discount);
 }

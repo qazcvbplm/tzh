@@ -6,16 +6,11 @@ import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
 import ops.school.api.constants.RedisConstants;
 import ops.school.api.dto.ShopTj;
-import ops.school.api.entity.FullCut;
-import ops.school.api.entity.School;
-import ops.school.api.entity.Shop;
-import ops.school.api.entity.ShopOpenTime;
+import ops.school.api.entity.*;
 import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.exception.DisplayException;
-import ops.school.api.service.FullCutService;
-import ops.school.api.service.SchoolService;
-import ops.school.api.service.ShopOpenTimeService;
-import ops.school.api.service.ShopService;
+import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.TimeUtilS;
@@ -24,6 +19,7 @@ import ops.school.api.wxutil.WXUtil;
 import ops.school.api.constants.NumConstants;
 import ops.school.service.TCommonService;
 import ops.school.service.TOrdersService;
+import ops.school.service.TProductService;
 import ops.school.util.ImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +59,9 @@ public class ShopController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-   /* @Autowired
-    private AuthController auth;*/
+
+    @Autowired
+    private ProductService productService;
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
@@ -224,5 +222,32 @@ public class ShopController {
             }
         }
         return new ResponseObject(false, "生成二维码失败");
+    }
+
+    /**
+     * @date:   2019/8/28 22:42
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   shopId
+     * @param   discount
+     * @Desc:   desc
+     */
+    @ApiOperation(value = "设置店铺是否全店铺商品统一折扣", httpMethod = "POST")
+    @PostMapping("discount/all")
+    public ResponseObject discountAllProduct(Integer shopId, BigDecimal discount) {
+        Assertions.notNull(shopId,ResponseViewEnums.SHOP_DISCOUNT_ALL_PARAMS_NULL);
+        Assertions.notNull(discount,ResponseViewEnums.SHOP_DISCOUNT_ALL_PARAMS_ID_NULL);
+        ResponseObject responseObject = shopService.discountAllProductBySId(shopId,discount);
+        return responseObject;
+    }
+
+    @ApiOperation(value = "查询该店铺下没删除且没下架的必选商品", httpMethod = "POST")
+    @PostMapping("choose/all")
+    public ResponseObject getAllNeedChooseAndNoDelPros(Product product) {
+        Assertions.notNull(product,ResponseViewEnums.SHOP_NEED_TO_ID);
+        Assertions.notNull(product.getShopId(),ResponseViewEnums.SHOP_NEED_TO_ID);
+        ResponseObject responseObject = productService.getAllNeedChooseAndNoDelPros(product);
+        return responseObject;
     }
 }

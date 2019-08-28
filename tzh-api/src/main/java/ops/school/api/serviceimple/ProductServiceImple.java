@@ -1,16 +1,22 @@
 package ops.school.api.serviceimple;
 
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import ops.school.api.constants.NumConstants;
 import ops.school.api.dao.ProductAttributeMapper;
 import ops.school.api.dao.ProductMapper;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Product;
+import ops.school.api.entity.Shop;
 import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.ProductService;
+import ops.school.api.util.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,5 +90,24 @@ public class ProductServiceImple extends ServiceImpl<ProductMapper, Product> imp
         Assertions.notEmpty(pIdAndAIdMap, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         List<ProductAndAttributeDTO> productAndAttributes = productMapper.batchFindProdAttributeByIdS(pIdAndAIdMap);
         return productAndAttributes;
+    }
+
+    /**
+     * @date:   2019/8/28 22:58
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   product
+     * @Desc:   desc
+     */
+    @Override
+    public ResponseObject getAllNeedChooseAndNoDelPros(Product product) {
+        Assertions.notNull(product, ResponseViewEnums.SHOP_NEED_TO_ID);
+        Assertions.notNull(product.getShopId(),ResponseViewEnums.SHOP_NEED_TO_ID);
+        QueryWrapper<Product> wrapper = new QueryWrapper<>(product);
+        wrapper.eq("shop_id",product.getShopId());
+        wrapper.eq("is_delete", NumConstants.DB_TABLE_IS_DELETE_NO);
+        List<Product> productList = productMapper.selectList(wrapper);
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("list",productList);
     }
 }

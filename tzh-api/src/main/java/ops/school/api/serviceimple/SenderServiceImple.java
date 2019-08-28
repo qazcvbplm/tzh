@@ -8,9 +8,14 @@ import ops.school.api.dao.SenderMapper;
 import ops.school.api.dao.WxUserMapper;
 import ops.school.api.entity.Sender;
 import ops.school.api.entity.WxUser;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.SenderService;
 import ops.school.api.util.RedisUtil;
+import ops.school.api.util.ResponseObject;
 import ops.school.api.util.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -185,4 +190,26 @@ public class SenderServiceImple extends ServiceImpl<SenderMapper, Sender> implem
     }
 
 
+    /**
+     * @date:   2019/8/28 23:12
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   sender
+     * @Desc:   desc
+     */
+    @Override
+    public ResponseObject findSenderByFree(Sender sender) {
+        Assertions.notNull(sender, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(sender.getPhone(), ResponseViewEnums.SENDER_NEED_PHONE);
+        QueryWrapper<Sender> wrapper = new QueryWrapper<>(sender);
+        Sender senderFind = null;
+        try {
+            senderFind = senderMapper.selectOne(wrapper);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            DisplayException.throwMessage("查询异常，每个手机号只能注册一个配送员");
+        }
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("sender",senderFind);
+    }
 }

@@ -8,6 +8,9 @@ import ops.school.api.dto.SenderTj;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.RunOrders;
 import ops.school.api.entity.Sender;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.SenderService;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.Util;
@@ -52,7 +55,7 @@ public class SenderController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Sender sender) {
         sender.setQueryType(request.getAttribute("role").toString());
         sender.setQuery(request.getAttribute("Id").toString());
-        QueryWrapper<Sender> query = new QueryWrapper<Sender>();
+        QueryWrapper<Sender> query = new QueryWrapper<Sender>(sender);
         if (sender.getExam() != null) {
             query.lambda().ne(Sender::getExam, sender.getExam());
         }
@@ -93,6 +96,15 @@ public class SenderController {
     public ResponseObject findbyphone(HttpServletRequest request, HttpServletResponse response, String phone) {
         Sender sender = senderService.findByPhone(phone);
         return new ResponseObject(true, "ok").push("sender", sender);
+    }
+
+    @ApiOperation(value = "根据姓名和电话查询配送员", httpMethod = "POST")
+    @PostMapping("nocheck/find/free")
+    public ResponseObject findSenderByFree(Sender sender) {
+        Assertions.notNull(sender, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(sender.getPhone(),ResponseViewEnums.SENDER_NEED_PHONE);
+        ResponseObject responseObject = senderService.findSenderByFree(sender);
+        return responseObject;
     }
 
     @ApiOperation(value = "配送员查询外卖订单", httpMethod = "POST")

@@ -15,6 +15,10 @@
         <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
         <result column="stock" jdbcType="INTEGER" property="stock"/>
         <result column="stock_flag" jdbcType="INTEGER" property="stockFlag"/>
+        <result column="need_choose" jdbcType="INTEGER" property="needChoose"/>
+
+
+
         <collection property="attribute" ofType="ops.school.api.entity.ProductAttribute" javaType="ArrayList">
             <result column="aid" jdbcType="INTEGER" property="id"/>
             <result column="product_id" jdbcType="INTEGER" property="productId"/>
@@ -59,7 +63,8 @@
         is_show,
         is_delete,
         stock,
-        stock_flag
+        stock_flag,
+        need_choose
     </sql>
 
     <sql id="Attribute_Column_List" >
@@ -207,6 +212,9 @@
             <if test="isDelete != null">
                 is_delete = #{isDelete,jdbcType=INTEGER},
             </if>
+            <if test="needChoose != null">
+                need_choose = #{needChoose},
+            </if>
         </set>
         where Id = #{id,jdbcType=INTEGER}
     </update>
@@ -220,6 +228,14 @@
         <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
             #{item}
         </foreach>
+        AND is_delete = 0
+    </update>
+
+    <!--CreatBy Fang Time:2019/8/28 22:39 |  -->
+    <update id="discountAllProductBySId">
+        UPDATE product
+        SET discount = #{discount}
+        WHERE shop_id = #{shopId}
         AND is_delete = 0
     </update>
 

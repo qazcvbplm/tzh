@@ -52,4 +52,15 @@ public interface ProductMapper extends BaseMapper<Product> {
      * @Desc:   desc
      */
     Integer deleteLogicBatchIds(@Param("list") List<Long> productIdS);
+
+    /**
+     * @date:   2019/8/28 22:37
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   shopId
+     * @param   discount
+     * @Desc:   desc
+     */
+    Integer discountAllProductBySId(@Param("shopId") Integer shopId, @Param("discount")BigDecimal discount);
 }

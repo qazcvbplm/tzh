@@ -170,7 +170,7 @@ public class ApplicationController {
 		String version=stringRedisTemplate.opsForValue().get("app_version");
 		return new ResponseObject(true, "")
 				.push("version", version)
-				.push("androidUrl", "http://www.chuyinkeji.cn/yzxy/new.apk")
+				.push("androidUrl", "http://www.chuyinkeji.cn/yzxy/YeZiXiaoYuan-Shop.apk")
 				.push("iosUrl", "https://itunes.apple.com/cn/app/id1457549508?mt=8");
 	}
 	

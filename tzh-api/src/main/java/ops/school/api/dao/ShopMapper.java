@@ -5,6 +5,7 @@ import ops.school.api.entity.PageQueryDTO;
 import ops.school.api.entity.Shop;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -30,4 +31,6 @@ public interface ShopMapper extends BaseMapper<Shop> {
      * @Desc:   desc 分页查询店铺，查询满减，根据开店时间倒叙排（关闭的店铺在最后面）
      */
     List<Shop> findShopWithFullCutOBTime(@Param("shop") Shop shop, @Param("pageQueryDTO") PageQueryDTO pageQueryDTO);
+
+
 }

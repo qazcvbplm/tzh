@@ -318,4 +318,6 @@
 		update shop set tx_amount = tx_amount - #{amount},
 		all_tx_amount = all_tx_amount + #{amount} where Id = #{shopId} and tx_amount >= #{amount}
 	</update>
+
+
 </mapper>
