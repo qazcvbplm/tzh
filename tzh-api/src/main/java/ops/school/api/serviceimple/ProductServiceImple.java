@@ -10,12 +10,14 @@ import ops.school.api.dao.ProductMapper;
 import ops.school.api.dto.project.ProductAndAttributeDTO;
 import ops.school.api.dto.project.ProductOrderDTO;
 import ops.school.api.entity.Product;
+import ops.school.api.entity.ProductAttribute;
 import ops.school.api.entity.Shop;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.ProductService;
+import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,6 +110,23 @@ public class ProductServiceImple extends ServiceImpl<ProductMapper, Product> imp
         wrapper.eq("shop_id",product.getShopId());
         wrapper.eq("is_delete", NumConstants.DB_TABLE_IS_DELETE_NO);
         List<Product> productList = productMapper.selectList(wrapper);
+        List<Long> proIds = PublicUtilS.getValueList(productList,"id");
+        if (proIds.size() < NumConstants.INT_NUM_1){
+            return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("list",productList);
+        }
+        List<ProductAttribute> attributeList = productAttributeMapper.batchFindByProductIds(proIds);
+        if (attributeList.size() < NumConstants.INT_NUM_1){
+            return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("list",productList);
+        }
+        Map<Integer,List<ProductAttribute>> attributeMap = PublicUtilS.listforEqualKeyListMap(attributeList,"productId");
+        if (attributeMap.size() < NumConstants.INT_NUM_1){
+            return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("list",productList);
+        }
+        for (Product pro : productList) {
+            if (attributeMap.get(pro.getId()) != null){
+                pro.setAttribute(attributeMap.get(pro.getId()));
+            }
+        }
         return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("list",productList);
     }
 }

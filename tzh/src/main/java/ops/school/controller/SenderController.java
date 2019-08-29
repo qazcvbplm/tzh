@@ -55,9 +55,15 @@ public class SenderController {
     public ResponseObject find(HttpServletRequest request, HttpServletResponse response, Sender sender) {
         sender.setQueryType(request.getAttribute("role").toString());
         sender.setQuery(request.getAttribute("Id").toString());
-        QueryWrapper<Sender> query = new QueryWrapper<Sender>(sender);
+        QueryWrapper<Sender> query = new QueryWrapper<Sender>();
         if (sender.getExam() != null) {
             query.lambda().ne(Sender::getExam, sender.getExam());
+        }
+        if (sender.getPhone() != null){
+            query.lambda().eq(Sender::getPhone, sender.getPhone());
+        }
+        if (sender.getName() != null){
+            query.lambda().like(Sender::getName, sender.getName());
         }
         switch (sender.getQueryType()) {
             case "wxuser":
