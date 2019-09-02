@@ -34,7 +34,7 @@ public class ImageUtil {
          * watermark(位置，水印图，透明度)
          */
         Map<String,Object> map = new HashMap<>();
-        String imagePath = "https://www.chuyinkeji.cn/shopbarcode/";
+        String imagePath = "https://ljxy.an4.net/shopbarcode/";
         int randomNumber = (int)(Math.random() * 50 + 1);
         // 店铺图片与二维码合并之后的图片
         String shopCodeImage = path + "yzxy" +shop.getId() + ".jpg";

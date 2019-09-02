@@ -48,19 +48,20 @@ public class FileController {
      */
     private String uploadQNImg(FileInputStream file, String key) {
         // 构造一个带指定Zone对象的配置类
-        Configuration cfg = new Configuration(Zone.zone0());
+        Configuration cfg = new Configuration(Zone.zone1());
         // 其他参数参考类注释
         UploadManager uploadManager = new UploadManager(cfg);
         // 生成上传凭证，然后准备上传
 
         try {
-            Auth auth = Auth.create("jra5S4ulxngso0Fs6JhCmx2OMAS9DL1yjwa6v6Oo", "eywGi5zc52FYWQkAECG5RtvlOf53yXHtKIvSWPQV");
-            String upToken = auth.uploadToken("school");
+            Auth auth = Auth.create("PyO2O2HxIqUJEeXyy4OuhpU0aWb-rfYWYzitCSYk",
+                    "609iopfUt79YA0h1UoryGBPYByW_jXNGYoe18fgQ");
+            String upToken = auth.uploadToken("yjxy");
             try {
                 Response response = uploadManager.put(file, key, upToken, null, null);
                 // 解析上传成功的结果
                 DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
-                String returnPath = "http://ops.chuyinkeji.cn" + "/" + putRet.key;
+                String returnPath = "http://down.an4.net" + "/" + putRet.key;
                 return returnPath;
             } catch (QiniuException ex) {
                 Response r = ex.response;

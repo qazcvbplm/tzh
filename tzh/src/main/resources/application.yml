@@ -26,16 +26,6 @@ barcode:
   path: /home/barcode
 cert:
   path: /home/cert
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://212.129.149.27:8761/eureka/
-  instance:
-    leaseExpirationDurationInSeconds: 2
-    leaseRenewalIntervalInSeconds: 1
-feign:
-  hystrix:
-    enabled: true
 logging:
   file: logs/chuyin.log
   level:
@@ -53,5 +43,6 @@ server:
 mybatis-plus:
   mapper-locations: ops/school/api/mapper/*.xml
   type-enums-package: ops/school/api/entity/enums
-
+chuyin:
+  white: "/ops/aaaa"
 

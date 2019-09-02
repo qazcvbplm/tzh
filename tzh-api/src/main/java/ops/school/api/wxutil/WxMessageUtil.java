@@ -46,7 +46,7 @@ public class WxMessageUtil {
         wxMessageUtil.schoolService = this.schoolService;
     }
 
-    private static final String templateId = "Wg-yNBXd6CvtYcDTCa17Qy6XEGPeD2iibo9rU2ng67o";
+    private static final String templateId = "0msZwFVwiKzF3q4mMY_Dclog5BTITIbhoKHECH3lbmE";
 
     // 商家接手跳转页面/配送员已接手
     private static final String acceptOrder = "pages/order/orderDetail/orderDetail?orderId=";

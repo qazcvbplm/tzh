@@ -157,7 +157,7 @@ public class WxUserController {
             codes.append((int) (Math.random() * 9));
         }
         try {
-            Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", phone, 244026, codes.toString(), null);
+            Util.qqsms(1400244578, "ebb96fc1104fea9b641bd8638c4da932", phone, 399679, codes.toString(), null);
             stringRedisTemplate.opsForValue().set(phone, codes.toString(), 5, TimeUnit.MINUTES);
         } catch (HTTPException | IOException | org.json.JSONException e) {
             return new ResponseObject(false, "发送失败");

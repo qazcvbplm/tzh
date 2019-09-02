@@ -125,7 +125,7 @@ public class ApplicationController {
 				}
 				if(map.get("EventKey").equals("商家APP")){
 					ReplyTextMsg re=new ReplyTextMsg(ToUserName,FromUserName,"text",
-							"安卓版本：www.chuyinkeji.cn/yzxy/YeZiXiaoYuan-Shop.apk        苹果版本：https://itunes.apple.com/cn/app/id1457549508?mt=8");
+							"安卓版本：ljxy.an4.net/yzxy/YeZiXiaoYuan-Shop.apk        苹果版本：https://itunes.apple.com/cn/app/id1457549508?mt=8");
 					return re.Msg2Xml();
 				}
 				if(map.get("EventKey").equals("商务合作")){
@@ -170,7 +170,7 @@ public class ApplicationController {
 		String version=stringRedisTemplate.opsForValue().get("app_version");
 		return new ResponseObject(true, "")
 				.push("version", version)
-				.push("androidUrl", "http://www.chuyinkeji.cn/yzxy/new.apk")
+				.push("androidUrl", "http://ljxy.an4.net/yzxy/new.apk")
 				.push("iosUrl", "https://itunes.apple.com/cn/app/id1457549508?mt=8");
 	}
 	

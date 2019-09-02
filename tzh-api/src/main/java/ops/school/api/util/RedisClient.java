@@ -18,7 +18,7 @@ public class RedisClient {
     static {
         //Configuration自行写的配置文件解析类,继承自Properties
         Configuration conf= Configuration.getInstance();
-        JEDIS_IP=conf.getString("jedis.ip","www.chuyinkeji.cn");
+        JEDIS_IP=conf.getString("jedis.ip","ljxy.an4.net");
         JEDIS_PORT=conf.getInt("jedis.port",6379);
         JEDIS_PASSWORD=conf.getString("jedis.password","tzh1234567890");
         JedisPoolConfig config=new JedisPoolConfig();

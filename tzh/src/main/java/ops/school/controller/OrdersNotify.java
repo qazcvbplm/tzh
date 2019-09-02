@@ -38,7 +38,7 @@ public class OrdersNotify {
     @Autowired
     private TOrdersService tOrdersService;
 
-	public static final String URL="https://www.chuyinkeji.cn/ops/";
+	public static final String URL="https://ljxy.an4.net/ops/";
 
 	@RequestMapping("takeout")
 	@ApiOperation(value="",hidden=true)

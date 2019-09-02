@@ -101,18 +101,7 @@ public class WxUserServiceImple extends ServiceImpl<WxUserMapper, WxUser> implem
 
     @Override
     public WxUser findById(String openId) {
-        if (SpringUtil.redisCache()) {
-            Object rs =  stringRedisTemplate.boundHashOps("WX_USER_LIST").get(openId);
-            if (rs != null && !"null".equals(rs)) {
-                return JSON.parseObject(String.valueOf(rs), WxUser.class);
-            } else {
-                WxUser wxUser = wxUserMapper.selectByPrimaryKey(openId);
-                if (wxUser != null){
-                    stringRedisTemplate.boundHashOps("WX_USER_LIST").put(openId, JSON.toJSONString(wxUser));
-                }
-                return wxUser;
-            }
-        }
+
         return wxUserMapper.selectById(openId);
     }
 

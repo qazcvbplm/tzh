@@ -41,7 +41,7 @@ public class School extends Base implements Serializable {
     private BigDecimal sendPerMoney;
     @NotBlank
     private String wxAppId;
-    @NotBlank
+
     private String wxMessageTemplateId;
     @NotBlank
     private String wxSecret;
