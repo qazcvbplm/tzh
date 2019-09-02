@@ -1,16 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ops.school.api.dao.DayLogTakeoutMapper">
-    <resultMap id="BaseResultMap" type="ops.school.api.entity.DayLogTakeout">
-        <id column="Id" jdbcType="INTEGER" property="id"/>
-        <result column="self_name" jdbcType="VARCHAR" property="selfName"/>
-        <result column="self_id" jdbcType="INTEGER" property="selfId"/>
-        <result column="day" jdbcType="VARCHAR" property="day"/>
-        <result column="total_count" jdbcType="INTEGER" property="totalCount"/>
-        <result column="total_price" jdbcType="DECIMAL" property="totalPrice"/>
-        <result column="self_get" jdbcType="DECIMAL" property="selfGet"/>
-        <result column="parent_get" jdbcType="DECIMAL" property="parentGet"/>
-        <result column="takeout_total_count" jdbcType="INTEGER" property="takeoutTotalCount"/>
-        <result column="selfget_total_count" jdbcType="INTEGER" property="selfgetTotalCount"/>
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.DayLogTakeout" >
+        <id column="Id" property="id" jdbcType="INTEGER" />
+        <result column="self_name" property="selfName" jdbcType="VARCHAR" />
+        <result column="self_id" property="selfId" jdbcType="INTEGER" />
+        <result column="day" property="day" jdbcType="VARCHAR" />
+        <result column="total_count" property="totalCount" jdbcType="INTEGER" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="self_get" property="selfGet" jdbcType="DECIMAL" />
+        <result column="parent_get" property="parentGet" jdbcType="DECIMAL" />
+        <result column="takeout_total_count" property="takeoutTotalCount" jdbcType="INTEGER" />
+        <result column="selfget_total_count" property="selfgetTotalCount" jdbcType="INTEGER" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+        <result column="box_price" property="boxPrice" jdbcType="DECIMAL" />
+        <result column="send_price" property="sendPrice" jdbcType="DECIMAL" />
+        <result column="product_price" property="productPrice" jdbcType="DECIMAL" />
+        <result column="wx_pay_get" property="wxPayGet" jdbcType="DECIMAL" />
+        <result column="bell_pay_get" property="bellPayGet" jdbcType="DECIMAL" />
+        <result column="used_coupon" property="usedCoupon" jdbcType="DECIMAL" />
+        <result column="used_food_coupon" property="usedFoodCoupon" jdbcType="DECIMAL" />
+        <result column="used_full_cut" property="usedFullCut" jdbcType="DECIMAL" />
+        <result column="used_discount" property="usedDiscount" jdbcType="DECIMAL" />
     </resultMap>
+
+    <sql id="Base_Column_List" >
+        Id,
+        self_name,
+        self_id,
+        day,
+        total_count,
+        total_price,
+        self_get,
+        parent_get,
+        takeout_total_count,
+        selfget_total_count,
+        type,
+        parent_id,
+        box_price,
+        send_price,
+        product_price,
+        wx_pay_get,
+        bell_pay_get,
+        used_coupon,
+        used_food_coupon,
+        used_full_cut,
+        used_discount
+    </sql>
+
+    <sql id="Table_Name">
+        day_log_takeout
+    </sql>
 </mapper>

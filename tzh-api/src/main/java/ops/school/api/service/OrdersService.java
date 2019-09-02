@@ -54,4 +54,16 @@ public interface OrdersService extends IService<Orders> {
     Orders completeByShopId(Map<String, Object> map);
 
     List<Orders> completeBySchoolId(Map<String, Object> map);
+
+    /**
+     * @date:   2019/9/2 15:45
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.Orders>
+     * @param   shopId
+     * @param   orderStatus
+     * @param   endTime
+     * @Desc:   desc
+     */
+    List<Orders> selectDayDataWithComplete(Integer shopId, String orderStatus, String endTime);
 }

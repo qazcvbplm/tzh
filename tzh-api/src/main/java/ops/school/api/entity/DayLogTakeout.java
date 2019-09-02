@@ -43,6 +43,14 @@ public class DayLogTakeout {
 
     private BigDecimal bellPayGet;
 
+    private BigDecimal usedCoupon;
+
+    private BigDecimal usedFoodCoupon;
+
+    private BigDecimal usedFullCut;
+
+    private BigDecimal usedDiscount;
+
     public BigDecimal getWxPayGet() {
         return wxPayGet;
     }
@@ -139,6 +147,11 @@ public class DayLogTakeout {
         this.boxPrice = order.getBoxPrice();
         this.sendPrice = order.getSendPrice();
         this.productPrice = order.getProductPrice();
+        this.usedCoupon = order.getUsedCoupon();
+        this.usedFoodCoupon = order.getUsedFoodCoupon();
+        this.usedFullCut = order.getUsedFullCut();
+        BigDecimal dis = order.getUsedDiscount() == null ? BigDecimal.valueOf(0) : order.getUsedDiscount();
+        this.usedDiscount = dis;
         return this;
     }
 
@@ -264,5 +277,35 @@ public class DayLogTakeout {
         this.selfgetTotalCount = selfgetTotalCount;
     }
 
+    public BigDecimal getUsedCoupon() {
+        return usedCoupon;
+    }
 
+    public void setUsedCoupon(BigDecimal usedCoupon) {
+        this.usedCoupon = usedCoupon;
+    }
+
+    public BigDecimal getUsedFoodCoupon() {
+        return usedFoodCoupon;
+    }
+
+    public void setUsedFoodCoupon(BigDecimal usedFoodCoupon) {
+        this.usedFoodCoupon = usedFoodCoupon;
+    }
+
+    public BigDecimal getUsedFullCut() {
+        return usedFullCut;
+    }
+
+    public void setUsedFullCut(BigDecimal usedFullCut) {
+        this.usedFullCut = usedFullCut;
+    }
+
+    public BigDecimal getUsedDiscount() {
+        return usedDiscount;
+    }
+
+    public void setUsedDiscount(BigDecimal usedDiscount) {
+        this.usedDiscount = usedDiscount;
+    }
 }

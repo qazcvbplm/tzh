@@ -7,6 +7,7 @@ import ops.school.api.dao.OrdersMapper;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.Sender;
 import ops.school.api.entity.Shop;
+import ops.school.api.exception.Assertions;
 import ops.school.api.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -149,5 +150,11 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
     @Override
     public List<Orders> completeBySchoolId(Map<String, Object> map) {
         return ordersMapper.completeBySchoolId(map);
+    }
+
+    @Override
+    public List<Orders> selectDayDataWithComplete(Integer shopId, String orderStatus, String endTime) {
+        List<Orders> ordersList = ordersMapper.selectDayDataWithComplete(shopId,orderStatus,endTime+"%");
+        return ordersList;
     }
 }

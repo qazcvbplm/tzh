@@ -313,6 +313,19 @@ public class Orders extends Base implements Serializable {
     private OrdersComplete complete;
 
     @TableField(exist = false)
+    private BigDecimal usedCoupon;
+
+    @TableField(exist = false)
+    private BigDecimal usedFoodCoupon;
+
+    @TableField(exist = false)
+    private BigDecimal usedFullCut;
+
+    @TableField(exist = false)
+    private BigDecimal usedDiscount;
+
+
+    @TableField(exist = false)
     List<ProductOrderDTO> productOrderDTOS;
 
     private static final long serialVersionUID = 1L;
@@ -925,5 +938,37 @@ public class Orders extends Base implements Serializable {
 
     public void setWxUserPhone(String wxUserPhone) {
         this.wxUserPhone = wxUserPhone;
+    }
+
+    public BigDecimal getUsedCoupon() {
+        return usedCoupon;
+    }
+
+    public void setUsedCoupon(BigDecimal usedCoupon) {
+        this.usedCoupon = usedCoupon;
+    }
+
+    public BigDecimal getUsedFoodCoupon() {
+        return usedFoodCoupon;
+    }
+
+    public void setUsedFoodCoupon(BigDecimal usedFoodCoupon) {
+        this.usedFoodCoupon = usedFoodCoupon;
+    }
+
+    public BigDecimal getUsedFullCut() {
+        return usedFullCut;
+    }
+
+    public void setUsedFullCut(BigDecimal usedFullCut) {
+        this.usedFullCut = usedFullCut;
+    }
+
+    public BigDecimal getUsedDiscount() {
+        return usedDiscount;
+    }
+
+    public void setUsedDiscount(BigDecimal usedDiscount) {
+        this.usedDiscount = usedDiscount;
     }
 }

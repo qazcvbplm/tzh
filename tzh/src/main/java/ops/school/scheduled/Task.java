@@ -2,8 +2,10 @@ package ops.school.scheduled;
 
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.constants.RedisConstants;
+import ops.school.api.dao.OrdersCompleteMapper;
 import ops.school.api.dto.RunOrdersTj;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
@@ -35,6 +37,7 @@ public class Task {
     private ShopService shopService;
     @Autowired
     private OrdersService ordersService;
+    
     @Autowired
     private RunOrdersService runOrdersService;
     @Autowired
@@ -130,17 +133,17 @@ public class Task {
     }
 
 
-    //0 0 10,14,16 * * ?   每天上午10点，下午2点，4点
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
         long start = System.currentTimeMillis();
-        String day = getYesterdayByCalendar();
+        String day = "2019-09-02";//getYesterdayByCalendar();
         Map<String, Object> map = new HashMap<>();
         map.put("day", day + "%");
         List<School> schools = schoolService.list(new QueryWrapper<School>().lambda().eq(School::getIsDelete, 0));
         for (School schooltemp : schools) {
             List<Shop> shops = shopService.list(new QueryWrapper<Shop>().lambda().eq(Shop::getSchoolId, schooltemp.getId()));
             for (Shop shoptemp : shops) {
+
                 map.put("shopId", shoptemp.getId());
                 Orders result = ordersService.completeByShopId(map);
                 DayLogTakeout daylog = new DayLogTakeout()
@@ -151,7 +154,7 @@ public class Task {
             List<Orders> result = ordersService.completeBySchoolId(map);
             DayLogTakeout daylog = new DayLogTakeout()
                     .schoollog(schooltemp.getName(), schooltemp.getId(), day, result, "学校商铺日志", schooltemp.getAppId());
-            dayLogTakeoutService.save(daylog);
+            //dayLogTakeoutService.save(daylog);
         }
         //////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
         for (School schooltemp : schools) {

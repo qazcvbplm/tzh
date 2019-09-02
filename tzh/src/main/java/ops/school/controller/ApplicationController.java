@@ -62,7 +62,7 @@ public class ApplicationController {
 					ReplyTextMsg re;
 					List<WxUser> minUser=wxUserService.findByPhoneGZH(Content);
 					if(minUser.size()==0){
-						re=new ReplyTextMsg(ToUserName,FromUserName,"text","该号码未在客户端小程序中绑定手机号!");
+						re=new ReplyTextMsg(ToUserName,FromUserName,"text","该号码未在客户端小程序中绑定，请前往椰子校园小程序“我的”界面授权绑定手机号! 或检查输入格式：绑定13788889999");
 						return re.Msg2Xml();
 					}
 					if(minUser.size()>1){

@@ -59,12 +59,14 @@ public enum ResponseViewEnums implements RootEnums{
     ORDER_MESSAGE_NULL_SCHOOL_ID("1250009","发送微信模板消息学校信息空需要学校id"),
     ORDER_PARAM_NULL("1250010","订单信息错误，请稍后重新下单"),
     ORDER_PARAM_TIME_BEFORE("1250011","预定订单时间太早，请稍后重新下单"),
+    ORDER_USER_BELL_NULL("1250012","用户数据有误，请前往“我的”界面重新授权绑定手机号"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),
 
     /**----------7-学校信息错误-----------*/
     SCHOOL_HAD_CHANGE("1270001","学校信息发生变化，请联系后台管理"),
+    SCHOOL_CANT_BE_NULL("1270002","需要选择学校"),
 
     /**----------8-店铺信息错误-----------*/
     SHOP_HAD_CHANGE("1280001","店铺信息发生变化，请联系后台管理"),

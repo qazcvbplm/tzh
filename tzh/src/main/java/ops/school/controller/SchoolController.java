@@ -7,6 +7,7 @@ import ops.school.api.auth.JWTUtil;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.Application;
 import ops.school.api.entity.School;
+import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.service.ApplicationService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.util.BaiduUtil;
@@ -183,4 +184,5 @@ public class SchoolController {
         ResponseObject responseObject = tCouponService.bindHomeCouponsBySIdAndIds(couponDTO);
         return responseObject;
     }
+
 }

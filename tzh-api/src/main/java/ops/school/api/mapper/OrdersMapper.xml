@@ -54,6 +54,12 @@
         <result column="shop_accept_time" jdbcType="VARCHAR" property="shopAcceptTime"/>
         <result column="pay_food_coupon" jdbcType="DECIMAL" property="payFoodCoupon"/>
         <result column="after_discount_price" jdbcType="DECIMAL" property="afterDiscountPrice"/>
+
+        <result column="used_coupon" property="usedCoupon" jdbcType="DECIMAL"/>
+        <result column="used_food_coupon" property="usedFoodCoupon" jdbcType="DECIMAL"/>
+        <result column="used_full_cut" property="usedFullCut" jdbcType="DECIMAL"/>
+        <result column="used_discount" property="usedDiscount" jdbcType="DECIMAL"/>
+
         <association property="complete" javaType="ops.school.api.entity.OrdersComplete">
             <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
             <result column="app_get_school_rate" jdbcType="DECIMAL" property="appGetSchoolRate"/>
@@ -66,6 +72,7 @@
             <result column="sender_get_total" jdbcType="DECIMAL" property="senderGetTotal"/>
             <result column="shop_get_total" jdbcType="DECIMAL" property="shopGetTotal"/>
         </association>
+
         <collection property="op" ofType="ops.school.api.entity.OrderProduct"
                     select="ops.school.api.dao.OrderProductMapper.findByOrderId" column="id">
             <result column="product_name" jdbcType="VARCHAR" property="productName"/>
@@ -289,9 +296,23 @@
     <select id="completeByShopId" parameterType="map" resultMap="BaseResultMap">
   select count(o.id) as remark,sum(o.pay_price) as pay_price,sum(box_price) as box_price,sum(send_price) as send_price,sum(product_price) as product_price
   ,sum(oc.app_get_total) as app_get_total,sum(oc.shop_get_total) as shop_get_total,
-  sum(oc.school_get_shop) as school_get_shop,sum(oc.school_get_sender) as school_get_sender,oc.app_get_school_rate
-  from orders o,orders_complete oc 
-  where oc.order_id=o.id and (o.status='已完成') and o.shop_id=#{shopId} and end_time like #{day}
+  sum(oc.school_get_shop) as school_get_shop,sum(oc.school_get_sender) as school_get_sender,oc.app_get_school_rate,
+  sum(o.coupon_used_amount) as used_coupon,
+  sum(o.full_used_amount) as used_full_cut,
+  sum(o.pay_food_coupon) as used_food_coupon,
+  (SELECT sum(orders.discount_price)
+   FROM orders,orders_complete
+   WHERE orders.discount_type = "商品折扣"
+   AND orders_complete.order_id = orders.id
+   AND orders.status = '已完成'
+   AND orders.shop_id = #{shopId}
+   AND orders.end_time like #{day}
+   ) AS used_discount
+  from orders o,orders_complete oc
+  where oc.order_id=o.id
+  and (o.status='已完成')
+  and o.shop_id=#{shopId}
+  and end_time like #{day}
   </select>
 
     <select id="completeBySchoolId" parameterType="map" resultMap="BaseResultMap">
@@ -509,5 +530,15 @@
 		 BETWEEN #{beginTime}
 		 AND #{endTime}
  </select>
+
+    <!--CreatBy Fang Time:2019/9/2 15:48 |  -->
+    <select id="selectDayDataWithComplete" resultType="ops.school.api.entity.Orders">
+        SELECT *
+        FROM orders,orders_complete
+        WHERE orders_complete.order_id = orders.id
+        AND (orders.status = #{orderStatus})
+        AND orders.shop_id=#{shopId}
+        AND orders.end_time LIKE #{endTime}
+    </select>
 
 </mapper>

@@ -65,4 +65,16 @@ public interface OrdersMapper extends BaseMapper<Orders> {
     List<Orders> findAllDjs();
 
     BigDecimal countPayPriceByFloor(Map<String,Object> map);
+
+    /**
+     * @date:   2019/9/2 15:47
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.Orders>
+     * @param   shopId
+     * @param   orderStatus
+     * @param   endTime
+     * @Desc:   desc
+     */
+    List<Orders> selectDayDataWithComplete(@Param("shopId") Integer shopId,@Param("orderStatus") String orderStatus,@Param("endTime") String endTime);
 }

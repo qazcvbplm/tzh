@@ -75,6 +75,13 @@ public class TWxUserServiceImplTest {
         //wxMessageUtil.wxSendMsg(orders,"",orders.getSchoolId());
     }
 
+    @Test
+    public void testPaySuccess(){
+        String orderId = "201908311212084831626837216";
+        String openId = "oWP5G4wITSFF8Ts7kJmjNy7E0xzQ";
+        String attach = "23";
+        tWxUserService.chargeSuccess(orderId, openId, attach);
+    }
 
 
 

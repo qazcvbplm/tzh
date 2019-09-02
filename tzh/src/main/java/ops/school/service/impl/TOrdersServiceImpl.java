@@ -489,6 +489,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         QueryWrapper<WxUserBell> query = new QueryWrapper<>();
         query.lambda().eq(WxUserBell::getPhone, wxUser.getOpenId() + "-" + wxUser.getPhone());
         WxUserBell wxUserBell = wxUserBellService.getOne(query);
+        Assertions.notNull(wxUserBell,ResponseViewEnums.ORDER_USER_BELL_NULL);
         if (wxUserBell != null) {
             if (wxUserBell.getFoodCoupon().compareTo(BigDecimal.ZERO) == 1) {
                 // 折后价格-优惠券+餐盒费+配送费 >= 粮票

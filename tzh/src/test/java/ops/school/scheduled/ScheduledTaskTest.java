@@ -43,10 +43,10 @@ public class ScheduledTaskTest{
         task.wxUserCouponInvalid();
     }
 
-//    @Test
-//    public void printTask(){
-//        printTask.doFailedPrintToWaitQueue();
-//    }
+    @Test
+    public void taskCom(){
+        task.jisuan();
+    }
 
 
 }
