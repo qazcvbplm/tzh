@@ -80,6 +80,16 @@ public class School extends Base implements Serializable {
 
     private Integer yesWaterOne;
 
+    private String senderTencentGroup;
+
+    public String getSenderTencentGroup() {
+        return senderTencentGroup;
+    }
+
+    public void setSenderTencentGroup(String senderTencentGroup) {
+        this.senderTencentGroup = senderTencentGroup;
+    }
+
     public BigDecimal getSmallMinAmount() {
         return smallMinAmount;
     }

@@ -38,6 +38,8 @@
         <result column="extra_large_min_amount" property="extraLargeMinAmount" jdbcType="DECIMAL" />
 
         <result column="yes_water_one" property="yesWaterOne" jdbcType="INTEGER" />
+        <result column="sender_tencent_group" property="senderTencentGroup" jdbcType="VARCHAR" />
+
     </resultMap>
 
     <sql id="Base_Column_List" >
@@ -74,6 +76,7 @@
         middle_min_amount,
         large_min_amount,
         extra_large_min_amount,
+        sender_tencent_group,
         yes_water_one
     </sql>
 
@@ -243,6 +246,9 @@
             </if>
             <if test="yesWaterOne != null">
                 yes_water_one = #{yesWaterOne},
+            </if>
+            <if test="senderTencentGroup != null">
+                sender_tencent_group = #{senderTencentGroup},
             </if>
 
             middle_min_amount = #{middleMinAmount}
