@@ -1,6 +1,7 @@
 package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.dto.RunOrdersTj;
 
@@ -50,6 +51,17 @@ public class DayLogTakeout {
     private BigDecimal usedFullCut;
 
     private BigDecimal usedDiscount;
+
+    @TableField(exist = false)
+    private Integer isDelete;
+
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
+    }
 
     public BigDecimal getWxPayGet() {
         return wxPayGet;

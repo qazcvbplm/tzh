@@ -75,47 +75,40 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
 //        }
         List<WxUserCoupon> wxUserCoupons = wxUserCouponMapper.selectAllUserCoupons(wxUserId,shopId);
         if (wxUserCoupons.size() < NumConstants.INT_NUM_1){
-            return wxUserCoupons;
+            return new ArrayList<>();
         }
         List<Long> couponIdS = PublicUtilS.getValueList(wxUserCoupons,"couponId");
         if (couponIdS.size() < NumConstants.INT_NUM_1){
-            return wxUserCoupons;
+            return new ArrayList<>();
         }
         List<ShopCoupon> shopCouponList = shopCouponMapper.batchFindSCByCouponIdSAndShopId(couponIdS,shopId);
-        if (shopCouponList.size() < NumConstants.INT_NUM_1){
-            return wxUserCoupons;
-        }
         List<WxUserCoupon> resultWXCouponList = new ArrayList<>();
         for (WxUserCoupon wxUserCoupon : wxUserCoupons) {
-            for (ShopCoupon shopCoupon : shopCouponList) {
-                if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_HOME ){
-                    //如果是优惠券id是一样的，
-                    if (wxUserCoupon.getCouponId().intValue() == shopCoupon.getCouponId().intValue()){
-                        //如果是优惠卷是1 并且优惠卷是一张，并且shopid是当前shopid就是传的值
-                        if (shopId.intValue() == shopCoupon.getShopId().intValue()){
+            if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_SHOP || wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_HOME){
+                for (ShopCoupon shopCoupon : shopCouponList) {
+                    if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_HOME ){
+                        //如果是优惠券id是一样的，
+                        if (wxUserCoupon.getCouponId().intValue() == shopCoupon.getCouponId().intValue()){
+                            //如果是优惠卷是1 并且优惠卷是一张，并且shopid是当前shopid就是传的值
+                            if (shopId.intValue() == shopCoupon.getShopId().intValue()){
+                                resultWXCouponList.add(wxUserCoupon);
+                                break;
+                            }
+
+                        }
+                    }else if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_SHOP){
+                        // 如果类型是0 并且是当前店铺的，就是传过来的id
+                        if (wxUserCoupon.getShopId().intValue() == shopId.intValue()){
                             resultWXCouponList.add(wxUserCoupon);
                             break;
                         }
-
                     }
-                }else if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_SHOP){
-                    // 如果类型是0 并且是当前店铺的，就是传过来的id
-                    if (wxUserCoupon.getShopId().intValue() == shopId.intValue()){
-                        resultWXCouponList.add(wxUserCoupon);
-                        break;
-                    }
-                }
-                else {
+                } //for
+            }else {
                 //如果是2的直接返回
                 resultWXCouponList.add(wxUserCoupon);
-                break;
             }
-
-            } //for
         }
-//        if (SpringUtil.redisCache()){
-//            stringRedisTemplate.boundHashOps("WX_USER_CAN_USE_COUPONS_LIST").put(wxUserId.toString(), JSON.toJSONString(resultWXCouponList));
-//        }
         return resultWXCouponList;
     }
 

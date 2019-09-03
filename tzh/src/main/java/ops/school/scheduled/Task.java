@@ -153,7 +153,7 @@ public class Task {
             List<Orders> result = ordersService.completeBySchoolId(map);
             DayLogTakeout daylog = new DayLogTakeout()
                     .schoollog(schooltemp.getName(), schooltemp.getId(), day, result, "学校商铺日志", schooltemp.getAppId());
-            //dayLogTakeoutService.save(daylog);
+            dayLogTakeoutService.save(daylog);
         }
         //////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
         for (School schooltemp : schools) {
