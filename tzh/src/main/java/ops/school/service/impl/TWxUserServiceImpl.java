@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.Server;
 import ops.school.api.dao.WxUserBellMapper;
+import ops.school.api.dto.BackBellDTO;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
 import ops.school.api.util.LoggerUtil;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -231,5 +233,133 @@ public class TWxUserServiceImpl implements TWxUserService {
             LoggerUtil.logError("decryptPhone"+e.getMessage());
         }
         return 1;
+    }
+
+
+    /**
+     * @date:   2019/9/3 18:20
+     * @author: QinDaoFang
+     * @version:version
+     * @return: void
+     * @param
+     * @Desc:   desc
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateBackDataFromOldToNewByPhone() {
+        Integer sumUpdate = 0;
+        Integer allNum = wxUserBellMapper.countOldData();
+        BigDecimal beforeUpdateMoney = wxUserBellMapper.beforeUpdateMoney();
+        List<BackBellDTO> oldDataList = wxUserBellMapper.findOldAllList();
+        for (BackBellDTO old : oldDataList) {
+            //获取手机
+            QueryWrapper<WxUserBell> wrapper = new QueryWrapper<>();
+            String phone = old.getPhone().substring(29);
+            wrapper.like("phone",phone);
+            wrapper.eq("money",0);
+            List<WxUserBell> wxUserBells =  wxUserBellMapper.selectList(wrapper);
+            WxUserBell newbell = null;
+            if (wxUserBells.size() < 1){
+                LoggerUtil.logError("BELL-更新数据-新数据失败-新数据空phone="+phone);
+                continue;
+            }
+            //获取新的bell
+            if (wxUserBells.size() > 1){
+                for (WxUserBell wxUserBell : wxUserBells) {
+                    if (wxUserBell.getSource() > 0){
+                        newbell = wxUserBell;
+                    }
+                }
+            }else {
+                newbell = wxUserBells.get(0);
+            }
+            if (newbell == null){
+                LoggerUtil.logError("BELL-更新数据-新数据失败-新数据空phone="+phone);
+                continue;
+            }
+            //加钱
+            newbell.setMoney(newbell.getMoney().add(old.getMoney()));
+            //更新
+            WxUserBell updateBell = new WxUserBell();
+            updateBell.setPhone(newbell.getPhone());
+            updateBell.setMoney(newbell.getMoney());
+            int updateNewNum = wxUserBellMapper.updateById(updateBell);
+            if (updateNewNum != 1){
+                LoggerUtil.logError("BELL-更新数据-新数据失败-更新失败"+newbell.toString());
+                continue;
+            }
+            LoggerUtil.logError("BELL-更新数据-新数据失败-更新成功"+newbell.toString());
+            //更新老的数据
+            int updateOldNum = wxUserBellMapper.updateOldMoneyTo0(old.getPhone());
+            if (updateOldNum != 1){
+                LoggerUtil.logError("BELL-更新数据-旧数据失败-更新失败"+old.getPhone());
+                continue;
+            }
+            LoggerUtil.logError("BELL-更新数据-旧数据失败-更新成功"+old.getPhone());
+            sumUpdate++;
+        }
+        BigDecimal afterUpdateMoney = wxUserBellMapper.beforeUpdateMoney();
+        LoggerUtil.logError("BELL-更新数据-更新条数"+sumUpdate+"总条数+"+oldDataList.size()+"-更新前old数据库的钱-"+beforeUpdateMoney+"-更新后old数据库的钱-"+afterUpdateMoney);
+    }
+
+    /**
+     * @date:   2019/9/3 18:20
+     * @author: QinDaoFang
+     * @version:version
+     * @return: void
+     * @param
+     * @Desc:   desc
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateDataSourceFromOldToNewByPhone() {
+        Integer sumUpdate = 0;
+        Integer beforeUpdateMoney = wxUserBellMapper.beforeUpdateSource();
+        List<BackBellDTO> oldDataList = wxUserBellMapper.findOldAllListSource();
+        for (BackBellDTO old : oldDataList) {
+            //获取手机
+            QueryWrapper<WxUserBell> wrapper = new QueryWrapper<>();
+            String phone = old.getPhone().substring(29);
+            wrapper.like("phone",phone);
+            List<WxUserBell> wxUserBells =  wxUserBellMapper.selectList(wrapper);
+            WxUserBell newbell = null;
+            if (wxUserBells.size() < 1){
+                LoggerUtil.logError("BELL-更新数据-新数据失败-新数据空phone="+phone);
+                continue;
+            }
+            //获取新的bell
+            if (wxUserBells.size() > 1){
+                LoggerUtil.logError("BELL-更新数据-新数据失败-有多条数据phone="+phone);
+                continue;
+            }else {
+                newbell = wxUserBells.get(0);
+            }
+            if (newbell == null){
+                LoggerUtil.logError("BELL-更新数据-新数据失败-新数据空phone="+phone);
+                continue;
+            }
+            //加积分
+            newbell.setSource(newbell.getSource()+(old.getSource()));
+            //更新
+            WxUserBell updateBell = new WxUserBell();
+            updateBell.setPhone(newbell.getPhone());
+            updateBell.setSource(newbell.getSource());
+            int updateNewNum = wxUserBellMapper.updateById(updateBell);
+            if (updateNewNum != 1){
+                LoggerUtil.logError("BELL-更新数据-新数据失败-更新失败"+newbell.toString());
+                continue;
+            }
+            LoggerUtil.logError("BELL-更新数据-新数据失败-更新成功"+newbell.toString());
+            //更新老的数据
+            int updateOldNum = wxUserBellMapper.updateOldSourceTo0(old.getPhone());
+            if (updateOldNum != 1){
+                LoggerUtil.logError("BELL-更新数据-旧数据失败-更新失败"+old.getPhone());
+                continue;
+            }
+            LoggerUtil.logError("BELL-更新数据-旧数据失败-更新成功"+old.getPhone());
+            sumUpdate++;
+        }
+        Integer afterUpdateMoney = wxUserBellMapper.beforeUpdateSource();
+        LoggerUtil.logError("BELL-更新数据-更新条数"+sumUpdate+"总条数+"+oldDataList.size()+"-更新前old数据库的钱-"+beforeUpdateMoney+"-更新后old数据库的钱-"+afterUpdateMoney);
     }
 }

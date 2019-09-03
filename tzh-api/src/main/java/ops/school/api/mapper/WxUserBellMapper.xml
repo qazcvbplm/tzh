@@ -113,4 +113,54 @@
          set phone=#{phone}
          where id = #{id}
     </update>
+
+    <!--CreatBy Fang Time:2019/9/3 18:50 |  -->
+    <update id="updateOldMoneyTo0">
+        update back_bell
+        set money = -1
+        WHERE phone= #{phone}
+    </update>
+    <!--CreatBy Fang Time:2019/9/3 20:59 |  -->
+    <select id="beforeUpdateSource" resultType="integer">
+        SELECT sum(source)
+        FROM back_bell
+        WHERE source > 0
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 21:04 |  -->
+    <update id="updateOldSourceTo0">
+        update back_bell
+        set source = -1
+        WHERE phone= #{phone}
+    </update>
+
+    <select id="beforeUpdateMoney" resultType="decimal">
+        SELECT sum(money)
+        FROM back_bell
+        WHERE money > 0
+        <![CDATA[  AND money <5 ]]>
+    </select>
+
+
+    <select id="countOldData" resultType="integer">
+        SELECT count(1)
+        FROM back_bell
+        WHERE money > 0
+        <![CDATA[  AND money <5 ]]>
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 18:31 |  -->
+    <select id="findOldAllList" resultType="ops.school.api.dto.BackBellDTO">
+        SELECT *
+        FROM back_bell
+        WHERE money > 0
+        <![CDATA[  AND money < 5 ]]>
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 21:01 |  -->
+    <select id="findOldAllListSource" resultType="ops.school.api.dto.BackBellDTO">
+        SELECT *
+        FROM back_bell
+        WHERE source > 0
+    </select>
 </mapper>

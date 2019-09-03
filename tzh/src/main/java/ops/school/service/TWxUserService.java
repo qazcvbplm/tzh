@@ -14,4 +14,24 @@ public interface TWxUserService {
     void chargeSuccess(String orderId, String openId, String attach);
 
     int decryptPhone(String decryptData,String sessionKey, String ivData, String openid);
+
+    /**
+     * @date:   2019/9/3 18:20
+     * @author: QinDaoFang
+     * @version:version
+     * @return: void
+     * @param
+     * @Desc:   desc
+     */
+    void updateBackDataFromOldToNewByPhone();
+
+    /**
+     * @date:   2019/9/3 20:57
+     * @author: QinDaoFang
+     * @version:version
+     * @return: void
+     * @param
+     * @Desc:   desc
+     */
+    void updateDataSourceFromOldToNewByPhone();
 }

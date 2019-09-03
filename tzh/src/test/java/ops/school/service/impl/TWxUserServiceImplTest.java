@@ -83,6 +83,15 @@ public class TWxUserServiceImplTest {
         tWxUserService.chargeSuccess(orderId, openId, attach);
     }
 
+//    @Test
+//    public void dataBack(){
+//        tWxUserService.updateBackDataFromOldToNewByPhone();
+//    }
+//
+//    @Test
+//    public void dataSourceBack(){
+//        tWxUserService.updateDataSourceFromOldToNewByPhone();
+//    }
 
 
 

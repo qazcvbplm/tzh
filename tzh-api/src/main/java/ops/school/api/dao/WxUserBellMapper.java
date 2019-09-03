@@ -1,11 +1,13 @@
 package ops.school.api.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import ops.school.api.dto.BackBellDTO;
 import ops.school.api.entity.WxUserBell;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 public interface WxUserBellMapper extends BaseMapper<WxUserBell> {
@@ -61,4 +63,18 @@ public interface WxUserBellMapper extends BaseMapper<WxUserBell> {
     Integer addSourceByWxId(@Param("source") Integer source, @Param("wxUserId") Long wxUserId);
 
     int updatePhoneById(@Param("phone") String updatePhone, @Param("id") Long id);
+
+    Integer countOldData();
+
+    List<BackBellDTO> findOldAllList();
+
+    int updateOldMoneyTo0(String phone);
+
+    BigDecimal beforeUpdateMoney();
+
+    Integer beforeUpdateSource();
+
+    List<BackBellDTO> findOldAllListSource();
+
+    int updateOldSourceTo0(String phone);
 }
