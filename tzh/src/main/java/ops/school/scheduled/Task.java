@@ -136,14 +136,13 @@ public class Task {
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
         long start = System.currentTimeMillis();
-        String day = "2019-09-02";//getYesterdayByCalendar();
+        String day = getYesterdayByCalendar();
         Map<String, Object> map = new HashMap<>();
         map.put("day", day + "%");
         List<School> schools = schoolService.list(new QueryWrapper<School>().lambda().eq(School::getIsDelete, 0));
         for (School schooltemp : schools) {
             List<Shop> shops = shopService.list(new QueryWrapper<Shop>().lambda().eq(Shop::getSchoolId, schooltemp.getId()));
             for (Shop shoptemp : shops) {
-
                 map.put("shopId", shoptemp.getId());
                 Orders result = ordersService.completeByShopId(map);
                 DayLogTakeout daylog = new DayLogTakeout()
