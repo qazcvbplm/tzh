@@ -166,7 +166,9 @@
     <!--修改用户优惠券is_invalid状态-->
     <update id="updateOnee" parameterType="ops.school.api.entity.WxUserCoupon">
         UPDATE <include refid="Table_Name"/>
-        set is_invalid = #{isInvalid}
+        set
+        use_time = now(),
+        is_invalid = #{isInvalid}
         where id = #{id}
     </update>
 
@@ -264,6 +266,21 @@
         WHERE is_invalid = 0
         AND failure_time <![CDATA[ < ]]> now()
         LIMIT 0,1000
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 23:52 |  -->
+    <select id="selectAllUserCouponsBySchool" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM wx_user_coupon,coupon
+        WHERE
+        wx_user_coupon.coupon_id = coupon.id
+        AND wx_user_coupon.is_invalid = 0
+        AND coupon.is_invalid = 0
+        AND coupon.is_delete = 0
+        AND wx_user_coupon.wx_user_id = #{wxUserId}
+        AND coupon.school_id = #{schoolId}
+        AND wx_user_coupon.is_invalid = 0
+        ORDER BY wx_user_coupon.failure_time DESC
     </select>
 
     <update id="batchUpdateToUnInvalidByIds">

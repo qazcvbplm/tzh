@@ -437,6 +437,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         payPrice = beforeCouponPrice;
         //优惠券id是wx的wxCouponId
         WxUserCoupon wxUserCoupon = null;
+        Coupon coupon = null;
         if (orders.getCouponId() != null && orders.getCouponId() != 0) {
             wxUserCoupon = wxUserCouponService.getById(orders.getCouponId());
             // 当前时间戳
@@ -444,8 +445,14 @@ public class TOrdersServiceImpl implements TOrdersService {
             // 用户优惠券失效 >= 当前时间
             if (wxUserCoupon != null && wxUserCoupon.getIsInvalid() == 0 && wxUserCoupon.getFailureTime().getTime() >= currentTime) {
                 //注释
-                Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
-                //判断优惠券类型是
+                coupon = couponService.getById(wxUserCoupon.getCouponId());
+                if (coupon == null || coupon.getIsInvalid().intValue() == NumConstants.DB_TABLE_IS_INVALID_NO){
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.COUPON_CANT_USE);
+                }
+                //判断优惠券类型是，不能在当前学校和店铺使用
+                if(coupon.getSchoolId().intValue() != school.getId().intValue()){
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.COUPON_CANT_USE_THIS_SCHOOL);
+                }
                 if (coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_SHOP || coupon.getCouponType().intValue() == CouponConstants.COUPON_TYPE_HOME) {
                     // 判断优惠卷只能在某个店铺使用
                     List<ShopCoupon> shopCouponList = tShopCouponService.findShopCouponBySIdAndCId(orders.getShopId(), coupon.getId());
@@ -474,9 +481,11 @@ public class TOrdersServiceImpl implements TOrdersService {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        // tWxUserCouponService.updateIsInvalid(wxUserCoupon);
                     }
                 }
+            }else {
+                //优惠券失效不可用
+                DisplayException.throwMessageWithEnum(ResponseViewEnums.COUPON_CANT_USE_OR_PAST);
             }
         }
         // 订单原价-->原菜价+配送费+餐盒费
@@ -584,7 +593,6 @@ public class TOrdersServiceImpl implements TOrdersService {
         //用户优惠券失效逻辑,如果用户的优惠券是生效的IsInvalid=0
         if (wxUserCoupon != null) {
             // 优惠券
-            Coupon coupon = couponService.getById(wxUserCoupon.getCouponId());
             if (coupon != null && coupon.getIsInvalid() != 1) {
                 wxUserCoupon.setIsInvalid(NumConstants.DB_TABLE_IS_INVALID_NO);
                 int updateUserCouponNum = tWxUserCouponService.updateIsInvalid(wxUserCoupon);

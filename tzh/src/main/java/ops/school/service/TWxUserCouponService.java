@@ -100,4 +100,16 @@ public interface TWxUserCouponService {
      * @Desc:   desc
      */
     Integer batchUpdateToUnInvalidByIds(List<Long> idList);
+
+    /**
+     * @date:   2019/9/3 23:44
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.WxUserCoupon>
+     * @param   wxUserId
+     * @param   shopId
+     * @param   schoolId
+     * @Desc:   desc
+     */
+    List<WxUserCoupon> findUserCouponBySchool(Long wxUserId, Long shopId, Integer schoolId);
 }

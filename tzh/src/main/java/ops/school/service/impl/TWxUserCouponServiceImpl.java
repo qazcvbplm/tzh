@@ -11,6 +11,8 @@ import ops.school.api.entity.ShopCoupon;
 import ops.school.api.entity.WxUserCoupon;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
+import ops.school.api.service.ShopService;
+import ops.school.api.service.WxUserService;
 import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.SpringUtil;
 import ops.school.api.constants.CouponConstants;
@@ -37,6 +39,12 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private WxUserService wxUserService;
+
+    @Autowired
+    private ShopService shopService;
 
     @Override
     public List<WxUserCoupon> findInvalidUserCoupon() {
@@ -67,12 +75,6 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
     @Override
     public List<WxUserCoupon> findUserCoupon(Long wxUserId, Long shopId) {
         Assertions.notNull(wxUserId,shopId);
-//        if (SpringUtil.redisCache()){
-//            String cacheList = (String) stringRedisTemplate.opsForHash().get("WX_USER_CAN_USE_COUPONS_LIST",wxUserId.toString());
-//            if (cacheList != null){
-//                return JSON.parseArray(cacheList, WxUserCoupon.class);
-//            }
-//        }
         List<WxUserCoupon> wxUserCoupons = wxUserCouponMapper.selectAllUserCoupons(wxUserId,shopId);
         if (wxUserCoupons.size() < NumConstants.INT_NUM_1){
             return new ArrayList<>();
@@ -234,5 +236,65 @@ public class TWxUserCouponServiceImpl implements TWxUserCouponService {
         }
         Integer updateNum = wxUserCouponMapper.batchUpdateToUnInvalidByIds(idList);
         return updateNum;
+    }
+
+    /**
+     * @date:   2019/9/3 23:48
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.WxUserCoupon>
+     * @param   wxUserId
+     * @param   shopId
+     * @param   schoolId
+     * @Desc:   desc
+     */
+    @Override
+    public List<WxUserCoupon> findUserCouponBySchool(Long wxUserId, Long shopId, Integer schoolId) {
+        Assertions.notNull(wxUserId);
+        Assertions.notNull(shopId);
+        if (schoolId == null || schoolId == 0){
+            Shop shop = shopService.getById(shopId);
+            Assertions.notNull(shop,ResponseViewEnums.SHOP_HAD_CHANGE);
+            Assertions.notNull(shop.getSchoolId(),ResponseViewEnums.SHOP_HAD_CHANGE);
+            schoolId = shop.getSchoolId();
+        }
+        List<WxUserCoupon> wxUserCoupons = wxUserCouponMapper.selectAllUserCouponsBySchool(wxUserId,shopId,schoolId);
+        if (wxUserCoupons.size() < NumConstants.INT_NUM_1){
+            return new ArrayList<>();
+        }
+        List<Long> couponIdS = PublicUtilS.getValueList(wxUserCoupons,"couponId");
+        if (couponIdS.size() < NumConstants.INT_NUM_1){
+            return new ArrayList<>();
+        }
+        List<ShopCoupon> shopCouponList = shopCouponMapper.batchFindSCByCouponIdSAndShopId(couponIdS,shopId);
+        List<WxUserCoupon> resultWXCouponList = new ArrayList<>();
+        for (WxUserCoupon wxUserCoupon : wxUserCoupons) {
+            if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_SHOP || wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_HOME){
+                for (ShopCoupon shopCoupon : shopCouponList) {
+                    //如果是1，wxcoupon村的是shopId-1，不能比较
+                    if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_HOME ){
+                        //如果是优惠券id是一样的，
+                        if (wxUserCoupon.getCouponId().intValue() == shopCoupon.getCouponId().intValue()){
+                            //如果是优惠卷是1 并且优惠卷是一张，并且shopid是当前shopid就是传的值
+                            if (shopId.intValue() == shopCoupon.getShopId().intValue()){
+                                resultWXCouponList.add(wxUserCoupon);
+                                break;
+                            }
+
+                        }
+                    }else if (wxUserCoupon.getCoupon().getCouponType() == CouponConstants.COUPON_TYPE_SHOP){
+                        // 如果类型是0 并且是当前店铺的，就是传过来的id
+                        if ((wxUserCoupon.getCouponId().intValue() == shopCoupon.getCouponId().intValue())&&(wxUserCoupon.getShopId().intValue() == shopCoupon.getShopId().intValue()) && (shopCoupon.getShopId().intValue() == shopId.intValue())){
+                            resultWXCouponList.add(wxUserCoupon);
+                            break;
+                        }
+                    }
+                } //for
+            }else {
+                //如果是2的直接返回
+                resultWXCouponList.add(wxUserCoupon);
+            }
+        }
+        return resultWXCouponList;
     }
 }

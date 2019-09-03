@@ -63,8 +63,8 @@ public class DayLogController {
         }
         Map<Integer,Shop> shopMap = PublicUtilS.listForMapValueE(shopList,"id");
         for (DayLogTakeout dayLog : list.getRecords()) {
-            if (shopMap.get(dayLog.getId()) != null ){
-                dayLog.setIsDelete(shopMap.get(dayLog.getId()).getIsDelete());
+            if (shopMap.get(dayLog.getSelfId()) != null ){
+                dayLog.setIsDelete(shopMap.get(dayLog.getSelfId()).getIsDelete());
             }
         }
         return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());

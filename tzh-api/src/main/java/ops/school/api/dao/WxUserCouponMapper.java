@@ -162,4 +162,16 @@ public interface WxUserCouponMapper extends BaseMapper<WxUserCoupon> {
      * @Desc:   desc
      */
     Integer batchUpdateToUnInvalidByIds(@Param("list") List<Long> list);
+
+    /**
+     * @date:   2019/9/3 23:51
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.entity.WxUserCoupon>
+     * @param   wxUserId
+     * @param   shopId
+     * @param   schoolId
+     * @Desc:   desc
+     */
+    List<WxUserCoupon> selectAllUserCouponsBySchool(@Param("wxUserId") Long wxUserId,@Param("shopId") Long shopId, @Param("schoolId")Integer schoolId);
 }

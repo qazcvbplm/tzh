@@ -39,6 +39,9 @@ public enum ResponseViewEnums implements RootEnums{
     COUPON_FIND_NEED_ID("1230006","优惠券查询需要优惠券id"),
     COUPON_TYPE_SHOP_NEED_SHOP_ID("1230007","优惠券查询需要优惠券id"),
     COUPON_CANT_USE_THIS_SHOP("1230008","这优惠卷不能用在当前店铺"),
+    COUPON_CANT_USE_THIS_SCHOOL("1230009","这优惠卷不能用在当前学校"),
+    COUPON_CANT_USE_OR_PAST("1230010","优惠卷不可用，过期或者失效"),
+    COUPON_CANT_USE("1230011","优惠卷失效无法使用"),
 
     /**----------4-微信用户错误-----------*/
     WX_USER_NO_EXIST("1240001","微信用户不存在，更新后操作"),

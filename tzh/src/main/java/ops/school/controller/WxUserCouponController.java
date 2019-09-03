@@ -89,8 +89,12 @@ public class WxUserCouponController {
      */
     @ResponseBody
     @RequestMapping(value = "findWxUserCoupons", method = RequestMethod.POST)
-    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId, @RequestParam String shopId){
-        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCoupon(Long.valueOf(wxUserId),Long.valueOf(shopId));
+    public ResponseObject findWxUserCoupons(@RequestParam String wxUserId, @RequestParam String shopId,@RequestParam(required = false) Integer schoolId){
+        Integer scId = null;
+        if (schoolId != null){
+            scId = schoolId;
+        }
+        List<WxUserCoupon> wxUserCoupons = tWxUserCouponService.findUserCouponBySchool(Long.valueOf(wxUserId),Long.valueOf(shopId),scId);
         return new ResponseObject(true,"查询成功").push("list",wxUserCoupons);
     }
 
