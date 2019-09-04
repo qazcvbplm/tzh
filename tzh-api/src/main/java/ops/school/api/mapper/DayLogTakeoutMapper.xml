@@ -23,6 +23,7 @@
         <result column="used_food_coupon" property="usedFoodCoupon" jdbcType="DECIMAL" />
         <result column="used_full_cut" property="usedFullCut" jdbcType="DECIMAL" />
         <result column="used_discount" property="usedDiscount" jdbcType="DECIMAL" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List" >

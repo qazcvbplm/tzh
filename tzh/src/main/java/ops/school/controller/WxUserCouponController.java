@@ -48,7 +48,7 @@ public class WxUserCouponController {
      */
     @ApiOperation(value="分页查询用户所有的优惠券（isInvalid不传查所有，传0查有效）",httpMethod="POST")
     @ResponseBody
-    @RequestMapping(value = "page", method = RequestMethod.POST)
+    @RequestMapping(value = "/page", method = RequestMethod.POST)
     public ResponseObject pageFindALLCouponsByUserId(Long userId,WxUserCoupon wxUserCoupon) {
         Assertions.notNull(userId, ResponseViewEnums.WX_USER_NEED_USER_ID);
         IPage<WxUserCoupon> resultList= tWxUserCouponService.pageFindALLCouponsByUserId(userId,wxUserCoupon);

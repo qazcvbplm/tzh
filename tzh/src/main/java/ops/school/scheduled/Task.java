@@ -139,7 +139,9 @@ public class Task {
         String day = getYesterdayByCalendar();
         Map<String, Object> map = new HashMap<>();
         map.put("day", day + "%");
-        List<School> schools = schoolService.list(new QueryWrapper<School>().lambda().eq(School::getIsDelete, 0));
+        QueryWrapper<School> wrapper = new QueryWrapper<School>();
+        wrapper.lambda().eq(School::getIsDelete, 0);
+        List<School> schools = schoolService.list(wrapper);
         for (School schooltemp : schools) {
             List<Shop> shops = shopService.list(new QueryWrapper<Shop>().lambda().eq(Shop::getSchoolId, schooltemp.getId()));
             for (Shop shoptemp : shops) {

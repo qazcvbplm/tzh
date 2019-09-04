@@ -27,7 +27,7 @@ public class TxLogController {
 
     @ApiOperation(value = "查询", httpMethod = "POST")
 	@PostMapping("/find")
-	public ResponseObject find(String appId, String schoolId, int page, int size){
+	public ResponseObject find(String appId, String schoolId, int page, int size,String txName){
 		if (appId == null && schoolId == null) {
 			return new ResponseObject(false, "");
 		}
@@ -38,6 +38,9 @@ public class TxLogController {
 		if(appId!=null)
 			query.lambda().eq(TxLog::getAppId, appId);
 		query.lambda().orderByDesc(TxLog::getCreateTime);
+		if (txName != null){
+			query.lambda().like(TxLog::getTxName,txName);
+		}
 		IPage<TxLog> rs = txLogService.page(PageUtil.getPage(page, size), query);
 		return new ResponseObject(true, "ok").push("list", rs.getRecords()).push("total", rs.getTotal());
 	}

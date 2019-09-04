@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.dto.RunOrdersTj;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class DayLogTakeout {
@@ -52,8 +53,21 @@ public class DayLogTakeout {
 
     private BigDecimal usedDiscount;
 
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
     @TableField(exist = false)
     private Integer isDelete;
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public Integer getIsDelete() {
         return isDelete;

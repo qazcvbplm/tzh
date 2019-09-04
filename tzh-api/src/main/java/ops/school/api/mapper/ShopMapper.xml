@@ -188,6 +188,9 @@
             <if test="id != null">
                 and shop.id = #{id,jdbcType=INTEGER}
             </if>
+            <if test="shopName != null">
+                and shop.shop_name LIKE CONCAT('%',replace(#{shopName},'%','/%'),'%') escape '/'
+            </if>
             and shop.is_delete=0
         </where>
         order by open_flag desc,sort ASC

@@ -30,6 +30,9 @@ CREATE TABLE `index_shop_product` (
 ) ENGINE = INNODB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8 COMMENT = '首页展示推荐店铺商品表';
 
 
+alter table day_log_takeout add `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间';
+
+
 
 
 insert into shop (

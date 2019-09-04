@@ -20,7 +20,7 @@ public class WxGUtil {
      * @return
      */
     public static String getAccessToken(String appid, String secert) {
-        if (token.equals("") || ((System.currentTimeMillis() - tokenTime) >= tokenTimeRefreshTime)) {
+        if ("".equals(token) || token == null || ((System.currentTimeMillis() - tokenTime) >= tokenTimeRefreshTime)) {
             String rs = HttpRequest.sendGet(tokenurl, "grant_type=client_credential&appid=" + appid + "&secret=" + secert);
             JSONObject json = JSON.parseObject(rs, JSONObject.class);
             token = json.getString("access_token");
