@@ -15,7 +15,7 @@ public class PayUtil {
      *
      * @param text�??要签名的字符�??
      * @param key               密钥
-     * @param input_charset编码格式
+     * @param input_charset 编码格式
      * @return 签名结果
      */
     public static String sign(String text, String key, String input_charset) {
@@ -28,7 +28,7 @@ public class PayUtil {
      *
      * @param text�要签名的字符
      * @param sign          签名结果
-     * @param key密钥
+     * @param key 密钥
      * @param input_charset 编码格式
      * @return 签名结果
      */
@@ -43,9 +43,9 @@ public class PayUtil {
     }
 
     /**
-     * @param requestUrl请求地址
-     * @param requestMethod请求方法
-     * @param outputStr参数
+     * @param requestUrl 请求地址
+     * @param requestMethod 请求方法
+     * @param outputStr 参数
      */
     public static String httpRequest(String requestUrl, String requestMethod, String outputStr) {
         // 创建SSLContext
@@ -83,7 +83,7 @@ public class PayUtil {
      * @param content
      * @param charset
      * @return
-     * @throws SignatureException
+     * @throws
      * @throws UnsupportedEncodingException
      */
     public static byte[] getContentBytes(String content, String charset) {

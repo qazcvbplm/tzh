@@ -10,16 +10,23 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.io.Files;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import ops.school.api.entity.Shop;
 import ops.school.api.service.ShopService;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import sun.awt.image.OffScreenImage;
 
 /**
  * Image process examples.
  */
 public class ImageUtil {
+
+    private static Logger logger = LoggerFactory.getLogger(ImageUtil.class);
 
     /**
      * 水印
@@ -41,22 +48,155 @@ public class ImageUtil {
         // 对店铺图片进行压缩
         String tempCodeImage = path + "temp" + randomNumber + ".jpg";
         // 切圆之后的图片
+        //去七牛云下载图片
         InputStream is = QiNiuUtils.downloadHttpFile(shopImage);
         try {
+            //七牛云图片处理存在本地
             Thumbnails.of(is).size(190, 190).keepAspectRatio(false).outputQuality(0.8f).toFile(tempCodeImage);
-            CircleUtil.circleUtil(tempCodeImage,100,100);
-            Thumbnails.of(codeImg).size(430, 430).keepAspectRatio(false).watermark(
-                    Positions.CENTER,
-                    ImageIO.read(new File(tempCodeImage)), 0.9f)
-                    .outputQuality(0.8f).toFile(shopCodeImage);
-        } catch (IOException e) {
+            //对图片切圆
+            BufferedImage circleCodeBufferedImage = CircleUtil.getCircledBufferedImage(tempCodeImage,100,100);
+            if (circleCodeBufferedImage == null){
+                File tempCodeFile = new File(tempCodeImage);
+                circleCodeBufferedImage = ImageIO.read(tempCodeFile);
+            }
+            if (circleCodeBufferedImage == null){
+                logger.error("pictureCombine处理图片失败-shopImage存在本地获取失败+" +shopImage+"本地+"+tempCodeImage);
+                map.put("code",0);
+                return map;
+            }
+            Thumbnails.Builder<File> thumbnails = Thumbnails.of(new File(codeImg));
+            if (thumbnails == null){
+                logger.error("pictureCombine处理图片失败-codeImger二维码图片获取失败-二维码图片获取微信的图片存本地+" +codeImg);
+                map.put("code",0);
+                return map;
+            }
+            thumbnails.size(430, 430)
+                    .keepAspectRatio(false)
+                    .watermark(Positions.CENTER,circleCodeBufferedImage, 0.9f);
+            thumbnails.outputQuality(0.8f).toFile(shopCodeImage);
+        } catch (Exception e) {
             e.printStackTrace();
+            logger.error("店铺二维码生成错误+"+e.getMessage());
             map.put("code",0);
             return map;
         }
+        delFileOne(tempCodeImage);
         map.put("code",1);
         map.put("shopCodeImage",imagePath +"yzxy" +shop.getId() + ".jpg");
         return map;
+    }
+
+
+    /**
+     * @date:   2019/9/5 11:47
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.Map<java.lang.String,java.lang.Object>
+     * @param   shopImage 店铺图片
+     * @param   shopCodeImgStream 店铺二维码图片
+     * @param   path 店铺图片与二维码合并之后的图片存放的路径
+     * @param   shop
+     * @Desc:   desc 还不可用
+     */
+    public static Map<String,Object> pictureCombineByInStream(String shopImage, InputStream shopCodeImgStream, String path, Shop shop) {
+        /**
+         * watermark(位置，水印图，透明度)
+         */
+        Map<String,Object> map = new HashMap<>();
+        String imagePath = "https://www.chuyinkeji.cn/shopbarcode/";
+        int randomNumber = (int)(Math.random() * 50 + 1);
+        // 店铺图片与二维码合并之后的图片
+        String shopCodeImage = path + "yzxy" + shop.getId() + ".jpg";
+        // 对店铺图片进行压缩
+        String tempCodeImage = path + "temp" + shop.getId() + ".jpg";
+        //本地存的微信的二维码图片
+        String wxShopCodeImg = path + shop.getId() + ".jpg";
+
+        // 切圆之后的图片
+        //去七牛云下载图片
+        InputStream is = QiNiuUtils.downloadHttpFile(shopImage);
+        try {
+            //七牛云图片处理存在本地
+            Thumbnails.of(is).size(190, 190).keepAspectRatio(false).outputQuality(0.8f).toFile(tempCodeImage);is.available();
+            //对图片切圆
+            BufferedImage circleCodeBufferedImage = CircleUtil.getCircledBufferedImage(tempCodeImage,100,100);
+            if (circleCodeBufferedImage == null){
+                File tempCodeFile = new File(tempCodeImage);
+                circleCodeBufferedImage = ImageIO.read(tempCodeFile);
+            }
+            if (circleCodeBufferedImage == null){
+                logger.error("pictureCombine处理图片失败-shopImage存在本地获取失败+" +shopImage+"本地+"+tempCodeImage);
+                map.put("code",0);
+                return map;
+            }
+            File shopCodeImgStreamFile = new File(wxShopCodeImg);
+            Thumbnails.Builder thumbnails = Thumbnails.of(wxShopCodeImg);
+            if (thumbnails == null){
+                //thumbnails = Thumbnails.of(wxShopCodeImg);
+            }
+            if (thumbnails == null){
+                logger.error("pictureCombine处理图片失败-codeImger二维码图片获取失败-二维码图片获取微信的图片inputStream");
+                map.put("code",0);
+                return map;
+            }
+            thumbnails.size(430, 430)
+                    .keepAspectRatio(false)
+                    .watermark(Positions.CENTER,circleCodeBufferedImage, 0.9f);
+            thumbnails.outputQuality(0.8f).toFile(shopCodeImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("店铺二维码生成错误+"+e.getMessage());
+            map.put("code",0);
+            return map;
+        }
+        delFileOne(tempCodeImage);
+        map.put("code",1);
+        map.put("shopCodeImage",imagePath +"yzxy" +shop.getId() + ".jpg");
+        return map;
+    }
+
+    /**
+     * @date:   2019/9/5 11:12
+     * @author: QinDaoFang
+     * @version:version
+     * @return: boolean
+     * @param   fileUrl
+     * @Desc:   desc
+     */
+    static boolean delFileOne(String fileUrl) {
+        try {
+            File file = new File(fileUrl);
+            if (!file.exists()) {
+                return false;
+            }
+            return file.delete();
+        }catch (Exception ex){
+           logger.error(ex.getMessage());
+        }
+        return false;
+
+    }
+
+    /**
+     * @date:   2019/9/5 11:12
+     * @author: QinDaoFang
+     * @version:version
+     * @return: boolean
+     * @param   fileUrl
+     * @Desc:   desc
+     */
+    static boolean delFileAll(String fileUrl) {
+        File file = new File(fileUrl);
+        if (!file.exists()) {
+            return false;
+        }
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                delFileAll(f.getPath());
+            }
+        }
+        return file.delete();
     }
 
 

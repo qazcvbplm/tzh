@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.thoughtworks.xstream.core.util.Base64Encoder;
 import ops.school.api.dto.min.MinMessageDTO;
 import ops.school.api.exception.YWException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,6 +17,9 @@ import java.util.Map;
 
 
 public class WXUtil {
+
+    private static Logger logger = LoggerFactory.getLogger(WXUtil.class);
+
     private static String openidurl = "https://api.weixin.qq.com/sns/jscode2session?appid=";
     private static String tokenurl = "https://api.weixin.qq.com/cgi-bin/token";  //获取token的api
     private static String codeurl = "https://api.weixin.qq.com/wxa/getwxacode?access_token=";                      //获取小程序二维码api
@@ -62,6 +67,49 @@ public class WXUtil {
         } else {
             return token;
         }
+    }
+
+    /**
+     * @date:   2019/9/5 11:14
+     * @author: QinDaoFang
+     * @version:version
+     * @return: int
+     * @param   appid
+     * @param   secert
+     * @param   wxPageUrl
+     * @param   path
+     * @Desc:   desc
+     */
+    public static InputStream getCodeInStream(String appid, String secert, String wxPageUrl, String path) {
+        String rs = HttpRequest.sendGet(tokenurl, "grant_type=client_credential&appid=" + appid + "&secret=" + secert);
+        JSONObject json = JSON.parseObject(rs, JSONObject.class);
+        String token = json.getString("access_token");
+        JSONObject params = new JSONObject();
+        params.put("path", wxPageUrl);
+        params.put("width", 430);
+        String u = codeurl + token;
+        InputStream in = PayUtil.httpRequest2(u, "POST", params.toString());
+        if (in == null) {
+            return null;
+        }
+        FileOutputStream fileout = null;
+        try {
+            fileout = new FileOutputStream(new File(path));
+            byte[] b = new byte[1024];
+            int len = 0;
+            while ((len = in.read(b)) != -1) {
+                fileout.write(b, 0, len);
+                fileout.flush();
+            }
+            if (fileout != null){
+                fileout.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+
+        }
+        return in;
     }
 
     /**

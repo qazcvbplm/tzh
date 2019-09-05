@@ -60,6 +60,10 @@
         <result column="used_full_cut" property="usedFullCut" jdbcType="DECIMAL"/>
         <result column="used_discount" property="usedDiscount" jdbcType="DECIMAL"/>
 
+        <result column="school_get_total" property="schoolGetTotal" jdbcType="DECIMAL"/>
+        <result column="school_day_tx" property="schoolDayTx" jdbcType="DECIMAL"/>
+        <result column="school_all_money" property="schoolAllMoney" jdbcType="DECIMAL"/>
+
         <association property="complete" javaType="ops.school.api.entity.OrdersComplete">
             <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
             <result column="app_get_school_rate" jdbcType="DECIMAL" property="appGetSchoolRate"/>
@@ -294,25 +298,41 @@
   </select>
 
     <select id="completeByShopId" parameterType="map" resultMap="BaseResultMap">
-  select count(o.id) as remark,sum(o.pay_price) as pay_price,sum(box_price) as box_price,sum(send_price) as send_price,sum(product_price) as product_price
-  ,sum(oc.app_get_total) as app_get_total,sum(oc.shop_get_total) as shop_get_total,
-  sum(oc.school_get_shop) as school_get_shop,sum(oc.school_get_sender) as school_get_sender,oc.app_get_school_rate,
-  sum(o.coupon_used_amount) as used_coupon,
-  sum(o.full_used_amount) as used_full_cut,
-  sum(o.pay_food_coupon) as used_food_coupon,
-  (SELECT sum(orders.discount_price)
-   FROM orders,orders_complete
-   WHERE orders.discount_type = "商品折扣"
-   AND orders_complete.order_id = orders.id
-   AND orders.status = '已完成'
-   AND orders.shop_id = #{shopId}
-   AND orders.end_time like #{day}
-   ) AS used_discount
-  from orders o,orders_complete oc
-  where oc.order_id=o.id
-  and (o.status='已完成')
-  and o.shop_id=#{shopId}
-  and end_time like #{day}
+  SELECT
+	count(o.id) AS remark,
+	sum(o.pay_price) AS pay_price,
+	sum(box_price) AS box_price,
+	sum(send_price) AS send_price,
+	sum(product_price) AS product_price,
+	sum(oc.app_get_total) AS app_get_total,
+	sum(oc.shop_get_total) AS shop_get_total,
+	sum(oc.school_get_shop) AS school_get_shop,
+	sum(oc.school_get_sender) AS school_get_sender,
+	oc.app_get_school_rate,
+	sum(o.coupon_used_amount) AS used_coupon,
+	sum(o.full_used_amount) AS used_full_cut,
+	sum(o.pay_food_coupon) AS used_food_coupon,
+	(
+		SELECT
+			sum(orders.discount_price)
+		FROM
+			orders,
+			orders_complete
+		WHERE
+			orders.discount_type = "商品折扣"
+		AND orders_complete.order_id = orders.id
+		AND orders. STATUS = '已完成'
+		AND orders.shop_id = #{shopId}
+		AND orders.end_time LIKE #{day}
+	) AS used_discount
+FROM
+	orders o,
+	orders_complete oc
+WHERE
+	oc.order_id = o.id
+AND (o. STATUS = '已完成')
+AND o.shop_id = #{shopId}
+AND end_time LIKE #{day}
   </select>
 
     <select id="completeBySchoolId" parameterType="map" resultMap="BaseResultMap">

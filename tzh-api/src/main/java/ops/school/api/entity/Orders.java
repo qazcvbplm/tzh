@@ -324,6 +324,15 @@ public class Orders extends Base implements Serializable {
     @TableField(exist = false)
     private BigDecimal usedDiscount;
 
+    @TableField(exist = false)
+    private BigDecimal schoolGetTotal;
+
+    @TableField(exist = false)
+    private BigDecimal schoolDayTx;
+
+    @TableField(exist = false)
+    private BigDecimal schoolAllMoney;
+
 
     @TableField(exist = false)
     List<ProductOrderDTO> productOrderDTOS;
@@ -720,6 +729,30 @@ public class Orders extends Base implements Serializable {
 
     public void setAfterDiscountPrice(BigDecimal afterDiscountPrice) {
         this.afterDiscountPrice = afterDiscountPrice;
+    }
+
+    public BigDecimal getSchoolGetTotal() {
+        return schoolGetTotal;
+    }
+
+    public void setSchoolGetTotal(BigDecimal schoolGetTotal) {
+        this.schoolGetTotal = schoolGetTotal;
+    }
+
+    public BigDecimal getSchoolDayTx() {
+        return schoolDayTx;
+    }
+
+    public void setSchoolDayTx(BigDecimal schoolDayTx) {
+        this.schoolDayTx = schoolDayTx;
+    }
+
+    public BigDecimal getSchoolAllMoney() {
+        return schoolAllMoney;
+    }
+
+    public void setSchoolAllMoney(BigDecimal schoolAllMoney) {
+        this.schoolAllMoney = schoolAllMoney;
     }
 
     @Override

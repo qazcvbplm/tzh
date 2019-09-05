@@ -10,6 +10,7 @@ import com.ibatis.common.beans.Probe;
 import com.ibatis.common.beans.ProbeFactory;
 import ops.school.api.entity.Shop;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -119,17 +120,17 @@ public class PublicUtilS {
 
 
     /**
-     * @date:   2019/7/26 17:19
+     * @param list
+     * @param keyProp
+     * @param valueProp
+     * @date: 2019/7/26 17:19
      * @author: QinDaoFang
      * @version:version
-     * @return: java.util.Map<K,java.util.List<V>>
-     * @param   list
-     * @param   keyProp
-     * @param   valueProp
-     * @Desc:   desc
+     * @return: java.util.Map<K, java.util.List < V>>
+     * @Desc: desc
      */
     @SuppressWarnings("unchecked")
-    public static <K, V, E> Map<K, List<V>> listforListMap(List<E> list,String keyProp, String valueProp) {
+    public static <K, V, E> Map<K, List<V>> listforListMap(List<E> list, String keyProp, String valueProp) {
         Map<K, List<V>> map = Collections.emptyMap();
         if (CollectionUtils.isNotEmpty(list)) {
             list.removeAll(Collections.singleton(null));
@@ -154,7 +155,7 @@ public class PublicUtilS {
     }
 
     @SuppressWarnings("unchecked")
-    public static <K, V, E> Map<K, List<V>> listforEqualKeyListMap(List<E> list,String keyProp) {
+    public static <K, V, E> Map<K, List<V>> listforEqualKeyListMap(List<E> list, String keyProp) {
         Map<K, List<V>> map = Collections.emptyMap();
         if (CollectionUtils.isNotEmpty(list)) {
             list.removeAll(Collections.singleton(null));
@@ -165,10 +166,10 @@ public class PublicUtilS {
                 value = (V) object;
                 //如果map里面有key，则取出value
                 List<V> valueListInMap = null;
-                if (map.containsKey(key)){
+                if (map.containsKey(key)) {
                     valueListInMap = map.get(key);
                     valueListInMap.add(value);
-                    map.put(key,valueListInMap);
+                    map.put(key, valueListInMap);
                     continue;
                 }
                 List<V> values = map.get(key);
@@ -184,8 +185,8 @@ public class PublicUtilS {
 
     /**
      * @author: QinDaoFang
-     * @date:   2019/7/27 12:17
-     * @desc:   特殊方法
+     * @date: 2019/7/27 12:17
+     * @desc: 特殊方法
      */
 //    @SuppressWarnings("unchecked")
 //    public static <K, V, E> Map<K, V> getCouponIdAndShopIdsString(List<E> list,String keyProp,String valueProp){
@@ -238,7 +239,7 @@ public class PublicUtilS {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                V value = (V) ((StringUtils.isEmpty(valueProp))?(object):(PROBE.getObject(object, valueProp)));
+                V value = (V) ((StringUtils.isEmpty(valueProp)) ? (object) : (PROBE.getObject(object, valueProp)));
                 if (value != null) {
                     map.put(key, value);
                 }
@@ -331,11 +332,11 @@ public class PublicUtilS {
         HashSet<T> set = new HashSet<T>(array.length);
 //        T[] result = (T[]) new Object[array.length];
         for (int i = 0; i < array.length; i++) {
-            if(set.add((T) array[i])){
+            if (set.add(array[i])) {
                 //result[i] = (T) array[i];
             }
         }
-       return (T[]) set.toArray();
+        return (T[]) set.toArray();
     }
 
 
@@ -356,7 +357,6 @@ public class PublicUtilS {
     }
 
     /**
-     *
      * <pre>
      * 从List的E中返回valueProp属性的List
      * </pre>
@@ -367,7 +367,7 @@ public class PublicUtilS {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <E> List<Object> GetPropertyList(List<E> list,String propertyName) {
+    public static <E> List<Object> GetPropertyList(List<E> list, String propertyName) {
         List<Object> valueList = new ArrayList<Object>();
         for (Object o : list) {
             Object value = PROBE.getObject(o, propertyName);
@@ -377,29 +377,28 @@ public class PublicUtilS {
     }
 
     /**
-     *
      * <pre>
      * 从List的E中返回valueProp属性的List
      * </pre>
      *
      * @param <E>
      * @param list
-     * @param keyProp map中的的key值
+     * @param keyProp   map中的的key值
      * @param valueProp map中的value值，为null时，取对象本身
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <E> Map<Object,Object> ListforMap(List<E> list, String keyProp, String valueProp) {
-        Map<Object,Object> map = new HashMap<Object,Object>();
+    public static <E> Map<Object, Object> ListforMap(List<E> list, String keyProp, String valueProp) {
+        Map<Object, Object> map = new HashMap<Object, Object>();
 
         for (int i = 0, n = list.size(); i < n; i++) {
             Object object = list.get(i);
-            if(null == object){
+            if (null == object) {
                 continue;
             }
             Object key = PROBE.getObject(object, keyProp);
             Object value = null;
-            if (valueProp == null || "".equals(valueProp)){
+            if (valueProp == null || "".equals(valueProp)) {
                 value = object;
             } else {
                 value = PROBE.getObject(object, valueProp);
@@ -414,10 +413,44 @@ public class PublicUtilS {
      */
     /**
      * 自动生成32位的UUid，对应数据库的主键id进行插入用。
+     *
      * @return
      */
     public static String get32CodeByUUID() {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    /**
+     * @param inputStream
+     * @date: 2019/9/5 13:05
+     * @author: QinDaoFang
+     * @version:version
+     * @return: boolean
+     * @Desc: desc
+     */
+    public static boolean checkInputStreamNullTrue(InputStream inputStream) {
+        long size = 0;
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream("");
+            byte[] b = new byte[1024];
+            int len = 0;
+            while ((len = inputStream.read(b)) != -1) {
+                fileInputStream.read(b, 0, len);
+            }
+            size = fileInputStream.getChannel().size();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return size > 0;
     }
 
 
@@ -435,9 +468,9 @@ public class PublicUtilS {
         shop2.setShopName("bbb");
         shopList.add(shop2);
 
-        Map map = ListforMap(shopList, "id","shopName");
+        Map map = ListforMap(shopList, "id", "shopName");
 
-        Map map1 = listForMap(shopList, "id","shopName");
+        Map map1 = listForMap(shopList, "id", "shopName");
 
         Map map2 = listForMapValueE(shopList, "id");
 
@@ -450,9 +483,9 @@ public class PublicUtilS {
         map2.get(1);
 
 
-        String[] array = {"1","2","4","1","1","4","5",};
-        int[] intarray = {1,2,3,1,2,4};
-        Integer[] tegArray = {1,2,3,1,2,4,5};
+        String[] array = {"1", "2", "4", "1", "1", "4", "5",};
+        int[] intarray = {1, 2, 3, 1, 2, 4};
+        Integer[] tegArray = {1, 2, 3, 1, 2, 4, 5};
 
         List<Long> longList = new ArrayList<>();
         longList.add(Long.valueOf(2));
@@ -466,7 +499,6 @@ public class PublicUtilS {
         System.out.println(longList);
 
     }
-
 
 
 }

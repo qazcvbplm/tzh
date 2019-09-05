@@ -1,5 +1,8 @@
 package ops.school.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -15,6 +18,39 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 public class CircleUtil {
+    private static Logger logger = LoggerFactory.getLogger(CircleUtil.class);
+
+    /**
+     * @date:   2019/9/5 10:27
+     * @author: QinDaoFang
+     * @version:version
+     * @return: void
+     * @param   strUrl
+     * @param   width
+     * @param   height
+     * @Desc:   desc
+     */
+    public static BufferedImage getCircledBufferedImage(String strUrl, Integer width, Integer height) {
+        BufferedImage convertImage = null;
+        try {
+            // 获取图片的流
+            Image src = ImageIO.read(new File(strUrl));
+            BufferedImage url = (BufferedImage) src;
+            // 处理图片将其压缩成正方形的小图
+            convertImage = scaleByPercentage(url, 100, 100);
+            // 裁剪成圆形 （传入的图像必须是正方形的 才会 圆形 如果是长方形的比例则会变成椭圆的）
+            convertImage = convertCircular(url,width,height);
+            // 生成的图片位置
+            String imagePath = strUrl;
+            ImageIO.write(convertImage, imagePath.substring(imagePath.lastIndexOf(".") + 1), new File(imagePath));
+            System.out.println("getCircledBufferedImage ok");
+            return convertImage;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getCircledBufferedImage"+e.getMessage());
+        }
+        return convertImage;
+    }
 
     public static void circleUtil(String strUrl, Integer width, Integer height) {
         try {

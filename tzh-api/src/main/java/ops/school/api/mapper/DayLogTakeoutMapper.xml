@@ -19,11 +19,17 @@
         <result column="product_price" property="productPrice" jdbcType="DECIMAL" />
         <result column="wx_pay_get" property="wxPayGet" jdbcType="DECIMAL" />
         <result column="bell_pay_get" property="bellPayGet" jdbcType="DECIMAL" />
+
         <result column="used_coupon" property="usedCoupon" jdbcType="DECIMAL" />
         <result column="used_food_coupon" property="usedFoodCoupon" jdbcType="DECIMAL" />
         <result column="used_full_cut" property="usedFullCut" jdbcType="DECIMAL" />
         <result column="used_discount" property="usedDiscount" jdbcType="DECIMAL" />
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+
+        <result column="school_get_total" property="schoolGetTotal" jdbcType="DECIMAL" />
+        <result column="school_day_tx" property="schoolDayTx" jdbcType="DECIMAL" />
+        <result column="school_all_money" property="schoolAllMoney" jdbcType="DECIMAL" />
+
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     </resultMap>
 
     <sql id="Base_Column_List" >
@@ -47,7 +53,11 @@
         used_coupon,
         used_food_coupon,
         used_full_cut,
-        used_discount
+        used_discount,
+        school_get_total,
+        school_day_tx,
+        school_all_money,
+        create_time
     </sql>
 
     <sql id="Table_Name">

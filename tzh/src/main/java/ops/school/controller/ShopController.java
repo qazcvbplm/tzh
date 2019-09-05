@@ -11,10 +11,7 @@ import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.Assertions;
 import ops.school.api.exception.DisplayException;
 import ops.school.api.service.*;
-import ops.school.api.util.LoggerUtil;
-import ops.school.api.util.ResponseObject;
-import ops.school.api.util.TimeUtilS;
-import ops.school.api.util.Util;
+import ops.school.api.util.*;
 import ops.school.api.wxutil.WXUtil;
 import ops.school.api.constants.NumConstants;
 import ops.school.service.TCommonService;
@@ -32,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
@@ -205,10 +205,16 @@ public class ShopController {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        int rs = WXUtil.getCode(school.getWxAppId()
-                , school.getWxSecret(), "pages/index/item/menu/menu?shopid=" + id, path + id + ".jpg");
-        if (rs == 1 && shop.getShopImage() != null) {
-            Map<String, Object> msg = ImageUtil.pictureCombine(shop.getShopImage(), path + id + ".jpg", path, shop);
+        InputStream shopCodeIn = WXUtil.getCodeInStream(school.getWxAppId(),
+                school.getWxSecret(),
+                "pages/index/item/menu/menu?shopid=" + id,
+                path + id + ".jpg");
+        if (shopCodeIn == null){
+            return new ResponseObject(false, "生成二维码失败");
+        }
+        if (shopCodeIn != null && shop.getShopImage() != null) {
+            String shopCodePath = path + id + ".jpg";
+            Map<String, Object> msg = ImageUtil.pictureCombine(shop.getShopImage(), shopCodePath, path, shop);
             if ((Integer) msg.get("code") == 1) {
                 String shopCodeImage = (String) msg.get("shopCodeImage");
                 shop.setShopCodeImage(shopCodeImage);

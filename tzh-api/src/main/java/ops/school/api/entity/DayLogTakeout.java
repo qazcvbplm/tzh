@@ -53,6 +53,13 @@ public class DayLogTakeout {
 
     private BigDecimal usedDiscount;
 
+    private BigDecimal schoolGetTotal;
+
+    private BigDecimal schoolDayTx;
+
+    private BigDecimal schoolAllMoney;
+
+
     /**
      * 创建时间
      */
@@ -63,6 +70,30 @@ public class DayLogTakeout {
 
     public Date getCreateTime() {
         return createTime;
+    }
+
+    public BigDecimal getSchoolGetTotal() {
+        return schoolGetTotal;
+    }
+
+    public void setSchoolGetTotal(BigDecimal schoolGetTotal) {
+        this.schoolGetTotal = schoolGetTotal;
+    }
+
+    public BigDecimal getSchoolDayTx() {
+        return schoolDayTx;
+    }
+
+    public void setSchoolDayTx(BigDecimal schoolDayTx) {
+        this.schoolDayTx = schoolDayTx;
+    }
+
+    public BigDecimal getSchoolAllMoney() {
+        return schoolAllMoney;
+    }
+
+    public void setSchoolAllMoney(BigDecimal schoolAllMoney) {
+        this.schoolAllMoney = schoolAllMoney;
     }
 
     public void setCreateTime(Date createTime) {

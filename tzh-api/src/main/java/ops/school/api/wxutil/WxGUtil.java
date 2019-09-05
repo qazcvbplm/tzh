@@ -54,9 +54,18 @@ public class WxGUtil {
 
     public static boolean checkGz(String openid) {
         String access_token = getAccessToken("wx5b97919ccae6d986", "21ffc5cd23e1efa82bb26ee79af691ac");
+        if (access_token == null){
+            LoggerUtil.logError("checkGz+access_token == null"+openid);
+            access_token = "";
+        }
         String rs = HttpRequest.sendGet(gz, "lang=zh_CN&access_token=" + access_token + "&openid=" + openid);
         JSONObject json = JSON.parseObject(rs, JSONObject.class);
-        if (json.getInteger("subscribe") == 1) {
+        if(json == null){
+            LoggerUtil.logError("checkGz+json == null"+"关注公众号情况+rs+");
+            LoggerUtil.logError(rs);
+            json = new JSONObject();
+        }
+        if (json != null && json.getInteger("subscribe") == 1) {
             return true;
         } else {
             return false;
