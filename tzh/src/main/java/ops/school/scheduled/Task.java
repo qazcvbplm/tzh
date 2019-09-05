@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.constants.RedisConstants;
+import ops.school.api.constants.StatisticsConstants;
 import ops.school.api.dao.OrdersCompleteMapper;
 import ops.school.api.dto.RunOrdersTj;
 import ops.school.api.entity.*;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +55,9 @@ public class Task {
 
     @Autowired
     private TOrdersService tOrdersService;
+
+    @Autowired
+    private TxLogService txLogService;
 
     /**
      * 每天晚上把待付款的改成取消的
@@ -137,25 +142,76 @@ public class Task {
     public void jisuan() {
         long start = System.currentTimeMillis();
         String day = getYesterdayByCalendar();
+        String theDayBeforeYesterday = TimeUtilS.theDayBeforeYesterday();
         Map<String, Object> map = new HashMap<>();
         map.put("day", day + "%");
         QueryWrapper<School> wrapper = new QueryWrapper<School>();
         wrapper.lambda().eq(School::getIsDelete, 0);
         List<School> schools = schoolService.list(wrapper);
+        //统计需要学校每天提现的金额，查2点的前一天的前一天的所有学校
+        QueryWrapper<DayLogTakeout> txSchoolWrapper = new QueryWrapper<DayLogTakeout>();
+        txSchoolWrapper.lambda().eq(DayLogTakeout::getType,StatisticsConstants.DAY_SCHOOL_CAN_TX_MONEY);
+        txSchoolWrapper.lambda().like(DayLogTakeout::getDay,theDayBeforeYesterday);
+        List<DayLogTakeout> allTxSchoolList = dayLogTakeoutService.list(txSchoolWrapper);
+        Map<Integer,DayLogTakeout> dayLogTxMap = PublicUtilS.listForMapValueE(allTxSchoolList,"selfId");
+
+        //统计学校当日提现
+        QueryWrapper<TxLog> txLog = new QueryWrapper<>();
+        txLog.eq("type","代理提现");
+        txLog.ge("create_time",TimeUtilS.getDayBegin(new Date(),-1));
+        txLog.le("create_time",TimeUtilS.getDayEnd(new Date(),-1));
+        List<TxLog> txLogList = txLogService.list(txLog);
+        Map<Integer,List<TxLog>> txLogListMap = PublicUtilS.listforEqualKeyListMap(txLogList,"txerId");
         for (School schooltemp : schools) {
+            //当天学校总钱
+            BigDecimal toDaySchoolAllMoney = new BigDecimal(0);
             List<Shop> shops = shopService.list(new QueryWrapper<Shop>().lambda().eq(Shop::getSchoolId, schooltemp.getId()));
             for (Shop shoptemp : shops) {
                 map.put("shopId", shoptemp.getId());
                 Orders result = ordersService.completeByShopId(map);
                 DayLogTakeout daylog = new DayLogTakeout()
                         .shoplog(shoptemp.getShopName(), shoptemp.getId(), day, result, "商铺日志", schooltemp.getId());
-                dayLogTakeoutService.save(daylog);
+                BigDecimal schoolGetTotal = new BigDecimal(0);
+                BigDecimal ShopGetTotal = new BigDecimal(0);
+                if (result.getSchoolGetTotal() != null){
+                    schoolGetTotal = result.getSchoolGetTotal();
+                }
+                if (result.getComplete() != null&& result.getComplete().getShopGetTotal() != null){
+                    ShopGetTotal = result.getComplete().getShopGetTotal();
+                }
+                toDaySchoolAllMoney = toDaySchoolAllMoney.add(schoolGetTotal).add(ShopGetTotal);
             }
+            //////////////////////////////////////////////////学校统计///////////////////////////////////////////////////////////
             map.put("schoolId", schooltemp.getId());
             List<Orders> result = ordersService.completeBySchoolId(map);
             DayLogTakeout daylog = new DayLogTakeout()
                     .schoollog(schooltemp.getName(), schooltemp.getId(), day, result, "学校商铺日志", schooltemp.getAppId());
             dayLogTakeoutService.save(daylog);
+            //////////////////////////////////每日提现和截至可提现统计////////////////////////////////////////
+            DayLogTakeout moneySave = daylog;
+            DayLogTakeout dayLogTakeoutTemp = dayLogTxMap.get(schooltemp.getId());
+            //统计前一天截至可提现的钱,不能为null
+            BigDecimal lastDaySchoolAllMoney = new BigDecimal(0);
+            BigDecimal lastDaySchoolDayTx = new BigDecimal(0);
+            if(dayLogTakeoutTemp != null){
+                lastDaySchoolAllMoney = dayLogTakeoutTemp.getSchoolAllMoney();
+                lastDaySchoolDayTx = dayLogTakeoutTemp.getSchoolDayTx();
+            }
+            //统计当天代理提现的钱
+            moneySave.setType(StatisticsConstants.DAY_SCHOOL_CAN_TX_MONEY);
+            BigDecimal tx = new BigDecimal(0);
+            List<TxLog> logList = txLogListMap.get(schooltemp.getId());
+            if (logList == null ){
+                logList = new ArrayList<>();
+            }
+            for (TxLog log : logList) {
+                tx = tx.add(log.getAmount());
+            }
+            moneySave.setSchoolDayTx(tx);
+            toDaySchoolAllMoney = toDaySchoolAllMoney.subtract(tx).add(lastDaySchoolAllMoney);
+            moneySave.setSchoolAllMoney(toDaySchoolAllMoney);
+            dayLogTakeoutService.save(moneySave);
+
         }
         //////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
         for (School schooltemp : schools) {

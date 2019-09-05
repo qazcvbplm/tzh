@@ -300,6 +300,7 @@
     <select id="completeByShopId" parameterType="map" resultMap="BaseResultMap">
   SELECT
 	count(o.id) AS remark,
+	sum(oc.school_get_total) AS school_get_total,
 	sum(o.pay_price) AS pay_price,
 	sum(box_price) AS box_price,
 	sum(send_price) AS send_price,

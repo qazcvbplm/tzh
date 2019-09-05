@@ -74,6 +74,35 @@ public class TimeUtilS {
         return cal.getTime();
     }
 
+    /**
+     * 获取当天开始时间
+     * @return
+     */
+    public static Date getDayBegin(Date date,int pastMuchDay){
+        Calendar cal=Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, pastMuchDay);
+        cal.set(Calendar.HOUR_OF_DAY, 0);//0点
+        cal.set(Calendar.MINUTE, 0);//0分
+        cal.set(Calendar.SECOND, 0);//0秒
+        cal.set(Calendar.MILLISECOND, 0);//0毫秒
+        return cal.getTime();
+    }
+
+    /**
+     * 获取当天结束时间
+     * @return
+     */
+    public static Date getDayEnd(Date date,int pastMuchDay){
+        Calendar cal=Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, pastMuchDay);
+        cal.set(Calendar.HOUR_OF_DAY, 23);//23点
+        cal.set(Calendar.MINUTE, 59);//59分
+        cal.set(Calendar.SECOND, 59);//59秒
+        return cal.getTime();
+    }
+
 
     /**
      * 获取昨天开始时间
@@ -1019,6 +1048,15 @@ public class TimeUtilS {
      */
     public static String getNo(int k) {
         return getUserDate("yyyyMMddhhmmss") + getRandom(k);
+    }
+
+
+    public static String theDayBeforeYesterday(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -2);
+        Date time = calendar.getTime();
+        String theDayBeforeYesterday = new SimpleDateFormat("yyyy-MM-dd").format(time);
+        return theDayBeforeYesterday;
     }
 
 

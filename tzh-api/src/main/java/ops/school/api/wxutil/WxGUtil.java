@@ -65,11 +65,20 @@ public class WxGUtil {
             LoggerUtil.logError(rs);
             json = new JSONObject();
         }
+        if (json.getInteger("subscribe") == null){
+            LoggerUtil.logError("checkGz+json == null"+"关注公众号情况+rs+");
+            LoggerUtil.logError(rs);
+            return false;
+        }
         if (json != null && json.getInteger("subscribe") == 1) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public static void main(String[] args) {
+        checkGz("oWP5G4wITSFF8Ts7kJmjNy7E0xzQ");
     }
 
 }

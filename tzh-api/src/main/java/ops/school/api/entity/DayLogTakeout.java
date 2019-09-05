@@ -209,6 +209,7 @@ public class DayLogTakeout {
         this.usedFullCut = order.getUsedFullCut();
         BigDecimal dis = order.getUsedDiscount() == null ? BigDecimal.valueOf(0) : order.getUsedDiscount();
         this.usedDiscount = dis;
+        this.schoolGetTotal = order.getSchoolGetTotal();
         return this;
     }
 

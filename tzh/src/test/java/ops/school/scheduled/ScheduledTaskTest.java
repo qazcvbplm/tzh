@@ -10,6 +10,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = App.class)
@@ -45,7 +48,17 @@ public class ScheduledTaskTest{
 
     @Test
     public void taskCom(){
+        List<String> stringList = new ArrayList<>();
+        stringList.add("2019-09");
         task.jisuan();
+    }
+
+    public static void main(String[] args) {
+        BigDecimal a = new BigDecimal(0);
+        BigDecimal b= new BigDecimal(10000);
+        BigDecimal c =  new BigDecimal(0);
+        System.out.println(a.subtract(b));
+        System.out.println(a.subtract(b).add(c));
     }
 
 

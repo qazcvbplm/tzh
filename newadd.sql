@@ -32,6 +32,10 @@ CREATE TABLE `index_shop_product` (
 
 alter table day_log_takeout add `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间';
 
+alter table day_log_takeout add `school_get_total` decimal(10,2) DEFAULT '0.00' COMMENT '当日统计学校所得';
+alter table day_log_takeout add `school_day_tx` decimal(10,2) DEFAULT '0.00' COMMENT '学校当日提现';
+alter table day_log_takeout add `school_all_money` decimal(10,2) DEFAULT '0.00' COMMENT '学校截至到统计时间可提现';
+
 
 
 
