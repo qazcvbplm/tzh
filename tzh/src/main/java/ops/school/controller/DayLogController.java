@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.constants.NumConstants;
+import ops.school.api.constants.StatisticsConstants;
 import ops.school.api.entity.DayLogTakeout;
 import ops.school.api.entity.Shop;
 import ops.school.api.service.DayLogTakeoutService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -51,15 +53,23 @@ public class DayLogController {
         query.lambda().orderByDesc(DayLogTakeout::getDay);
         IPage<DayLogTakeout> list = dayLogTakeoutService.page(PageUtil.getPage(page, size), query);
         if (!"商铺日志".equals(type)){
-            return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
+            return new ResponseObject(true, "ok")
+                    .push("total", list.getTotal())
+                    .push("list", list.getRecords());
         }
         List<Integer> shopIds = PublicUtilS.getValueList(list.getRecords(),"selfId");
         if (shopIds.size() < NumConstants.INT_NUM_1){
-            return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
+            return new ResponseObject(true, "ok")
+                    .push("total", list.getTotal())
+                    .push("list", list.getRecords())
+                    .push("all",new ArrayList<>());
         }
         Collection<Shop> shopList = shopService.listByIds(shopIds);
         if (shopList.size() < NumConstants.INT_NUM_1){
-            return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
+            return new ResponseObject(true, "ok")
+                    .push("total", list.getTotal())
+                    .push("list", list.getRecords())
+                    .push("all",new ArrayList<>());
         }
         Map<Integer,Shop> shopMap = PublicUtilS.listForMapValueE(shopList,"id");
         for (DayLogTakeout dayLog : list.getRecords()) {
@@ -67,6 +77,16 @@ public class DayLogController {
                 dayLog.setIsDelete(shopMap.get(dayLog.getSelfId()).getIsDelete());
             }
         }
-        return new ResponseObject(true, "ok").push("total", list.getTotal()).push("list", list.getRecords());
+        //加入当日数据统计-提现和负责人截至可提现
+        QueryWrapper<DayLogTakeout> txSchoolWrapper = new QueryWrapper<DayLogTakeout>();
+        txSchoolWrapper.lambda().eq(DayLogTakeout::getType, StatisticsConstants.DAY_SCHOOL_CAN_TX_MONEY);
+        txSchoolWrapper.lambda().eq(DayLogTakeout::getSelfId,parentId);
+        txSchoolWrapper.lambda().like(DayLogTakeout::getDay,day);
+        List<DayLogTakeout> allTxSchoolList = dayLogTakeoutService.list(txSchoolWrapper);
+        return new ResponseObject(true, "ok")
+                .push("total", list.getTotal())
+                .push("list", list.getRecords())
+                .push("all",allTxSchoolList)
+                ;
     }
 }

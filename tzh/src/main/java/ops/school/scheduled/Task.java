@@ -169,7 +169,7 @@ public class Task {
             for (Shop shoptemp : shops) {
                 map.put("shopId", shoptemp.getId());
                 Orders result = ordersService.completeByShopId(map);
-                DayLogTakeout daylog = new DayLogTakeout()
+                DayLogTakeout shopDayLog = new DayLogTakeout()
                         .shoplog(shoptemp.getShopName(), shoptemp.getId(), day, result, "商铺日志", schooltemp.getId());
                 BigDecimal schoolGetTotal = new BigDecimal(0);
                 BigDecimal ShopGetTotal = new BigDecimal(0);
@@ -180,15 +180,18 @@ public class Task {
                     ShopGetTotal = result.getComplete().getShopGetTotal();
                 }
                 toDaySchoolAllMoney = toDaySchoolAllMoney.add(schoolGetTotal).add(ShopGetTotal);
+                //保存店铺
+                dayLogTakeoutService.save(shopDayLog);
             }
             //////////////////////////////////////////////////学校统计///////////////////////////////////////////////////////////
             map.put("schoolId", schooltemp.getId());
             List<Orders> result = ordersService.completeBySchoolId(map);
-            DayLogTakeout daylog = new DayLogTakeout()
+            DayLogTakeout schoolDayLog = new DayLogTakeout()
                     .schoollog(schooltemp.getName(), schooltemp.getId(), day, result, "学校商铺日志", schooltemp.getAppId());
-            dayLogTakeoutService.save(daylog);
+            //保存学校商铺日志
+            dayLogTakeoutService.save(schoolDayLog);
             //////////////////////////////////每日提现和截至可提现统计////////////////////////////////////////
-            DayLogTakeout moneySave = daylog;
+            DayLogTakeout moneySave = schoolDayLog;
             DayLogTakeout dayLogTakeoutTemp = dayLogTxMap.get(schooltemp.getId());
             //统计前一天截至可提现的钱,不能为null
             BigDecimal lastDaySchoolAllMoney = new BigDecimal(0);
@@ -210,6 +213,7 @@ public class Task {
             moneySave.setSchoolDayTx(tx);
             toDaySchoolAllMoney = toDaySchoolAllMoney.subtract(tx).add(lastDaySchoolAllMoney);
             moneySave.setSchoolAllMoney(toDaySchoolAllMoney);
+            //保存当日提现
             dayLogTakeoutService.save(moneySave);
 
         }
@@ -234,7 +238,6 @@ public class Task {
      */
     @Scheduled(cron = "0 */5 * * * ?")
     public void remindUntakenOrders() {
-
         // 查询所有待接手订单
         List<Orders> ordersList;
         if (SpringUtil.redisCache()) {
