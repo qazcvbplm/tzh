@@ -52,41 +52,48 @@ public class DayLogController {
             query.lambda().eq(DayLogTakeout::getDay, day);
         query.lambda().orderByDesc(DayLogTakeout::getDay);
         IPage<DayLogTakeout> list = dayLogTakeoutService.page(PageUtil.getPage(page, size), query);
-        if (!"商铺日志".equals(type)){
-            return new ResponseObject(true, "ok")
-                    .push("total", list.getTotal())
-                    .push("list", list.getRecords());
-        }
-        List<Integer> shopIds = PublicUtilS.getValueList(list.getRecords(),"selfId");
-        if (shopIds.size() < NumConstants.INT_NUM_1){
-            return new ResponseObject(true, "ok")
-                    .push("total", list.getTotal())
-                    .push("list", list.getRecords())
-                    .push("all",new ArrayList<>());
-        }
-        Collection<Shop> shopList = shopService.listByIds(shopIds);
-        if (shopList.size() < NumConstants.INT_NUM_1){
+        //加入当日数据统计-提现和负责人截至可提现
+        if ("学校商铺日志".equals(type)){
+            QueryWrapper<DayLogTakeout> txSchoolWrapper = new QueryWrapper<DayLogTakeout>();
+            txSchoolWrapper.lambda().eq(DayLogTakeout::getType, StatisticsConstants.DAY_SCHOOL_CAN_TX_MONEY);
+            txSchoolWrapper.lambda().eq(DayLogTakeout::getSelfId,selfId);
+            List<DayLogTakeout> allTxSchoolList = dayLogTakeoutService.list(txSchoolWrapper);
+            Map<String,DayLogTakeout> takeoutMap = PublicUtilS.listForMapValueE(allTxSchoolList,"day");
+            for (DayLogTakeout record : list.getRecords()) {
+                record.setEveryDayCount(takeoutMap.get(record.getDay()));
+            }
             return new ResponseObject(true, "ok")
                     .push("total", list.getTotal())
                     .push("list", list.getRecords())
-                    .push("all",new ArrayList<>());
+                    ;
         }
-        Map<Integer,Shop> shopMap = PublicUtilS.listForMapValueE(shopList,"id");
-        for (DayLogTakeout dayLog : list.getRecords()) {
-            if (shopMap.get(dayLog.getSelfId()) != null ){
-                dayLog.setIsDelete(shopMap.get(dayLog.getSelfId()).getIsDelete());
+        // 商铺日志
+        if ("商铺日志".equals(type)){
+            List<Integer> shopIds = PublicUtilS.getValueList(list.getRecords(),"selfId");
+            if (shopIds.size() < NumConstants.INT_NUM_1){
+                return new ResponseObject(true, "ok")
+                        .push("total", list.getTotal())
+                        .push("list", list.getRecords())
+                        .push("all",new ArrayList<>());
+            }
+            Collection<Shop> shopList = shopService.listByIds(shopIds);
+            if (shopList.size() < NumConstants.INT_NUM_1){
+                return new ResponseObject(true, "ok")
+                        .push("total", list.getTotal())
+                        .push("list", list.getRecords())
+                        .push("all",new ArrayList<>());
+            }
+            Map<Integer,Shop> shopMap = PublicUtilS.listForMapValueE(shopList,"id");
+            for (DayLogTakeout dayLog : list.getRecords()) {
+                if (shopMap.get(dayLog.getSelfId()) != null ){
+                    dayLog.setIsDelete(shopMap.get(dayLog.getSelfId()).getIsDelete());
+                }
             }
         }
-        //加入当日数据统计-提现和负责人截至可提现
-        QueryWrapper<DayLogTakeout> txSchoolWrapper = new QueryWrapper<DayLogTakeout>();
-        txSchoolWrapper.lambda().eq(DayLogTakeout::getType, StatisticsConstants.DAY_SCHOOL_CAN_TX_MONEY);
-        txSchoolWrapper.lambda().eq(DayLogTakeout::getSelfId,parentId);
-        txSchoolWrapper.lambda().like(DayLogTakeout::getDay,day);
-        List<DayLogTakeout> allTxSchoolList = dayLogTakeoutService.list(txSchoolWrapper);
         return new ResponseObject(true, "ok")
                 .push("total", list.getTotal())
                 .push("list", list.getRecords())
-                .push("all",allTxSchoolList)
                 ;
+
     }
 }

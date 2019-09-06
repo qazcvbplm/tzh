@@ -8,6 +8,7 @@ import ops.school.api.constants.RedisConstants;
 import ops.school.api.constants.StatisticsConstants;
 import ops.school.api.dao.OrdersCompleteMapper;
 import ops.school.api.dto.RunOrdersTj;
+import ops.school.api.dto.TimeEveryDTO;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
 import ops.school.api.util.*;
@@ -17,6 +18,8 @@ import ops.school.service.TCouponService;
 import ops.school.service.TOrdersService;
 import ops.school.service.TWxUserCouponService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,6 +35,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Service(value = "scheduledTask")
 public class Task {
+
+    private Logger logger = LoggerFactory.getLogger(Task.class);
 
     @Autowired
     private SchoolService schoolService;
@@ -140,9 +145,14 @@ public class Task {
 
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
+        TimeEveryDTO timeEveryDTO = null;
         long start = System.currentTimeMillis();
-        String day = getYesterdayByCalendar();
-        String theDayBeforeYesterday = TimeUtilS.theDayBeforeYesterday();
+        Date changeDay = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
+        // todo
+        // String day = getYesterdayByCalendar();
+        // String theDayBeforeYesterday = TimeUtilS.theDayBeforeYesterday();
+        String day = TimeUtilS.theYesterdayByCalendar(changeDay);
+        String theDayBeforeYesterday = TimeUtilS.theDayBeforeYesterday(changeDay);
         Map<String, Object> map = new HashMap<>();
         map.put("day", day + "%");
         QueryWrapper<School> wrapper = new QueryWrapper<School>();
@@ -158,13 +168,16 @@ public class Task {
         //统计学校当日提现
         QueryWrapper<TxLog> txLog = new QueryWrapper<>();
         txLog.eq("type","代理提现");
-        txLog.ge("create_time",TimeUtilS.getDayBegin(new Date(),-1));
-        txLog.le("create_time",TimeUtilS.getDayEnd(new Date(),-1));
+        // todo
+        txLog.ge("create_time",TimeUtilS.getDayBegin(changeDay,-1));
+        txLog.le("create_time",TimeUtilS.getDayEnd(changeDay,-1));
         List<TxLog> txLogList = txLogService.list(txLog);
         Map<Integer,List<TxLog>> txLogListMap = PublicUtilS.listforEqualKeyListMap(txLogList,"txerId");
         for (School schooltemp : schools) {
             //当天学校总钱
             BigDecimal toDaySchoolAllMoney = new BigDecimal(0);
+            BigDecimal schoolEveryDayGetTotal = new BigDecimal(0);
+            BigDecimal shopEveryDayGetTotal = new BigDecimal(0);
             List<Shop> shops = shopService.list(new QueryWrapper<Shop>().lambda().eq(Shop::getSchoolId, schooltemp.getId()));
             for (Shop shoptemp : shops) {
                 map.put("shopId", shoptemp.getId());
@@ -172,14 +185,18 @@ public class Task {
                 DayLogTakeout shopDayLog = new DayLogTakeout()
                         .shoplog(shoptemp.getShopName(), shoptemp.getId(), day, result, "商铺日志", schooltemp.getId());
                 BigDecimal schoolGetTotal = new BigDecimal(0);
-                BigDecimal ShopGetTotal = new BigDecimal(0);
+                BigDecimal shopGetTotal = new BigDecimal(0);
                 if (result.getSchoolGetTotal() != null){
                     schoolGetTotal = result.getSchoolGetTotal();
                 }
                 if (result.getComplete() != null&& result.getComplete().getShopGetTotal() != null){
-                    ShopGetTotal = result.getComplete().getShopGetTotal();
+                    shopGetTotal = result.getComplete().getShopGetTotal();
                 }
-                toDaySchoolAllMoney = toDaySchoolAllMoney.add(schoolGetTotal).add(ShopGetTotal);
+                toDaySchoolAllMoney = toDaySchoolAllMoney.add(schoolGetTotal).add(shopGetTotal);
+                //每日学校负责人所得
+                schoolEveryDayGetTotal = schoolEveryDayGetTotal.add(schoolGetTotal);
+                //店铺所得
+                shopEveryDayGetTotal = shopEveryDayGetTotal.add(shopGetTotal);
                 //保存店铺
                 dayLogTakeoutService.save(shopDayLog);
             }
@@ -213,8 +230,13 @@ public class Task {
             moneySave.setSchoolDayTx(tx);
             toDaySchoolAllMoney = toDaySchoolAllMoney.subtract(tx).add(lastDaySchoolAllMoney);
             moneySave.setSchoolAllMoney(toDaySchoolAllMoney);
+            //学校所得
+            moneySave.setSchoolGetTotal(schoolEveryDayGetTotal);
+            //使用微信payGet字段记录店铺所得总和shopEveryDayGetTotal
+            moneySave.setWxPayGet(shopEveryDayGetTotal);
             //保存当日提现
             dayLogTakeoutService.save(moneySave);
+            logger.error("定时数据统计-"+schooltemp.getName()+TimeUtilS.dateFormat(new Date()));
 
         }
         //////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////

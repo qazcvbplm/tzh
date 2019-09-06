@@ -1051,8 +1051,34 @@ public class TimeUtilS {
     }
 
 
+    public static String theYesterdayByCalendar() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        Date time = calendar.getTime();
+        String yesterday = new SimpleDateFormat("yyyy-MM-dd").format(time);
+        return yesterday;
+    }
+
+    public static String theYesterdayByCalendar(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, -1);
+        Date time = calendar.getTime();
+        String yesterday = new SimpleDateFormat("yyyy-MM-dd").format(time);
+        return yesterday;
+    }
+
     public static String theDayBeforeYesterday(){
         Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -2);
+        Date time = calendar.getTime();
+        String theDayBeforeYesterday = new SimpleDateFormat("yyyy-MM-dd").format(time);
+        return theDayBeforeYesterday;
+    }
+
+    public static String theDayBeforeYesterday(Date date){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
         calendar.add(Calendar.DATE, -2);
         Date time = calendar.getTime();
         String theDayBeforeYesterday = new SimpleDateFormat("yyyy-MM-dd").format(time);
@@ -1074,6 +1100,9 @@ public class TimeUtilS {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        Date date = getDateByEvery(2019,9-1,6,0,0,0);
+        System.out.println(date);
 
 
 

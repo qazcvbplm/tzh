@@ -2,10 +2,12 @@ package ops.school.scheduled;
 
 
 import ops.school.App;
+import ops.school.api.dto.TimeEveryDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -16,7 +18,7 @@ import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = App.class)
-@WebAppConfiguration
+@ContextConfiguration(locations = {"classpath:application.yml", "classpath:application-dev.yml","classpath:application-prod.yml","","classpath:application-test.yml","classpath:generator.xml"})
 public class ScheduledTaskTest{
 
     @Resource(name = "scheduledTask")
@@ -48,9 +50,18 @@ public class ScheduledTaskTest{
 
     @Test
     public void taskCom(){
-        List<String> stringList = new ArrayList<>();
-        stringList.add("2019-09");
-        task.jisuan();
+        List<TimeEveryDTO> dtoList = new ArrayList<>();
+        dtoList.add(new TimeEveryDTO(8,30));
+        dtoList.add(new TimeEveryDTO(8,31));
+        dtoList.add(new TimeEveryDTO(9,1));
+        dtoList.add(new TimeEveryDTO(9,2));
+        dtoList.add(new TimeEveryDTO(9,3));
+        dtoList.add(new TimeEveryDTO(9,4));
+        dtoList.add(new TimeEveryDTO(9,5));
+        dtoList.add(new TimeEveryDTO(9,6));
+        for (TimeEveryDTO timeEveryDTO : dtoList) {
+            task.jisuan();
+        }
     }
 
     public static void main(String[] args) {

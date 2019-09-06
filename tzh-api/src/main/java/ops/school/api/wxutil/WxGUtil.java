@@ -19,8 +19,7 @@ public class WxGUtil {
      * @param appid
      * @return
      */
-    public static String getAccessToken(String appid, String secert) {
-        if ("".equals(token) || token == null || ((System.currentTimeMillis() - tokenTime) >= tokenTimeRefreshTime)) {
+    public static String getAccessToken(String appid, String secert) { if ("".equals(token) || token == null || ((System.currentTimeMillis() - tokenTime) >= tokenTimeRefreshTime)) {
             String rs = HttpRequest.sendGet(tokenurl, "grant_type=client_credential&appid=" + appid + "&secret=" + secert);
             JSONObject json = JSON.parseObject(rs, JSONObject.class);
             token = json.getString("access_token");
@@ -29,6 +28,23 @@ public class WxGUtil {
         } else {
             return token;
         }
+    }
+
+
+    /**
+     * @date:   2019/9/6 13:59
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.String
+     * @param   appid
+     * @param   secert
+     * @Desc:   desc
+     */
+    public static String getAccessTokenEveryTime(String appid, String secert) {
+        String rs = HttpRequest.sendGet(tokenurl, "grant_type=client_credential&appid=" + appid + "&secret=" + secert);
+        JSONObject json = JSON.parseObject(rs, JSONObject.class);
+        String resultToken = json.getString("access_token");
+        return resultToken;
     }
 
     /**
@@ -53,7 +69,7 @@ public class WxGUtil {
     }
 
     public static boolean checkGz(String openid) {
-        String access_token = getAccessToken("wx5b97919ccae6d986", "21ffc5cd23e1efa82bb26ee79af691ac");
+        String access_token = getAccessTokenEveryTime("wx5b97919ccae6d986", "21ffc5cd23e1efa82bb26ee79af691ac");
         if (access_token == null){
             LoggerUtil.logError("checkGz+access_token == null"+openid);
             access_token = "";

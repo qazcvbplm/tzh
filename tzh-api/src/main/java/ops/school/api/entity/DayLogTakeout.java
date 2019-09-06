@@ -68,6 +68,17 @@ public class DayLogTakeout {
     @TableField(exist = false)
     private Integer isDelete;
 
+    @TableField(exist = false)
+    private DayLogTakeout everyDayCount;
+
+    public DayLogTakeout getEveryDayCount() {
+        return everyDayCount;
+    }
+
+    public void setEveryDayCount(DayLogTakeout everyDayCount) {
+        this.everyDayCount = everyDayCount;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
