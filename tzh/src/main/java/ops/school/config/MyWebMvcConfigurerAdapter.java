@@ -40,6 +40,7 @@ public class MyWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
                 .excludePathPatterns("/ops/orders/android/**")
                 .excludePathPatterns("/ops/shop/nocheck/shopstatistics")
                 .excludePathPatterns("/ops/application/check")
+                .excludePathPatterns("/ops/application/version")
                 .excludePathPatterns("/ops/user/wx/get/bell")
                 .excludePathPatterns("/ops/filesystem/*")
                 //.excludePathPatterns("/ops/sender/nocheck/**")
