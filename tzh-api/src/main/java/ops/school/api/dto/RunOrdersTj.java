@@ -14,22 +14,6 @@ public class RunOrdersTj {
 
     private Integer counts;
 
-    public Integer getCounts() {
-        return counts;
-    }
-
-    public void setCounts(Integer counts) {
-        this.counts = counts;
-    }
-
-    public BigDecimal getSenderGet() {
-        return senderGet;
-    }
-
-    public void setSenderGet(BigDecimal senderGet) {
-        this.senderGet = senderGet;
-    }
-
     public Integer getSchoolId() {
         return schoolId;
     }
@@ -46,12 +30,27 @@ public class RunOrdersTj {
         this.total = total;
     }
 
-
     public String getPayType() {
         return payType;
     }
 
     public void setPayType(String payType) {
         this.payType = payType;
+    }
+
+    public BigDecimal getSenderGet() {
+        return senderGet;
+    }
+
+    public void setSenderGet(BigDecimal senderGet) {
+        this.senderGet = senderGet;
+    }
+
+    public Integer getCounts() {
+        return counts;
+    }
+
+    public void setCounts(Integer counts) {
+        this.counts = counts;
     }
 }

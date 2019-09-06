@@ -163,4 +163,23 @@
 		 BETWEEN #{beginTime}
 		 AND #{endTime}
  </select>
+
+
+    <select id="tj" resultType="ops.school.api.dto.RunOrdersTj">
+        SELECT
+            count(ro.id) AS counts,
+            sum(ro.total_price * s.rate) AS senderGet,
+            sum(ro.total_price) AS total,
+            ro.school_id AS schoolId,
+            ro.payment AS payType
+        FROM
+            run_orders ro,
+            sender s
+        WHERE
+            ro.school_id = #{schoolId}
+            and ro.sender_id=s.id
+            and ro.status='已完成'
+            and ro.create_time like #{day}
+            group by payType
+    </select>
 </mapper>

@@ -145,14 +145,28 @@ public class Task {
 
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
-        TimeEveryDTO timeEveryDTO = null;
+        List<TimeEveryDTO> dtoList = new ArrayList<>();
+        dtoList.add(new TimeEveryDTO(8,30));
+        dtoList.add(new TimeEveryDTO(8,31));
+        dtoList.add(new TimeEveryDTO(9,1));
+        dtoList.add(new TimeEveryDTO(9,2));
+        dtoList.add(new TimeEveryDTO(9,3));
+        dtoList.add(new TimeEveryDTO(9,4));
+        dtoList.add(new TimeEveryDTO(9,5));
+        dtoList.add(new TimeEveryDTO(9,6));
+        for (TimeEveryDTO timeEveryDTO : dtoList) {
+            Date date = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
+            this.theDayilyStatistics(date);
+        }
+        TimeEveryDTO timeEveryDTO = new TimeEveryDTO(9,1);
+        Date date = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
+
+    }
+
+    private void theDayilyStatistics(Date runTaskDay) {
         long start = System.currentTimeMillis();
-        Date changeDay = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
-        // todo
-        // String day = getYesterdayByCalendar();
-        // String theDayBeforeYesterday = TimeUtilS.theDayBeforeYesterday();
-        String day = TimeUtilS.theYesterdayByCalendar(changeDay);
-        String theDayBeforeYesterday = TimeUtilS.theDayBeforeYesterday(changeDay);
+        String day = TimeUtilS.theYesterdayByCalendar(runTaskDay);
+        String theDayBeforeYesterday = TimeUtilS.theDayBeforeYesterday(runTaskDay);
         Map<String, Object> map = new HashMap<>();
         map.put("day", day + "%");
         QueryWrapper<School> wrapper = new QueryWrapper<School>();
@@ -169,8 +183,8 @@ public class Task {
         QueryWrapper<TxLog> txLog = new QueryWrapper<>();
         txLog.eq("type","代理提现");
         // todo
-        txLog.ge("create_time",TimeUtilS.getDayBegin(changeDay,-1));
-        txLog.le("create_time",TimeUtilS.getDayEnd(changeDay,-1));
+        txLog.ge("create_time",TimeUtilS.getDayBegin(runTaskDay,-1));
+        txLog.le("create_time",TimeUtilS.getDayEnd(runTaskDay,-1));
         List<TxLog> txLogList = txLogService.list(txLog);
         Map<Integer,List<TxLog>> txLogListMap = PublicUtilS.listforEqualKeyListMap(txLogList,"txerId");
         for (School schooltemp : schools) {
@@ -207,6 +221,12 @@ public class Task {
                     .schoollog(schooltemp.getName(), schooltemp.getId(), day, result, "学校商铺日志", schooltemp.getAppId());
             //保存学校商铺日志
             dayLogTakeoutService.save(schoolDayLog);
+            //////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
+            List<RunOrdersTj> runOrdersTjs = runOrdersService.tj(schooltemp.getId(), day + "%");
+            DayLogTakeout runLog = new DayLogTakeout(day, schooltemp, runOrdersTjs);
+            dayLogTakeoutService.save(runLog);
+            //////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
+
             //////////////////////////////////每日提现和截至可提现统计////////////////////////////////////////
             DayLogTakeout moneySave = schoolDayLog;
             DayLogTakeout dayLogTakeoutTemp = dayLogTxMap.get(schooltemp.getId());
@@ -229,6 +249,12 @@ public class Task {
             }
             moneySave.setSchoolDayTx(tx);
             toDaySchoolAllMoney = toDaySchoolAllMoney.subtract(tx).add(lastDaySchoolAllMoney);
+            //每日可提现加上跑腿所得
+            BigDecimal runSchoolGet = new BigDecimal(0);
+            if (runLog.getSelfGet() != null){
+                runSchoolGet = runLog.getSelfGet();
+            }
+            toDaySchoolAllMoney = toDaySchoolAllMoney.add(runSchoolGet);
             moneySave.setSchoolAllMoney(toDaySchoolAllMoney);
             //学校所得
             moneySave.setSchoolGetTotal(schoolEveryDayGetTotal);
@@ -237,14 +263,8 @@ public class Task {
             //保存当日提现
             dayLogTakeoutService.save(moneySave);
             logger.error("定时数据统计-"+schooltemp.getName()+TimeUtilS.dateFormat(new Date()));
+        } //schoolfor
 
-        }
-        //////////////////////////////////////////////////跑腿日志///////////////////////////////////////////////////////////
-        for (School schooltemp : schools) {
-            List<RunOrdersTj> runOrdersTjs = runOrdersService.tj(schooltemp.getId(), day + "%");
-            DayLogTakeout runLog = new DayLogTakeout(day, schooltemp, runOrdersTjs);
-            dayLogTakeoutService.save(runLog);
-        }
         LoggerUtil.log("统计耗时:" + (System.currentTimeMillis() - start));
     }
 

@@ -3,6 +3,7 @@ package ops.school.api.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.dto.DayLogTakeoutDTO;
 import ops.school.api.dto.RunOrdersTj;
 
 import java.math.BigDecimal;
@@ -69,13 +70,13 @@ public class DayLogTakeout {
     private Integer isDelete;
 
     @TableField(exist = false)
-    private DayLogTakeout everyDayCount;
+    private DayLogTakeoutDTO everyDayCount;
 
-    public DayLogTakeout getEveryDayCount() {
+    public DayLogTakeoutDTO getEveryDayCount() {
         return everyDayCount;
     }
 
-    public void setEveryDayCount(DayLogTakeout everyDayCount) {
+    public void setEveryDayCount(DayLogTakeoutDTO everyDayCount) {
         this.everyDayCount = everyDayCount;
     }
 
@@ -145,6 +146,7 @@ public class DayLogTakeout {
         this.type = "学校跑腿日志";
         BigDecimal wxPay = new BigDecimal(0);
         BigDecimal bellPay = new BigDecimal(0);
+        int len = runOrdersTjs.size();
         for (RunOrdersTj temp : runOrdersTjs) {
             this.totalCount += temp.getCounts();
             this.totalPrice = this.getTotalPrice().add(temp.getTotal());
@@ -377,4 +379,5 @@ public class DayLogTakeout {
     public void setUsedDiscount(BigDecimal usedDiscount) {
         this.usedDiscount = usedDiscount;
     }
+
 }

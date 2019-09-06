@@ -337,12 +337,29 @@ AND end_time LIKE #{day}
   </select>
 
     <select id="completeBySchoolId" parameterType="map" resultMap="BaseResultMap">
-  select count(o.id) as remark,sum(o.pay_price) as pay_price,sum(box_price) as box_price,sum(send_price) as send_price,sum(product_price) as product_price
-  ,sum(o.pay_price * oc.app_get_school_rate) as send_add_count_price,
-  sum(oc.app_get_total) as app_get_total,sum(oc.shop_get_total) as shop_get_total,
-  sum(oc.school_get_shop) as school_get_shop,sum(oc.school_get_sender) as school_get_sender,o.payment
-  from orders o,orders_complete oc 
-  where oc.order_id=o.id and (o.status='已完成') and o.school_id=#{schoolId} and end_time like #{day}  group by o.payment
+      SELECT
+        count(o.id) AS remark,
+        sum(o.pay_price) AS pay_price,
+        sum(box_price) AS box_price,
+        sum(send_price) AS send_price,
+        sum(product_price) AS product_price,
+        sum(
+            o.pay_price * oc.app_get_school_rate
+        ) AS send_add_count_price,
+        sum(oc.app_get_total) AS app_get_total,
+        sum(oc.shop_get_total) AS shop_get_total,
+        sum(oc.school_get_shop) AS school_get_shop,
+        sum(oc.school_get_sender) AS school_get_sender,
+        o.payment
+    FROM
+        orders o,
+        orders_complete oc
+    WHERE
+        oc.order_id = o.id
+    AND (o. STATUS = '已完成')
+    AND o.school_id = #{schoolId}
+    and end_time like #{day}
+    group by o.payment
   </select>
 
 

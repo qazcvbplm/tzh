@@ -115,6 +115,10 @@ public enum ResponseViewEnums implements RootEnums{
     INDEX_ADD_ERROR_NULL("1215003","首页展示设置未选择任何店铺和商品，请检查"),
     INDEX_ADD_ERROR_PARAMS("1215004","首页展示设置格式错误，请检查，必须是1,2,3格式"),
 
+    /**----------16-统计和提现错误错误-----------*/
+    TX_DATA_HAD_NOT_COUNT("1216001","后台每日统计数据存疑，禁止当日提现，请联系后台"),
+    TX_MONEY_LESS("1216002","可提现金额不足，请校验"),
+
 
     ;
 

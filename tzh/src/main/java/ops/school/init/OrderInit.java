@@ -23,6 +23,9 @@ public class OrderInit implements CommandLineRunner {
     @Value("${server.port}")
     private String port;
 
+    @Value("${spring.profiles.active}")
+    private String active;
+
 
     public void redisInit() {
         if (stringRedisTemplate.opsForValue().get("cache") == null) {
@@ -49,6 +52,6 @@ public class OrderInit implements CommandLineRunner {
         for (Orders temp : list) {
             stringRedisTemplate.boundHashOps("SHOP_YJS").put(temp.getId(), JSON.toJSONString(temp));
         }
-        System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成-port-" + port);
+        System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成"+ "-环境-" + active + "-port-" + port );
     }
 }

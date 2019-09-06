@@ -1,17 +1,23 @@
 package ops.school.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.qcloudsms.httpclient.HTTPException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.auth.JWTUtil;
+import ops.school.api.constants.StatisticsConstants;
 import ops.school.api.dto.project.CouponDTO;
 import ops.school.api.entity.Application;
+import ops.school.api.entity.DayLogTakeout;
 import ops.school.api.entity.School;
 import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.ApplicationService;
+import ops.school.api.service.DayLogTakeoutService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.util.BaiduUtil;
 import ops.school.api.util.ResponseObject;
+import ops.school.api.util.TimeUtilS;
 import ops.school.api.util.Util;
 import ops.school.api.constants.CouponConstants;
 import ops.school.api.constants.NumConstants;
@@ -26,8 +32,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.awt.*;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +54,9 @@ public class SchoolController {
 
     @Autowired
     private TCouponService tCouponService;
+
+    @Autowired
+    private DayLogTakeoutService dayLogTakeoutService;
 
     @ApiOperation(value = "添加", httpMethod = "POST")
     @PostMapping("add")
@@ -137,6 +148,17 @@ public class SchoolController {
                              @RequestParam String codes) {
         School school = schoolService.findById(schoolId);
         String cache = stringRedisTemplate.opsForValue().get(schoolId + school.getPhone());
+        QueryWrapper<DayLogTakeout> txSchoolWrapper = new QueryWrapper<DayLogTakeout>();
+        txSchoolWrapper.lambda().eq(DayLogTakeout::getType, StatisticsConstants.DAY_SCHOOL_CAN_TX_MONEY);
+        txSchoolWrapper.lambda().eq(DayLogTakeout::getSelfId,schoolId);
+        txSchoolWrapper.lambda().like(DayLogTakeout::getDay, TimeUtilS.theYesterdayByCalendar(new Date()));
+        List<DayLogTakeout> allTxSchoolList = dayLogTakeoutService.list(txSchoolWrapper);
+        DayLogTakeout dayLogTakeout = allTxSchoolList.get(0);
+        if (dayLogTakeout == null){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_DATA_HAD_NOT_COUNT);
+        }else if (dayLogTakeout.getSchoolAllMoney().compareTo(amount) < 0){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_MONEY_LESS);
+        }
         String res = "";
         if (cache != null && cache.equals(codes)) {
             stringRedisTemplate.delete(schoolId + school.getPhone());

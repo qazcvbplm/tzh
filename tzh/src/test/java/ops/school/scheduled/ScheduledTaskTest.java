@@ -16,9 +16,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+
+//@ContextConfiguration(locations = {"classpath:application.yml", "classpath:application-dev.yml","classpath:application-prod.yml","","classpath:application-test.yml","classpath:generator.xml"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = App.class)
-@ContextConfiguration(locations = {"classpath:application.yml", "classpath:application-dev.yml","classpath:application-prod.yml","","classpath:application-test.yml","classpath:generator.xml"})
 public class ScheduledTaskTest{
 
     @Resource(name = "scheduledTask")
@@ -50,18 +51,7 @@ public class ScheduledTaskTest{
 
     @Test
     public void taskCom(){
-        List<TimeEveryDTO> dtoList = new ArrayList<>();
-        dtoList.add(new TimeEveryDTO(8,30));
-        dtoList.add(new TimeEveryDTO(8,31));
-        dtoList.add(new TimeEveryDTO(9,1));
-        dtoList.add(new TimeEveryDTO(9,2));
-        dtoList.add(new TimeEveryDTO(9,3));
-        dtoList.add(new TimeEveryDTO(9,4));
-        dtoList.add(new TimeEveryDTO(9,5));
-        dtoList.add(new TimeEveryDTO(9,6));
-        for (TimeEveryDTO timeEveryDTO : dtoList) {
-            task.jisuan();
-        }
+        task.jisuan();
     }
 
     public static void main(String[] args) {
