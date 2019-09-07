@@ -11,6 +11,7 @@ import ops.school.api.dto.DayLogTakeoutDTO;
 import ops.school.api.dto.TimeEveryDTO;
 import ops.school.api.entity.DayLogTakeout;
 import ops.school.api.entity.Shop;
+import ops.school.api.exception.DisplayException;
 import ops.school.api.service.DayLogTakeoutService;
 import ops.school.api.service.ShopService;
 import ops.school.api.util.PublicUtilS;
@@ -61,6 +62,7 @@ public class DayLogController {
             query.lambda().eq(DayLogTakeout::getDay, day);
         query.lambda().orderByDesc(DayLogTakeout::getDay);
         IPage<DayLogTakeout> list = dayLogTakeoutService.page(PageUtil.getPage(page, size), query);
+        // DisplayException
         //加入当日数据统计-提现和负责人截至可提现
         if ("学校商铺日志".equals(type)){
             //---------查询学校跑腿日志

@@ -58,6 +58,8 @@ public class DayLogTakeoutDTO {
 
     private BigDecimal schoolDayTx;
 
+    private BigDecimal shopDayTx;
+
     private BigDecimal schoolAllMoney;
 
 
@@ -330,5 +332,13 @@ public class DayLogTakeoutDTO {
 
     public void setOrderAllMoneyAmount(BigDecimal orderAllMoneyAmount) {
         this.orderAllMoneyAmount = orderAllMoneyAmount;
+    }
+
+    public BigDecimal getShopDayTx() {
+        return shopDayTx;
+    }
+
+    public void setShopDayTx(BigDecimal shopDayTx) {
+        this.shopDayTx = shopDayTx;
     }
 }

@@ -86,10 +86,6 @@ public class TestAll {
         System.out.println(re.toString());
     }
 
-    @org.junit.Test
-    public void wxPhoneTest(){
-        tOrdersService.orderSettlement("201907271706272822542855187");
-    }
 
     @org.junit.Test
     public void imageTest(){

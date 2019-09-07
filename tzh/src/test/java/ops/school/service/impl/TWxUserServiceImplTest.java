@@ -62,12 +62,6 @@ public class TWxUserServiceImplTest {
     }
 
     @Test
-    public void testOrderComplete(){
-        String orderId = "201908061718417597677171055";
-        tOrdersService.orderSettlement(orderId);
-    }
-
-    @Test
     public void testWxMessageUtil(){
         Orders orders = new Orders();
         School school = new School();

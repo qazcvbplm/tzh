@@ -17,6 +17,8 @@ public class School extends Base implements Serializable {
     private String name;
     @NotBlank
     private String phone;
+
+    private String messagePhone;
     @NotBlank
     private String loginName;
     @NotBlank
@@ -81,6 +83,14 @@ public class School extends Base implements Serializable {
     private Integer yesWaterOne;
 
     private String senderTencentGroup;
+
+    public String getMessagePhone() {
+        return messagePhone;
+    }
+
+    public void setMessagePhone(String messagePhone) {
+        this.messagePhone = messagePhone;
+    }
 
     public String getSenderTencentGroup() {
         return senderTencentGroup;

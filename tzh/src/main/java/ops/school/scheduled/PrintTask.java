@@ -155,7 +155,7 @@ public class PrintTask {
             params[0] = orders.getShopName();
             params[1] = orders.getShopPhone();
             params[2] = orders.getId();
-            printDataDTO.setSchoolLeaderPhone(school.getPhone());
+            printDataDTO.setSchoolLeaderPhone(school.getMessagePhone());
             printDataDTO.setSendMsg3Params(params);
             sendMsgList.add(printDataDTO);
         }//true

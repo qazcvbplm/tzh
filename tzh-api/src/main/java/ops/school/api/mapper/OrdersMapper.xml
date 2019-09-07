@@ -542,16 +542,48 @@ AND end_time LIKE #{day}
   </delete>
 
     <select id="shopsta" parameterType="map" resultMap="BaseResultMap">
-  select (select count(*) from orders where shop_id=#{shopId} and status!='待付款' and status!='已取消' and create_time between #{beginTime} and #{endTime}) as remark,
-  sum(box_price) as box_price,sum(pay_price) as pay_price,sum(if(destination=1,send_price,send_price+school_top_down_price)) as send_price, count(*) as floor_id,sum(shop_get_total) as shop_get_total
-  from orders o,orders_complete oc 
-  where oc.order_id=o.id and shop_id=#{shopId} and status='已完成'  and create_time between #{beginTime} and #{endTime}
+      SELECT
+        (
+            SELECT
+                count(*)
+            FROM
+                orders
+            WHERE
+                shop_id = #{shopId} and status!='待付款' and status!='已取消' and create_time between #{beginTime} and #{endTime}
+        ) as remark,
+        sum(box_price) AS box_price,
+        sum(pay_price) AS pay_price,
+        sum(send_price) AS send_price,
+        count(*) AS floor_id,
+        sum(shop_get_total) AS shop_get_total
+        FROM
+            orders o,
+            orders_complete oc
+        WHERE
+            oc.order_id = o.id
+        AND shop_id = #{shopId}
+        and status='已完成'
+        and create_time between #{beginTime} and #{endTime}
   </select>
 
     <select id="senderStatistics" parameterType="map" resultMap="BaseResultMap">
-     select id,status,sender_id,create_time,count(*) as floor_id,sum(send_price) as send_price from orders  where sender_id = #{senderId}
-     and (status='已完成' or status='配送员已接手') and create_time between #{beginTime} and #{endTime} group by status
-  </select>
+        SELECT
+            id,
+            STATUS,
+            sender_id,
+            create_time,
+            count(*) AS floor_id,
+            sum(send_price) AS send_price
+        FROM
+            orders
+        WHERE
+            sender_id = #{senderId}
+        AND (
+            STATUS = '已完成'
+            OR STATUS = '配送员已接手'
+        )
+        AND create_time BETWEEN #{beginTime} and #{endTime} group by status
+    </select>
 
     <update id="pl" parameterType="string">
    update orders set evaluate_flag=1 where id=#{id}

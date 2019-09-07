@@ -138,8 +138,7 @@ public class Task {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
         Date time = calendar.getTime();
-        String yesterday = new SimpleDateFormat("yyyy-MM-dd").format(time);
-        return yesterday;
+        return new SimpleDateFormat("yyyy-MM-dd").format(time);
     }
 
 
@@ -171,13 +170,21 @@ public class Task {
         // todo
         txLog.ge("create_time",TimeUtilS.getDayBegin(runTaskDay,-1));
         txLog.le("create_time",TimeUtilS.getDayEnd(runTaskDay,-1));
-        List<TxLog> txLogList = txLogService.list(txLog);
-        Map<Integer,List<TxLog>> txLogListMap = PublicUtilS.listforEqualKeyListMap(txLogList,"txerId");
+        List<TxLog> txProxyList = txLogService.list(txLog);
+        Map<Integer,List<TxLog>> txProxyListMap = PublicUtilS.listforEqualKeyListMap(txProxyList,"txerId");
+        //统计店铺提现
+        txLog.eq("type","商家提现");
+        // todo
+        txLog.ge("create_time",TimeUtilS.getDayBegin(runTaskDay,-1));
+        txLog.le("create_time",TimeUtilS.getDayEnd(runTaskDay,-1));
+        List<TxLog> txShoperList = txLogService.list(txLog);
+        Map<Integer,List<TxLog>> txShoperListMap = PublicUtilS.listforEqualKeyListMap(txShoperList,"txerId");
         for (School schooltemp : schools) {
             //当天学校总钱
             BigDecimal toDaySchoolAllMoney = new BigDecimal(0);
             BigDecimal schoolEveryDayGetTotal = new BigDecimal(0);
             BigDecimal shopEveryDayGetTotal = new BigDecimal(0);
+            BigDecimal shopsAllTxMoney = new BigDecimal(0);
             List<Shop> shops = shopService.list(new QueryWrapper<Shop>().lambda().eq(Shop::getSchoolId, schooltemp.getId()));
             for (Shop shoptemp : shops) {
                 map.put("shopId", shoptemp.getId());
@@ -197,6 +204,17 @@ public class Task {
                 schoolEveryDayGetTotal = schoolEveryDayGetTotal.add(schoolGetTotal);
                 //店铺所得
                 shopEveryDayGetTotal = shopEveryDayGetTotal.add(shopGetTotal);
+                //计算每天店铺提现
+                BigDecimal shopDayTxMoney = new BigDecimal(0);
+                List<TxLog> shopTxList = txShoperListMap.get(shoptemp.getId());
+                if (shopTxList == null ){
+                    shopTxList = new ArrayList<>();
+                }
+                for (TxLog log : shopTxList) {
+                    shopDayTxMoney = shopDayTxMoney.add(log.getAmount());
+                }
+                shopsAllTxMoney = shopsAllTxMoney.add(shopDayTxMoney);
+                shopDayLog.setShopDayTx(shopDayTxMoney);
                 //保存店铺
                 dayLogTakeoutService.save(shopDayLog);
             }
@@ -226,14 +244,17 @@ public class Task {
             //统计当天代理提现的钱
             moneySave.setType(StatisticsConstants.DAY_SCHOOL_CAN_TX_MONEY);
             BigDecimal tx = new BigDecimal(0);
-            List<TxLog> logList = txLogListMap.get(schooltemp.getId());
-            if (logList == null ){
-                logList = new ArrayList<>();
+            List<TxLog> proxyList = txProxyListMap.get(schooltemp.getId());
+            if (proxyList == null ){
+                proxyList = new ArrayList<>();
             }
-            for (TxLog log : logList) {
+            for (TxLog log : proxyList) {
                 tx = tx.add(log.getAmount());
             }
+            //学校当日提现
             moneySave.setSchoolDayTx(tx);
+            //学校所有店铺当日提现
+            moneySave.setShopDayTx(shopsAllTxMoney);
             toDaySchoolAllMoney = toDaySchoolAllMoney.subtract(tx).add(lastDaySchoolAllMoney);
             //每日可提现加上跑腿所得
             BigDecimal runSchoolGet = new BigDecimal(0);
@@ -249,7 +270,7 @@ public class Task {
             //保存当日提现
             dayLogTakeoutService.save(moneySave);
             logger.error("定时数据统计-"+schooltemp.getName()+TimeUtilS.dateFormat(new Date()));
-        } //schoolfor
+        } //schoolFor
 
         LoggerUtil.log("统计耗时:" + (System.currentTimeMillis() - start));
     }
@@ -261,7 +282,7 @@ public class Task {
 
 
     /**
-     * 每1分钟执行一次,隔5分钟提醒一次
+     * 每1分钟执行一次,隔10分钟提醒一次
      * 提醒学校负责人，商家有超时未接手订单
      */
     @Scheduled(cron = "0 */5 * * * ?")
@@ -312,11 +333,18 @@ public class Task {
             if (differTime > 10) {
                 if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SHOP" + school.getPhone()) == null) {
                     try {
-                        Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getPhone(), 372755, shop.getShopName() + "," + school.getPhone(), null);
+                        if (shop == null ){
+                            shop = new Shop();
+                            shop.setShopPhone("系统未查询到店家手机号");
+                        }
+                        if (shop.getShopPhone() == null){
+                            shop.setShopPhone("系统未查询到店家手机号");
+                        }
+                        Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getMessagePhone(), 372755, shop.getShopName() + "," + shop.getShopPhone(), null);
                     } catch (Exception e) {
                         LoggerUtil.log(e.getMessage());
                     }
-                    stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SHOP" + school.getPhone(), "", 5, TimeUnit.MINUTES);
+                    stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SHOP" + school.getMessagePhone(), "", 5, TimeUnit.MINUTES);
                 }
             }
         }//for

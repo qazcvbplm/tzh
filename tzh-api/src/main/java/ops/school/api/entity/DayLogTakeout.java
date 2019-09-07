@@ -58,6 +58,8 @@ public class DayLogTakeout {
 
     private BigDecimal schoolDayTx;
 
+    private BigDecimal shopDayTx;
+
     private BigDecimal schoolAllMoney;
 
 
@@ -71,6 +73,14 @@ public class DayLogTakeout {
 
     @TableField(exist = false)
     private DayLogTakeoutDTO everyDayCount;
+
+    public BigDecimal getShopDayTx() {
+        return shopDayTx;
+    }
+
+    public void setShopDayTx(BigDecimal shopDayTx) {
+        this.shopDayTx = shopDayTx;
+    }
 
     public DayLogTakeoutDTO getEveryDayCount() {
         return everyDayCount;

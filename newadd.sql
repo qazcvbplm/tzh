@@ -35,60 +35,6 @@ alter table day_log_takeout add `create_time` datetime NOT NULL DEFAULT CURRENT_
 alter table day_log_takeout add `school_get_total` decimal(10,2) DEFAULT '0.00' COMMENT '当日统计学校所得';
 alter table day_log_takeout add `school_day_tx` decimal(10,2) DEFAULT '0.00' COMMENT '学校当日提现';
 alter table day_log_takeout add `school_all_money` decimal(10,2) DEFAULT '0.00' COMMENT '学校截至到统计时间可提现';
+alter table day_log_takeout add `shop_day_tx` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '每家店铺当日提现/学校店铺当日总提现';
 
-
-
-
-insert into shop (
-        shop.school_id,
-        shop.shop_name,
-        shop.shop_phone,
-        shop.shop_category_id,
-        shop.open_flag,
-        shop.send_model_flag,
-        shop.get_model_flag,
-        shop.score,
-        shop.start_price,
-        shop.box_price,
-        shop.send_price,
-        shop.send_time,
-        shop.top_title,
-        shop.shop_login_name,
-        shop.shop_login_pass_word,
-        shop.shop_address,
-        shop.rate,
-        shop.send_price_add,
-        shop.ts_model_flag,
-        shop.full_minus_rate,
-        shop.coupon_rate,
-        shop.discount_rate,
-        shop.shop_tx_flag
-)
-values
-(
-		24,
-		'小木村石锅拌饭',
-		'18357317997',
-		'53',
-		'1',
-		'1',
-		'1',
-		'5',
-		'10.00',
-		'1.00',
-		'0.00',
-		'35',
-		'',
-		'13136207971',
-		'123456',
-		'浙江省嘉兴市南湖区东栅街道景宜路格林小镇',
-		'0.06',
-		'0',
-		'0.00',
-		'1',
-		'0.00',
-		'0.00',
-		'0.00',
-		'1'
-		);
-
+alter table school add `message_phone` varchar(20) DEFAULT '0' COMMENT '学校负责人短信接收手机号';
