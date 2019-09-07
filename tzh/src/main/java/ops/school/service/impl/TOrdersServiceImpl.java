@@ -1198,7 +1198,6 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (orderComplete1 != null) {
             Assertions.notNull(orderComplete1, ResponseViewEnums.ORDERS_COMPLETE_HAD_ERROR);
         }
-
         // 对订单进行校验
         Assertions.notNull(orders, ResponseViewEnums.ORDER_PARAM_ERROR);
         // 配送员
@@ -1318,19 +1317,25 @@ public class TOrdersServiceImpl implements TOrdersService {
         schoolGetshop = schoolGetshop.add(tempPrice.multiply(shop.getRate()));
         ordersComplete.setSchoolGetShop(schoolGetshop);
         /**
-         * 负责人承担比例金额
+         * 负责人承担比例金额，先算满减折扣，再算优惠券
          */
+        if (fullCutAmount == null){
+            fullCutAmount = new BigDecimal(0);
+        }
+        if (discountAmount == null){
+            discountAmount = new BigDecimal(0);
+        }
+        //shop.getFullMinusRate这个比例是店铺承担
+        schoolUnderTakeAmount = schoolUnderTakeAmount
+                .add(fullCutAmount.multiply(new BigDecimal(1).subtract(shop.getFullMinusRate())))
+                .add(discountAmount.multiply(new BigDecimal(1).subtract(shop.getDiscountRate())));
         if (isCoupon) {
             // 如果优惠券类型为2 --> 负责人承担所有优惠券金额
             if (coupon.getCouponType() == 2) {
-                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
-                        .add(couponAmount)
-                        .add(discountAmount.multiply(shop.getDiscountRate()));
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(couponAmount);
             } else {
                 // 否则为店铺优惠券 --> 负责人承担一定比例
-                schoolUnderTakeAmount = schoolUnderTakeAmount.add(fullCutAmount.multiply(shop.getFullMinusRate()))
-                        .add(couponAmount.multiply(shop.getCouponRate()))
-                        .add(discountAmount.multiply(shop.getDiscountRate()));
+                schoolUnderTakeAmount = schoolUnderTakeAmount.add(couponAmount.multiply(new BigDecimal(1).subtract(shop.getCouponRate())));
             }
         }
         /**
