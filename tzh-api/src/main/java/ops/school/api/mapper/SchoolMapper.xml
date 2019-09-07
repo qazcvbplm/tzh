@@ -218,6 +218,9 @@
             <if test="phone!= null">
                 phone = #{phone},
             </if>
+            <if test="messagePhone!= null">
+                message_phone = #{messagePhone},
+            </if>
 
 
             <if test="senderAllTx != null ">

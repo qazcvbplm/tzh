@@ -20,12 +20,6 @@ public class TZHExceptionHandler {
 
     private static Logger logger = LoggerFactory.getLogger(TZHExceptionHandler.class);
 
-    final Writer result = new StringWriter();
-    final PrintWriter printWriter = new PrintWriter(result);
-
-
-    private StringWriter stringWriter;
-
     /**
      * 全局异常捕捉处理
      *
@@ -35,43 +29,49 @@ public class TZHExceptionHandler {
 
     @ExceptionHandler(DisplayException.class)
     public ResponseObject handlerDisplayException(DisplayException ex) {
-        logger.error(ex.getMessage(), ex);
-        StackTraceElement stackTraceElement= ex.getStackTrace()[0];
-        System.out.println(stackTraceElement.getMethodName());
-        System.out.println(stackTraceElement.getLineNumber());
+        StackTraceElement[] elements =  ex.getStackTrace();
+        StringBuilder message = new StringBuilder();
+        for (StackTraceElement element : elements) {
+            message.append(element.toString());
+            message.append("\n");
+        }
+        logger.error(message.toString());
         return new ResponseObject(false, ex.getMessage());
     }
 
     @ExceptionHandler(YWException.class)
     public ResponseObject handlerYWException(YWException ex) {
-       /* stringWriter = new StringWriter();
-        ex.printStackTrace(new PrintWriter(stringWriter));*/
-        StackTraceElement[] trace = ex.getStackTrace();
-        StringBuilder out = new StringBuilder();
-        for (StackTraceElement s : trace) {
-            out.append("\tat " + s + "\r\n");
+        StackTraceElement[] elements =  ex.getStackTrace();
+        StringBuilder message = new StringBuilder();
+        for (StackTraceElement element : elements) {
+            message.append(element.toString());
+            message.append("\n");
         }
-        LoggerUtil.log(out.toString());
-        if (ex instanceof YWException) {
-            return new ResponseObject(false, ex.getMessage());
-        } else {
-            return new ResponseObject(false, "服务器被外星人攻击了！");
-        }
+        logger.error(message.toString());
+        return new ResponseObject(false, ex.getMessage());
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseObject handlerNoFoundException(Exception ex) {
-        logger.error(ex.getMessage(), ex);
-        StackTraceElement stackTraceElement= ex.getStackTrace()[0];
-        System.out.println(stackTraceElement.getMethodName());
-        System.out.println(stackTraceElement.getLineNumber());
+        StackTraceElement[] elements =  ex.getStackTrace();
+        StringBuilder message = new StringBuilder();
+        for (StackTraceElement element : elements) {
+            message.append(element.toString());
+            message.append("\n");
+        }
+        logger.error(message.toString());
         return new ResponseObject(false, "页面被外星人带走了！");
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseObject handleException(Exception ex) {
-        ex.fillInStackTrace().printStackTrace(printWriter);
-        logger.error(ex.toString());
+        StackTraceElement[] elements =  ex.getStackTrace();
+        StringBuilder message = new StringBuilder();
+        for (StackTraceElement element : elements) {
+            message.append(element.toString());
+            message.append("\n");
+        }
+        logger.error(message.toString());
         return new ResponseObject(false, "服务器被外星人攻击了！");
     }
 

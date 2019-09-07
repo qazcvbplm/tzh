@@ -62,7 +62,6 @@ public class DayLogController {
             query.lambda().eq(DayLogTakeout::getDay, day);
         query.lambda().orderByDesc(DayLogTakeout::getDay);
         IPage<DayLogTakeout> list = dayLogTakeoutService.page(PageUtil.getPage(page, size), query);
-        // DisplayException
         //加入当日数据统计-提现和负责人截至可提现
         if ("学校商铺日志".equals(type)){
             //---------查询学校跑腿日志
