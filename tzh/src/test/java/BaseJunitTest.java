@@ -6,6 +6,5 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = App.class)
-@WebAppConfiguration
 public class BaseJunitTest {
 }

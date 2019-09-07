@@ -2,7 +2,11 @@ package ops.school;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import com.sun.jmx.snmp.Timestamp;
+import ops.school.api.util.TimeUtilS;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -27,6 +31,10 @@ public class Api_java_demo {
 		
 		//**********测试时，打开下面注释掉方法的即可,更多接口文档信息,请访问官网开放平台查看**********
 		public static void main(String[] args) throws Exception{
+
+
+			Date start = TimeUtilS.getDayBegin(TimeUtilS.getDateByEvery(2019,9-1,7,0,0,0),0);
+			System.out.println(start);
 			
 			//==================添加打印机接口（支持批量）==================
 			//***返回值JSON字符串***
@@ -449,6 +457,7 @@ public class Api_java_demo {
 			String s = DigestUtils.sha1Hex(USER+UKEY+STIME);
 			return s;
 		}
+
 		
 	
 }

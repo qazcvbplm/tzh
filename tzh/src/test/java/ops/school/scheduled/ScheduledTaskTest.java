@@ -53,6 +53,7 @@ public class ScheduledTaskTest{
 
     @Test
     public void taskCom(){
+        long start = System.currentTimeMillis();
         List<TimeEveryDTO> dtoList = new ArrayList<>();
         dtoList.add(new TimeEveryDTO(8,30));
         dtoList.add(new TimeEveryDTO(8,31));
@@ -68,7 +69,10 @@ public class ScheduledTaskTest{
         }
         TimeEveryDTO timeEveryDTO = new TimeEveryDTO(9,1);
         Date date = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
-        task.jisuan();
+        //task.jisuan();
+        long stop = System.currentTimeMillis();
+        System.out.println(stop- start);
+        System.out.println((stop- start)/1000/60);
     }
 
     public static void main(String[] args) {

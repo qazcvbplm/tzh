@@ -251,6 +251,38 @@ public class PublicUtilS {
         return map;
     }
 
+    /**
+     * 根据字段名将list转为map
+     */
+    @SuppressWarnings("unchecked")
+    public static <K, V, E> Map<K, V> listForMap(Collection<E> list, String keyProp, String valueProp) {
+
+        Map<K, V> map = new LinkedHashMap<>();
+
+        if (CollectionUtils.isNotEmpty(list)) {
+
+            list.removeAll(Collections.singleton(null));
+
+            for (E object : list) {
+
+                K key = null;
+                try {
+                    key = (K) PROBE.getObject(object, keyProp);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                V value = (V) ((StringUtils.isEmpty(valueProp)) ? (object) : (PROBE.getObject(object, valueProp)));
+                if (value != null) {
+                    map.put(key, value);
+                }
+
+            }
+
+        }
+
+        return map;
+    }
+
 
     /**
      * 根据字段名将list转为map

@@ -38,6 +38,10 @@ public class OrderInit implements CommandLineRunner {
     public void run(String... args) throws Exception {
         redisInit();
         System.out.println("v1.0");
+        if (!"prod".equals(active)){
+            System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成"+ "-环境-" + active + "-port-" + port );
+            return;
+        }
         //设置待接手订单
         List<Orders> orders= ordersService.findAllDjs();
         for(Orders temp:orders){

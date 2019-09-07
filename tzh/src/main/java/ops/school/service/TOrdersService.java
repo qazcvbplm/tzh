@@ -2,7 +2,7 @@ package ops.school.service;
 
 import ops.school.api.dto.ShopTj;
 import ops.school.api.dto.project.ProductOrderDTO;
-import ops.school.api.entity.Orders;
+import ops.school.api.entity.*;
 import ops.school.api.util.ResponseObject;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +59,19 @@ public interface TOrdersService {
 
 
     /**
-     * @date:   2019/8/21 14:38
+     * @date:   2019/9/7 16:12
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   orders
+     * @param   shop
+     * @param   coupon
+     * @Desc:   desc
+     */
+    ResponseObject orderComputeDataByOrders(Orders orders, Shop shop, Coupon coupon, Sender sender, WxUser senderUser,WxUser orderUser);
+
+    /**
+     * @date:   2019/9/7 16:59
      * @author: QinDaoFang
      * @version:version
      * @return: java.lang.Boolean
