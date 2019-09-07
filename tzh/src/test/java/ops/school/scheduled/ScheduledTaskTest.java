@@ -3,6 +3,7 @@ package ops.school.scheduled;
 
 import ops.school.App;
 import ops.school.api.dto.TimeEveryDTO;
+import ops.school.api.util.TimeUtilS;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -51,6 +53,21 @@ public class ScheduledTaskTest{
 
     @Test
     public void taskCom(){
+        List<TimeEveryDTO> dtoList = new ArrayList<>();
+        dtoList.add(new TimeEveryDTO(8,30));
+        dtoList.add(new TimeEveryDTO(8,31));
+        dtoList.add(new TimeEveryDTO(9,1));
+        dtoList.add(new TimeEveryDTO(9,2));
+        dtoList.add(new TimeEveryDTO(9,3));
+        dtoList.add(new TimeEveryDTO(9,4));
+        dtoList.add(new TimeEveryDTO(9,5));
+        dtoList.add(new TimeEveryDTO(9,6));
+        for (TimeEveryDTO timeEveryDTO : dtoList) {
+            Date date = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
+
+        }
+        TimeEveryDTO timeEveryDTO = new TimeEveryDTO(9,1);
+        Date date = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
         task.jisuan();
     }
 

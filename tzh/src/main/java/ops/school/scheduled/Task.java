@@ -145,22 +145,8 @@ public class Task {
 
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
-        List<TimeEveryDTO> dtoList = new ArrayList<>();
-        dtoList.add(new TimeEveryDTO(8,30));
-        dtoList.add(new TimeEveryDTO(8,31));
-        dtoList.add(new TimeEveryDTO(9,1));
-        dtoList.add(new TimeEveryDTO(9,2));
-        dtoList.add(new TimeEveryDTO(9,3));
-        dtoList.add(new TimeEveryDTO(9,4));
-        dtoList.add(new TimeEveryDTO(9,5));
-        dtoList.add(new TimeEveryDTO(9,6));
-        for (TimeEveryDTO timeEveryDTO : dtoList) {
-            Date date = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
-            this.theDayilyStatistics(date);
-        }
-        TimeEveryDTO timeEveryDTO = new TimeEveryDTO(9,1);
-        Date date = TimeUtilS.getDateByEvery(timeEveryDTO.getYear(),timeEveryDTO.getMonth()-1,timeEveryDTO.getDay(),timeEveryDTO.getHour(),timeEveryDTO.getMinutes(),timeEveryDTO.getSeconds());
-
+        Date date = new Date();
+        this.theDayilyStatistics(date);
     }
 
     private void theDayilyStatistics(Date runTaskDay) {
