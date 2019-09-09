@@ -64,6 +64,9 @@
         <result column="school_day_tx" property="schoolDayTx" jdbcType="DECIMAL"/>
         <result column="school_all_money" property="schoolAllMoney" jdbcType="DECIMAL"/>
 
+        <result column="down_send_count" property="downSendCount" jdbcType="INTEGER" />
+        <result column="down_send_money" property="downSendMoney" jdbcType="DECIMAL" />
+
         <association property="complete" javaType="ops.school.api.entity.OrdersComplete">
             <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
             <result column="app_get_school_rate" jdbcType="DECIMAL" property="appGetSchoolRate"/>
@@ -325,7 +328,33 @@
 		AND orders. STATUS = '已完成'
 		AND orders.shop_id = #{shopId}
 		AND orders.end_time LIKE #{day}
-	) AS used_discount
+	) AS used_discount,
+	(
+		SELECT
+			count(1) AS down_send_count
+		FROM
+			orders,
+			orders_complete
+		WHERE
+		orders_complete.order_id = orders.id
+		AND orders. STATUS = '已完成'
+		AND orders.shop_id = #{shopId}
+		AND orders.end_time LIKE #{day}
+		AND orders.destination = 0
+	) AS down_send_count,
+	(
+		SELECT
+			sum(orders.send_price) AS down_send_money
+		FROM
+			orders,
+			orders_complete
+		WHERE
+		orders_complete.order_id = orders.id
+		AND orders. STATUS = '已完成'
+		AND orders.shop_id = #{shopId}
+		AND orders.end_time LIKE #{day}
+		AND orders.destination = 0
+	) AS down_send_money
 FROM
 	orders o,
 	orders_complete oc
@@ -358,7 +387,7 @@ AND end_time LIKE #{day}
         oc.order_id = o.id
     AND (o. STATUS = '已完成')
     AND o.school_id = #{schoolId}
-    and end_time like #{day}
+    AND end_time like #{day}
     group by o.payment
   </select>
 
@@ -573,7 +602,38 @@ AND end_time LIKE #{day}
             sender_id,
             create_time,
             count(*) AS floor_id,
-            sum(send_price) AS send_price
+            sum(send_price) AS send_price,
+            (
+                SELECT
+                    count(1) AS down_send_count
+                FROM
+                    orders
+                WHERE
+                sender_id = #{senderId}
+                AND (
+                    STATUS = '已完成'
+                    OR STATUS = '配送员已接手'
+                )
+                AND create_time BETWEEN #{beginTime} and #{endTime}
+                AND destination = 0
+                group by status
+            ) AS down_send_count,
+            (
+                SELECT
+                    sum(orders.send_price) AS down_send_money
+                FROM
+                    orders
+                WHERE
+                sender_id = #{senderId}
+                AND (
+                    STATUS = '已完成'
+                    OR STATUS = '配送员已接手'
+                )
+                AND create_time BETWEEN #{beginTime} and #{endTime}
+                AND destination = 0
+                group by status
+
+            ) AS down_send_money
         FROM
             orders
         WHERE

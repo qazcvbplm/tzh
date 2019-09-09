@@ -5,7 +5,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   profiles:
-    active: test
+    active: prod
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     driverClassName: com.mysql.jdbc.Driver

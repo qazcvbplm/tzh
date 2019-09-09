@@ -405,6 +405,12 @@ public class TSenderServiceImpl implements TSenderService {
             }
             if (temp.getSendPrice() != null)
                 rs.setTakeout_Price(rs.getTakeout_Price().add(temp.getSendPrice()));
+            if (temp.getDownSendCount() != null){
+                rs.setDownSendCount(temp.getDownSendCount());
+            }
+            if (temp.getDownSendMoney() != null){
+                rs.setDownSendMoney(temp.getDownSendMoney());
+            }
         }
         for (RunOrders temp : result2) {
             if (temp.getStatus().equals("配送员已接手")) {

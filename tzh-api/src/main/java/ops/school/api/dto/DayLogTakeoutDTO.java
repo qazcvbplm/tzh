@@ -62,6 +62,11 @@ public class DayLogTakeoutDTO {
 
     private BigDecimal schoolAllMoney;
 
+    private Integer downSendCount;
+
+    private BigDecimal downSendMoney;
+
+
 
     /**
      * 创建时间
@@ -340,5 +345,22 @@ public class DayLogTakeoutDTO {
 
     public void setShopDayTx(BigDecimal shopDayTx) {
         this.shopDayTx = shopDayTx;
+    }
+
+
+    public Integer getDownSendCount() {
+        return downSendCount;
+    }
+
+    public void setDownSendCount(Integer downSendCount) {
+        this.downSendCount = downSendCount;
+    }
+
+    public BigDecimal getDownSendMoney() {
+        return downSendMoney;
+    }
+
+    public void setDownSendMoney(BigDecimal downSendMoney) {
+        this.downSendMoney = downSendMoney;
     }
 }

@@ -62,7 +62,9 @@ public class DayLogTakeout {
 
     private BigDecimal schoolAllMoney;
 
+    private Integer downSendCount;
 
+    private BigDecimal downSendMoney;
     /**
      * 创建时间
      */
@@ -73,6 +75,22 @@ public class DayLogTakeout {
 
     @TableField(exist = false)
     private DayLogTakeoutDTO everyDayCount;
+
+    public Integer getDownSendCount() {
+        return downSendCount;
+    }
+
+    public void setDownSendCount(Integer downSendCount) {
+        this.downSendCount = downSendCount;
+    }
+
+    public BigDecimal getDownSendMoney() {
+        return downSendMoney;
+    }
+
+    public void setDownSendMoney(BigDecimal downSendMoney) {
+        this.downSendMoney = downSendMoney;
+    }
 
     public BigDecimal getShopDayTx() {
         return shopDayTx;
@@ -233,6 +251,8 @@ public class DayLogTakeout {
         BigDecimal dis = order.getUsedDiscount() == null ? BigDecimal.valueOf(0) : order.getUsedDiscount();
         this.usedDiscount = dis;
         this.schoolGetTotal = order.getSchoolGetTotal();
+        this.downSendCount = order.getDownSendCount();
+        this.downSendMoney = order.getDownSendMoney();
         return this;
     }
 

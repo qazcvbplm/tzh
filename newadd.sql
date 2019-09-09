@@ -38,3 +38,8 @@ alter table day_log_takeout add `school_all_money` decimal(10,2) DEFAULT '0.00' 
 alter table day_log_takeout add `shop_day_tx` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '每家店铺当日提现/学校店铺当日总提现';
 
 alter table school add `message_phone` varchar(20) DEFAULT '0' COMMENT '学校负责人短信接收手机号';
+
+ALTER TABLE `day_log_takeout`
+ADD COLUMN `down_send_count`  int(4) NOT NULL DEFAULT 0 COMMENT '楼下完成配送员总单数' AFTER `school_all_money`,
+ADD COLUMN `down_send_money`  decimal(10,2) NOT NULL DEFAULT 0 COMMENT '配送员楼下完成订单配送费' AFTER `down_send_count`;
+

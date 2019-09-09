@@ -31,6 +31,9 @@
         <result column="shop_day_tx" property="shopDayTx" jdbcType="DECIMAL" />
         <result column="school_all_money" property="schoolAllMoney" jdbcType="DECIMAL" />
 
+        <result column="down_send_count" property="downSendCount" jdbcType="INTEGER" />
+        <result column="down_send_money" property="downSendMoney" jdbcType="DECIMAL" />
+
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     </resultMap>
 
@@ -60,6 +63,8 @@
         school_day_tx,
         shop_day_tx,
         school_all_money,
+        down_send_count,
+        down_send_money,
         create_time
     </sql>
 

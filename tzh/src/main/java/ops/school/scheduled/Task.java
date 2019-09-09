@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -185,6 +186,8 @@ public class Task {
             BigDecimal schoolEveryDayGetTotal = new BigDecimal(0);
             BigDecimal shopEveryDayGetTotal = new BigDecimal(0);
             BigDecimal shopsAllTxMoney = new BigDecimal(0);
+            BigDecimal downSendMoney = new BigDecimal(0);
+            Integer downSendCount = 0;
             List<Shop> shops = shopService.list(new QueryWrapper<Shop>().lambda().eq(Shop::getSchoolId, schooltemp.getId()));
             for (Shop shoptemp : shops) {
                 map.put("shopId", shoptemp.getId());
@@ -214,6 +217,11 @@ public class Task {
                     shopDayTxMoney = shopDayTxMoney.add(log.getAmount());
                 }
                 shopsAllTxMoney = shopsAllTxMoney.add(shopDayTxMoney);
+                if (result.getDownSendMoney() == null){
+                    result.setDownSendMoney(new BigDecimal(0));
+                }
+                downSendMoney = downSendMoney.add(result.getDownSendMoney());
+                downSendCount = downSendCount + result.getDownSendCount();
                 shopDayLog.setShopDayTx(shopDayTxMoney);
                 //保存店铺
                 dayLogTakeoutService.save(shopDayLog);
@@ -267,12 +275,14 @@ public class Task {
             moneySave.setSchoolGetTotal(schoolEveryDayGetTotal);
             //使用微信payGet字段记录店铺所得总和shopEveryDayGetTotal
             moneySave.setWxPayGet(shopEveryDayGetTotal);
+            moneySave.setDownSendCount(downSendCount);
+            moneySave.setDownSendMoney(downSendMoney);
             //保存当日提现
             dayLogTakeoutService.save(moneySave);
             logger.error("定时数据统计-"+schooltemp.getName()+TimeUtilS.dateFormat(new Date()));
         } //schoolFor
 
-        LoggerUtil.log("统计耗时:" + (System.currentTimeMillis() - start));
+        logger.info("每天总的数据统计——theDayilyStatistics-耗时（ms）:" + (System.currentTimeMillis() - start));
     }
 
     @Scheduled(cron = "1 0 0 * * ?")

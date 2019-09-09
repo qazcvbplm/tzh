@@ -1868,6 +1868,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         printDataDTO.setPrintBrand(ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E);
         printDataDTO.setWaterNumber(orders.getWaterNumber());
         printDataDTO.setYesPrintTrue(NumConstants.INTEGER_NUM_1);
+        printDataDTO.setCreatTime(new Date());
         orders.setStatus("商家已接手");
         printDataDTO.setRealOrder(orders);
         stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));

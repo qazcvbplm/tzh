@@ -3,6 +3,7 @@ package ops.school.api.wxutil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import ops.school.api.util.LoggerUtil;
+import org.springframework.util.StringUtils;
 
 public class WxGUtil {
 
@@ -44,6 +45,9 @@ public class WxGUtil {
         String rs = HttpRequest.sendGet(tokenurl, "grant_type=client_credential&appid=" + appid + "&secret=" + secert);
         JSONObject json = JSON.parseObject(rs, JSONObject.class);
         String resultToken = json.getString("access_token");
+        if (resultToken == null || !StringUtils.hasText(resultToken)){
+            LoggerUtil.logError("getAccessTokenEveryTime-失败-信息-"+rs);
+        }
         return resultToken;
     }
 
@@ -73,6 +77,7 @@ public class WxGUtil {
         if (access_token == null){
             LoggerUtil.logError("checkGz+access_token == null"+openid);
             access_token = "";
+            return false;
         }
         String rs = HttpRequest.sendGet(gz, "lang=zh_CN&access_token=" + access_token + "&openid=" + openid);
         JSONObject json = JSON.parseObject(rs, JSONObject.class);

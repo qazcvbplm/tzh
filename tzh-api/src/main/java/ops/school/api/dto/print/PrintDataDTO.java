@@ -3,6 +3,7 @@ package ops.school.api.dto.print;
 import ops.school.api.entity.Orders;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +30,8 @@ public class PrintDataDTO {
     private Integer printBrand;
 
     private Integer waterNumber;
+
+    private Date creatTime;
 
     private Orders realOrder;
 
@@ -135,6 +138,14 @@ public class PrintDataDTO {
         this.schoolLeaderPhone = schoolLeaderPhone;
     }
 
+    public Date getCreatTime() {
+        return creatTime;
+    }
+
+    public void setCreatTime(Date creatTime) {
+        this.creatTime = creatTime;
+    }
+
     @Override
     public String toString() {
         return "PrintDataDTO{" +
@@ -146,6 +157,7 @@ public class PrintDataDTO {
                 ", yesPrintTrue=" + yesPrintTrue +
                 ", printBrand=" + printBrand +
                 ", waterNumber=" + waterNumber +
+                ", creatTime=" + creatTime +
                 ", realOrder=" + realOrder +
                 ", cycleRedisCount=" + cycleRedisCount +
                 ", sendMsg3Params=" + Arrays.toString(sendMsg3Params) +

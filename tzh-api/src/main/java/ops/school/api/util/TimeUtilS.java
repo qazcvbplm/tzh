@@ -46,6 +46,32 @@ public class TimeUtilS {
         return min;
     }
 
+    /**
+     * 两个日期相减得到的毫秒数
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    public static long dateDiffMinutes(Date beginDate, Date endDate) {
+        long nd = 1000 * 24 * 60 * 60;// 一天的毫秒数
+        long nh = 1000 * 60 * 60;// 一小时的毫秒数
+        long nm = 1000 * 60;// 一分钟的毫秒数
+        long date1ms=beginDate.getTime();
+        long date2ms=endDate.getTime();
+        long diff = 2L;
+        long day = 0;
+        long min = 0;
+        diff = date2ms-date1ms;
+        min = diff % nd % nh / nm + day * 24 * 60;// 计算差多少分钟
+        return min;
+    }
+
+    public static long dateDiffMS(Date beginDate, Date endDate) {
+        long date1ms=beginDate.getTime();
+        long date2ms=endDate.getTime();
+        return date2ms - date1ms;
+    }
+
     //============================借助Calendar类获取今天、昨天、本周、上周、本年及特定时间的开始时间和结束时间（返回类型为date类型）========================
 
     /**
@@ -369,17 +395,6 @@ public class TimeUtilS {
     }
 
 
-    /**
-     * 两个日期相减得到的毫秒数
-     * @param beginDate
-     * @param endDate
-     * @return
-     */
-    public static long dateDiff(Date beginDate, Date endDate) {
-        long date1ms=beginDate.getTime();
-        long date2ms=endDate.getTime();
-        return date2ms-date1ms;
-    }
 
 
     /**

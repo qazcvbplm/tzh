@@ -1,5 +1,7 @@
 package ops.school.api.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -29,6 +31,12 @@ public class SenderTj implements Serializable {
 
     private BigDecimal run_price;
 
+    @TableField(exist = false)
+    private Integer downSendCount;
+
+    @TableField(exist = false)
+    private BigDecimal downSendMoney;
+
 
     public SenderTj() {
         super();
@@ -44,6 +52,22 @@ public class SenderTj implements Serializable {
         this.totalGet = new BigDecimal(0);
         this.takeout_Price = new BigDecimal(0);
         this.run_price = new BigDecimal(0);
+    }
+
+    public Integer getDownSendCount() {
+        return downSendCount;
+    }
+
+    public void setDownSendCount(Integer downSendCount) {
+        this.downSendCount = downSendCount;
+    }
+
+    public BigDecimal getDownSendMoney() {
+        return downSendMoney;
+    }
+
+    public void setDownSendMoney(BigDecimal downSendMoney) {
+        this.downSendMoney = downSendMoney;
     }
 
     public BigDecimal getTakeout_Price() {

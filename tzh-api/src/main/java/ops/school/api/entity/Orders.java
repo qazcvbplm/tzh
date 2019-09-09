@@ -333,6 +333,12 @@ public class Orders extends Base implements Serializable {
     @TableField(exist = false)
     private BigDecimal schoolAllMoney;
 
+    @TableField(exist = false)
+    private Integer downSendCount;
+
+    @TableField(exist = false)
+    private BigDecimal downSendMoney;
+
 
     @TableField(exist = false)
     List<ProductOrderDTO> productOrderDTOS;
@@ -1003,5 +1009,21 @@ public class Orders extends Base implements Serializable {
 
     public void setUsedDiscount(BigDecimal usedDiscount) {
         this.usedDiscount = usedDiscount;
+    }
+
+    public Integer getDownSendCount() {
+        return downSendCount;
+    }
+
+    public void setDownSendCount(Integer downSendCount) {
+        this.downSendCount = downSendCount;
+    }
+
+    public BigDecimal getDownSendMoney() {
+        return downSendMoney;
+    }
+
+    public void setDownSendMoney(BigDecimal downSendMoney) {
+        this.downSendMoney = downSendMoney;
     }
 }

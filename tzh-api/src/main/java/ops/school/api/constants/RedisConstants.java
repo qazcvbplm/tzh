@@ -23,5 +23,7 @@ public class RedisConstants {
 
     public final static  String Index_Second_Hand_Shop_Hash= "Index_Second_Hand_Shop_Hash" ;
 
+    public final static  String Shop_Wait_Print_Set_Key = "Shop_Wait_Print_Set_Key";
+
 
 }
