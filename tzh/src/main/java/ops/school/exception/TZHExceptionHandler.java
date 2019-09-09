@@ -31,6 +31,8 @@ public class TZHExceptionHandler {
     public ResponseObject handlerDisplayException(DisplayException ex) {
         StackTraceElement[] elements =  ex.getStackTrace();
         StringBuilder message = new StringBuilder();
+        message.append(ex.getMessage());
+        message.append("\n");
         for (StackTraceElement element : elements) {
             message.append(element.toString());
             message.append("\n");
@@ -43,6 +45,8 @@ public class TZHExceptionHandler {
     public ResponseObject handlerYWException(YWException ex) {
         StackTraceElement[] elements =  ex.getStackTrace();
         StringBuilder message = new StringBuilder();
+        message.append(ex.getMessage());
+        message.append("\n");
         for (StackTraceElement element : elements) {
             message.append(element.toString());
             message.append("\n");
@@ -55,6 +59,8 @@ public class TZHExceptionHandler {
     public ResponseObject handlerNoFoundException(Exception ex) {
         StackTraceElement[] elements =  ex.getStackTrace();
         StringBuilder message = new StringBuilder();
+        message.append(ex.getMessage());
+        message.append("\n");
         for (StackTraceElement element : elements) {
             message.append(element.toString());
             message.append("\n");
@@ -67,6 +73,8 @@ public class TZHExceptionHandler {
     public ResponseObject handleException(Exception ex) {
         StackTraceElement[] elements =  ex.getStackTrace();
         StringBuilder message = new StringBuilder();
+        message.append(ex.getMessage());
+        message.append("\n");
         for (StackTraceElement element : elements) {
             message.append(element.toString());
             message.append("\n");

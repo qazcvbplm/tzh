@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import javax.validation.constraints.NotNull;
 
 public class SourceOrder extends Base {
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.INPUT)
     private String id;
     @NotNull
     private Integer appId;

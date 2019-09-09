@@ -29,7 +29,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/ops/index")
-public class IndexShopProductController {
+public class  IndexShopProductController {
 
     @Autowired
     private IndexShopProductService indexShopProductService;
