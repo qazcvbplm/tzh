@@ -667,6 +667,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             //失败把订单改成待接手，定时器会查询到
             if (!responseObject.isCode()){
                 Integer updateNum = ordersService.makeOrdersToWaitAccept(orderId);
+                logger.error("云打印-支付成功回调-paySuccess-无法完成接单并打印和推送查询-"+orderId);
             }
             return 0;
         }
