@@ -81,39 +81,43 @@ public class PrintTask {
                 }
                 //先发送微信消息
                 //发送所有的流水号
-                Map<Integer,List<PrintDataDTO>> shopOrderMap = PublicUtilS.listforEqualKeyListMap(sendMsgList,"ourShopId");
-                Map<Integer,List<PrintDataDTO>> schoolSendList = PublicUtilS.listforEqualKeyListMap(sendMsgList,"")
-                for (PrintDataDTO send : sendMsgList) {
-                    boolean sendTrue = set.add(send.getOurShopId());
-                    if (!sendTrue) {
+                Map<Integer,List<PrintDataDTO>> schoolSendMap = PublicUtilS.listforEqualKeyListMap(sendMsgList,"ourSchoolId");
+                for (Integer schoolId : schoolSendMap.keySet()) {
+                    List<PrintDataDTO> schoolSendList = schoolSendMap.get(schoolId);
+                    if (schoolSendList.size() < NumConstants.INT_NUM_1){
                         continue;
                     }
-                    //流水号
-                    List<PrintDataDTO> printDataDTOS = shopOrderMap.get(send.getOurShopId());
-                    List<Integer> waterAll = PublicUtilS.getValueList(printDataDTOS,"waterNumber");
-                    List<String> shopNameAll = PublicUtilS.getValueList(printDataDTOS,"waterNumber");
-                    if (waterAll == null){
-                        waterAll = new ArrayList<>();
+                    Set<String> shopNameSet = new HashSet<>();
+                    Set<String> shopPhoneSet = new HashSet<>();
+                    Map<Integer,List<Integer>> waterAllByshopMap = new HashMap<>();
+                    for (PrintDataDTO sendDTO : schoolSendList) {
+                        shopNameSet.add(sendDTO.getRealOrder().getShopName());
+                        shopPhoneSet.add(sendDTO.getRealOrder().getShopPhone());
+                        if (waterAllByshopMap.get(sendDTO.getOurShopId()) == null){
+                            waterAllByshopMap.put(sendDTO.getOurShopId(),Arrays.asList(sendDTO.getWaterNumber()));
+                        }else {
+                            List<Integer> waterAll = new ArrayList<>();
+                            waterAll.addAll(waterAllByshopMap.get(sendDTO.getOurShopId()));
+                            waterAll.add(sendDTO.getWaterNumber());
+                            waterAllByshopMap.put(sendDTO.getOurShopId(),waterAll);
+                        }
                     }
-                    String waterMsg = null;
-                    if (waterAll.size() > NumConstants.INT_NUM_0){
-                        waterMsg = "流水号：" + waterAll.toString();
-                    }else {
-                        waterMsg = send.getOurOrderId();
+                    StringBuilder param3waterArray = new StringBuilder();
+                    param3waterArray.append("的流水号分别是:");
+                    for (Integer shopId : waterAllByshopMap.keySet()) {
+                        param3waterArray.append(waterAllByshopMap.get(shopId).toString());
                     }
-                    //拼接参数
                     String[] params = new String[3];
-                    params[0] = "[" + send.getRealOrder().getShopName() + "]";
-                    params[1] = send.getRealOrder().getShopPhone();
-                    params[2] = waterMsg;
-
+                    params[0] = shopNameSet.toString();
+                    params[1] = shopPhoneSet.toString();
+                    params[2] = param3waterArray.toString();
                     try {
-                        Util.qqSmsNoConfig(send.getSchoolLeaderPhone(), WechatConfigConstants.Tencent_Message_NOT_Print_Template, params);
+                        Util.qqSmsNoConfig(schoolSendList.get(0).getSchoolLeaderPhone(), WechatConfigConstants.Tencent_Message_NOT_Print_Template, params);
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态后发送负责人短信失败-" + send.getOurOrderId());
+                        LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态后发送负责人短信失败-" + schoolSendList.get(0).getOurOrderId());
                     }
-                }
+                }//流程结束
 
                 int waitTime = 60;
                 try {
@@ -182,7 +186,7 @@ public class PrintTask {
                 }
                 continue;
             }
-            //3参数在发送瓶装
+            //3参数在发送拼装
             printDataDTO.setSchoolLeaderPhone(school.getMessagePhone());
             sendMsgList.add(printDataDTO);
         }//true
