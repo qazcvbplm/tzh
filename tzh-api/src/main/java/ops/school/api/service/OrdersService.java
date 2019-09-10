@@ -78,4 +78,14 @@ public interface OrdersService extends IService<Orders> {
      * @Desc:   desc
      */
     Orders countSenderDownOrders(int senderId, String beginTime, String endTime);
+
+    /**
+     * @date:   2019/9/10 20:52
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   orderId
+     * @Desc:   desc
+     */
+    Integer makeOrdersToWaitAccept(String orderId);
 }

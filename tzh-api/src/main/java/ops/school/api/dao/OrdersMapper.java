@@ -90,4 +90,14 @@ public interface OrdersMapper extends BaseMapper<Orders> {
      * @Desc:   desc
      */
     Orders countSenderDownOrders(@Param("senderId") int senderId,@Param("beginTime") String beginTime, @Param("endTime") String endTime);
+
+    /**
+     * @date:   2019/9/10 20:53
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   orderId
+     * @Desc:   desc
+     */
+    Integer makeOrdersToWaitAccept(String orderId);
 }

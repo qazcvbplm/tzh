@@ -654,4 +654,11 @@ AND end_time LIKE #{day}
         AND destination = 0
     </select>
 
+    <!--CreatBy Fang Time:2019/9/10 20:53 |  -->
+    <update id="makeOrdersToWaitAccept">
+        UPDATE orders
+        SET status='待接手'
+        WHERE id = #{orderId}
+    </update>
+
 </mapper>

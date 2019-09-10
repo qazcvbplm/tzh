@@ -43,4 +43,9 @@ public class ShopPrintConfigConstants {
     public final static String FE_YIN_2_0_APP_ID = "154609";
 
     public final static String FEI_E_Open_printMsg = "Open_printMsg";
+
+    public final static int DB_SHOP_PRINT_CLOUD = 1;
+
+    public final static int DB_SHOP_PRINT_BLUE = 2;
+
 }

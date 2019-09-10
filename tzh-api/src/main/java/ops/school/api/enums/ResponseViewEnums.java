@@ -63,6 +63,7 @@ public enum ResponseViewEnums implements RootEnums{
     ORDER_PARAM_NULL("1250010","订单信息错误，请稍后重新下单"),
     ORDER_PARAM_TIME_BEFORE("1250011","预定订单时间太早，请稍后重新下单"),
     ORDER_USER_BELL_NULL("1250012","用户数据有误，请前往“我的”界面重新授权绑定手机号"),
+    ORDER_ADD_ORDER_NO_SHOP("1250013","亲！支付成功，下单失败，店铺有误，请联系学校负责人或者椰子后台客服服务"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),

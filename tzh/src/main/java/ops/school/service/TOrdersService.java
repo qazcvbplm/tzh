@@ -31,7 +31,7 @@ public interface TOrdersService {
     int pay(Orders orders,String formid);
 
     @Transactional
-    int paySuccess(String orderId, String payment);
+    int paySuccess(String orderId, String payment,Orders orders);
 
     @Transactional
     int cancel(String id);

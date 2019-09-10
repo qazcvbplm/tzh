@@ -630,7 +630,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                 logger.error("系统异常- {},订单id{}，支付价格{}，粮票{}，学校id{}",ResponseViewEnums.PAY_ERROR_SCHOOL_FAILED.getErrorMessage(),orders.getId(),orders.getPayPrice(), orders.getPayFoodCoupon(), school.getId());
 
             }
-            if (paySuccess(orders.getId(), "余额支付") == 0) {
+            if (paySuccess(orders.getId(), "余额支付",orders) == 0) {
                 stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).delete(orders.getId().toString());
                 stringRedisTemplate.boundHashOps("ALL_DJS").delete(orders.getId().toString());
                 //删除订单product
@@ -652,12 +652,39 @@ public class TOrdersServiceImpl implements TOrdersService {
 
     @Transactional
     @Override
-    public int paySuccess(String orderId, String payment) {
+    public int paySuccess(String orderId, String payment,Orders orders) {
+        if (orders == null){
+            orders = ordersService.findById(orderId);
+        }
+        Shop shop = shopService.getById(orders.getShopId());
+        if (shop == null){
+            logger.error("支付成功回调-paySuccess-学校查不到-订单-"+orderId);
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_ADD_ORDER_NO_SHOP);
+        }
+        //1-如果开启云打印就是云打印就是
+        if (shop.getPrintType().intValue() == ShopPrintConfigConstants.DB_SHOP_PRINT_CLOUD){
+            ResponseObject responseObject = this.letOrderShopHadAccept(orderId,orders.getShopId());
+            //失败把订单改成待接手，定时器会查询到
+            if (!responseObject.isCode()){
+                Integer updateNum = ordersService.makeOrdersToWaitAccept(orderId);
+            }
+            return 0;
+        }
+        else{
+        //2-没有开启就是带接手
+            return this.letOrderWaitToAccept(orderId, payment,orders);
+        }
+
+    }
+    private ResponseObject letOrderShopHadAccept(String orderId, Integer shopId) {
+        return printAndAcceptOneOrderByOId(orderId, Long.valueOf(shopId));
+    }
+
+    private int letOrderWaitToAccept(String orderId, String payment, Orders orders) {
         Map<String, Object> map = new HashMap<>();
         map.put("orderId", orderId);
         map.put("payment", payment);
         map.put("payTimeLong", System.currentTimeMillis());
-        Orders orders = ordersService.findById(orderId);
         int rs = ordersService.paySuccess(map);
         if (rs == 1) {
             cache.takeoutCountadd(orders.getSchoolId());
@@ -679,6 +706,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         }
         return rs;
     }
+
 
     @Transactional
     @Override

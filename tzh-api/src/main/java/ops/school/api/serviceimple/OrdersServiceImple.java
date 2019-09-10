@@ -172,4 +172,17 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
     public Orders countSenderDownOrders(int senderId, String beginTime, String endTime) {
         return ordersMapper.countSenderDownOrders(senderId,beginTime,endTime);
     }
+
+    /**
+     * @date:   2019/9/10 20:53
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Integer
+     * @param   orderId
+     * @Desc:   desc
+     */
+    @Override
+    public Integer makeOrdersToWaitAccept(String orderId) {
+        return ordersMapper.makeOrdersToWaitAccept(orderId);
+    }
 }

@@ -57,7 +57,7 @@ public class OrdersNotify {
 				String orderId=map.get("out_trade_no");
 				Orders orders= ordersService.findById(orderId);
 				if(orders.getStatus().equals("待付款")){
-                    if (tOrdersService.paySuccess(orderId, "微信支付") == 1) {
+                    if (tOrdersService.paySuccess(orderId, "微信支付",orders) == 1) {
 						//wxUserService.addSourcePaySuccess(orders);
 						Success(response);
 					}
