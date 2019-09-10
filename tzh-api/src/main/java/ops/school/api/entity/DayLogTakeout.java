@@ -65,6 +65,12 @@ public class DayLogTakeout {
     private Integer downSendCount;
 
     private BigDecimal downSendMoney;
+
+    @TableField(exist = false)
+    private Integer upSendCount;
+
+    @TableField(exist = false)
+    private BigDecimal upSendMoney;
     /**
      * 创建时间
      */
@@ -75,6 +81,22 @@ public class DayLogTakeout {
 
     @TableField(exist = false)
     private DayLogTakeoutDTO everyDayCount;
+
+    public Integer getUpSendCount() {
+        return upSendCount;
+    }
+
+    public void setUpSendCount(Integer upSendCount) {
+        this.upSendCount = upSendCount;
+    }
+
+    public BigDecimal getUpSendMoney() {
+        return upSendMoney;
+    }
+
+    public void setUpSendMoney(BigDecimal upSendMoney) {
+        this.upSendMoney = upSendMoney;
+    }
 
     public Integer getDownSendCount() {
         return downSendCount;

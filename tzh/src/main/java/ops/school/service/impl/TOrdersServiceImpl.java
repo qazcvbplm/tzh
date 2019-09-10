@@ -1850,18 +1850,25 @@ public class TOrdersServiceImpl implements TOrdersService {
         String content = this.getOrderPrintContent(orders);
         List<ShopPrint> shopPrintList = shopPringService.findOneShopFeiEByShopId(shopId);
         if (shopPrintList.size() < NumConstants.INT_NUM_1){
-            DisplayException.throwMessage(ResponseViewEnums.ORDER_PRINT_NO_PRINTER.getErrorMessage()+"订单号"+orderId);
+            LoggerUtil.logError(ResponseViewEnums.ORDER_PRINT_NO_PRINTER.getErrorMessage()+"订单号"+orderId);
         }
-        ShopPrint shopPrint = shopPrintList.get(0);
+        ShopPrint shopPrint = null;
+        if (shopPrintList.size() > NumConstants.INT_NUM_0){
+            shopPrint = shopPrintList.get(0);
+        }else {
+            shopPrint = new ShopPrint();
+            shopPrint.setFeiESn("test");
+        }
         ShopPrintResultDTO<String> printResult = ShopPrintUtils.feiESendMsgAndPrint(shopPrint.getFeiESn(),content);
         if (printResult == null || !printResult.isSuccess()){
             //发送打印失败,不管了
-            LoggerUtil.logError("打印接手订单失败-printAndAcceptOneOrderByOId-订单号-"+orderId+"打印-"+printResult.getMsg()+printResult.getRet());
+            logger.error("打印接手订单失败-printAndAcceptOneOrderByOId-订单号-"+orderId+"打印-"+printResult.getMsg()+printResult.getRet());
         }
         //3-放入打印查询队列
         PrintDataDTO printDataDTO = new PrintDataDTO();
         printDataDTO.setOurOrderId(orders.getId());
         printDataDTO.setOurShopId(orders.getShopId());
+        printDataDTO.setOurSchoolId(orders.getSchoolId());
         printDataDTO.setPlatePrintSn(shopPrint.getFeiESn());
         printDataDTO.setPlatePrintKey(shopPrint.getFeiEKey());
         printDataDTO.setPlatePrintOrderId(printResult.getData());

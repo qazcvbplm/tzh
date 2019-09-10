@@ -19,6 +19,8 @@ public class PrintDataDTO {
 
     private Integer ourShopId;
 
+    private Integer ourSchoolId;
+
     private String platePrintOrderId;
 
     private String platePrintSn;
@@ -146,11 +148,20 @@ public class PrintDataDTO {
         this.creatTime = creatTime;
     }
 
+    public Integer getOurSchoolId() {
+        return ourSchoolId;
+    }
+
+    public void setOurSchoolId(Integer ourSchoolId) {
+        this.ourSchoolId = ourSchoolId;
+    }
+
     @Override
     public String toString() {
         return "PrintDataDTO{" +
                 "ourOrderId='" + ourOrderId + '\'' +
                 ", ourShopId=" + ourShopId +
+                ", ourSchoolId=" + ourSchoolId +
                 ", platePrintOrderId='" + platePrintOrderId + '\'' +
                 ", platePrintSn='" + platePrintSn + '\'' +
                 ", platePrintKey='" + platePrintKey + '\'' +

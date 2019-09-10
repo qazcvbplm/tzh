@@ -395,6 +395,20 @@ public class TSenderServiceImpl implements TSenderService {
         map.put("beginTime", beginTime);
         map.put("endTime", endTime);
         List<Orders> result = ordersService.senderStatistics(map);
+        Orders countDown = ordersService.countSenderDownOrders(senderId,beginTime,endTime);
+        if (countDown != null){
+            rs.setDownSendMoney(countDown.getDownSendMoney());
+            rs.setDownSendCount(countDown.getDownSendCount());
+        }else {
+            rs.setDownSendMoney(BigDecimal.valueOf(0));
+            rs.setDownSendCount(0);
+        }
+        if (countDown.getDownSendCount() == null){
+            countDown.setDownSendCount(0);
+        }
+        if (countDown.getDownSendMoney() == null){
+            countDown.setDownSendMoney(BigDecimal.valueOf(0));
+        }
         List<RunOrders> result2 = runOrdersService.senderStatistics(map);
         for (Orders temp : result) {
             if (temp.getStatus().equals("配送员已接手")) {
@@ -405,13 +419,12 @@ public class TSenderServiceImpl implements TSenderService {
             }
             if (temp.getSendPrice() != null)
                 rs.setTakeout_Price(rs.getTakeout_Price().add(temp.getSendPrice()));
-            if (temp.getDownSendCount() != null){
-                rs.setDownSendCount(temp.getDownSendCount());
-            }
-            if (temp.getDownSendMoney() != null){
-                rs.setDownSendMoney(temp.getDownSendMoney());
-            }
         }
+        rs.setUpSendCount(rs.getTakeoutSuccess() - countDown.getDownSendCount());
+        if (rs.getTakeout_Price() == null){
+            rs.setTakeout_Price(BigDecimal.valueOf(0));
+        }
+        rs.setUpSendMoney(rs.getTakeout_Price().subtract(countDown.getDownSendMoney()));
         for (RunOrders temp : result2) {
             if (temp.getStatus().equals("配送员已接手")) {
                 rs.setRunNosuccess(temp.getFloorId());

@@ -16,10 +16,7 @@ import ops.school.api.entity.Shop;
 import ops.school.api.service.OrderProductService;
 import ops.school.api.service.OrdersService;
 import ops.school.api.service.SchoolService;
-import ops.school.api.util.LoggerUtil;
-import ops.school.api.util.ShopPrintUtils;
-import ops.school.api.util.TimeUtilS;
-import ops.school.api.util.Util;
+import ops.school.api.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import sun.rmi.runtime.Log;
 
+import java.awt.peer.ChoicePeer;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -65,64 +63,99 @@ public class PrintTask {
      */
     @Scheduled(cron = "* */5 * * * ?")
     public void doPrintAndAcceptOrder() {
-        List<PrintDataDTO> failedPrintList = new ArrayList<>();
         Set<Integer> set = new HashSet();
         List<PrintDataDTO> sendMsgList = new ArrayList<>();
+        List<PrintDataDTO> timeYesPrintList = new ArrayList<>();
         while (true) {
             Long redisSize = stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").size();
             if (redisSize < NumConstants.INT_NUM_1) {
+                //先去把时间还在之内的数据重新入队
+                if (timeYesPrintList.size() > NumConstants.INT_NUM_0) {
+                    for (PrintDataDTO dataDTO : timeYesPrintList) {
+                        dataDTO.setCycleRedisCount(dataDTO.getCycleRedisCount().intValue() + NumConstants.INT_NUM_1);
+                        Long index = stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").leftPush(JSON.toJSONString(dataDTO));
+                        if (index == NumConstants.INT_NUM_0){
+                            LoggerUtil.logError("云打印消息丢失-原因-未超时订单轮询重新入队失败——"+dataDTO.toString());
+                        }
+                    }
+                }
                 //先发送微信消息
+                //发送所有的流水号
+                Map<Integer,List<PrintDataDTO>> shopOrderMap = PublicUtilS.listforEqualKeyListMap(sendMsgList,"ourShopId");
+                Map<Integer,List<PrintDataDTO>> schoolSendList = PublicUtilS.listforEqualKeyListMap(sendMsgList,"")
                 for (PrintDataDTO send : sendMsgList) {
                     boolean sendTrue = set.add(send.getOurShopId());
-                    if (!sendTrue){
+                    if (!sendTrue) {
                         continue;
                     }
+                    //流水号
+                    List<PrintDataDTO> printDataDTOS = shopOrderMap.get(send.getOurShopId());
+                    List<Integer> waterAll = PublicUtilS.getValueList(printDataDTOS,"waterNumber");
+                    List<String> shopNameAll = PublicUtilS.getValueList(printDataDTOS,"waterNumber");
+                    if (waterAll == null){
+                        waterAll = new ArrayList<>();
+                    }
+                    String waterMsg = null;
+                    if (waterAll.size() > NumConstants.INT_NUM_0){
+                        waterMsg = "流水号：" + waterAll.toString();
+                    }else {
+                        waterMsg = send.getOurOrderId();
+                    }
+                    //拼接参数
+                    String[] params = new String[3];
+                    params[0] = "[" + send.getRealOrder().getShopName() + "]";
+                    params[1] = send.getRealOrder().getShopPhone();
+                    params[2] = waterMsg;
+
                     try {
-                        Util.qqSmsNoConfig(send.getSchoolLeaderPhone(), WechatConfigConstants.Tencent_Message_NOT_Print_Template, send.getSendMsg3Params());
+                        Util.qqSmsNoConfig(send.getSchoolLeaderPhone(), WechatConfigConstants.Tencent_Message_NOT_Print_Template, params);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态后发送负责人短信失败-" + send.getOurOrderId());
                     }
-
                 }
+
                 int waitTime = 60;
                 try {
                     //没有订单等xs
+                    sendMsgList.clear();
+                    timeYesPrintList.clear();
+                    set.clear();
                     Thread.sleep(waitTime * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     LoggerUtil.log(e.getMessage());
                 }
-                System.out.println("doPrintAndAcceptOrder 5 分钟队列没有订单循环{}s等待"+waitTime);
-                if (stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).size() < NumConstants.INT_NUM_1){
-                    //5分钟内循环完放置队列，唯一可能就是5分钟队列没有循环完那就gg
-                    if (failedPrintList.size() > 0){
-                        for (PrintDataDTO dto : failedPrintList) {
-                            Long index = stringRedisTemplate.boundListOps(RedisConstants.Shop_Wait_Print_OId_List).leftPush(JSON.toJSONString(dto));
-                            System.out.println(index);
-                        }
-                    }
-                    break;
-                }else {
-                    continue;
-                }
-            }
+                System.out.println("doPrintAndAcceptOrder 5 分钟队列没有订单循环{}s等待" + waitTime);
+                continue;
+            }//需要返回
+            //redis 有订单了
             String findOrder = stringRedisTemplate.boundListOps("Shop_Wait_Print_OId_List").rightPop();
             if (findOrder == null) {
                 return;
             }
             PrintDataDTO printDataDTO = JSONObject.parseObject(findOrder, PrintDataDTO.class);
+            /**
+             *按照订单时间5分钟计算是否查询和提醒
+             */
+            System.out.println("执行了");
+            Date nowTime = new Date();
+            long differTimeMinutes = TimeUtilS.dateDiffMinutes(printDataDTO.getCreatTime(), nowTime);
+            if (differTimeMinutes < 5) {
+                timeYesPrintList.add(printDataDTO);
+                continue;
+            }
             Orders orders = null;
             if (printDataDTO != null && printDataDTO.getRealOrder() != null) {
                 orders = printDataDTO.getRealOrder();
-            }else {
+            } else {
                 //订单为空，如果不能发送，跳过,放入失败队列
-                LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态后-订单缓存为空-订单和打印id"+printDataDTO.getOurOrderId()+"-"+printDataDTO.getPlatePrintOrderId());
+                LoggerUtil.logError("doPrintAndAcceptOrder-修改订单状态后-订单缓存为空-订单和打印id" + printDataDTO.getOurOrderId() + "-" + printDataDTO.getPlatePrintOrderId());
                 printDataDTO.setCycleRedisCount(printDataDTO.getCycleRedisCount() + NumConstants.INT_NUM_1);
                 Long listIndex = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
                 Long outTime = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).getExpire();
-                if (outTime != null && outTime.intValue() > 0){
-                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDayNextTime(new Date(),1,10,0,0 ));
+                if (outTime != null && outTime.intValue() > 0) {
+                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDayNextTime(new Date(), 1, 10, 0, 0));
                 }
                 continue;
             }
@@ -137,7 +170,6 @@ public class PrintTask {
                 continue;
             }
             //没有打印给负责人发消息
-            failedPrintList.add(printDataDTO);
             //1-先查学校
             School school = schoolService.findById(orders.getSchoolId());
             if (school.getPhone() == null || orders.getShopName() == null || orders.getShopPhone() == null) {
@@ -145,18 +177,13 @@ public class PrintTask {
                 printDataDTO.setCycleRedisCount(printDataDTO.getCycleRedisCount() + NumConstants.INT_NUM_1);
                 Long listIndex = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
                 Long outTime = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).getExpire();
-                if (outTime != null && outTime.intValue() > 0){
-                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDayNextTime(new Date(),1,10,0,0 ));
+                if (outTime != null && outTime.intValue() > 0) {
+                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDayNextTime(new Date(), 1, 10, 0, 0));
                 }
                 continue;
             }
-
-            String[] params = new String[3];
-            params[0] = orders.getShopName();
-            params[1] = orders.getShopPhone();
-            params[2] = orders.getId();
+            //3参数在发送瓶装
             printDataDTO.setSchoolLeaderPhone(school.getMessagePhone());
-            printDataDTO.setSendMsg3Params(params);
             sendMsgList.add(printDataDTO);
         }//true
     }

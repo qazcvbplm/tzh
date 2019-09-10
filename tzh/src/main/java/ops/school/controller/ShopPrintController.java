@@ -9,7 +9,6 @@ import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiOperation;
 import ops.school.api.constants.RedisConstants;
 import ops.school.api.dto.ShopPrintDTO;
-import ops.school.api.dto.print.PrintDataDTO;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.ShopPrint;
 import ops.school.api.enums.PublicErrorEnums;

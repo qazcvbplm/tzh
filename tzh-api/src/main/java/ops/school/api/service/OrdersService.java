@@ -66,4 +66,16 @@ public interface OrdersService extends IService<Orders> {
      * @Desc:   desc
      */
     List<Orders> selectDayDataWithComplete(Integer shopId, String orderStatus, String endTime);
+
+    /**
+     * @date:   2019/9/10 12:20
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.Orders
+     * @param   senderId
+     * @param   beginTime
+     * @param   endTime
+     * @Desc:   desc
+     */
+    Orders countSenderDownOrders(int senderId, String beginTime, String endTime);
 }

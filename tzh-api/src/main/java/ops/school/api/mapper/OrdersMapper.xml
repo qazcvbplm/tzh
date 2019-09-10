@@ -602,38 +602,7 @@ AND end_time LIKE #{day}
             sender_id,
             create_time,
             count(*) AS floor_id,
-            sum(send_price) AS send_price,
-            (
-                SELECT
-                    count(1) AS down_send_count
-                FROM
-                    orders
-                WHERE
-                sender_id = #{senderId}
-                AND (
-                    STATUS = '已完成'
-                    OR STATUS = '配送员已接手'
-                )
-                AND create_time BETWEEN #{beginTime} and #{endTime}
-                AND destination = 0
-                group by status
-            ) AS down_send_count,
-            (
-                SELECT
-                    sum(orders.send_price) AS down_send_money
-                FROM
-                    orders
-                WHERE
-                sender_id = #{senderId}
-                AND (
-                    STATUS = '已完成'
-                    OR STATUS = '配送员已接手'
-                )
-                AND create_time BETWEEN #{beginTime} and #{endTime}
-                AND destination = 0
-                group by status
-
-            ) AS down_send_money
+            sum(send_price) AS send_price
         FROM
             orders
         WHERE
@@ -669,6 +638,20 @@ AND end_time LIKE #{day}
         AND (orders.status = #{orderStatus})
         AND orders.shop_id=#{shopId}
         AND orders.end_time LIKE #{endTime}
+    </select>
+
+
+    <select id="countSenderDownOrders" resultType="ops.school.api.entity.Orders">
+        SELECT
+            count(1) AS down_send_count,
+            sum(orders.send_price) AS down_send_money
+        FROM
+            orders
+        WHERE
+        sender_id = #{senderId}
+        AND STATUS = '已完成'
+        AND create_time BETWEEN #{beginTime} and #{endTime}
+        AND destination = 0
     </select>
 
 </mapper>

@@ -115,6 +115,8 @@ public class DayLogController {
                 dto.setRunMoneyAmount(runMoneyAmount);
                 dto.setOrderAllCounts(orderAllCounts);
                 dto.setOrderAllMoneyAmount(orderAllMoneyAmount);
+                dto.setUpSendCount(orderAllCounts - dto.getDownSendCount());
+                dto.setUpSendMoney(dto.getSendPrice().subtract(dto.getDownSendMoney()));
                 //转换返回
                 record.setEveryDayCount(dto);
             }
@@ -144,6 +146,8 @@ public class DayLogController {
                 if (shopMap.get(dayLog.getSelfId()) != null ){
                     dayLog.setIsDelete(shopMap.get(dayLog.getSelfId()).getIsDelete());
                 }
+                dayLog.setUpSendCount(dayLog.getTotalCount() - dayLog.getDownSendCount());
+                dayLog.setUpSendMoney(dayLog.getSendPrice().subtract(dayLog.getDownSendMoney()));
             }
         }
         return new ResponseObject(true, "ok")

@@ -325,10 +325,12 @@ public class ShopPrintUtils {
                 }else if (feiEDTO.getRet().intValue() != NumConstants.INT_NUM_0){
                     //不等于0才是失败的
                     feiEDTO.setSuccess(false);
+                    return feiEDTO;
                 }else if (feiEDTO.getData() == null){
                     //返回的orderid是空
                     feiEDTO.setSuccess(false);
                     feiEDTO.setErrorMessage(ResponseViewEnums.SHOP_PRINT_ERROR_NOT_ORDER_ID.getErrorMessage());
+                    return feiEDTO;
                 }
                 //飞鹅返回只能根据字符串判断，垃圾
                 feiEDTO.setSuccess(true);

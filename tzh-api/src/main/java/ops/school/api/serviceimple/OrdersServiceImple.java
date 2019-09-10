@@ -157,4 +157,19 @@ public class OrdersServiceImple extends ServiceImpl<OrdersMapper, Orders> implem
         List<Orders> ordersList = ordersMapper.selectDayDataWithComplete(shopId,orderStatus,endTime+"%");
         return ordersList;
     }
+
+    /**
+     * @date:   2019/9/10 12:21
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.Orders
+     * @param   senderId
+     * @param   beginTime
+     * @param   endTime
+     * @Desc:   desc
+     */
+    @Override
+    public Orders countSenderDownOrders(int senderId, String beginTime, String endTime) {
+        return ordersMapper.countSenderDownOrders(senderId,beginTime,endTime);
+    }
 }

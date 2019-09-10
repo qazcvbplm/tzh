@@ -77,4 +77,17 @@ public interface OrdersMapper extends BaseMapper<Orders> {
      * @Desc:   desc
      */
     List<Orders> selectDayDataWithComplete(@Param("shopId") Integer shopId,@Param("orderStatus") String orderStatus,@Param("endTime") String endTime);
+
+
+    /**
+     * @date:   2019/9/10 12:21
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.entity.Orders
+     * @param   senderId
+     * @param   beginTime
+     * @param   endTime
+     * @Desc:   desc
+     */
+    Orders countSenderDownOrders(@Param("senderId") int senderId,@Param("beginTime") String beginTime, @Param("endTime") String endTime);
 }

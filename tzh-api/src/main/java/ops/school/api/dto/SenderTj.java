@@ -37,6 +37,12 @@ public class SenderTj implements Serializable {
     @TableField(exist = false)
     private BigDecimal downSendMoney;
 
+    @TableField(exist = false)
+    private Integer upSendCount;
+
+    @TableField(exist = false)
+    private BigDecimal upSendMoney;
+
 
     public SenderTj() {
         super();
@@ -52,6 +58,22 @@ public class SenderTj implements Serializable {
         this.totalGet = new BigDecimal(0);
         this.takeout_Price = new BigDecimal(0);
         this.run_price = new BigDecimal(0);
+    }
+
+    public Integer getUpSendCount() {
+        return upSendCount;
+    }
+
+    public void setUpSendCount(Integer upSendCount) {
+        this.upSendCount = upSendCount;
+    }
+
+    public BigDecimal getUpSendMoney() {
+        return upSendMoney;
+    }
+
+    public void setUpSendMoney(BigDecimal upSendMoney) {
+        this.upSendMoney = upSendMoney;
     }
 
     public Integer getDownSendCount() {

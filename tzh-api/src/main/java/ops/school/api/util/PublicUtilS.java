@@ -1,8 +1,8 @@
 package ops.school.api.util;
 
 import com.alibaba.fastjson.JSON;
-import io.swagger.models.auth.In;
 import ops.school.api.entity.Coupon;
+import ops.school.api.entity.Orders;
 import ops.school.api.entity.ShopCoupon;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -529,6 +529,9 @@ public class PublicUtilS {
         System.out.println(longList);
         removeDuplicate(longList);
         System.out.println(longList);
+
+
+
 
     }
 
