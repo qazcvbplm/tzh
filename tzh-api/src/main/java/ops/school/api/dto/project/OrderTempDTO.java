@@ -121,24 +121,66 @@ public class OrderTempDTO {
         if (this == o) {return true;}
         if (o == null ) {return false;}
         OrderTempDTO that = (OrderTempDTO) o;
-        if (that.getSendPrice() == null || this.sendPrice.compareTo(that.getSendPrice()) != 0){
+        if (this.getSendPrice() == null){
+            this.setSendPrice(new BigDecimal(0));
+        }
+        if (that.getSendPrice() == null){
+            that.setSendPrice(new BigDecimal(0));
+        }
+        if (this.getSendPrice().compareTo(that.getSendPrice()) != 0){
             return false;
         }
-        if (that.getBoxPrice() == null || this.getBoxPrice().compareTo(that.getBoxPrice()) != 0){
+        //1
+        if (this.getBoxPrice() == null){
+            this.setBoxPrice(new BigDecimal(0));
+        }
+        if (that.getBoxPrice() == null){
+            that.setBoxPrice(new BigDecimal(0));
+        }
+        if (this.getBoxPrice().compareTo(that.getBoxPrice()) != 0){
             return false;
         }
-        if (that.getPayPrice() == null || this.getPayPrice().compareTo(that.getPayPrice()) != 0){
+        //1
+        if (this.getPayPrice() == null){
+            this.setPayPrice(new BigDecimal(0));
+        }
+        if (that.getPayPrice() == null){
+            that.setPayPrice(new BigDecimal(0));
+        }
+        if (this.getPayPrice().compareTo(that.getPayPrice()) != 0){
             return false;
         }
-        if (that.getProductPrice() == null || this.getProductPrice().compareTo(that.getProductPrice()) != 0){
+        //1
+        if (this.getProductPrice() == null){
+            this.setProductPrice(new BigDecimal(0));
+        }
+        if (that.getProductPrice() == null){
+            that.setProductPrice(new BigDecimal(0));
+        }
+        if (this.getProductPrice().compareTo(that.getProductPrice()) != 0){
             return false;
         }
-        if (that.getDiscountPrice() == null || this.getDiscountPrice().compareTo(that.getDiscountPrice()) != 0){
+        //1
+        if (this.getDiscountPrice() == null){
+            this.setDiscountPrice(new BigDecimal(0));
+        }
+        if (that.getDiscountPrice() == null){
+            that.setDiscountPrice(new BigDecimal(0));
+        }
+        if (this.getDiscountPrice().compareTo(that.getDiscountPrice()) != 0){
             return false;
         }
-        if (that.getPayFoodCoupon() == null || this.getPayFoodCoupon().compareTo(that.getPayFoodCoupon()) != 0){
+        //1
+        if (this.getPayFoodCoupon() == null){
+            this.setPayFoodCoupon(new BigDecimal(0));
+        }
+        if (that.getPayFoodCoupon() == null){
+            that.setPayFoodCoupon(new BigDecimal(0));
+        }
+        if (this.getPayFoodCoupon().compareTo(that.getPayFoodCoupon()) != 0){
             return false;
         }
+        //1
         return true;
     }
 

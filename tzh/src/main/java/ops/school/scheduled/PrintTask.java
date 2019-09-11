@@ -56,6 +56,7 @@ public class PrintTask {
     private SchoolService schoolService;
 
     private static CountDownLatch countDownLatch = new CountDownLatch(10);
+    private final int orderOutTime = 5;
 
 
     /**
@@ -89,23 +90,23 @@ public class PrintTask {
                     }
                     Set<String> shopNameSet = new HashSet<>();
                     Set<String> shopPhoneSet = new HashSet<>();
-                    Map<Integer,List<Integer>> waterAllByshopMap = new HashMap<>();
+                    Map<Integer,List<Integer>> waterAllByShopMap = new HashMap<>();
                     for (PrintDataDTO sendDTO : schoolSendList) {
                         shopNameSet.add(sendDTO.getRealOrder().getShopName());
                         shopPhoneSet.add(sendDTO.getRealOrder().getShopPhone());
-                        if (waterAllByshopMap.get(sendDTO.getOurShopId()) == null){
-                            waterAllByshopMap.put(sendDTO.getOurShopId(),Arrays.asList(sendDTO.getWaterNumber()));
+                        if (waterAllByShopMap.get(sendDTO.getOurShopId()) == null){
+                            waterAllByShopMap.put(sendDTO.getOurShopId(),Arrays.asList(sendDTO.getWaterNumber()));
                         }else {
                             List<Integer> waterAll = new ArrayList<>();
-                            waterAll.addAll(waterAllByshopMap.get(sendDTO.getOurShopId()));
+                            waterAll.addAll(waterAllByShopMap.get(sendDTO.getOurShopId()));
                             waterAll.add(sendDTO.getWaterNumber());
-                            waterAllByshopMap.put(sendDTO.getOurShopId(),waterAll);
+                            waterAllByShopMap.put(sendDTO.getOurShopId(),waterAll);
                         }
                     }
                     StringBuilder param3waterArray = new StringBuilder();
                     param3waterArray.append("的流水号分别是:");
-                    for (Integer shopId : waterAllByshopMap.keySet()) {
-                        param3waterArray.append(waterAllByshopMap.get(shopId).toString());
+                    for (Integer shopId : waterAllByShopMap.keySet()) {
+                        param3waterArray.append(waterAllByShopMap.get(shopId).toString());
                     }
                     String[] params = new String[3];
                     params[0] = shopNameSet.toString();
@@ -145,7 +146,7 @@ public class PrintTask {
             System.out.println("执行了");
             Date nowTime = new Date();
             long differTimeMinutes = TimeUtilS.dateDiffMinutes(printDataDTO.getCreatTime(), nowTime);
-            if (differTimeMinutes < 5) {
+            if (differTimeMinutes < orderOutTime) {
                 timeYesPrintList.add(printDataDTO);
                 continue;
             }
@@ -164,7 +165,7 @@ public class PrintTask {
                 continue;
             }
             if (printDataDTO.getPrintBrand().intValue() != ShopPrintConfigConstants.PRINT_BRAND_DB_FEI_E) {
-                LoggerUtil.logError("系统记录-定时器查询打印机-此订单是飞印打印不能处理-信息-" + printDataDTO.toString());
+                LoggerUtil.logError("系统记录-定时器查询打印机-此订单是飞鹅打印不能处理-信息-" + printDataDTO.toString());
                 continue;
             }
             //查询飞鹅打印

@@ -656,9 +656,16 @@ public class TOrdersServiceImpl implements TOrdersService {
         if (orders == null){
             orders = ordersService.findById(orderId);
         }
+        //1-先改成待接手
+        String shopDjs = (String) stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product + orders.getShopId().toString()).get(orderId);
+        int updateD = this.letOrderWaitToAccept(orderId, payment,orders,shopDjs);
+        if (updateD != NumConstants.INT_NUM_1){
+            return updateD;
+        }
+        //2-判断云打印
         Shop shop = shopService.getById(orders.getShopId());
         if (shop == null){
-            logger.error("支付成功回调-paySuccess-学校查不到-订单-"+orderId);
+            logger.error("支付成功回调-paySuccess-店铺查不到-订单-"+orderId);
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_ADD_ORDER_NO_SHOP);
         }
         //1-如果开启云打印就是云打印就是
@@ -667,21 +674,28 @@ public class TOrdersServiceImpl implements TOrdersService {
             //失败把订单改成待接手，定时器会查询到
             if (!responseObject.isCode()){
                 Integer updateNum = ordersService.makeOrdersToWaitAccept(orderId);
+                //还原订单商品redis
+                stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product + orders.getShopId().toString()).put(orderId,shopDjs);
                 logger.error("云打印-支付成功回调-paySuccess-无法完成接单并打印和推送查询-"+orderId);
+                return 0;
             }
-            return 0;
+            return 1;
         }
         else{
         //2-没有开启就是带接手
-            return this.letOrderWaitToAccept(orderId, payment,orders);
+            return updateD;
         }
+    }
+
+    private void thisOrderToRedisDJS(String orderId,Orders orders) {
 
     }
+
     private ResponseObject letOrderShopHadAccept(String orderId, Integer shopId) {
         return printAndAcceptOneOrderByOId(orderId, Long.valueOf(shopId));
     }
 
-    private int letOrderWaitToAccept(String orderId, String payment, Orders orders) {
+    private int letOrderWaitToAccept(String orderId, String payment, Orders orders,String shopDjs) {
         Map<String, Object> map = new HashMap<>();
         map.put("orderId", orderId);
         map.put("payment", payment);
@@ -689,11 +703,10 @@ public class TOrdersServiceImpl implements TOrdersService {
         int rs = ordersService.paySuccess(map);
         if (rs == 1) {
             cache.takeoutCountadd(orders.getSchoolId());
-            String ordersStr = JSON.toJSONString(orders);
+            //先缓存待接手
+            //获取订单op
             orders.setStatus("待接手");
             orders.setPayTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            //获取订单op
-            String shopDjs = (String) stringRedisTemplate.boundHashOps(RedisConstants.Shop_Need_Pay_Product + orders.getShopId().toString()).get(orderId);
             Orders ordersTemp = null;
             if (shopDjs != null){
                 ordersTemp = JSONObject.parseObject(shopDjs,Orders.class);
@@ -704,6 +717,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             stringRedisTemplate.boundHashOps("SHOP_DJS" + orders.getShopId()).put(orderId, JSON.toJSONString(orders));
             stringRedisTemplate.boundHashOps("ALL_DJS").put(orderId, JSON.toJSONString(orders));
+            //先缓存待接手
         }
         return rs;
     }

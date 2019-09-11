@@ -166,12 +166,13 @@ public class ShopPrintController {
     @ResponseBody
     @RequestMapping(value = "/accept",method = RequestMethod.POST)
     public ResponseObject printAndAcceptOrder(String orderId,Long shopId){
-        Assertions.notNull(orderId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(shopId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        String orderRedis = (String) stringRedisTemplate.boundHashOps("SHOP_DJS"+shopId.toString()).get(orderId);
-        Assertions.notNull(orderRedis,PublicErrorEnums.PUBLIC_DATA_ERROR);
-        ResponseObject view = tOrderService.printAndAcceptOneOrderByOId(orderId,shopId);
-        return view;
+//        Assertions.notNull(orderId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+//        Assertions.notNull(shopId,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+//        String orderRedis = (String) stringRedisTemplate.boundHashOps("SHOP_DJS"+shopId.toString()).get(orderId);
+//        Assertions.notNull(orderRedis,PublicErrorEnums.PUBLIC_DATA_ERROR);
+//        ResponseObject view = tOrderService.printAndAcceptOneOrderByOId(orderId,shopId);
+//        return view;
+        return new ResponseObject(true,"");
     }
 
 }
