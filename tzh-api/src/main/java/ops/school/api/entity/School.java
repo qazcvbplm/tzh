@@ -373,4 +373,46 @@ public class School extends Base implements Serializable {
     public void setYesWaterOne(Integer yesWaterOne) {
         this.yesWaterOne = yesWaterOne;
     }
+
+
+    @Override
+    public String toString() {
+        return "School{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", messagePhone='" + messagePhone + '\'' +
+                ", loginName='" + loginName + '\'' +
+                ", rate=" + rate +
+                ", appId=" + appId +
+                ", money=" + money +
+                ", topDown=" + topDown +
+                ", sort=" + sort +
+                ", senderMoney=" + senderMoney +
+                ", sendMaxDistance=" + sendMaxDistance +
+                ", sendPerOut=" + sendPerOut +
+                ", sendPerMoney=" + sendPerMoney +
+                ", wxAppId='" + wxAppId + '\'' +
+                ", wxMessageTemplateId='" + wxMessageTemplateId + '\'' +
+                ", wxSecret='" + wxSecret + '\'' +
+                ", mchId='" + mchId + '\'' +
+                ", wxPayId='" + wxPayId + '\'' +
+                ", certPath='" + certPath + '\'' +
+                ", isDelete=" + isDelete +
+                ", createTime=" + createTime +
+                ", enableTakeout=" + enableTakeout +
+                ", enableCoupon=" + enableCoupon +
+                ", senderAllTx=" + senderAllTx +
+                ", userCharge=" + userCharge +
+                ", userBellAll=" + userBellAll +
+                ", userChargeSend=" + userChargeSend +
+                ", pageLayout=" + pageLayout +
+                ", smallMinAmount=" + smallMinAmount +
+                ", middleMinAmount=" + middleMinAmount +
+                ", largeMinAmount=" + largeMinAmount +
+                ", extraLargeMinAmount=" + extraLargeMinAmount +
+                ", yesWaterOne=" + yesWaterOne +
+                ", senderTencentGroup='" + senderTencentGroup + '\'' +
+                '}';
+    }
 }

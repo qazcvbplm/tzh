@@ -526,6 +526,9 @@ public class TOrdersServiceImpl implements TOrdersService {
         OrderTempDTO orderTempDTO = new OrderTempDTO(sendPrice, boxPrice, payPrice.setScale(2, BigDecimal.ROUND_HALF_UP),
                 productPrice, discountPrice.setScale(2, BigDecimal.ROUND_HALF_UP), payFoodCoupon.setScale(2, BigDecimal.ROUND_HALF_UP));
         if (!tempDTO.thisCompareToTempTrue(orderTempDTO)) {
+            logger.error("订单金额有问题，请负责人进行核实!-后端的-"+orderTempDTO.toString()+"前端的"+tempDTO.toString());
+            logger.error("订单金额有问题，请负责人进行核实!-前端订单信息-"+orders.toString()+"前端的pro信息"+productOrderDTOS.toString());
+            logger.error("订单金额有问题，请负责人进行核实!-后端的学校信息-"+school.toString()+"后端的wxuser信息"+wxUser.toString()+"后端的bell信息"+wxUserBell.toString());
             return new ResponseObject(false, "订单金额有问题，请负责人进行核实!");
         }
         ordersSaveTemp.setDiscountPrice(discountPrice);

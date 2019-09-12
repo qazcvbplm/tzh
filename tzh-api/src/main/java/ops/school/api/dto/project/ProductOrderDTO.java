@@ -33,4 +33,13 @@ public class ProductOrderDTO {
         this.count = count;
     }
 
+
+    @Override
+    public String toString() {
+        return "ProductOrderDTO{" +
+                "productId=" + productId +
+                ", attributeId=" + attributeId +
+                ", count=" + count +
+                '}';
+    }
 }
