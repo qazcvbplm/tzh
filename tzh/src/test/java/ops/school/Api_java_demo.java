@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.sun.jmx.snmp.Timestamp;
 import ops.school.api.util.TimeUtilS;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -31,62 +33,9 @@ public class Api_java_demo {
 		
 		//**********测试时，打开下面注释掉方法的即可,更多接口文档信息,请访问官网开放平台查看**********
 		public static void main(String[] args) throws Exception{
-
-
-			Date start = TimeUtilS.getDayBegin(TimeUtilS.getDateByEvery(2019,9-1,7,0,0,0),0);
-			System.out.println(start);
-			
-			//==================添加打印机接口（支持批量）==================
-			//***返回值JSON字符串***
-			//正确例子：{"msg":"ok","ret":0,"data":{"ok":["sn#key#remark#carnum","316500011#abcdefgh#快餐前台"],"no":["316500012#abcdefgh#快餐前台#13688889999  （错误：识别码不正确）"]},"serverExecutedTime":3}
-			//错误：{"msg":"参数错误 : 该帐号未注册.","ret":-2,"data":null,"serverExecutedTime":37}
-
-			//提示：打印机编号(必填) # 打印机识别码(必填) # 备注名称(选填) # 流量卡号码(选填)，多台打印机请换行（\n）添加新打印机信息，每次最多100行(台)。
-			String snlist = "sn1#key1#remark1#carnum1\nsn2#key2#remark2#carnum2";
-			String method = addprinter(snlist);
-			System.out.println(method);
-			
-			
-			
-			//==================方法1.打印订单==================
-			//***返回值JSON字符串***
-			//成功：{"msg":"ok","ret":0,"data":"xxxxxxx_xxxxxxxx_xxxxxxxx","serverExecutedTime":5}
-			//失败：{"msg":"错误描述","ret":非0,"data":"null","serverExecutedTime":5}
-			
-			String method1 = print(SN);
-			System.out.println(method1);
-			
-			
-			
-			//===========方法2.查询某订单是否打印成功=============
-			//***返回值JSON字符串***
-		 	//成功：{"msg":"ok","ret":0,"data":true,"serverExecutedTime":2}//data:true为已打印,false为未打印
-			//失败：{"msg":"错误描述","ret":非0, "data":null,"serverExecutedTime":7}
-			
-			String orderid = "xxxxxxx_xxxxxxxx_xxxxxxxx";//订单ID，从方法1返回值data获取
-			String method2 = queryOrderState(orderid);
-//			System.out.println(method2);
-			
-			
-			
-			//===========方法3.查询指定打印机某天的订单详情============
-			//***返回值JSON字符串***
-			//成功：{"msg":"ok","ret":0,"data":{"print":6,"waiting":1},"serverExecutedTime":9}//print已打印，waiting为打印
-			//失败：{"msg":"错误描述","ret":非0,"data":"null","serverExecutedTime":5}
-			
-//			String strdate = "2016-11-12";//注意时间格式为"yyyy-MM-dd"
-//			String method3 = queryOrderInfoByDate(SN,strdate);
-//			System.out.println(method3);
-			
-			
-			
-			//===========方法4.查询打印机的状态==========================
-			//***返回值JSON字符串***
-		    //成功：{"msg":"ok","ret":0,"data":"状态","serverExecutedTime":4}
-			//失败：{"msg":"错误描述","ret":非0,"data":"null","serverExecutedTime":5}
-			
-//			String method4 = queryPrinterStatus(SN);
-//			System.out.println(method4);
+			String a1 = "{\"creatTime\":1568266392923,\"cycleRedisCount\":0,\"ourOrderId\":\"201909121333122541299619669\",\"ourSchoolId\":22,\"ourShopId\":215,\"platePrintSn\":\"test\",\"printBrand\":1,\"realOrder\":{\"addressDetail\":\"椰子大学,楼栋一,201\",\"addressName\":\"陈顺波\",\"addressPhone\":\"18857818257\",\"afterDiscountPrice\":15.00,\"appId\":1,\"boxPrice\":0.00,\"couponFullAmount\":0.00,\"couponId\":0,\"couponUsedAmount\":0.00,\"createTime\":\"2019-09-12 13:33:12\",\"destination\":0,\"discountPrice\":6.00,\"discountType\":\"商品折扣\",\"endTime\":\"\",\"evaluateFlag\":0,\"floorId\":104,\"fullAmount\":0.00,\"fullCutId\":0,\"fullUsedAmount\":0.00,\"id\":\"201909121333122541299619669\",\"op\":[{\"attributeName\":\"A1\",\"attributePrice\":10.00,\"id\":12266,\"orderId\":\"201909121333122541299619669\",\"productCount\":2,\"productDiscount\":6.0000,\"productId\":10276,\"productImage\":\"http://ops.chuyinkeji.cn/5fab35f4-270e-4737-ba15-53fa1009b0d2\",\"productName\":\"A1\",\"totalPrice\":4.0000}],\"openId\":\"oWP5G42cNW2gghAZiqvfOFDQ--0A\",\"originalPrice\":21.00,\"payFoodCoupon\":0.00,\"payPrice\":15.00,\"payTime\":\"2019-09-12 13:33:12\",\"payment\":\"\",\"productPrice\":20.00,\"remark\":\"无\",\"reseverTime\":\"14:13\",\"schoolId\":22,\"schoolTopDownPrice\":1.00,\"sendAddCountPrice\":0.00,\"sendAddDistancePrice\":0.00,\"sendBasePrice\":1.00,\"sendGetFlag\":0,\"sendPrice\":1.00,\"senderId\":0,\"shopAcceptTime\":\"\",\"shopAddress\":\"太和殿\",\"shopId\":215,\"shopImage\":\"http://ops.chuyinkeji.cn/5e499ede-ea15-4dcb-b7b5-435f4ed6ed98\",\"shopName\":\"十点见（本店装修ing）\",\"shopPhone\":\"18857818257\",\"status\":\"商家已接手\",\"typ\":\"外卖订单\",\"waterNumber\":2},\"sendMsg3Params\":[null,null,null],\"waterNumber\":2,\"yesPrintTrue\":1}";
+			JSON json = JSONObject.parseObject(a1);
+			System.out.println(json);
 			
 		}
 		

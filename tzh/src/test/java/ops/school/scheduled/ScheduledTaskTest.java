@@ -75,6 +75,11 @@ public class ScheduledTaskTest{
         System.out.println((stop- start)/1000/60);
     }
 
+    @Test
+    public void testDoPrintAndAcceptOrder(){
+        printTask.doPrintAndAcceptOrder();
+    }
+
     public static void main(String[] args) {
         BigDecimal a = new BigDecimal(0);
         BigDecimal b= new BigDecimal(10000);

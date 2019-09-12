@@ -36,10 +36,11 @@ public class ProductOrderDTO {
 
     @Override
     public String toString() {
-        return "ProductOrderDTO{" +
-                "productId=" + productId +
-                ", attributeId=" + attributeId +
-                ", count=" + count +
-                '}';
+        final StringBuffer sb = new StringBuffer("ProductOrderDTO{");
+        sb.append("productId=").append(productId);
+        sb.append(", attributeId=").append(attributeId);
+        sb.append(", count=").append(count);
+        sb.append('}');
+        return sb.toString();
     }
 }
