@@ -2,9 +2,11 @@ package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
 
 public class Address extends Base {
     @TableId(type = IdType.AUTO)

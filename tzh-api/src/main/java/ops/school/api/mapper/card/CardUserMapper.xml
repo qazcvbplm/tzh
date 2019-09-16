@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="ops.school.api.dao.ShopFullCutMapper" >
-<resultMap id="BaseResultMap" type="ops.school.api.entity.ShopFullCut" >
+<mapper namespace="ops.school.api.dao.card.CardUserMapper" >
+<resultMap id="BaseResultMap" type="ops.school.api.vo.card.CardUserVO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
-    <result column="full_amount" property="fullAmount" jdbcType="INTEGER" />
-    <result column="cut_amount" property="cutAmount" jdbcType="INTEGER" />
+    <result column="school_id" property="schoolId" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="card_day_time" property="cardDayTime" jdbcType="INTEGER" />
+    <result column="card_day_money" property="cardDayMoney" jdbcType="DECIMAL" />
+    <result column="card_type" property="cardType" jdbcType="TINYINT" />
+    <result column="card_failure_time" property="cardFailureTime" jdbcType="TIMESTAMP" />
     <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
     <result column="create_id" property="createId" jdbcType="BIGINT" />
     <result column="update_id" property="updateId" jdbcType="BIGINT" />
@@ -15,9 +18,12 @@
 
     <sql id="Base_Column_List" >
         id,
-        shop_id,
-        full_amount,
-        cut_amount,
+        school_id,
+        user_id,
+        card_day_time,
+        card_day_money,
+        card_type,
+        card_failure_time,
         is_delete,
         create_id,
         update_id,
@@ -26,7 +32,7 @@
     </sql>
 
     <sql id="Table_Name">
-        shop_full_cut
+        card_user
     </sql>
 
 <sql id="Select_Limit_State">
@@ -34,14 +40,23 @@
     <if test="id != null and id != '' ">
         AND id = #{id}
     </if>
-    <if test="shopId != null and shopId != '' ">
-        AND shop_id = #{shopId}
+    <if test="schoolId != null and schoolId != '' ">
+        AND school_id = #{schoolId}
     </if>
-    <if test="fullAmount != null and fullAmount != '' ">
-        AND full_amount = #{fullAmount}
+    <if test="userId != null and userId != '' ">
+        AND user_id = #{userId}
     </if>
-    <if test="cutAmount != null and cutAmount != '' ">
-        AND cut_amount = #{cutAmount}
+    <if test="cardDayTime != null and cardDayTime != '' ">
+        AND card_day_time = #{cardDayTime}
+    </if>
+    <if test="cardDayMoney != null and cardDayMoney != '' ">
+        AND card_day_money = #{cardDayMoney}
+    </if>
+    <if test="cardType != null and cardType != '' ">
+        AND card_type = #{cardType}
+    </if>
+    <if test="cardFailureTime != null and cardFailureTime != '' ">
+        AND card_failure_time = #{cardFailureTime}
     </if>
     <if test="isDelete != null and isDelete != '' ">
         AND is_delete = #{isDelete}
@@ -110,13 +125,5 @@
     WHERE id = #{id}
     AND is_delete = 0
 </update>
-<select id="findShopFullCut" parameterType="Integer" resultMap="BaseResultMap">
-    SELECT
-    <include refid="Base_Column_List"/>
-    FROM
-    <include refid="Table_Name"/>
-    where shop_id = #{shopId}
-    and is_delete = 0
-    order by full_amount desc
-</select>
+
 </mapper>

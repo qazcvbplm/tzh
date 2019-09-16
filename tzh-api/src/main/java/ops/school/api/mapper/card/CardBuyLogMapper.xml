@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="ops.school.api.dao.HomeCouponMapper" >
-<resultMap id="BaseResultMap" type="ops.school.api.entity.HomeCoupon" >
+<mapper namespace="ops.school.api.dao.card.CardBuyLogMapper" >
+<resultMap id="BaseResultMap" type="ops.school.api.vo.card.CardBuyLogVO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="coupon_id" property="couponId" jdbcType="BIGINT" />
     <result column="school_id" property="schoolId" jdbcType="BIGINT" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="card_id" property="cardId" jdbcType="BIGINT" />
+    <result column="money" property="money" jdbcType="DECIMAL" />
+    <result column="wx_trade_no" property="wxTradeNo" jdbcType="VARCHAR" />
     <result column="create_id" property="createId" jdbcType="BIGINT" />
-    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
-    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
-    <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+    <result column="update_id" property="updateId" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
 </resultMap>
 
     <sql id="Base_Column_List" >
         id,
-        coupon_id,
         school_id,
-        create_time,
+        user_id,
+        card_id,
+        money,
+        wx_trade_no,
         create_id,
-        begin_time,
-        end_time,
-        is_delete
+        update_id,
+        create_time,
+        update_time
     </sql>
 
     <sql id="Table_Name">
-        home_coupon
+        card_buy_log
     </sql>
 
 <sql id="Select_Limit_State">
@@ -32,23 +36,32 @@
     <if test="id != null and id != '' ">
         AND id = #{id}
     </if>
-    <if test="couponId != null and couponId != '' ">
-        AND coupon_id = #{couponId}
+    <if test="schoolId != null and schoolId != '' ">
+        AND school_id = #{schoolId}
     </if>
-    <if test="createTime != null and createTime != '' ">
-        AND create_time = #{createTime}
+    <if test="userId != null and userId != '' ">
+        AND user_id = #{userId}
+    </if>
+    <if test="cardId != null and cardId != '' ">
+        AND card_id = #{cardId}
+    </if>
+    <if test="money != null and money != '' ">
+        AND money = #{money}
+    </if>
+    <if test="wxTradeNo != null and wxTradeNo != '' ">
+        AND wx_trade_no = #{wxTradeNo}
     </if>
     <if test="createId != null and createId != '' ">
         AND create_id = #{createId}
     </if>
-    <if test="beginTime != null and beginTime != '' ">
-        AND begin_time = #{beginTime}
+    <if test="updateId != null and updateId != '' ">
+        AND update_id = #{updateId}
     </if>
-    <if test="endTime != null and endTime != '' ">
-        AND end_time = #{endTime}
+    <if test="createTime != null and createTime != '' ">
+        AND create_time = #{createTime}
     </if>
-    <if test="isDelete != null and isDelete != '' ">
-        AND is_delete = #{isDelete}
+    <if test="updateTime != null and updateTime != '' ">
+        AND update_time = #{updateTime}
     </if>
 </sql>
 

@@ -184,14 +184,6 @@
 
     </dependencies>
     <build>
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/main/java</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/*.xml</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
-<!--        </resources>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -222,6 +214,14 @@
         </plugins>
         <!-- 如果不添加此节点mybatis的mapper.xml文件都会被漏掉将src/main/java作为resource资源文件-->
         <resources>
+            <!--复制mapper二选一-->
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <!--复制mapper二选一-->
             <resource>
                 <directory>src/main/java</directory>
                 <includes>

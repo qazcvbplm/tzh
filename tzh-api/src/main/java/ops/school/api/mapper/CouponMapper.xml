@@ -114,7 +114,7 @@
         <include refid="Table_Name"/>
         WHERE
         <include refid="Select_Limit_State"/>
-        LIMIT #{startNum},#{sizeNum}
+        LIMIT #{page},#{size}
     </select>
 
     <!--CreatBy Fang Time: | 批量查询-->

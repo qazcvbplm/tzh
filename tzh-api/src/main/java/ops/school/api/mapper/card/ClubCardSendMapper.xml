@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="ops.school.api.dao.ShopFullCutMapper" >
-<resultMap id="BaseResultMap" type="ops.school.api.entity.ShopFullCut" >
+<mapper namespace="ops.school.api.dao.card.ClubCardSendMapper" >
+<resultMap id="BaseResultMap" type="ops.school.api.vo.card.ClubCardSendVO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
-    <result column="full_amount" property="fullAmount" jdbcType="INTEGER" />
-    <result column="cut_amount" property="cutAmount" jdbcType="INTEGER" />
+    <result column="school_id" property="schoolId" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="day_time" property="dayTime" jdbcType="INTEGER" />
+    <result column="price_sale" property="priceSale" jdbcType="DECIMAL" />
+    <result column="price_original" property="priceOriginal" jdbcType="DECIMAL" />
+    <result column="day_money" property="dayMoney" jdbcType="DECIMAL" />
+    <result column="send_begin_time" property="sendBeginTime" jdbcType="TIMESTAMP" />
+    <result column="send_end_time" property="sendEndTime" jdbcType="TIMESTAMP" />
+    <result column="effective_days" property="effectiveDays" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
     <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
     <result column="create_id" property="createId" jdbcType="BIGINT" />
     <result column="update_id" property="updateId" jdbcType="BIGINT" />
@@ -15,9 +24,18 @@
 
     <sql id="Base_Column_List" >
         id,
-        shop_id,
-        full_amount,
-        cut_amount,
+        school_id,
+        name,
+        description,
+        day_time,
+        price_sale,
+        price_original,
+        day_money,
+        send_begin_time,
+        send_end_time,
+        effective_days,
+        type,
+        status,
         is_delete,
         create_id,
         update_id,
@@ -26,7 +44,7 @@
     </sql>
 
     <sql id="Table_Name">
-        shop_full_cut
+        club_card_send
     </sql>
 
 <sql id="Select_Limit_State">
@@ -34,14 +52,41 @@
     <if test="id != null and id != '' ">
         AND id = #{id}
     </if>
-    <if test="shopId != null and shopId != '' ">
-        AND shop_id = #{shopId}
+    <if test="schoolId != null and schoolId != '' ">
+        AND school_id = #{schoolId}
     </if>
-    <if test="fullAmount != null and fullAmount != '' ">
-        AND full_amount = #{fullAmount}
+    <if test="name != null and name != '' ">
+        AND name = #{name}
     </if>
-    <if test="cutAmount != null and cutAmount != '' ">
-        AND cut_amount = #{cutAmount}
+    <if test="description != null and description != '' ">
+        AND description = #{description}
+    </if>
+    <if test="dayTime != null and dayTime != '' ">
+        AND day_time = #{dayTime}
+    </if>
+    <if test="priceSale != null and priceSale != '' ">
+        AND price_sale = #{priceSale}
+    </if>
+    <if test="priceOriginal != null and priceOriginal != '' ">
+        AND price_original = #{priceOriginal}
+    </if>
+    <if test="dayMoney != null and dayMoney != '' ">
+        AND day_money = #{dayMoney}
+    </if>
+    <if test="sendBeginTime != null and sendBeginTime != '' ">
+        AND send_begin_time = #{sendBeginTime}
+    </if>
+    <if test="sendEndTime != null and sendEndTime != '' ">
+        AND send_end_time = #{sendEndTime}
+    </if>
+    <if test="effectiveDays != null and effectiveDays != '' ">
+        AND effective_days = #{effectiveDays}
+    </if>
+    <if test="type != null and type != '' ">
+        AND type = #{type}
+    </if>
+    <if test="status != null and status != '' ">
+        AND status = #{status}
     </if>
     <if test="isDelete != null and isDelete != '' ">
         AND is_delete = #{isDelete}
@@ -65,8 +110,7 @@
     SELECT COUNT(1)
     FROM
     <include refid="Table_Name"/>
-    WHERE
-    <include refid="Select_Limit_State"/>
+
 </select>
 
 <!--CreatBy Fang Time: |  分页查询-->
@@ -110,13 +154,5 @@
     WHERE id = #{id}
     AND is_delete = 0
 </update>
-<select id="findShopFullCut" parameterType="Integer" resultMap="BaseResultMap">
-    SELECT
-    <include refid="Base_Column_List"/>
-    FROM
-    <include refid="Table_Name"/>
-    where shop_id = #{shopId}
-    and is_delete = 0
-    order by full_amount desc
-</select>
+
 </mapper>
