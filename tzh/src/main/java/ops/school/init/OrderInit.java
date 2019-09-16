@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Properties;
 
 @Component
 public class OrderInit implements CommandLineRunner {
@@ -38,8 +39,11 @@ public class OrderInit implements CommandLineRunner {
     public void run(String... args) throws Exception {
         redisInit();
         System.out.println("v1.0");
-        if (!"prod".equals(active)){
-            System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成"+ "-环境-" + active + "-port-" + port );
+        Properties props = System.getProperties();
+        String osName = props.getProperty("os.name");
+        if (!"prod".equals(active) || "win".equalsIgnoreCase(osName.substring(0,3)) ){
+            System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成"+ "-环境" + active + "-port" + port + "-系统Os-"+osName);
+            System.out.println("启动未查询待接手");
             return;
         }
         //设置待接手订单
@@ -56,6 +60,6 @@ public class OrderInit implements CommandLineRunner {
         for (Orders temp : list) {
             stringRedisTemplate.boundHashOps("SHOP_YJS").put(temp.getId(), JSON.toJSONString(temp));
         }
-        System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成"+ "-环境-" + active + "-port-" + port );
+        System.out.println("v1.0-初始化完成-启动完成-查询商家接手订单完成"+ "-环境" + active + "-port" + port + "-系统Os-"+osName);
     }
 }

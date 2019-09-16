@@ -242,7 +242,12 @@ public class Util {
         Assertions.notNull(templateId);
         Assertions.notEmpty(params);
         SmsSingleSender sender = new SmsSingleSender(WechatConfigConstants.Tencent_Message_NOT_App_Id,WechatConfigConstants.Tencent_Message_App_key);
-        SmsSingleSenderResult result = sender.sendWithParam("86", phoneNumber, templateId, params, null, "", "");
+        try{
+            SmsSingleSenderResult result = sender.sendWithParam("86", phoneNumber, templateId, params, null, "", "");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            LoggerUtil.logError(ex.getMessage());
+        }
     }
 
     public static void main(String[] args) {

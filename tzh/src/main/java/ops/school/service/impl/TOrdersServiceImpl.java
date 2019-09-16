@@ -503,14 +503,14 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (wxUserBell.getFoodCoupon().compareTo(BigDecimal.ZERO) == 1) {
                 // 折后价格-优惠券+餐盒费+配送费 >= 粮票
                 if (payPrice.subtract(wxUserBell.getFoodCoupon()).compareTo(BigDecimal.ZERO) == -1) {
-                    // 支付价格（除粮票外）小于 粮票--> 支付价格为  0
-                    payPrice = new BigDecimal(0);
                     // 用户粮票修改为 --> 用户粮票余额 - 支付金额（除粮票外）
                     wxUserBell.setFoodCoupon(wxUserBell.getFoodCoupon().subtract(payPrice));
                     /**
                      * 消费粮票金额
                      */
                     payFoodCoupon = payFoodCoupon.add(payPrice);
+                    // 支付价格（除粮票外）小于 粮票--> 支付价格为  0
+                    payPrice = new BigDecimal(0);
                 } else {
                     // 最终的实付款  --> 订单原菜价（原菜价+配送费+餐盒费）-粮票-优惠券-满减/折扣
                     payPrice = payPrice.subtract(wxUserBell.getFoodCoupon());
@@ -672,7 +672,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_ADD_ORDER_NO_SHOP);
         }
         //1-如果开启云打印就是云打印就是
-        if (shop.getPrintType().intValue() == ShopPrintConfigConstants.DB_SHOP_PRINT_CLOUD){
+        if (shop.getPrintType() != null && shop.getPrintType().intValue() == ShopPrintConfigConstants.DB_SHOP_PRINT_CLOUD){
             ResponseObject responseObject = this.letOrderShopHadAccept(orderId,orders.getShopId());
             //失败把订单改成待接手，定时器会查询到
             if (!responseObject.isCode()){
