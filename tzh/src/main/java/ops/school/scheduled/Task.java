@@ -64,6 +64,8 @@ public class Task {
 
     @Autowired
     private TxLogService txLogService;
+    //10分钟
+    private final long timeOut = 10;
 
     /**
      * 每天晚上把待付款的改成取消的
@@ -292,7 +294,7 @@ public class Task {
 
 
     /**
-     * 每1分钟执行一次,隔10分钟提醒一次
+     * 每n分钟执行一次,隔10分钟提醒一次
      * 提醒学校负责人，商家有超时未接手订单
      */
     @Scheduled(cron = "0 */5 * * * ?")
@@ -340,7 +342,7 @@ public class Task {
             String curTime = df.format(current);
             // 获取订单支付时间
             long differTime = TimeUtilS.dateDiff(temp.getPayTime(), curTime);
-            if (differTime > 10) {
+            if (differTime > timeOut) {
                 if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SHOP" + school.getPhone()) == null) {
                     try {
                         if (shop == null ){
