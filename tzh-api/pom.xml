@@ -221,7 +221,7 @@
                     <include>**/*.xml</include>
                 </includes>
             </resource>
-            <!--复制mapper二选一-->
+<!--            复制mapper二选一-->
             <resource>
                 <directory>src/main/java</directory>
                 <includes>
