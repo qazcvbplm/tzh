@@ -1,0 +1,98 @@
+package ops.school.api.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+public class ChargeLog {
+    @TableId(type = IdType.AUTO)
+    private String id;
+
+    private BigDecimal pay;
+
+    private BigDecimal send;
+
+    private String openId;
+
+    private String createTime;
+
+    private Integer appId;
+
+    /**
+     * 微信订单号27位太长了
+     */
+    private String wxTradeNo;
+
+
+    public Integer getAppId() {
+        return appId;
+    }
+
+    public void setAppId(Integer appId) {
+        this.appId = appId;
+    }
+
+    public ChargeLog(String id, BigDecimal pay, BigDecimal send, String openId, int appId) {
+        super();
+        this.id = id;
+        this.pay = pay;
+        this.send = send;
+        this.openId = openId;
+        this.appId = appId;
+    }
+
+    public ChargeLog() {
+        super();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public BigDecimal getPay() {
+        return pay;
+    }
+
+    public void setPay(BigDecimal pay) {
+        this.pay = pay;
+    }
+
+    public BigDecimal getSend() {
+        return send;
+    }
+
+    public void setSend(BigDecimal send) {
+        this.send = send;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId == null ? null : openId.trim();
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime == null ? null : createTime.trim();
+    }
+
+
+    public String getWxTradeNo() {
+        return wxTradeNo;
+    }
+
+    public void setWxTradeNo(String wxTradeNo) {
+        this.wxTradeNo = wxTradeNo;
+    }
+}

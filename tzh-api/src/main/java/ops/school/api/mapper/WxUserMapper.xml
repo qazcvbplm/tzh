@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ops.school.api.dao.WxUserMapper">
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.WxUser">
+        <id column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="id" property="id" jdbcType="BIGINT" />
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl"/>
+        <result column="gender" jdbcType="VARCHAR" property="gender"/>
+        <result column="province" jdbcType="VARCHAR" property="province"/>
+        <result column="city" jdbcType="VARCHAR" property="city"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="client" jdbcType="VARCHAR" property="client"/>
+        <result column="total" jdbcType="INTEGER" property="total"/>
+        <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
+        <result column="app_id" jdbcType="INTEGER" property="appId"/>
+        <result column="gzh_open_id" jdbcType="VARCHAR" property="gzhOpenId"/>
+        <association property="bell" javaType="ops.school.api.entity.WxUserBell">
+            <result column="id" property="id" jdbcType="BIGINT" />
+            <result column="source" jdbcType="INTEGER" property="source"/>
+            <result column="money" jdbcType="DECIMAL" property="money"/>
+            <result column="is_vip" jdbcType="INTEGER" property="isVip"/>
+            <result column="vip_out_time" jdbcType="BIGINT" property="vipOutTime"/>
+            <result column="food_coupon" jdbcType="DECIMAL" property="foodCoupon"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id,
+        open_id,
+        nick_name,
+        avatar_url,
+        gender,
+        province,
+        city,
+        phone,
+        client,
+        school_id,
+        app_id,
+        gzh_open_id
+    </sql>
+
+    <sql id="User_Bell_List" >
+        wx_user.id,
+        wx_user.open_id,
+        wx_user.nick_name,
+        wx_user.avatar_url,
+        wx_user.gender,
+        wx_user.province,
+        wx_user.city,
+        wx_user.phone,
+        wx_user.client,
+        wx_user.school_id,
+        wx_user.app_id,
+        wx_user.gzh_open_id,
+
+        wx_user_bell.id,
+        wx_user_bell.wx_user_id,
+        wx_user_bell.phone,
+        wx_user_bell.source,
+        wx_user_bell.money,
+        wx_user_bell.is_vip,
+        wx_user_bell.vip_out_time,
+        wx_user_bell.food_coupon
+    </sql>
+
+    <sql id="Table_Name">
+        wx_user
+    </sql>
+
+    <sql id="Select_Limit_State">
+        <if test="id != null and id != '' ">
+            AND id = #{id}
+        </if>
+        <if test="openId != null and openId != '' ">
+            AND open_id = #{openId}
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND nick_name = #{nickName}
+        </if>
+        <if test="avatarUrl != null and avatarUrl != '' ">
+            AND avatar_url = #{avatarUrl}
+        </if>
+        <if test="gender != null and gender != '' ">
+            AND gender = #{gender}
+        </if>
+        <if test="province != null and province != '' ">
+            AND province = #{province}
+        </if>
+        <if test="city != null and city != '' ">
+            AND city = #{city}
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND phone = #{phone}
+        </if>
+        <if test="client != null and client != '' ">
+            AND client = #{client}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND school_id = #{schoolId}
+        </if>
+        <if test="appId != null and appId != '' ">
+            AND app_id = #{appId}
+        </if>
+        <if test="gzhOpenId != null and gzhOpenId != '' ">
+            AND gzh_open_id = #{gzhOpenId}
+        </if>
+    </sql>
+
+    <select id="findGzh" parameterType="string" resultMap="BaseResultMap">
+  select * from wx_user where phone=#{phone} and client='微信公众号' limit 10
+  </select>
+
+    <select id="findByPhoneGZH" parameterType="string" resultMap="BaseResultMap">
+     select * from wx_user where client!='微信公众号' and phone=#{phone} and school_id!=23
+  </select>
+
+    <select id="countBySchoolId" parameterType="int" resultType="int">
+   select count(*) from wx_user where school_id=#{schoolId} and phone !=''
+  </select>
+
+    <select id="findByschoolAndPhone" resultMap="BaseResultMap" parameterType="ops.school.api.entity.WxUser">
+   select * from wx_user where school_id=#{schoolId} and phone=#{phone} 
+  </select>
+
+    <select id="find" resultMap="BaseResultMap" parameterType="ops.school.api.entity.WxUser">
+        select
+        <if test="total==null">
+            *
+        </if>
+        <if test="total!=null">
+            count(*) as total
+        </if>
+        from wx_user
+        <where>
+            <if test="openId!=null">
+                open_id =#{openId}
+            </if>
+            <if test="appId!=null">
+                app_id =#{appId}
+            </if>
+            <if test="schoolId!=null">
+                and school_id =#{schoolId}
+            </if>
+            <if test="nickName!=null">
+                and nick_name =#{nickName}
+            </if>
+            <if test="phone!=null">
+                and phone =#{phone}
+            </if>
+        </where>
+        <if test="orderBy!=null">
+            order by #{orderBy}
+        </if>
+        <if test="page!=null and size!=null">
+            limit #{page},#{size}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    *
+    from wx_user
+    where open_id = #{openId,jdbcType=VARCHAR}
+  </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="ops.school.api.entity.WxUser">
+        update wx_user
+        <set>
+            <if test="nickName != null">
+                nick_name = #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="avatarUrl != null">
+                avatar_url = #{avatarUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="gender != null">
+                gender = #{gender,jdbcType=VARCHAR},
+            </if>
+            <if test="province != null">
+                province = #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                city = #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="schoolId!= null">
+                school_id = #{schoolId,jdbcType=INTEGER},
+            </if>
+            <if test="gzhOpenId!= null">
+                gzh_open_id = #{gzhOpenId,jdbcType=INTEGER},
+            </if>
+        </set>
+        where open_id = #{openId,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findByPhone" parameterType="string" resultType="int">
+   select count(*) from wx_user where phone=#{phone}
+  </select>
+
+    <!--CreatBy Fang Time:2019/7/19 10:40 |  根据用户id查询用户-->
+    <select id="selectOneByUserId" resultType="ops.school.api.entity.WxUser">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE id = #{userId}
+    </select>
+
+    <!--CreatBy Fang Time:2019/7/24 16:08 |  根据用户的openid和phone查找用户和用户余额-->
+    <select id="findUserAndBell" resultMap="BaseResultMap">
+        SELECT <include refid="User_Bell_List"/>
+        FROM wx_user,wx_user_bell
+        WHERE wx_user.open_id = #{openId}
+        AND wx_user.phone = #{phone}
+    </select>
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ops.school.api.dao.OrdersCompleteMapper">
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.OrdersComplete">
+        <id column="Id" property="id" jdbcType="INTEGER" />
+        <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <result column="app_get_school_rate" property="appGetSchoolRate" jdbcType="DECIMAL" />
+        <result column="school_get_shop_rate" property="schoolGetShopRate" jdbcType="DECIMAL" />
+        <result column="school_get_sender_rate" property="schoolGetSenderRate" jdbcType="DECIMAL" />
+        <result column="app_get_total" property="appGetTotal" jdbcType="DECIMAL" />
+        <result column="school_get_shop" property="schoolGetShop" jdbcType="DECIMAL" />
+        <result column="school_get_sender" property="schoolGetSender" jdbcType="DECIMAL" />
+        <result column="school_get_total" property="schoolGetTotal" jdbcType="DECIMAL" />
+        <result column="sender_get_total" property="senderGetTotal" jdbcType="DECIMAL" />
+        <result column="shop_get_total" property="shopGetTotal" jdbcType="DECIMAL" />
+    </resultMap>
+
+
+    <sql id="Base_Column_List" >
+        Id,
+        order_id,
+        app_get_school_rate,
+        school_get_shop_rate,
+        school_get_sender_rate,
+        app_get_total,
+        school_get_shop,
+        school_get_sender,
+        school_get_total,
+        sender_get_total,
+        shop_get_total
+    </sql>
+
+    <sql id="Table_Name">
+        orders_complete
+    </sql>
+
+    <!--CreatBy Fang Time:2019/9/7 17:32 |  -->
+    <insert id="batchInsertOrdersComplete">
+        INSERT INTO <include refid="Table_Name"/>
+        (
+        order_id,
+        app_get_school_rate,
+        school_get_shop_rate,
+        school_get_sender_rate,
+        app_get_total,
+        school_get_shop,
+        school_get_sender,
+        school_get_total,
+        sender_get_total,
+        shop_get_total
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," close=" " open=" ">
+            (
+            #{item.orderId},
+            #{item.appGetSchoolRate},
+            #{item.schoolGetShopRate},
+            #{item.schoolGetSenderRate},
+            #{item.appGetTotal},
+            #{item.schoolGetShop},
+            #{item.schoolGetSender},
+            #{item.schoolGetTotal},
+            #{item.senderGetTotal},
+            #{item.shopGetTotal}
+            )
+        </foreach>
+    </insert>
+</mapper>

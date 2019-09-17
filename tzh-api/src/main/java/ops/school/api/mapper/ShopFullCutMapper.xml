@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ops.school.api.dao.ShopFullCutMapper" >
+<resultMap id="BaseResultMap" type="ops.school.api.entity.ShopFullCut" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+    <result column="full_amount" property="fullAmount" jdbcType="INTEGER" />
+    <result column="cut_amount" property="cutAmount" jdbcType="INTEGER" />
+    <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
+    <result column="create_id" property="createId" jdbcType="BIGINT" />
+    <result column="update_id" property="updateId" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+</resultMap>
+
+    <sql id="Base_Column_List" >
+        id,
+        shop_id,
+        full_amount,
+        cut_amount,
+        is_delete,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+    </sql>
+
+    <sql id="Table_Name">
+        shop_full_cut
+    </sql>
+
+<sql id="Select_Limit_State">
+    1=1
+    <if test="id != null and id != '' ">
+        AND id = #{id}
+    </if>
+    <if test="shopId != null and shopId != '' ">
+        AND shop_id = #{shopId}
+    </if>
+    <if test="fullAmount != null and fullAmount != '' ">
+        AND full_amount = #{fullAmount}
+    </if>
+    <if test="cutAmount != null and cutAmount != '' ">
+        AND cut_amount = #{cutAmount}
+    </if>
+    <if test="isDelete != null and isDelete != '' ">
+        AND is_delete = #{isDelete}
+    </if>
+    <if test="createId != null and createId != '' ">
+        AND create_id = #{createId}
+    </if>
+    <if test="updateId != null and updateId != '' ">
+        AND update_id = #{updateId}
+    </if>
+    <if test="createTime != null and createTime != '' ">
+        AND create_time = #{createTime}
+    </if>
+    <if test="updateTime != null and updateTime != '' ">
+        AND update_time = #{updateTime}
+    </if>
+</sql>
+
+<!--CreatBy Fang Time: |  分页查询统计-->
+<select id="countLimitByDTO" resultType="java.lang.Integer">
+    SELECT COUNT(1)
+    FROM
+    <include refid="Table_Name"/>
+    WHERE
+    <include refid="Select_Limit_State"/>
+</select>
+
+<!--CreatBy Fang Time: |  分页查询-->
+<select id="selectLimitByDTO" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    WHERE
+    <include refid="Select_Limit_State"/>
+    LIMIT #{page},#{size}
+</select>
+
+<!--CreatBy Fang Time: | 批量查询-->
+<select id="batchFindByIds" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    WHERE id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+</select>
+
+
+
+
+<!--CreatBy Fang Time: |  停用-->
+<update id="stopOneById">
+    UPDATE <include refid="Table_Name"/>
+    SET status = 0
+    WHERE id = #{id}
+    AND is_delete = 0
+</update>
+
+<!--CreatBy Fang Time: |  启用-->
+<update id="startOneById">
+    UPDATE <include refid="Table_Name"/>
+    SET status = 1
+    WHERE id = #{id}
+    AND is_delete = 0
+</update>
+<select id="findShopFullCut" parameterType="Integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    where shop_id = #{shopId}
+    and is_delete = 0
+    order by full_amount desc
+</select>
+</mapper>

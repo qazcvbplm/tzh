@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ops.school.api.dao.CouponMapper">
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.Coupon">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="school_id" property="schoolId" jdbcType="BIGINT"/>
+        <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
+        <result column="coupon_desc" property="couponDesc" jdbcType="VARCHAR"/>
+        <result column="full_amount" property="fullAmount" jdbcType="INTEGER"/>
+        <result column="cut_amount" property="cutAmount" jdbcType="INTEGER"/>
+        <result column="coupon_type" property="couponType" jdbcType="INTEGER"/>
+        <result column="yes_show_index" property="yesShowIndex" jdbcType="INTEGER"/>
+        <result column="send_begin_time" property="sendBeginTime" jdbcType="TIMESTAMP"/>
+        <result column="send_end_time" property="sendEndTime" jdbcType="TIMESTAMP"/>
+        <result column="effective_days" property="effectiveDays" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_id" property="createId" jdbcType="BIGINT"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+        <result column="is_invalid" property="isInvalid" jdbcType="INTEGER"/>
+        <result column="is_delete" property="isDelete" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        school_id,
+        coupon_name,
+        coupon_desc,
+        full_amount,
+        cut_amount,
+        coupon_type,
+        yes_show_index,
+        send_begin_time,
+        send_end_time,
+        effective_days,
+        create_time,
+        create_id,
+        update_time,
+        update_id,
+        is_invalid,
+        is_delete
+    </sql>
+
+    <sql id="Table_Name">
+        coupon
+    </sql>
+
+    <sql id="Select_Limit_State">
+        1=1
+        <if test="id != null and id != '' ">
+            AND id = #{id}
+        </if>
+        <if test="couponName != null and couponName != '' ">
+            AND coupon_name = #{couponName}
+        </if>
+        <if test="couponDesc != null and couponDesc != '' ">
+            AND coupon_desc = #{couponDesc}
+        </if>
+        <if test="fullAmount != null and fullAmount != '' ">
+            AND full_amount = #{fullAmount}
+        </if>
+        <if test="cutAmount != null and cutAmount != '' ">
+            AND cut_amount = #{cutAmount}
+        </if>
+        <if test="couponType != null and couponType != '' ">
+            AND coupon_type = #{couponType}
+        </if>
+        <if test="yesShowIndex != null and yesShowIndex != '' ">
+            AND yes_show_index = #{yesShowIndex}
+        </if>
+        <if test="sendBeginTime != null and sendBeginTime != '' ">
+            AND send_begin_time = #{sendBeginTime}
+        </if>
+        <if test="sendEndTime != null and sendEndTime != '' ">
+            AND send_end_time = #{sendEndTime}
+        </if>
+        <if test="effectiveDays != null and effectiveDays != '' ">
+            AND effective_days = #{effectiveDays}
+        </if>
+        <if test="createTime != null and createTime != '' ">
+            AND create_time = #{createTime}
+        </if>
+        <if test="createId != null and createId != '' ">
+            AND create_id = #{createId}
+        </if>
+        <if test="updateTime != null and updateTime != '' ">
+            AND update_time = #{updateTime}
+        </if>
+        <if test="updateId != null and updateId != '' ">
+            AND update_id = #{updateId}
+        </if>
+        <if test="isInvalid != null and isInvalid != '' ">
+            AND is_invalid = #{isInvalid}
+        </if>
+        <if test="isDelete != null and isDelete != '' ">
+            AND is_delete = #{isDelete}
+        </if>
+    </sql>
+
+    <!--CreatBy Fang Time: |  分页查询统计-->
+    <select id="countLimitByDTO" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM
+        <include refid="Table_Name"/>
+        WHERE
+        <include refid="Select_Limit_State"/>
+    </select>
+
+    <!--CreatBy Fang Time: |  分页查询-->
+    <select id="selectLimitByDTO" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Table_Name"/>
+        WHERE
+        <include refid="Select_Limit_State"/>
+        LIMIT #{page},#{size}
+    </select>
+
+    <!--CreatBy Fang Time: | 批量查询-->
+    <select id="batchFindByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Table_Name"/>
+        WHERE id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <!--CreatBy Fang Time: |  停用-->
+    <update id="stopOneById">
+        UPDATE
+        <include refid="Table_Name"/>
+        SET is_delete = 1
+        WHERE id = #{id}
+        AND is_delete = 0
+    </update>
+
+    <!--CreatBy Fang Time: |  启用-->
+    <update id="startOneById">
+        UPDATE
+        <include refid="Table_Name"/>
+        SET status = 1
+        WHERE id = #{id}
+        AND is_delete = 0
+    </update>
+<!--    查询完批量更新优惠券首页展示-->
+    <update id="batchUpdateToShowIndex">
+        UPDATE <include refid="Table_Name"/>
+        SET
+        yes_show_index = #{yesShowIndex},
+        update_id = #{updateId},
+        update_time = now()
+        WHERE
+        is_delete = 0
+        AND is_invalid= 0
+        AND id IN
+        <foreach collection="couponList" index="index" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+
+    <select id="findByIndex" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        <include refid="Table_Name"/>
+        <where>
+            school_id = #{schoolId } and coupon_type IN (1,2)
+            and is_delete = 0 and is_invalid = 0
+            <if test="yesShowIndex != null and yesShowIndex != '' ">
+                AND yes_show_index = #{yesShowIndex}
+            </if>
+        </where>
+    </select>
+
+        <insert id="insertOne" parameterType="ops.school.api.entity.Coupon" useGeneratedKeys="true"  keyProperty="id" >
+        insert into
+        <include refid="Table_Name"/>
+        (
+        school_id,
+        coupon_name,
+        coupon_desc,
+        full_amount,
+        cut_amount,
+        coupon_type,
+        yes_show_index,
+        send_begin_time,
+        send_end_time,
+        effective_days,
+        create_time,
+        create_id,
+        update_time,
+        update_id,
+        is_invalid,
+        is_delete
+        )
+        values (
+        #{schoolId},
+        #{couponName},
+        #{couponDesc},
+        #{fullAmount},
+        #{cutAmount},
+        #{couponType},
+        #{yesShowIndex},
+        #{sendBeginTime},
+        #{sendEndTime},
+        #{effectiveDays},
+        now(),
+        #{createId},
+        now(),
+        #{updateId},
+        0,
+        0
+        );
+    </insert>
+
+    <!--CreatBy Fang Time:2019/7/18 15:39 |  根据学校id，优惠卷ids，优惠券开启首页展示状态查询优惠券-->
+    <select id="batchFindHomeBySIdAndCIds" resultType="ops.school.api.entity.Coupon">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE
+        is_delete = 0
+        AND is_invalid = 0
+        AND id IN
+        <foreach collection="couponList" index="index" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+
+    </select>
+    <!--查询所有未失效和未删除的优惠券中已失效的优惠券-->
+    <select id="findInvalidCoupon" resultMap="BaseResultMap" parameterType="map">
+        select * from `coupon`
+        where is_delete = 0 and is_invalid = 0
+        and send_end_time <![CDATA[ < ]]> now()
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 15:12 |  -->
+    <select id="countInvalidCoupon" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM coupon
+        WHERE is_delete = 0
+        AND is_invalid = 0
+        AND send_end_time <![CDATA[ < ]]> now()
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 15:17 |  -->
+    <select id="limitFindInvalidUserCoupon" resultType="ops.school.api.entity.Coupon">
+        SELECT <include refid="Base_Column_List"/>
+        FROM coupon
+        WHERE is_delete = 0
+        AND is_invalid = 0
+        AND send_end_time <![CDATA[ < ]]> now()
+        LIMIT 0,1000
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 15:23 |  -->
+    <update id="batchUpdateToUnInvalidByIds">
+        UPDATE <include refid="Table_Name"/>
+        SET is_invalid = 1
+        WHERE id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+</mapper>

@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ops.school.api.dao.OrdersMapper">
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.Orders">
+        <id column="Id" jdbcType="VARCHAR" property="id"/>
+        <result column="app_id" jdbcType="INTEGER" property="appId"/>
+        <result column="school_id" jdbcType="INTEGER" property="schoolId"/>
+        <result column="school_top_down_price" jdbcType="DECIMAL" property="schoolTopDownPrice"/>
+        <result column="shop_id" jdbcType="INTEGER" property="shopId"/>
+        <result column="shop_name" jdbcType="VARCHAR" property="shopName"/>
+        <result column="shop_image" jdbcType="VARCHAR" property="shopImage"/>
+        <result column="shop_address" jdbcType="VARCHAR" property="shopAddress"/>
+        <result column="shop_phone" jdbcType="VARCHAR" property="shopPhone"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="address_name" jdbcType="VARCHAR" property="addressName"/>
+        <result column="address_phone" jdbcType="VARCHAR" property="addressPhone"/>
+        <result column="address_detail" jdbcType="VARCHAR" property="addressDetail"/>
+        <result column="floor_id" jdbcType="INTEGER" property="floorId"/>
+        <result column="typ" jdbcType="VARCHAR" property="typ"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="box_price" jdbcType="DECIMAL" property="boxPrice"/>
+        <result column="send_price" jdbcType="DECIMAL" property="sendPrice"/>
+        <result column="send_base_price" jdbcType="DECIMAL" property="sendBasePrice"/>
+        <result column="send_add_distance_price" jdbcType="DECIMAL" property="sendAddDistancePrice"/>
+        <result column="send_add_count_price" jdbcType="DECIMAL" property="sendAddCountPrice"/>
+        <result column="product_price" jdbcType="DECIMAL" property="productPrice"/>
+        <result column="discount_type" jdbcType="VARCHAR" property="discountType"/>
+        <result column="discount_price" jdbcType="DECIMAL" property="discountPrice"/>
+
+        <result column="coupon_id" property="couponId" jdbcType="BIGINT"/>
+        <result column="coupon_full_amount" property="couponFullAmount" jdbcType="DECIMAL"/>
+        <result column="coupon_used_amount" property="couponUsedAmount" jdbcType="DECIMAL"/>
+        <result column="full_cut_id" property="fullCutId" jdbcType="BIGINT"/>
+        <result column="full_amount" property="fullAmount" jdbcType="DECIMAL"/>
+        <result column="full_used_amount" property="fullUsedAmount" jdbcType="DECIMAL"/>
+        <result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
+
+
+        <result column="pay_price" jdbcType="DECIMAL" property="payPrice"/>
+        <result column="sender_name" jdbcType="VARCHAR" property="senderName"/>
+        <result column="sender_phone" jdbcType="VARCHAR" property="senderPhone"/>
+        <result column="sender_id" jdbcType="INTEGER" property="senderId"/>
+        <result column="destination" jdbcType="INTEGER" property="destination"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="water_number" jdbcType="INTEGER" property="waterNumber"/>
+        <result column="evaluate_flag" jdbcType="INTEGER" property="evaluateFlag"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="payment" jdbcType="VARCHAR" property="payment"/>
+        <result column="pay_time" jdbcType="VARCHAR" property="payTime"/>
+        <result column="pay_time_long" property="payTimeLong"/>
+        <result column="send_get_flag" jdbcType="INTEGER" property="sendGetFlag"/>
+        <result column="end_time" jdbcType="VARCHAR" property="endTime"/>
+        <result column="resever_time" jdbcType="VARCHAR" property="reseverTime"/>
+        <result column="shop_accept_time" jdbcType="VARCHAR" property="shopAcceptTime"/>
+        <result column="pay_food_coupon" jdbcType="DECIMAL" property="payFoodCoupon"/>
+        <result column="after_discount_price" jdbcType="DECIMAL" property="afterDiscountPrice"/>
+
+        <result column="used_coupon" property="usedCoupon" jdbcType="DECIMAL"/>
+        <result column="used_food_coupon" property="usedFoodCoupon" jdbcType="DECIMAL"/>
+        <result column="used_full_cut" property="usedFullCut" jdbcType="DECIMAL"/>
+        <result column="used_discount" property="usedDiscount" jdbcType="DECIMAL"/>
+
+        <result column="school_get_total" property="schoolGetTotal" jdbcType="DECIMAL"/>
+        <result column="school_day_tx" property="schoolDayTx" jdbcType="DECIMAL"/>
+        <result column="school_all_money" property="schoolAllMoney" jdbcType="DECIMAL"/>
+
+        <result column="down_send_count" property="downSendCount" jdbcType="INTEGER" />
+        <result column="down_send_money" property="downSendMoney" jdbcType="DECIMAL" />
+
+        <association property="complete" javaType="ops.school.api.entity.OrdersComplete">
+            <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+            <result column="app_get_school_rate" jdbcType="DECIMAL" property="appGetSchoolRate"/>
+            <result column="school_get_shop_rate" jdbcType="DECIMAL" property="schoolGetShopRate"/>
+            <result column="school_get_sender_rate" jdbcType="DECIMAL" property="schoolGetSenderRate"/>
+            <result column="app_get_total" jdbcType="DECIMAL" property="appGetTotal"/>
+            <result column="school_get_shop" jdbcType="DECIMAL" property="schoolGetShop"/>
+            <result column="school_get_sender" jdbcType="DECIMAL" property="schoolGetSender"/>
+            <result column="school_get_total" jdbcType="DECIMAL" property="schoolGetTotal"/>
+            <result column="sender_get_total" jdbcType="DECIMAL" property="senderGetTotal"/>
+            <result column="shop_get_total" jdbcType="DECIMAL" property="shopGetTotal"/>
+        </association>
+
+        <collection property="op" ofType="ops.school.api.entity.OrderProduct"
+                    select="ops.school.api.dao.OrderProductMapper.findByOrderId" column="id">
+            <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+            <result column="product_image" jdbcType="VARCHAR" property="productImage"/>
+            <result column="product_count" jdbcType="INTEGER" property="productCount"/>
+            <result column="total_price" jdbcType="DECIMAL" property="totalPrice"/>
+            <result column="attribute_name" jdbcType="VARCHAR" property="attributeName"/>
+            <result column="attribute_price" jdbcType="DECIMAL" property="attributePrice"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        Id,
+        app_id,
+        school_id,
+        school_top_down_price,
+        shop_id,
+        shop_name,
+        shop_image,
+        shop_address,
+        shop_phone,
+        open_id,
+        address_name,
+        address_phone,
+        address_detail,
+        floor_id,
+        typ,
+        status,
+        box_price,
+        send_price,
+        send_base_price,
+        send_add_distance_price,
+        send_add_count_price,
+        product_price,
+        discount_type,
+        discount_price,
+        coupon_id,
+        coupon_full_amount,
+        coupon_used_amount,
+        full_cut_id,
+        full_amount,
+        full_used_amount,
+        original_price,
+        pay_price,
+        sender_name,
+        sender_phone,
+        sender_id,
+        destination,
+        remark,
+        water_number,
+        create_time,
+        payment,
+        pay_time,
+        pay_time_long,
+        send_get_flag,
+        end_time,
+        evaluate_flag,
+        resever_time,
+        shop_accept_time,
+        pay_food_coupon,
+        after_discount_price
+    </sql>
+
+    <sql id="Table_Name">
+        orders
+    </sql>
+
+    <sql id="Select_Limit_State">
+        1=1
+        <if test="id != null and id != '' ">
+            AND Id = #{id}
+        </if>
+        <if test="appId != null and appId != '' ">
+            AND app_id = #{appId}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND school_id = #{schoolId}
+        </if>
+        <if test="schoolTopDownPrice != null and schoolTopDownPrice != '' ">
+            AND school_top_down_price = #{schoolTopDownPrice}
+        </if>
+        <if test="shopId != null and shopId != '' ">
+            AND shop_id = #{shopId}
+        </if>
+        <if test="shopName != null and shopName != '' ">
+            AND shop_name = #{shopName}
+        </if>
+        <if test="shopImage != null and shopImage != '' ">
+            AND shop_image = #{shopImage}
+        </if>
+        <if test="shopAddress != null and shopAddress != '' ">
+            AND shop_address = #{shopAddress}
+        </if>
+        <if test="shopPhone != null and shopPhone != '' ">
+            AND shop_phone = #{shopPhone}
+        </if>
+        <if test="openId != null and openId != '' ">
+            AND open_id = #{openId}
+        </if>
+        <if test="addressName != null and addressName != '' ">
+            AND address_name = #{addressName}
+        </if>
+        <if test="addressPhone != null and addressPhone != '' ">
+            AND address_phone = #{addressPhone}
+        </if>
+        <if test="addressDetail != null and addressDetail != '' ">
+            AND address_detail = #{addressDetail}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floor_id = #{floorId}
+        </if>
+        <if test="typ != null and typ != '' ">
+            AND typ = #{typ}
+        </if>
+        <if test="status != null and status != '' ">
+            AND status = #{status}
+        </if>
+        <if test="boxPrice != null and boxPrice != '' ">
+            AND box_price = #{boxPrice}
+        </if>
+        <if test="sendPrice != null and sendPrice != '' ">
+            AND send_price = #{sendPrice}
+        </if>
+        <if test="sendBasePrice != null and sendBasePrice != '' ">
+            AND send_base_price = #{sendBasePrice}
+        </if>
+        <if test="sendAddDistancePrice != null and sendAddDistancePrice != '' ">
+            AND send_add_distance_price = #{sendAddDistancePrice}
+        </if>
+        <if test="sendAddCountPrice != null and sendAddCountPrice != '' ">
+            AND send_add_count_price = #{sendAddCountPrice}
+        </if>
+        <if test="productPrice != null and productPrice != '' ">
+            AND product_price = #{productPrice}
+        </if>
+        <if test="discountType != null and discountType != '' ">
+            AND discount_type = #{discountType}
+        </if>
+        <if test="discountPrice != null and discountPrice != '' ">
+            AND discount_price = #{discountPrice}
+        </if>
+        <if test="couponId != null and couponId != '' ">
+            AND coupon_id = #{couponId}
+        </if>
+        <if test="couponFullAmount != null and couponFullAmount != '' ">
+            AND coupon_full_amount = #{couponFullAmount}
+        </if>
+        <if test="couponUsedAmount != null and couponUsedAmount != '' ">
+            AND coupon_used_amount = #{couponUsedAmount}
+        </if>
+        <if test="fullCutId != null and fullCutId != '' ">
+            AND full_cut_id = #{fullCutId}
+        </if>
+        <if test="fullAmount != null and fullAmount != '' ">
+            AND full_amount = #{fullAmount}
+        </if>
+        <if test="fullUsedAmount != null and fullUsedAmount != '' ">
+            AND full_used_amount = #{fullUsedAmount}
+        </if>
+        <if test="originalPrice != null and originalPrice != '' ">
+            AND original_price = #{originalPrice}
+        </if>
+        <if test="payPrice != null and payPrice != '' ">
+            AND pay_price = #{payPrice}
+        </if>
+        <if test="senderName != null and senderName != '' ">
+            AND sender_name = #{senderName}
+        </if>
+        <if test="senderPhone != null and senderPhone != '' ">
+            AND sender_phone = #{senderPhone}
+        </if>
+        <if test="senderId != null and senderId != '' ">
+            AND sender_id = #{senderId}
+        </if>
+        <if test="destination != null and destination != '' ">
+            AND destination = #{destination}
+        </if>
+        <if test="remark != null and remark != '' ">
+            AND remark = #{remark}
+        </if>
+        <if test="waterNumber != null and waterNumber != '' ">
+            AND water_number = #{waterNumber}
+        </if>
+        <if test="createTime != null and createTime != '' ">
+            AND create_time = #{createTime}
+        </if>
+        <if test="payment != null and payment != '' ">
+            AND payment = #{payment}
+        </if>
+        <if test="payTime != null and payTime != '' ">
+            AND pay_time = #{payTime}
+        </if>
+        <if test="payTimeLong != null and payTimeLong != '' ">
+            AND pay_time_long = #{payTimeLong}
+        </if>
+        <if test="sendGetFlag != null and sendGetFlag != '' ">
+            AND send_get_flag = #{sendGetFlag}
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            AND end_time = #{endTime}
+        </if>
+        <if test="evaluateFlag != null and evaluateFlag != '' ">
+            AND evaluate_flag = #{evaluateFlag}
+        </if>
+        <if test="reseverTime != null and reseverTime != '' ">
+            AND resever_time = #{reseverTime}
+        </if>
+        <if test="shopAcceptTime != null and shopAcceptTime != '' ">
+            AND shop_accept_time = #{shopAcceptTime}
+        </if>
+        <if test="payFoodCoupon != null and payFoodCoupon != '' ">
+            AND pay_food_coupon = #{payFoodCoupon}
+        </if>
+    </sql>
+
+
+    <select id="countBySchoolId" parameterType="int" resultType="int">
+  select count(*) from orders where school_id=#{schoolId} and day(create_time)=day(now()) and status!='待付款'
+  </select>
+
+    <select id="completeByShopId" parameterType="map" resultMap="BaseResultMap">
+  SELECT
+	count(o.id) AS remark,
+	sum(oc.school_get_total) AS school_get_total,
+	sum(o.pay_price) AS pay_price,
+	sum(box_price) AS box_price,
+	sum(send_price) AS send_price,
+	sum(product_price) AS product_price,
+	sum(oc.app_get_total) AS app_get_total,
+	sum(oc.shop_get_total) AS shop_get_total,
+	sum(oc.school_get_shop) AS school_get_shop,
+	sum(oc.school_get_sender) AS school_get_sender,
+	oc.app_get_school_rate,
+	sum(o.coupon_used_amount) AS used_coupon,
+	sum(o.full_used_amount) AS used_full_cut,
+	sum(o.pay_food_coupon) AS used_food_coupon,
+	(
+		SELECT
+			sum(orders.discount_price)
+		FROM
+			orders,
+			orders_complete
+		WHERE
+			orders.discount_type = "商品折扣"
+		AND orders_complete.order_id = orders.id
+		AND orders. STATUS = '已完成'
+		AND orders.shop_id = #{shopId}
+		AND orders.end_time LIKE #{day}
+	) AS used_discount,
+	(
+		SELECT
+			count(1) AS down_send_count
+		FROM
+			orders,
+			orders_complete
+		WHERE
+		orders_complete.order_id = orders.id
+		AND orders. STATUS = '已完成'
+		AND orders.shop_id = #{shopId}
+		AND orders.end_time LIKE #{day}
+		AND orders.destination = 0
+	) AS down_send_count,
+	(
+		SELECT
+			sum(orders.send_price) AS down_send_money
+		FROM
+			orders,
+			orders_complete
+		WHERE
+		orders_complete.order_id = orders.id
+		AND orders. STATUS = '已完成'
+		AND orders.shop_id = #{shopId}
+		AND orders.end_time LIKE #{day}
+		AND orders.destination = 0
+	) AS down_send_money
+FROM
+	orders o,
+	orders_complete oc
+WHERE
+	oc.order_id = o.id
+AND (o. STATUS = '已完成')
+AND o.shop_id = #{shopId}
+AND end_time LIKE #{day}
+  </select>
+
+    <select id="completeBySchoolId" parameterType="map" resultMap="BaseResultMap">
+      SELECT
+        count(o.id) AS remark,
+        sum(o.pay_price) AS pay_price,
+        sum(box_price) AS box_price,
+        sum(send_price) AS send_price,
+        sum(product_price) AS product_price,
+        sum(
+            o.pay_price * oc.app_get_school_rate
+        ) AS send_add_count_price,
+        sum(oc.app_get_total) AS app_get_total,
+        sum(oc.shop_get_total) AS shop_get_total,
+        sum(oc.school_get_shop) AS school_get_shop,
+        sum(oc.school_get_sender) AS school_get_sender,
+        o.payment
+    FROM
+        orders o,
+        orders_complete oc
+    WHERE
+        oc.order_id = o.id
+    AND (o. STATUS = '已完成')
+    AND o.school_id = #{schoolId}
+    AND end_time like #{day}
+    group by o.payment
+  </select>
+
+
+    <update id="paySuccess" parameterType="map">
+   update orders set status='待接手',pay_time=now(),payment=#{payment},pay_time_long=#{payTimeLong} where id=#{orderId} and status='待付款'
+  </update>
+    <select id="count" parameterType="ops.school.api.entity.Orders" resultType="int">
+        select count(*) from orders
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="typ != null">
+                and orders.typ = #{typ}
+            </if>
+            <if test="status != null">
+                and orders.status = #{status}
+            </if>
+            <if test="addressName != null">
+                and orders.address_name = #{addressName}
+            </if>
+            <if test="shopName != null">
+                and orders.shop_name = #{shopName}
+            </if>
+            <if test="schoolId != null">
+                and school_id = #{schoolId,jdbcType=INTEGER}
+            </if>
+            <if test="shopId != null">
+                and shop_id = #{shopId,jdbcType=INTEGER}
+            </if>
+            <if test="openId != null">
+                and open_id = #{openId,jdbcType=VARCHAR}
+            </if>
+            <if test="floorId != null">
+                and floor_id = #{floorId,jdbcType=INTEGER}
+            </if>
+            <if test="senderId != null">
+                and sender_id = #{senderId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null">
+                and create_time like #{createTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+    <select id="find" resultMap="BaseResultMap" parameterType="ops.school.api.entity.Orders">
+        select
+        orders.*
+        from orders
+        <where>
+            <if test="o.id != null">
+                and orders.id = #{o.id}
+            </if>
+            <if test="o.typ != null">
+                and orders.typ = #{o.typ}
+            </if>
+            <if test="o.status != null">
+                and orders.status = #{o.status}
+            </if>
+            <if test="o.addressName != null">
+                and orders.address_name = #{o.addressName}
+            </if>
+            <if test="o.addressPhone != null">
+                and orders.address_phone = #{o.addressPhone}
+            </if>
+            <if test="o.shopName != null">
+                and orders.shop_name = #{o.shopName}
+            </if>
+            <if test="o.schoolId != null">
+                and orders.school_id = #{o.schoolId,jdbcType=INTEGER}
+            </if>
+            <if test="o.shopId != null">
+                and orders.shop_id = #{o.shopId,jdbcType=INTEGER}
+            </if>
+            <if test="o.openId != null">
+                and orders.open_id = #{o.openId,jdbcType=VARCHAR}
+            </if>
+            <if test="o.floorId != null">
+                and orders.floor_id = #{o.floorId,jdbcType=INTEGER}
+            </if>
+            <if test="o.senderId != null">
+                and orders.sender_id = #{o.senderId,jdbcType=INTEGER}
+            </if>
+            <if test="o.createTime != null">
+                and orders.create_time like #{o.createTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    *
+    from orders
+    where Id = #{id,jdbcType=VARCHAR}
+  </select>
+
+
+    <update id="shopAcceptOrderById" parameterType="ops.school.api.entity.Orders">
+  update orders set status='商家已接手',water_number=#{waterNumber},shop_accept_time = date_format(now(), '%Y-%c-%d %h:%i:%s') where id=#{id} and status='待接手'
+ </update>
+
+    <select id="waterNumber" resultType="int" parameterType="ops.school.api.entity.Orders">
+  select max(water_number) from orders where create_time like #{payTime} and shop_id =#{shopId}
+ </select>
+
+    <select id="findAllDjs" resultMap="BaseResultMap">
+    select 
+    orders.*
+    from orders 
+    where status='待接手'
+ </select>
+
+    <select id="findByShopByDjs" resultMap="BaseResultMap" parameterType="int">
+    select 
+    orders.*
+    from orders 
+    where shop_id =#{shopId} and status='待接手'
+  </select>
+    <select id="findByShop" parameterType="ops.school.api.entity.Shop" resultMap="BaseResultMap">
+   select 
+    orders.*
+    from orders
+    where  orders.shop_id =#{id} and orders.status != '待付款' and orders.status != '已取消'
+    order by create_time desc
+     limit #{page},#{size}
+  </select>
+    <select id="findByShopYJS" parameterType="map" resultMap="BaseResultMap">
+   select 
+    orders.*
+    from orders
+    where  orders.shop_id =#{id} and (orders.status = '商家已接手' or orders.status = '配送员已接手')
+    order by create_time desc
+     limit #{page},#{size}
+  </select>
+    <select id="findBySenderTakeout" parameterType="ops.school.api.entity.Sender" resultMap="BaseResultMap">
+        select * from orders
+        <if test="orderBy=='商家已接手'">
+            where status=#{orderBy}
+            and floor_id in (${floorIds}) and shop_id in (${shopIds}) and typ ='外卖订单'
+        </if>
+        <if test="orderBy=='已取消'">
+            where status=#{orderBy}
+            and sender_id =#{id}
+            and floor_id in (${floorIds})
+            and shop_id in (${shopIds})
+            and typ ='外卖订单'
+            order by create_time desc
+        </if>
+        <if test="orderBy=='配送员已接手' or orderBy=='已完成'">
+            where sender_id =#{id} and status=#{orderBy} and typ ='外卖订单'
+            <if test="orderBy=='已完成'">
+                order by create_time desc
+            </if>
+        </if>
+        limit #{page},#{size}
+    </select>
+
+    <update id="SenderAccept" parameterType="ops.school.api.entity.Orders">
+   update orders set status='配送员已接手', sender_id=#{senderId} ,sender_name=#{senderName} ,sender_phone=#{senderPhone} 
+   where id=#{id} and  status='商家已接手'
+  </update>
+
+
+    <update id="getorder" parameterType="string">
+  update orders set send_get_flag=1 where id=#{orderId}
+  </update>
+
+    <update id="end" parameterType="ops.school.api.entity.Orders">
+        update orders set end_time=now(),status='已完成'
+        <if test="sendPrice!=null">
+            ,send_price = #{sendPrice}
+        </if>
+        <if test="destination!=null">
+            ,destination=#{destination}
+        </if>
+        where id=#{id} and (status ='商家已接手' or status='配送员已接手')
+    </update>
+
+    <delete id="remove">
+     delete from orders where status='待付款'
+  </delete>
+
+    <select id="shopsta" parameterType="map" resultMap="BaseResultMap">
+      SELECT
+        (
+            SELECT
+                count(*)
+            FROM
+                orders
+            WHERE
+                shop_id = #{shopId} and status!='待付款' and status!='已取消' and create_time between #{beginTime} and #{endTime}
+        ) as remark,
+        sum(box_price) AS box_price,
+        sum(pay_price) AS pay_price,
+        sum(send_price) AS send_price,
+        count(*) AS floor_id,
+        sum(shop_get_total) AS shop_get_total
+        FROM
+            orders o,
+            orders_complete oc
+        WHERE
+            oc.order_id = o.id
+        AND shop_id = #{shopId}
+        and status='已完成'
+        and create_time between #{beginTime} and #{endTime}
+  </select>
+
+    <select id="senderStatistics" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+            id,
+            STATUS,
+            sender_id,
+            create_time,
+            count(*) AS floor_id,
+            sum(send_price) AS send_price
+        FROM
+            orders
+        WHERE
+            sender_id = #{senderId}
+        AND (
+            STATUS = '已完成'
+            OR STATUS = '配送员已接手'
+        )
+        AND create_time BETWEEN #{beginTime} and #{endTime} group by status
+    </select>
+
+    <update id="pl" parameterType="string">
+   update orders set evaluate_flag=1 where id=#{id}
+  </update>
+
+    <update id="cancel" parameterType="string">
+    update orders set status='已取消' where status !='已取消' and id=#{id}
+  </update>
+
+    <select id="countPayPriceByFloor" parameterType="map" resultType="decimal">
+     select sum(pay_price) from orders
+		 where floor_id = #{floorId}
+		 and create_time
+		 BETWEEN #{beginTime}
+		 AND #{endTime}
+ </select>
+
+    <!--CreatBy Fang Time:2019/9/2 15:48 |  -->
+    <select id="selectDayDataWithComplete" resultType="ops.school.api.entity.Orders">
+        SELECT *
+        FROM orders,orders_complete
+        WHERE orders_complete.order_id = orders.id
+        AND (orders.status = #{orderStatus})
+        AND orders.shop_id=#{shopId}
+        AND orders.end_time LIKE #{endTime}
+    </select>
+
+
+    <select id="countSenderDownOrders" resultType="ops.school.api.entity.Orders">
+        SELECT
+            count(1) AS down_send_count,
+            sum(orders.send_price) AS down_send_money
+        FROM
+            orders
+        WHERE
+        sender_id = #{senderId}
+        AND STATUS = '已完成'
+        AND create_time BETWEEN #{beginTime} and #{endTime}
+        AND destination = 0
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/10 20:53 |  -->
+    <update id="makeOrdersToWaitAccept">
+        UPDATE orders
+        SET status='待接手'
+        WHERE id = #{orderId}
+    </update>
+
+</mapper>

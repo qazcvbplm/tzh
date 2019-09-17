@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ops.school.api.dao.IndexShopProductMapper">
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.IndexShopProduct">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+        <result column="shop_weight" property="shopWeight" jdbcType="INTEGER" />
+        <result column="product_id" property="productId" jdbcType="BIGINT" />
+        <result column="product_weight" property="productWeight" jdbcType="INTEGER" />
+        <result column="school_id" property="schoolId" jdbcType="BIGINT" />
+        <result column="create_id" property="createId" jdbcType="BIGINT" />
+        <result column="update_id" property="updateId" jdbcType="BIGINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        shop_id,
+        shop_weight,
+        product_id,
+        product_weight,
+        school_id,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+    </sql>
+
+    <sql id="Table_Name">
+        index_shop_product
+    </sql>
+
+    <!--CreatBy Fang Time: | 批量查询-->
+    <select id="batchFindByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Table_Name"/>
+        WHERE id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/22 15:17 |  -->
+    <select id="findIndexShopProBySchoolId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="Table_Name"/>
+        WHERE school_id = #{schoolId}
+    </select>
+
+
+    <!--CreatBy Fang Time:2019/8/22 16:38 |  -->
+    <insert id="batchInsert">
+        INSERT INTO <include refid="Table_Name"/>
+        (
+        shop_id,
+        shop_weight,
+        product_id,
+        product_weight,
+        school_id,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" open=" " separator="," close=" ">
+            (
+            #{item.shopId},
+            #{item.shopWeight},
+            #{item.productId},
+            #{item.productWeight},
+            #{item.schoolId},
+            #{item.createId},
+            #{item.updateId},
+            #{item.createTime},
+            #{item.updateTime}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

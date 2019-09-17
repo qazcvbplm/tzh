@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ops.school.api.dao.WxUserCouponMapper" >
+<resultMap id="BaseResultMap" type="ops.school.api.entity.WxUserCoupon" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="wx_user_id" property="wxUserId" jdbcType="BIGINT" />
+    <result column="coupon_id" property="couponId" jdbcType="BIGINT" />
+    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+    <result column="coupon_type" property="couponType" jdbcType="INTEGER" />
+    <result column="get_time" property="getTime" jdbcType="TIMESTAMP" />
+    <result column="use_time" property="useTime" jdbcType="TIMESTAMP" />
+    <result column="failure_time" property="failureTime" jdbcType="TIMESTAMP" />
+    <result column="is_invalid" property="isInvalid" jdbcType="INTEGER" />
+    <collection property="coupon" ofType="ops.school.api.entity.Coupon">
+        <id column="CId" property="id" jdbcType="BIGINT"/>
+        <result column="school_id" property="schoolId" jdbcType="BIGINT"/>
+        <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
+        <result column="coupon_desc" property="couponDesc" jdbcType="VARCHAR"/>
+        <result column="full_amount" property="fullAmount" jdbcType="INTEGER"/>
+        <result column="cut_amount" property="cutAmount" jdbcType="INTEGER"/>
+        <result column="coupon_type" property="couponType" jdbcType="INTEGER"/>
+        <result column="yes_show_index" property="yesShowIndex" jdbcType="INTEGER"/>
+        <result column="send_begin_time" property="sendBeginTime" jdbcType="TIMESTAMP"/>
+        <result column="send_end_time" property="sendEndTime" jdbcType="TIMESTAMP"/>
+        <result column="effective_days" property="effectiveDays" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_id" property="createId" jdbcType="BIGINT"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+        <result column="is_invalid" property="isInvalid" jdbcType="INTEGER"/>
+        <result column="is_delete" property="isDelete" jdbcType="INTEGER"/>
+    </collection>
+
+</resultMap>
+
+    <sql id="Base_Column_List" >
+        id,
+        wx_user_id,
+        coupon_id,
+        shop_id,
+        coupon_type,
+        get_time,
+        use_time,
+        failure_time,
+        is_invalid
+    </sql>
+
+    <sql id="Rel_Column_List" >
+        wx_user_coupon.id,
+        wx_user_coupon.wx_user_id,
+        wx_user_coupon.coupon_id,
+        wx_user_coupon.shop_id,
+        wx_user_coupon.coupon_type,
+        wx_user_coupon.get_time,
+        wx_user_coupon.use_time,
+        wx_user_coupon.failure_time,
+        wx_user_coupon.is_invalid,
+
+        coupon.id as CId,
+        coupon.school_id,
+        coupon.coupon_name,
+        coupon.coupon_desc,
+        coupon.full_amount,
+        coupon.cut_amount,
+        coupon.coupon_type,
+        coupon.yes_show_index,
+        coupon.send_begin_time,
+        coupon.send_end_time,
+        coupon.effective_days,
+        coupon.create_time,
+        coupon.create_id,
+        coupon.update_time,
+        coupon.update_id,
+        coupon.is_invalid,
+        coupon.is_delete
+    </sql>
+
+    <sql id="Table_Name">
+        wx_user_coupon
+    </sql>
+
+<sql id="Select_Limit_State">
+    1=1
+    <if test="id != null and id != '' ">
+        AND id = #{id}
+    </if>
+    <if test="wxUserId != null and wxUserId != '' ">
+        AND wx_user_id = #{wxUserId}
+    </if>
+    <if test="couponId != null and couponId != '' ">
+        AND coupon_id = #{couponId}
+    </if>
+    <if test="getTime != null and getTime != '' ">
+        AND get_time = #{getTime}
+    </if>
+    <if test="useTime != null and useTime != '' ">
+        AND use_time = #{useTime}
+    </if>
+    <if test="failureTime != null and failureTime != '' ">
+        AND failure_time = #{failureTime}
+    </if>
+    <if test="isInvalid != null and isInvalid != '' ">
+        AND is_invalid = #{isInvalid}
+    </if>
+</sql>
+
+<!--CreatBy Fang Time: |  分页查询统计-->
+<select id="countLimitByDTO" resultType="java.lang.Integer">
+    SELECT COUNT(1)
+    FROM
+    <include refid="Table_Name"/>
+    WHERE
+    <include refid="Select_Limit_State"/>
+</select>
+
+<!--CreatBy Fang Time: |  分页查询-->
+<select id="selectLimitByDTO" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    WHERE
+    <include refid="Select_Limit_State"/>
+    LIMIT #{page},#{size}
+</select>
+
+<!--CreatBy Fang Time: | 批量查询-->
+<select id="batchFindByIds" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    WHERE id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+</select>
+
+
+
+
+<!--CreatBy Fang Time: |  停用-->
+<update id="stopOneById">
+    UPDATE <include refid="Table_Name"/>
+    SET status = 0
+    WHERE id = #{id}
+    AND is_delete = 0
+</update>
+
+<!--CreatBy Fang Time: |  启用-->
+<update id="startOneById">
+    UPDATE <include refid="Table_Name"/>
+    SET status = 1
+    WHERE id = #{id}
+    AND is_delete = 0
+</update>
+
+    <!--查询所有用户的未使用的失效优惠券-->
+    <select id="findInvalidUserCoupon" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from <include refid="Table_Name"/>
+        where is_invalid = 0
+        and failure_time <![CDATA[ < ]]> now()
+    </select>
+
+    <!--修改用户优惠券is_invalid状态-->
+    <update id="updateOnee" parameterType="ops.school.api.entity.WxUserCoupon">
+        UPDATE <include refid="Table_Name"/>
+        set
+        use_time = now(),
+        is_invalid = #{isInvalid}
+        where id = #{id}
+    </update>
+
+
+
+
+    <!--根据店铺查询用户所有可用的优惠券-->
+    <!--<select id="findUserCoupon" resultMap="BaseResultMap">-->
+        <!--select <include refid="Rel_Column_List"/>-->
+        <!--from wx_user_coupon as wx_user_coupon-->
+        <!--left join coupon as coupon-->
+        <!--on wx_user_coupon.coupon_id = coupon.id-->
+        <!--where-->
+        <!--wx_user_coupon.is_invalid = 0-->
+        <!--and coupon.is_invalid = 0-->
+		<!--and coupon.is_delete = 0-->
+		<!--and wx_user_coupon.wx_user_id = #{wxUserId}-->
+        <!--and wx_user_coupon.shop_id = #{shopId}-->
+		<!--or-->
+		<!--(wx_user_coupon.coupon_type = 2-->
+		<!--and wx_user_coupon.wx_user_id = #{wxUserId})-->
+        <!--order by wx_user_coupon.failure_time desc-->
+    <!--</select>-->
+
+    <!--根据用户id查询用户所有优惠券-->
+    <select id="findAllUserCoupons" parameterType="Long" resultType="java.util.HashMap">
+        select cp.*, uc.*
+        from `wx_user_coupon` as uc
+        left join `coupon` as cp
+        on uc.coupon_id = cp.id
+        where uc.wx_user_id = #{wxUserId}
+	    and uc.is_invalid = 0
+	    and cp.is_invalid = 0
+	    order by uc.failure_time desc
+    </select>
+
+
+    <!--CreatBy Fang Time:2019/7/25 15:33 | 分页查询用户所有的优惠券（isInvalid不传查所有，传0查有效） -->
+    <select id="pageFindALLCouponsByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM coupon,wx_user_coupon
+        WHERE wx_user_coupon.wx_user_id = #{userId}
+        AND wx_user_coupon.coupon_id = coupon.id
+        <if test="wxUserCoupon.isInvalid != null">
+            AND wx_user_coupon.is_invalid = #{wxUserCoupon.isInvalid}
+        </if>
+        ORDER BY wx_user_coupon.is_invalid ASC,wx_user_coupon.get_time DESC,wx_user_coupon.failure_time ASC
+        LIMIT #{wxUserCoupon.page},#{wxUserCoupon.size}
+    </select>
+
+
+    <select id="userFindCouponsByWIdSId" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM wx_user_coupon
+        left join coupon on
+        wx_user_coupon.coupon_id = coupon.id
+        WHERE
+        wx_user_coupon.is_invalid = 0
+        AND coupon.is_invalid = 0
+        AND coupon.is_delete = 0
+        AND wx_user_coupon.wx_user_id = #{wxUserId}
+        AND wx_user_coupon.shop_id = #{shopId}
+        OR
+        (wx_user_coupon.coupon_type IN (-1,-2,2,1)
+        AND wx_user_coupon.wx_user_id = #{wxUserId})
+        ORDER BY wx_user_coupon.failure_time DESC
+    </select>
+
+    <!--CreatBy Fang Time:2019/7/27 23:05 |  -->
+    <select id="selectAllUserCoupons" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM wx_user_coupon,coupon
+        WHERE
+        wx_user_coupon.coupon_id = coupon.id
+        AND wx_user_coupon.is_invalid = 0
+        AND coupon.is_invalid = 0
+        AND coupon.is_delete = 0
+        AND wx_user_coupon.wx_user_id = #{wxUserId}
+        AND wx_user_coupon.is_invalid = 0
+        ORDER BY wx_user_coupon.failure_time DESC
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 14:22 |  -->
+    <select id="countInvalidUserCoupon" resultType="java.lang.Integer">
+        select COUNT(1)
+        from <include refid="Table_Name"/>
+        where is_invalid = 0
+        and failure_time <![CDATA[ < ]]> now()
+    </select>
+
+    <!--CreatBy Fang Time:2019/8/7 14:32 |  -->
+    <select id="limitFindInvalidUserCoupon" resultType="ops.school.api.entity.WxUserCoupon">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE is_invalid = 0
+        AND failure_time <![CDATA[ < ]]> now()
+        LIMIT 0,1000
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 23:52 |  -->
+    <select id="selectAllUserCouponsBySchool" resultMap="BaseResultMap">
+        SELECT <include refid="Rel_Column_List"/>
+        FROM wx_user_coupon,coupon
+        WHERE
+        wx_user_coupon.coupon_id = coupon.id
+        AND wx_user_coupon.is_invalid = 0
+        AND coupon.is_invalid = 0
+        AND coupon.is_delete = 0
+        AND wx_user_coupon.wx_user_id = #{wxUserId}
+        AND coupon.school_id = #{schoolId}
+        AND wx_user_coupon.is_invalid = 0
+        ORDER BY wx_user_coupon.failure_time DESC
+    </select>
+
+    <update id="batchUpdateToUnInvalidByIds">
+        UPDATE <include refid="Table_Name"/>
+        SET is_invalid = 2
+        WHERE id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+</mapper>

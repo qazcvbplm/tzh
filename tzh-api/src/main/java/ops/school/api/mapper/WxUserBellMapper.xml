@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ops.school.api.dao.WxUserBellMapper">
+    <resultMap id="BaseResultMap" type="ops.school.api.entity.WxUserBell">
+        <result column="id" property="id" jdbcType="BIGINT" />
+        <result column="wx_user_id" property="wxUserId" jdbcType="BIGINT" />
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="source" jdbcType="INTEGER" property="source"/>
+        <result column="money" jdbcType="DECIMAL" property="money"/>
+        <result column="is_vip" jdbcType="INTEGER" property="isVip"/>
+        <result column="vip_out_time" jdbcType="BIGINT" property="vipOutTime"/>
+        <result column="food_coupon" jdbcType="DECIMAL" property="foodCoupon"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List" >
+        id,
+        wx_user_id,
+        phone,
+        source,
+        money,
+        is_vip,
+        vip_out_time,
+        food_coupon
+    </sql>
+
+    <sql id="Table_Name">
+        wx_user_bell
+    </sql>
+
+    <sql id="Select_Limit_State">
+        1=1
+        <if test="id != null and id != '' ">
+            AND id = #{id}
+        </if>
+        <if test="wxUserId != null and wxUserId != '' ">
+            AND wx_user_id = #{wxUserId}
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND phone = #{phone}
+        </if>
+        <if test="source != null and source != '' ">
+            AND source = #{source}
+        </if>
+        <if test="money != null and money != '' ">
+            AND money = #{money}
+        </if>
+        <if test="isVip != null and isVip != '' ">
+            AND is_vip = #{isVip}
+        </if>
+        <if test="vipOutTime != null and vipOutTime != '' ">
+            AND vip_out_time = #{vipOutTime}
+        </if>
+        <if test="foodCoupon != null and foodCoupon != '' ">
+            AND food_coupon = #{foodCoupon}
+        </if>
+    </sql>
+
+    <!--CreatBy Fang Time:2019/8/5 17:47 |  -->
+    <update id="addSourceByWxId">
+        UPDATE wx_user_bell
+        SET source = source + #{source}
+        WHERE wx_user_id = #{wxUserId}
+    </update>
+
+    <!--CreatBy Fang Time:2019/8/4 21:40 |  -->
+    <update id="addSenderMoneyByWXId">
+        UPDATE wx_user_bell
+        SET money = money + #{senderGet}
+        WHERE wx_user_id = #{wxUserId}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    *
+    from wx_user_bell
+    where phone = #{phone,jdbcType=VARCHAR}
+  </select>
+
+    <update id="addSource" parameterType="map">
+   update wx_user_bell set source = source+#{source} where phone=#{phone} 
+  </update>
+
+    <update id="paySource" parameterType="map">
+   update wx_user_bell set source = source-#{source} where phone=#{phone} and source >= #{source}
+  </update>
+
+    <update id="pay" parameterType="map">
+   update wx_user_bell set money = money-#{amount} where phone=#{phone} and money >= #{amount}
+  </update>
+
+    <update id="charge" parameterType="map">
+  update wx_user_bell set money = money+#{amount} where phone=#{phone}
+  </update>
+
+    <select id="findByPhone" parameterType="string" resultType="int">
+   select count(*) from wx_user_bell where phone=#{phone}
+  </select>
+
+    <update id="updatePhone" parameterType="map" >
+        update wx_user_bell set phone = #{updatePhone}
+        where phone=#{phone}
+    </update>
+
+    <update id="txUpdate" parameterType="map">
+        update wx_user_bell set
+        money = #{amount}
+        where phone = #{phone}
+    </update>
+
+    <update id="updatePhoneById">
+         update wx_user_bell
+         set phone=#{phone}
+         where id = #{id}
+    </update>
+
+    <!--CreatBy Fang Time:2019/9/3 18:50 |  -->
+    <update id="updateOldMoneyTo0">
+        update back_bell
+        set money = -1
+        WHERE phone= #{phone}
+    </update>
+    <!--CreatBy Fang Time:2019/9/3 20:59 |  -->
+    <select id="beforeUpdateSource" resultType="integer">
+        SELECT sum(source)
+        FROM back_bell
+        WHERE source > 0
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 21:04 |  -->
+    <update id="updateOldSourceTo0">
+        update back_bell
+        set source = -1
+        WHERE phone= #{phone}
+    </update>
+
+    <select id="beforeUpdateMoney" resultType="decimal">
+        SELECT sum(money)
+        FROM back_bell
+        WHERE money > 0
+        <![CDATA[  AND money <5 ]]>
+    </select>
+
+
+    <select id="countOldData" resultType="integer">
+        SELECT count(1)
+        FROM back_bell
+        WHERE money > 0
+        <![CDATA[  AND money <5 ]]>
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 18:31 |  -->
+    <select id="findOldAllList" resultType="ops.school.api.dto.BackBellDTO">
+        SELECT *
+        FROM back_bell
+        WHERE money > 0
+        <![CDATA[  AND money < 5 ]]>
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/3 21:01 |  -->
+    <select id="findOldAllListSource" resultType="ops.school.api.dto.BackBellDTO">
+        SELECT *
+        FROM back_bell
+        WHERE source > 0
+    </select>
+</mapper>

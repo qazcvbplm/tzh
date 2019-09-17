@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ops.school.api.dao.card.ClubCardSendMapper" >
+<resultMap id="BaseResultMap" type="ops.school.api.vo.card.ClubCardSendVO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="school_id" property="schoolId" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="day_time" property="dayTime" jdbcType="INTEGER" />
+    <result column="price_sale" property="priceSale" jdbcType="DECIMAL" />
+    <result column="price_original" property="priceOriginal" jdbcType="DECIMAL" />
+    <result column="day_money" property="dayMoney" jdbcType="DECIMAL" />
+    <result column="send_begin_time" property="sendBeginTime" jdbcType="TIMESTAMP" />
+    <result column="send_end_time" property="sendEndTime" jdbcType="TIMESTAMP" />
+    <result column="effective_days" property="effectiveDays" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
+    <result column="create_id" property="createId" jdbcType="BIGINT" />
+    <result column="update_id" property="updateId" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+</resultMap>
+
+    <sql id="Base_Column_List" >
+        id,
+        school_id,
+        name,
+        description,
+        day_time,
+        price_sale,
+        price_original,
+        day_money,
+        send_begin_time,
+        send_end_time,
+        effective_days,
+        type,
+        status,
+        is_delete,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+    </sql>
+
+    <sql id="Table_Name">
+        club_card_send
+    </sql>
+
+<sql id="Select_Limit_State">
+    1=1
+    <if test="id != null and id != '' ">
+        AND id = #{id}
+    </if>
+    <if test="schoolId != null and schoolId != '' ">
+        AND school_id = #{schoolId}
+    </if>
+    <if test="name != null and name != '' ">
+        AND name = #{name}
+    </if>
+    <if test="description != null and description != '' ">
+        AND description = #{description}
+    </if>
+    <if test="dayTime != null and dayTime != '' ">
+        AND day_time = #{dayTime}
+    </if>
+    <if test="priceSale != null and priceSale != '' ">
+        AND price_sale = #{priceSale}
+    </if>
+    <if test="priceOriginal != null and priceOriginal != '' ">
+        AND price_original = #{priceOriginal}
+    </if>
+    <if test="dayMoney != null and dayMoney != '' ">
+        AND day_money = #{dayMoney}
+    </if>
+    <if test="sendBeginTime != null and sendBeginTime != '' ">
+        AND send_begin_time = #{sendBeginTime}
+    </if>
+    <if test="sendEndTime != null and sendEndTime != '' ">
+        AND send_end_time = #{sendEndTime}
+    </if>
+    <if test="effectiveDays != null and effectiveDays != '' ">
+        AND effective_days = #{effectiveDays}
+    </if>
+    <if test="type != null and type != '' ">
+        AND type = #{type}
+    </if>
+    <if test="status != null and status != '' ">
+        AND status = #{status}
+    </if>
+    <if test="isDelete != null and isDelete != '' ">
+        AND is_delete = #{isDelete}
+    </if>
+    <if test="createId != null and createId != '' ">
+        AND create_id = #{createId}
+    </if>
+    <if test="updateId != null and updateId != '' ">
+        AND update_id = #{updateId}
+    </if>
+    <if test="createTime != null and createTime != '' ">
+        AND create_time = #{createTime}
+    </if>
+    <if test="updateTime != null and updateTime != '' ">
+        AND update_time = #{updateTime}
+    </if>
+</sql>
+
+<!--CreatBy Fang Time: |  分页查询统计-->
+<select id="countLimitByDTO" resultType="java.lang.Integer">
+    SELECT COUNT(1)
+    FROM
+    <include refid="Table_Name"/>
+
+</select>
+
+<!--CreatBy Fang Time: |  分页查询-->
+<select id="selectLimitByDTO" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    WHERE
+    <include refid="Select_Limit_State"/>
+    LIMIT #{page},#{size}
+</select>
+
+<!--CreatBy Fang Time: | 批量查询-->
+<select id="batchFindByIds" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    <include refid="Table_Name"/>
+    WHERE id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+</select>
+
+
+
+
+<!--CreatBy Fang Time: |  停用-->
+<update id="stopOneById">
+    UPDATE <include refid="Table_Name"/>
+    SET status = 0
+    WHERE id = #{id}
+    AND is_delete = 0
+</update>
+
+<!--CreatBy Fang Time: |  启用-->
+<update id="startOneById">
+    UPDATE <include refid="Table_Name"/>
+    SET status = 1
+    WHERE id = #{id}
+    AND is_delete = 0
+</update>
+
+</mapper>
