@@ -6,7 +6,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   profiles:
-    active: test
+    active: dev
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     driverClassName: com.mysql.jdbc.Driver
@@ -27,16 +27,16 @@ barcode:
   path: /home/barcode
 cert:
   path: /home/cert
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://212.129.149.27:8761/eureka/
-  instance:
-    leaseExpirationDurationInSeconds: 2
-    leaseRenewalIntervalInSeconds: 1
-feign:
-  hystrix:
-    enabled: true
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://212.129.149.27:8761/eureka/
+#  instance:
+#    leaseExpirationDurationInSeconds: 2
+#    leaseRenewalIntervalInSeconds: 1
+#feign:
+#  hystrix:
+#    enabled: true
 logging:
   file: logs/chuyin.log
   level:

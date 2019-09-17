@@ -16,21 +16,23 @@ import org.springframework.web.client.RestTemplate;
 import javax.sql.DataSource;
 
 
-@SpringBootApplication
-@EnableFeignClients
-@EnableEurekaClient
+
+
+//@EnableFeignClients
+//@EnableEurekaClient
 @EnableScheduling
+@SpringBootApplication
 @MapperScan("ops.school.api.dao")
 public class App {
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(App.class, args);
 	}
-	
+
 	@Bean
 	@ConfigurationProperties(prefix="spring.datasource")
 	public DataSource druidDataSource() {
-	   return new DruidDataSource();
+		return new DruidDataSource();
 	}
 
 	@Bean
