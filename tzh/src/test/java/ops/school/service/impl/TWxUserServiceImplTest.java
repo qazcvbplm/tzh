@@ -2,9 +2,12 @@ package ops.school.service.impl;
 
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.App;
+import ops.school.api.entity.OrderProduct;
 import ops.school.api.entity.Orders;
 import ops.school.api.entity.School;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.wxutil.WxMessageUtil;
 import ops.school.service.TCommonService;
 import ops.school.service.TOrdersService;
@@ -14,6 +17,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -86,6 +92,8 @@ public class TWxUserServiceImplTest {
 //    public void dataSourceBack(){
 //        tWxUserService.updateDataSourceFromOldToNewByPhone();
 //    }
+
+
 
 
 

@@ -8,19 +8,25 @@ import ops.school.App;
 import ops.school.api.dao.OrdersCompleteMapper;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
+import ops.school.api.util.LoggerUtil;
 import ops.school.api.util.PublicUtilS;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.util.TimeUtilS;
+import ops.school.api.wxutil.WxMessageUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -61,107 +67,67 @@ public class OrdersServiceTest {
     @Autowired
     private WxUserService wxUserService;
 
-/*    @Test
-    public void testOrderComputeData(){
-        Integer sum = 0;
-        Long startTime = System.currentTimeMillis();
-        QueryWrapper<Orders> wrapper = new QueryWrapper<>();
-        wrapper.eq("status","已完成");
-        Date start = TimeUtilS.getDayBegin(TimeUtilS.getDateByEvery(2019,9-1,8,0,0,0),0);
-        wrapper.le("end_time",start);
-        // wrapper.in("Id","201909071419332971319179688","201909071357281815418855448");
-        List<Orders> ordersList = ordersService.list(wrapper);
-        //查店铺
-        List<Integer> shopIds = PublicUtilS.getValueList(ordersList,"shopId");
-        PublicUtilS.removeDuplicate(shopIds);
-        Collection<Shop> shopList = shopService.listByIds(shopIds);
-        Map<Integer,Shop> shopMap = PublicUtilS.listForMapValueE(shopList,"id");
-        //查优惠券
-        List<Long> userCouponIds = PublicUtilS.getValueList(ordersList,"couponId");
-        PublicUtilS.removeDuplicate(userCouponIds);
-        Collection<WxUserCoupon> wxUserCouponList = wxUserCouponService.listByIds(userCouponIds);
-        List<Long> couponIds = PublicUtilS.getValueList(wxUserCouponList,"couponId");
-        PublicUtilS.removeDuplicate(couponIds);
-        Map<Long,Long> userAndCouponIdMap =  PublicUtilS.listForMap(wxUserCouponList,"id","couponId");
-        Collection<Coupon> couponList = couponService.listByIds(couponIds);
-        Map<Long,Coupon> couponMap = PublicUtilS.listForMapValueE(couponList,"id");
-        //查配送员
-        List<Integer> senderIds = PublicUtilS.getValueList(ordersList,"senderId");
-        PublicUtilS.removeDuplicate(senderIds);
-        Collection<Sender> senderList = senderService.listByIds(senderIds);
-        Map<Integer,Sender> senderMap = PublicUtilS.listForMapValueE(senderList,"id");
-        //senderUser
-        List<String> openIds = PublicUtilS.getValueList(ordersList,"openId");
-        List<String> openIds2 = PublicUtilS.getValueList(senderList,"openId");
-        openIds.addAll(openIds2);
-        PublicUtilS.removeDuplicate(openIds);
-        Collection<WxUser> wxUserList = wxUserService.listByIds(openIds);
-        Map<Integer,WxUser> wxUserListMap = PublicUtilS.listForMapValueE(wxUserList,"openId");
+    @Autowired
+    private TSenderService tSenderService;
 
-        List<OrdersComplete> completeList = new LinkedList<>();
-        for (Orders temp : ordersList) {
-            Orders orders = temp;
-            if (couponMap.get(userAndCouponIdMap.get(orders.getCouponId())) == null && orders.getCouponId().intValue() != 0){
-                logger.error("批量结算订单-优惠券空-订单号-"+orders.getId()+orders.getStatus()+orders.getTyp()+sum);
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private OrderProductService orderProductService;
+
+    @Test
+    public void keyOrderCompleteTest(){
+        List<String> orderList = new ArrayList<>();
+        orderList.add("201909171149038394489931615");
+        orderList.add("201909171149371356568796785");
+        orderList.add("201909171151580221681265288");
+        orderList.add("201909171208128175899961796");
+        orderList.add("201909171215418237112321213");
+        orderList.add("201909171219486911119386998");
+        orderList.add("201909171223213309511382980");
+        orderList.add("201909171226374859555646571");
+        orderList.add("201909171258277409860776773");
+        orderList.add("201909171315445596956865554");
+        for (String orderId : orderList) {
+            this.doOrderComplete(orderId);
+        }
+
+
+    }
+
+    private void doOrderComplete(String orderId) {
+        Orders orders = ordersService.findById(orderId);
+        try {
+            //完结订单并结算
+            tSenderService.tsTakeOutOrdersEnd(orderId, true);
+            //发送用户消息，已完成
+            // 微信小程序推送消息
+            List<String> formIds = new ArrayList<>();
+            try {
+                formIds = stringRedisTemplate.boundListOps("FORMID" + orders.getId()).range(0, -1);
+            } catch (Exception ex) {
+                LoggerUtil.logError("商家接手外卖订单-shopAcceptOrderById-完成发送消息失败，formid取缓存为空" + orders.getId());
             }
-            if (shopMap.get(orders.getShopId()) == null ){
-                logger.error("批量结算订单-店铺空-订单号-"+orders.getId()+orders.getStatus()+orders.getTyp()+sum);
-            }
-            if (!"外卖订单".equals(orders.getTyp())){
-                logger.info("");
-            }
-            if (orders.getSenderId() != null && senderMap.get(orders.getSenderId()) == null && orders.getSenderId().intValue() != 0 ){
-                logger.info("");
-            }
-            ResponseObject response = null;
-            try{
-                if (senderMap.get(orders.getSenderId()) == null){
-                    Sender sender = new Sender();
-                    sender.setOpenId("0");
-                    senderMap.put(orders.getSenderId(),sender);
-                    logger.info("批量结算订单失败-跑腿信息空-订单号-"+orders.getId()+orders.getStatus()+orders.getTyp()+sum);
+            if (formIds.size() > 0) {
+                // 查询订单商品表信息
+                QueryWrapper<OrderProduct> productWrapper = new QueryWrapper<>();
+                productWrapper.lambda().eq(OrderProduct::getOrderId, orders.getId());
+                List<OrderProduct> orderProducts = orderProductService.list(productWrapper);
+                orders.setOp(orderProducts);
+                orders.setStatus("商家已接手");
+                try {
+                    //WxMessageUtil.wxSendMsg(orders, formIds.get(0), orders.getSchoolId());
+                    stringRedisTemplate.boundListOps("FORMID" + orders.getId()).remove(1, formIds.get(0));
+                } catch (Exception ex) {
+                    LoggerUtil.logError("wx发送消息失败-shopAcceptOrderById-" + ex.getMessage());
                 }
-                response = tOrdersService.orderComputeDataByOrders(
-                        orders,shopMap.get(orders.getShopId()),
-                        couponMap.get(userAndCouponIdMap.get(orders.getCouponId())),
-                        senderMap.get(orders.getSenderId()),
-                        wxUserListMap.get(senderMap.get(orders.getSenderId()).getOpenId()),
-                        wxUserListMap.get(orders.getOpenId()));
-            }catch (Exception e){
-                logger.info(e.getMessage());
+            } else {
+                LoggerUtil.logError("商家接手自取堂食订单-KeyOutTimeListener-完成发送消息失败，发送失败-formid为空" + orders.getId());
             }
-            OrdersComplete ordersComplete = new OrdersComplete();
-            ordersComplete = (OrdersComplete) response.getParams().get("ordersComplete");
-            System.out.print("ordersComplete.getOrderId()"+ordersComplete.getOrderId()+"打印每个ordersComplete");
-            logger.info(ordersComplete.getOrderId());
-            if (ordersComplete == null){
-                ordersComplete.setOrderId(orders.getId());
-            }
-            if (ordersComplete.getOrderId() == null){
-                ordersComplete.setOrderId(orders.getId());
-                logger.info("结算错误"+orders.getId()+"sum序号"+sum);
-            }
-            if (!response.isCode()){
-                logger.info("批量结算订单失败-订单号-操作后不是true-"+orders.getId()+orders.getTyp()+sum+"-"+orders.getStatus());
-            }else {
-                completeList.add((OrdersComplete) response.getParams().get("ordersComplete"));
-            }
-            sum++;
-            logger.info("sum"+sum);
+        } catch (Exception e) {
+            LoggerUtil.log("堂食完成失败:" + e.getMessage());
         }
-        sum = 0;
-        for (OrdersComplete complete : completeList) {
-            try{
-                ordersCompleteMapper.insert(complete);
-            }catch (Exception e){
-                logger.info("保存订单失败-订单号-"+sum+"-"+ordersList.get(sum).getId());
-            }
-            sum++;
-            logger.info("sum"+sum);
-        }
-//        Integer  saveNum = ordersCompleteMapper.batchInsertOrdersComplete(completeList);
-        logger.info("查询总订单"+ordersList.size()+"批量结算订单+结算单数"+completeList.size()+"-orderComplete新增的条数"+sum);
-        Long stopTime = System.currentTimeMillis();
-        logger.info(String.valueOf((stopTime - startTime)/1000/60));
-    }*/
+
+    }
 }

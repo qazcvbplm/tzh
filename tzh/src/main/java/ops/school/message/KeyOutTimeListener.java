@@ -84,7 +84,7 @@ public class KeyOutTimeListener extends KeyExpirationEventMessageListener {
             } catch (Exception e) {
                 LoggerUtil.log("堂食完成失败:" + e.getMessage());
             }
-        }
+        }//if
     }
 
 }
