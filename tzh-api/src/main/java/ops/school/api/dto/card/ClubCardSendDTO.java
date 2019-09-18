@@ -3,13 +3,14 @@ package ops.school.api.dto.card;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import ops.school.api.dto.BaseDTOCompute;
 import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.ClubCardSend;
 import ops.school.api.vo.card.ClubCardSendVO;
 import java.io.Serializable;
 
 
-public class ClubCardSendDTO extends BaseDTOMP implements Serializable {
+public class ClubCardSendDTO extends BaseDTOCompute implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/

@@ -53,7 +53,7 @@ public class BaseDTOCompute {
         if (this.startNum == null){
             this.startNum = 0;
         }
-        this.sizeNum = sizeNum;
+        this.sizeNum = sizeNum*this.startNum;
     }
 
     public List<Long> getSelectIds() {

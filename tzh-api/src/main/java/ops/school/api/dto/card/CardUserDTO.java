@@ -3,6 +3,7 @@ package ops.school.api.dto.card;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import ops.school.api.dto.BaseDTOCompute;
 import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.CardUser;
 import ops.school.api.vo.card.CardUserVO;
@@ -10,7 +11,7 @@ import ops.school.api.vo.card.CardUserVO;
 import java.io.Serializable;
 
 
-public class CardUserDTO extends BaseDTOMP implements Serializable {
+public class CardUserDTO extends BaseDTOCompute implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
