@@ -13,8 +13,8 @@ spring:
     password: TZH1234567890
     username: root
   redis:
-    host: 127.0.0.1
-    password: csb18857818257..
+    host: 47.101.221.55
+    password: toor
     port: 6379
   rabbitmq:
     host: www.chuyinkeji.cn

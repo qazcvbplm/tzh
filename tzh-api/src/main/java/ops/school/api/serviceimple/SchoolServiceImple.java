@@ -29,7 +29,6 @@ public class SchoolServiceImple extends ServiceImpl<SchoolMapper, School> implem
     public void add(@Valid School school) throws Exception {
         if (schoolMapper.findByLoginName(school.getLoginName()) == null) {
             school.setLoginPassWord(Util.EnCode(school.getLoginPassWord()));
-            school.setSort(System.currentTimeMillis());
             schoolMapper.insert(school);
         } else {
             throw new Exception("账号已存在请重新输入");

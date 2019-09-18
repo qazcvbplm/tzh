@@ -130,9 +130,7 @@
             </if>
             and is_delete=0
         </where>
-        <if test="orderBy!=null">
-            order by #{orderBy}
-        </if>
+        order by sort DESC
         <if test="page!=null and size!=null">
             limit #{page},#{size}
         </if>
