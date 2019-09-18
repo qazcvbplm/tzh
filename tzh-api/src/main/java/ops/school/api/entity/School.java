@@ -60,6 +60,8 @@ public class School extends Base implements Serializable {
     @NotNull
     private Integer enableTakeout;
 
+    private Integer enableSender;
+
     private Integer enableCoupon;
 
     private BigDecimal senderAllTx;
@@ -374,6 +376,13 @@ public class School extends Base implements Serializable {
         this.yesWaterOne = yesWaterOne;
     }
 
+    public Integer getEnableSender() {
+        return enableSender;
+    }
+
+    public void setEnableSender(Integer enableSender) {
+        this.enableSender = enableSender;
+    }
 
     @Override
     public String toString() {

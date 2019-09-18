@@ -26,6 +26,9 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
         <result column="enable_takeout" property="enableTakeout" jdbcType="INTEGER" />
         <result column="enable_coupon" property="enableCoupon" jdbcType="INTEGER" />
+
+        <result column="enable_sender" property="enableSender" jdbcType="INTEGER" />
+
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="sender_all_tx" property="senderAllTx" jdbcType="DECIMAL" />
         <result column="user_charge" property="userCharge" jdbcType="DECIMAL" />
@@ -65,6 +68,7 @@
         is_delete,
         create_time,
         enable_takeout,
+        enable_sender,
         enable_coupon,
         phone,
         sender_all_tx,
@@ -213,13 +217,16 @@
             <if test="enableTakeout!= null">
                 enable_takeout = #{enableTakeout},
             </if>
+            <if test="enableSender!= null">
+                enable_sender = #{enableSender},
+            </if>
+
             <if test="phone!= null">
                 phone = #{phone},
             </if>
             <if test="messagePhone!= null">
                 message_phone = #{messagePhone},
             </if>
-
 
             <if test="senderAllTx != null ">
                  sender_all_tx = #{senderAllTx},
