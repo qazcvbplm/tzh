@@ -52,7 +52,7 @@ server:
     mime-types: image/png,image/jpeg,image/jpg,text/html,application/javascript,text/css,application/octet-stream,application/json
     min-response-size: 1024
 mybatis-plus:
-  mapper-locations: ops/school/api/mapper/*.xml
+  mapper-locations: ops/school/api/mapper/*.xml,ops/school/api/mapper/card/*.xml
   type-enums-package: ops/school/api/entity/enums
 
 
