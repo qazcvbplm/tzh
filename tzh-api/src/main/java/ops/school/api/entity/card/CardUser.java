@@ -1,5 +1,7 @@
 package ops.school.api.entity.card;
 
+import ops.school.api.dto.card.CardUserDTO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
@@ -129,4 +131,20 @@ public class CardUser implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public CardUserDTO toDTO() {
+        CardUserDTO dto = new CardUserDTO();
+        dto.setId(this.id);
+        dto.setSchoolId(this.schoolId);
+        dto.setUserId(this.userId);
+        dto.setCardDayTime(this.cardDayTime);
+        dto.setCardDayMoney(this.cardDayMoney);
+        dto.setCardType(this.cardType);
+        dto.setCardFailureTime(this.cardFailureTime);
+        dto.setIsDelete(this.isDelete);
+        dto.setCreateId(this.createId);
+        dto.setUpdateId(this.updateId);
+        dto.setCreateTime(this.createTime);
+        dto.setUpdateTime(this.updateTime);
+        return dto;
+    }
 }

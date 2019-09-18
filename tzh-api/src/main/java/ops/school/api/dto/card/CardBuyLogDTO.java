@@ -1,16 +1,16 @@
 package ops.school.api.dto.card;
 
 import java.math.BigDecimal;
-
 import java.util.Date;
 
+import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.CardBuyLog;
-import org.springframework.beans.BeanUtils;
+import ops.school.api.vo.card.CardBuyLogVO;
 import java.io.Serializable;
 
 
-public class CardBuyLogDTO implements Serializable {
-    
+public class CardBuyLogDTO extends BaseDTOMP implements Serializable {
+
     private static final long serialVersionUID = 1L;
     /**主键id*/
     private Long id;
@@ -32,91 +32,113 @@ public class CardBuyLogDTO implements Serializable {
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
-    
+
     public Long getId() {
-    return this.id;
-    }
-    
-    public void setId(Long id) {
-    this.id = id;
-    }
-    
-    public Long getSchoolId() {
-    return this.schoolId;
-    }
-    
-    public void setSchoolId(Long schoolId) {
-    this.schoolId = schoolId;
-    }
-    
-    public Long getUserId() {
-    return this.userId;
-    }
-    
-    public void setUserId(Long userId) {
-    this.userId = userId;
-    }
-    
-    public Long getCardId() {
-    return this.cardId;
-    }
-    
-    public void setCardId(Long cardId) {
-    this.cardId = cardId;
-    }
-    
-    public BigDecimal getMoney() {
-    return this.money;
-    }
-    
-    public void setMoney(BigDecimal money) {
-    this.money = money;
-    }
-    
-    public String getWxTradeNo() {
-    return this.wxTradeNo;
-    }
-    
-    public void setWxTradeNo(String wxTradeNo) {
-    this.wxTradeNo = wxTradeNo;
-    }
-    
-    public Long getCreateId() {
-    return this.createId;
-    }
-    
-    public void setCreateId(Long createId) {
-    this.createId = createId;
-    }
-    
-    public Long getUpdateId() {
-    return this.updateId;
-    }
-    
-    public void setUpdateId(Long updateId) {
-    this.updateId = updateId;
-    }
-    
-    public Date getCreateTime() {
-    return this.createTime;
-    }
-    
-    public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-    }
-    
-    public Date getUpdateTime() {
-    return this.updateTime;
-    }
-    
-    public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-    }
-    
-    public CardBuyLog toModel() {
-    	CardBuyLog model = new CardBuyLog();
-		BeanUtils.copyProperties(this, model);
-		return model;
+        return this.id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getSchoolId() {
+        return this.schoolId;
+    }
+
+    public void setSchoolId(Long schoolId) {
+        this.schoolId = schoolId;
+    }
+
+    public Long getUserId() {
+        return this.userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getCardId() {
+        return this.cardId;
+    }
+
+    public void setCardId(Long cardId) {
+        this.cardId = cardId;
+    }
+
+    public BigDecimal getMoney() {
+        return this.money;
+    }
+
+    public void setMoney(BigDecimal money) {
+        this.money = money;
+    }
+
+    public String getWxTradeNo() {
+        return this.wxTradeNo;
+    }
+
+    public void setWxTradeNo(String wxTradeNo) {
+        this.wxTradeNo = wxTradeNo;
+    }
+
+    public Long getCreateId() {
+        return this.createId;
+    }
+
+    public void setCreateId(Long createId) {
+        this.createId = createId;
+    }
+
+    public Long getUpdateId() {
+        return this.updateId;
+    }
+
+    public void setUpdateId(Long updateId) {
+        this.updateId = updateId;
+    }
+
+    public Date getCreateTime() {
+        return this.createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return this.updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public CardBuyLogVO toVO() {
+        CardBuyLogVO vo = new CardBuyLogVO();
+        vo.setId(this.id);
+        vo.setSchoolId(this.schoolId);
+        vo.setUserId(this.userId);
+        vo.setCardId(this.cardId);
+        vo.setMoney(this.money);
+        vo.setWxTradeNo(this.wxTradeNo);
+        vo.setCreateId(this.createId);
+        vo.setUpdateId(this.updateId);
+        vo.setCreateTime(this.createTime);
+        vo.setUpdateTime(this.updateTime);
+        return vo;
+    }
+    public CardBuyLog toModel() {
+        CardBuyLog model = new CardBuyLog();
+        model.setId(this.id);
+        model.setSchoolId(this.schoolId);
+        model.setUserId(this.userId);
+        model.setCardId(this.cardId);
+        model.setMoney(this.money);
+        model.setWxTradeNo(this.wxTradeNo);
+        model.setCreateId(this.createId);
+        model.setUpdateId(this.updateId);
+        model.setCreateTime(this.createTime);
+        model.setUpdateTime(this.updateTime);
+        return model;
+    }
 }

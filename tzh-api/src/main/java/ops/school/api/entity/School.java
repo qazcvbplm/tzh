@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class School extends Base implements Serializable {
+public class School extends BaseDTOMP implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotBlank

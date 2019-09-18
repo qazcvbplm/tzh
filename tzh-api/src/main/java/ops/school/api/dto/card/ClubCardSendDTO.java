@@ -3,13 +3,13 @@ package ops.school.api.dto.card;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import ops.school.api.entity.Base;
+import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.ClubCardSend;
-import org.springframework.beans.BeanUtils;
+import ops.school.api.vo.card.ClubCardSendVO;
 import java.io.Serializable;
 
 
-public class ClubCardSendDTO extends Base implements Serializable {
+public class ClubCardSendDTO extends BaseDTOMP implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
@@ -48,6 +48,8 @@ public class ClubCardSendDTO extends Base implements Serializable {
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
+
+    private Long wxUserId;
     
     public Long getId() {
     return this.id;
@@ -192,11 +194,57 @@ public class ClubCardSendDTO extends Base implements Serializable {
     public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
     }
-    
-    public ClubCardSend toModel() {
-    	ClubCardSend model = new ClubCardSend();
-		BeanUtils.copyProperties(this, model);
-		return model;
+
+    public Long getWxUserId() {
+        return wxUserId;
     }
 
+    public void setWxUserId(Long wxUserId) {
+        this.wxUserId = wxUserId;
+    }
+
+    public ClubCardSendVO toVO() {
+        ClubCardSendVO vo = new ClubCardSendVO();
+        vo.setId(this.id);
+        vo.setSchoolId(this.schoolId);
+        vo.setName(this.name);
+        vo.setDescription(this.description);
+        vo.setDayTime(this.dayTime);
+        vo.setPriceSale(this.priceSale);
+        vo.setPriceOriginal(this.priceOriginal);
+        vo.setDayMoney(this.dayMoney);
+        vo.setSendBeginTime(this.sendBeginTime);
+        vo.setSendEndTime(this.sendEndTime);
+        vo.setEffectiveDays(this.effectiveDays);
+        vo.setType(this.type);
+        vo.setStatus(this.status);
+        vo.setIsDelete(this.isDelete);
+        vo.setCreateId(this.createId);
+        vo.setUpdateId(this.updateId);
+        vo.setCreateTime(this.createTime);
+        vo.setUpdateTime(this.updateTime);
+        return vo;
+    }
+    public ClubCardSend toModel() {
+        ClubCardSend model = new ClubCardSend();
+        model.setId(this.id);
+        model.setSchoolId(this.schoolId);
+        model.setName(this.name);
+        model.setDescription(this.description);
+        model.setDayTime(this.dayTime);
+        model.setPriceSale(this.priceSale);
+        model.setPriceOriginal(this.priceOriginal);
+        model.setDayMoney(this.dayMoney);
+        model.setSendBeginTime(this.sendBeginTime);
+        model.setSendEndTime(this.sendEndTime);
+        model.setEffectiveDays(this.effectiveDays);
+        model.setType(this.type);
+        model.setStatus(this.status);
+        model.setIsDelete(this.isDelete);
+        model.setCreateId(this.createId);
+        model.setUpdateId(this.updateId);
+        model.setCreateTime(this.createTime);
+        model.setUpdateTime(this.updateTime);
+        return model;
+    }
 }

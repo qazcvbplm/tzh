@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Product extends Base {
+public class Product extends BaseDTOMP {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotBlank

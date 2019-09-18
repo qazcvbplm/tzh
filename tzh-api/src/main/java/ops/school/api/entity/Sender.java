@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-public class Sender extends Base {
+public class Sender extends BaseDTOMP {
     @TableId(type = IdType.AUTO)
     private Integer id;
 

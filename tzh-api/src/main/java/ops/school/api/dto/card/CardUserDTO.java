@@ -3,12 +3,14 @@ package ops.school.api.dto.card;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.CardUser;
-import org.springframework.beans.BeanUtils;
+import ops.school.api.vo.card.CardUserVO;
+
 import java.io.Serializable;
 
 
-public class CardUserDTO implements Serializable {
+public class CardUserDTO extends BaseDTOMP implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
@@ -131,11 +133,37 @@ public class CardUserDTO implements Serializable {
     public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
     }
-    
-    public CardUser toModel() {
-    	CardUser model = new CardUser();
-		BeanUtils.copyProperties(this, model);
-		return model;
-    }
 
+    public CardUserVO toVO() {
+        CardUserVO vo = new CardUserVO();
+        vo.setId(this.id);
+        vo.setSchoolId(this.schoolId);
+        vo.setUserId(this.userId);
+        vo.setCardDayTime(this.cardDayTime);
+        vo.setCardDayMoney(this.cardDayMoney);
+        vo.setCardType(this.cardType);
+        vo.setCardFailureTime(this.cardFailureTime);
+        vo.setIsDelete(this.isDelete);
+        vo.setCreateId(this.createId);
+        vo.setUpdateId(this.updateId);
+        vo.setCreateTime(this.createTime);
+        vo.setUpdateTime(this.updateTime);
+        return vo;
+    }
+    public CardUser toModel() {
+        CardUser model = new CardUser();
+        model.setId(this.id);
+        model.setSchoolId(this.schoolId);
+        model.setUserId(this.userId);
+        model.setCardDayTime(this.cardDayTime);
+        model.setCardDayMoney(this.cardDayMoney);
+        model.setCardType(this.cardType);
+        model.setCardFailureTime(this.cardFailureTime);
+        model.setIsDelete(this.isDelete);
+        model.setCreateId(this.createId);
+        model.setUpdateId(this.updateId);
+        model.setCreateTime(this.createTime);
+        model.setUpdateTime(this.updateTime);
+        return model;
+    }
 }

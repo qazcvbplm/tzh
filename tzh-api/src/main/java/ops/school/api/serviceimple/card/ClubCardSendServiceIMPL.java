@@ -81,16 +81,16 @@ public class ClubCardSendServiceIMPL implements ClubCardSendService {
     @Override
     public ResponseObject saveOneClubCardSendByDTO(@Valid ClubCardSendDTO saveDTO) {
         Assertions.notNull(saveDTO, PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO.getWxUserId(),ResponseViewEnums.WX_USER_NEED_USER_ID);
         //设置日期格式
-        saveDTO.setCreateTime(new Date());
-        saveDTO.setUpdateTime(new Date());
-        ClubCardSendVO saveVO = new ClubCardSendVO();
-        BeanUtils.copyProperties(saveDTO,saveVO);
+        saveDTO.setCreateId(saveDTO.getWxUserId());
+        saveDTO.setUpdateId(saveDTO.getWxUserId());
+        ClubCardSendVO saveVO = saveDTO.toVO();
         Integer saveNum = clubCardSendMapper.insert(saveVO);
         if (saveNum != NumConstants.INT_NUM_1){
             return new ResponseObject(false, ResponseViewEnums.FAILED);
         }
-        return new ResponseObject();
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
     /**

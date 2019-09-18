@@ -3,12 +3,14 @@ package ops.school.api.dto.card;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.CardPayLog;
-import org.springframework.beans.BeanUtils;
+import ops.school.api.vo.card.CardPayLogVO;
+
 import java.io.Serializable;
 
 
-public class CardPayLogDTO implements Serializable {
+public class CardPayLogDTO  extends BaseDTOMP implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
@@ -121,11 +123,35 @@ public class CardPayLogDTO implements Serializable {
     public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
     }
-    
-    public CardPayLog toModel() {
-    	CardPayLog model = new CardPayLog();
-		BeanUtils.copyProperties(this, model);
-		return model;
-    }
 
+    public CardPayLogVO toVO() {
+        CardPayLogVO vo = new CardPayLogVO();
+        vo.setId(this.id);
+        vo.setSchoolId(this.schoolId);
+        vo.setUserId(this.userId);
+        vo.setCardId(this.cardId);
+        vo.setCardType(this.cardType);
+        vo.setOrderId(this.orderId);
+        vo.setUseMoney(this.useMoney);
+        vo.setCreateId(this.createId);
+        vo.setUpdateId(this.updateId);
+        vo.setCreateTime(this.createTime);
+        vo.setUpdateTime(this.updateTime);
+        return vo;
+    }
+    public CardPayLog toModel() {
+        CardPayLog model = new CardPayLog();
+        model.setId(this.id);
+        model.setSchoolId(this.schoolId);
+        model.setUserId(this.userId);
+        model.setCardId(this.cardId);
+        model.setCardType(this.cardType);
+        model.setOrderId(this.orderId);
+        model.setUseMoney(this.useMoney);
+        model.setCreateId(this.createId);
+        model.setUpdateId(this.updateId);
+        model.setCreateTime(this.createTime);
+        model.setUpdateTime(this.updateTime);
+        return model;
+    }
 }

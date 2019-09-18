@@ -24,7 +24,7 @@ import java.util.Objects;
  * @author 
  */
 @Table(name="orders")
-public class Orders extends Base implements Serializable {
+public class Orders extends BaseDTOMP implements Serializable {
     /**
      * 订单
      */

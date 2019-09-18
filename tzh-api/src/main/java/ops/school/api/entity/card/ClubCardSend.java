@@ -1,5 +1,7 @@
 package ops.school.api.entity.card;
 
+import ops.school.api.dto.card.ClubCardSendDTO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
@@ -189,4 +191,26 @@ public class ClubCardSend implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public ClubCardSendDTO toDTO() {
+        ClubCardSendDTO dto = new ClubCardSendDTO();
+        dto.setId(this.id);
+        dto.setSchoolId(this.schoolId);
+        dto.setName(this.name);
+        dto.setDescription(this.description);
+        dto.setDayTime(this.dayTime);
+        dto.setPriceSale(this.priceSale);
+        dto.setPriceOriginal(this.priceOriginal);
+        dto.setDayMoney(this.dayMoney);
+        dto.setSendBeginTime(this.sendBeginTime);
+        dto.setSendEndTime(this.sendEndTime);
+        dto.setEffectiveDays(this.effectiveDays);
+        dto.setType(this.type);
+        dto.setStatus(this.status);
+        dto.setIsDelete(this.isDelete);
+        dto.setCreateId(this.createId);
+        dto.setUpdateId(this.updateId);
+        dto.setCreateTime(this.createTime);
+        dto.setUpdateTime(this.updateTime);
+        return dto;
+    }
 }

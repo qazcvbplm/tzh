@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.math.BigDecimal;
 
-public class OrderProduct extends Base {
+public class OrderProduct extends BaseDTOMP {
     @TableId(type = IdType.AUTO)
     private Integer id;
 

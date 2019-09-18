@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
  */
 @Table(name="wx_user_bell")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class WxUserBell extends Base implements Serializable {
+public class WxUserBell extends BaseDTOMP implements Serializable {
     /**
      * 手机号
      */

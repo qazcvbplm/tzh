@@ -1,5 +1,7 @@
 package ops.school.api.entity.card;
 
+import ops.school.api.dto.card.CardPayLogDTO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
@@ -119,4 +121,19 @@ public class CardPayLog implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public CardPayLogDTO toDTO() {
+        CardPayLogDTO dto = new CardPayLogDTO();
+        dto.setId(this.id);
+        dto.setSchoolId(this.schoolId);
+        dto.setUserId(this.userId);
+        dto.setCardId(this.cardId);
+        dto.setCardType(this.cardType);
+        dto.setOrderId(this.orderId);
+        dto.setUseMoney(this.useMoney);
+        dto.setCreateId(this.createId);
+        dto.setUpdateId(this.updateId);
+        dto.setCreateTime(this.createTime);
+        dto.setUpdateTime(this.updateTime);
+        return dto;
+    }
 }

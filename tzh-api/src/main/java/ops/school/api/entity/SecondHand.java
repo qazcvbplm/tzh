@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-public class SecondHand extends Base {
+public class SecondHand extends BaseDTOMP {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotNull

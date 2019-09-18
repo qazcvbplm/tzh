@@ -8,7 +8,7 @@ import javax.persistence.Transient;
 import java.io.Serializable;
 
 @JsonInclude(Include.NON_NULL)
-public class Base implements Serializable {
+public class BaseDTOMP implements Serializable {
 
     @TableField(exist = false)
     private Integer page;

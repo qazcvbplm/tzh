@@ -19,3 +19,4 @@ public class CardBuyLogVO extends CardBuyLog implements Serializable{
 
 
 
+

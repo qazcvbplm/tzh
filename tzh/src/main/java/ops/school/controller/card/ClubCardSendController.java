@@ -21,7 +21,6 @@ public class ClubCardSendController{
     @Resource(name="clubCardSendService")
     private ClubCardSendService clubCardSendService;
 
-
     /**
      * @date:
      * @author: Fang
@@ -35,6 +34,7 @@ public class ClubCardSendController{
     public LimitTableData<ClubCardSendVO> limitTableData(ClubCardSendDTO dto){
         Assertions.notNull(dto, PublicErrorEnums.PULBIC_EMPTY_PARAM);
         LimitTableData<ClubCardSendVO> tableData = clubCardSendService.limitTableDataByDTO(dto);
+        ResponseObject responseObject = new ResponseObject();
         return tableData;
     }
 

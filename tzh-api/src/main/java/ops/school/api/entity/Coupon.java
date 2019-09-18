@@ -16,7 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @author 
  */
 @Table(name="coupon")
-public class Coupon extends Base implements Serializable {
+public class Coupon extends BaseDTOMP implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * 主键id

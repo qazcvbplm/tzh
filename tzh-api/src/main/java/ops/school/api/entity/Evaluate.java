@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-public class Evaluate extends Base {
+public class Evaluate extends BaseDTOMP {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotBlank

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class ProductCategory extends Base {
+public class ProductCategory extends BaseDTOMP {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotBlank
