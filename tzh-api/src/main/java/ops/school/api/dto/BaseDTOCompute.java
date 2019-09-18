@@ -25,14 +25,18 @@ public class BaseDTOCompute {
     private List<Long> selectIds;
 
     public Integer getStartNum() {
-        if (startNum == null){
-            return null;
-        }
-        return (startNum - 1) * this.sizeNum;
+        return startNum;
     }
 
     public void setStartNum(Integer startNum) {
-        this.startNum = startNum;
+        if (startNum == null){
+            startNum = 0;
+        }
+        if (this.sizeNum == null){
+            this.sizeNum = 0;
+        }
+
+        this.startNum = (startNum - 1)*this.sizeNum;
     }
 
     public Integer getSizeNum() {
@@ -43,6 +47,12 @@ public class BaseDTOCompute {
     }
 
     public void setSizeNum(Integer sizeNum) {
+        if (sizeNum == null){
+            sizeNum = 0;
+        }
+        if (this.startNum == null){
+            this.startNum = 0;
+        }
         this.sizeNum = sizeNum;
     }
 
