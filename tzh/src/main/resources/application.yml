@@ -39,10 +39,15 @@ cert:
 #    enabled: true
 logging:
   file: logs/chuyin.log
+  config: classpath:config/logback.xml
   level:
+    org.springframework.web: DEBUG        ##Spring框架中的日志级别
+    ops.school.api: DEBUG
+    ops.school: DEBUG
     com:
       util: debug
   root: debug
+
 ops:
   redis:
     cache: true

@@ -12,48 +12,29 @@ import java.util.List;
  */
 public class BaseDTOCompute {
 
-    /**
-     * limit 开始的位置
-     */
-    private Integer startNum;
+    private Integer page;
 
-    /**
-     * limit 条数
-     */
-    private Integer sizeNum;
+    private Integer size;
 
     private List<Long> selectIds;
 
-    public Integer getStartNum() {
-        return startNum;
+    public Integer getPage() {
+        if (this.page == null || this.page <= 0){
+            page = 1;
+        }
+        return (page - 1) * this.size;
     }
 
-    public void setStartNum(Integer startNum) {
-        if (startNum == null){
-            startNum = 0;
-        }
-        if (this.sizeNum == null){
-            this.sizeNum = 0;
-        }
-
-        this.startNum = (startNum - 1)*this.sizeNum;
+    public void setPage(Integer page) {
+        this.page = page;
     }
 
-    public Integer getSizeNum() {
-        if (sizeNum == null){
-            return null;
-        }
-        return sizeNum * this.startNum;
+    public Integer getSize() {
+        return size * this.page;
     }
 
-    public void setSizeNum(Integer sizeNum) {
-        if (sizeNum == null){
-            sizeNum = 0;
-        }
-        if (this.startNum == null){
-            this.startNum = 0;
-        }
-        this.sizeNum = sizeNum*this.startNum;
+    public void setSize(Integer size) {
+        this.size = size;
     }
 
     public List<Long> getSelectIds() {

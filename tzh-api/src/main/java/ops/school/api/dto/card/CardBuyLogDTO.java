@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import ops.school.api.dto.BaseDTOCompute;
-import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.CardBuyLog;
 import ops.school.api.vo.card.CardBuyLogVO;
 import java.io.Serializable;

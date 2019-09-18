@@ -5,6 +5,8 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ops.school.api.constants.NumConstants;
 import ops.school.api.dao.card.ClubCardSendMapper;
 import ops.school.api.dto.card.ClubCardSendDTO;
@@ -46,6 +48,7 @@ public class ClubCardSendServiceIMPL implements ClubCardSendService {
         if (countNum < NumConstants.INTEGER_NUM_1){
             return tableData;
         }
+        IPage<ClubCardSendVO> page = new Page<>();
         List<ClubCardSendVO> clubCardSendVOS = clubCardSendMapper.selectLimitByDTO(limitDTO);
         if (CollectionUtils.isEmpty(clubCardSendVOS)){
             tableData.setRecordsTotal(countNum);

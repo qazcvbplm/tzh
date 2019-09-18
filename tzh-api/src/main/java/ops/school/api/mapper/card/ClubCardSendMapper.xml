@@ -110,7 +110,8 @@
     SELECT COUNT(1)
     FROM
     <include refid="Table_Name"/>
-
+    WHERE
+    <include refid="Select_Limit_State"/>
 </select>
 
 <!--CreatBy Fang Time: |  分页查询-->
