@@ -65,7 +65,33 @@
     </if>
 </sql>
 
-<!--CreatBy Fang Time: |  分页查询统计-->
+    <!--CreatBy Fang Time:2019/9/19 16:17 |  -->
+    <insert id="saveOneCardBuyLogByDTOGetId" keyProperty="id" useGeneratedKeys="true" >
+        INSERT INTO <include refid="Table_Name"/>
+        (
+        school_id,
+        user_id,
+        card_id,
+        money,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+        )
+        VALUES
+        (
+        #{schoolId},
+        #{userId},
+        #{cardId},
+        #{money},
+        #{createId},
+        #{updateId},
+        now(),
+        now()
+        )
+    </insert>
+
+    <!--CreatBy Fang Time: |  分页查询统计-->
 <select id="countLimitByDTO" resultType="java.lang.Integer">
     SELECT COUNT(1)
     FROM

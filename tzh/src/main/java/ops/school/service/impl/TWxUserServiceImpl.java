@@ -1,9 +1,8 @@
 package ops.school.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import ops.school.api.config.Server;
+import ops.school.api.config.ServerConstants;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.BackBellDTO;
 import ops.school.api.entity.*;
@@ -90,7 +89,7 @@ public class TWxUserServiceImpl implements TWxUserService {
         if (charge != null && wxUser != null && school != null) {
             return WXpayUtil.payrequest(school.getWxAppId(), school.getMchId(), school.getWxPayId(),
                     "椰子-w", Util.GenerateOrderId(), charge.getFull() * 100 + "", openId,
-                    "127.0.0.1", chargeId + "", Server.URL + "notify/charge");
+                    "127.0.0.1", chargeId + "", ServerConstants.URL + "notify/charge");
         }
         return null;
     }

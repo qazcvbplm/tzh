@@ -199,4 +199,24 @@ public class CardBuyLogServiceIMPL implements CardBuyLogService {
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
+    /**
+     * @date:   2019/9/19 16:15
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Long
+     * @param   cardBuyLogDTO
+     * @Desc:   desc
+     */
+    @Override
+    public Integer saveOneCardBuyLogByDTOGetId(CardBuyLogDTO cardBuyLogDTO) {
+        Assertions.notNull(cardBuyLogDTO);
+        Assertions.notNull(cardBuyLogDTO.getSchoolId());
+        Assertions.notNull(cardBuyLogDTO.getUserId());
+        Assertions.notNull(cardBuyLogDTO.getCardId());
+        Assertions.notNull(cardBuyLogDTO.getMoney());
+        Assertions.notNull(cardBuyLogDTO.getCreateId());
+        Assertions.notNull(cardBuyLogDTO.getUpdateId());
+        Integer addId = cardBuyLogMapper.saveOneCardBuyLogByDTOGetId(cardBuyLogDTO);
+        return addId;
+    }
 }

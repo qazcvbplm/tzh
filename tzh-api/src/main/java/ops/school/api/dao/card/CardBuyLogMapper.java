@@ -61,4 +61,13 @@ public interface CardBuyLogMapper extends BaseMapper<CardBuyLogVO> {
      */
     Integer startOneById(Long id);
 
+    /**
+     * @date:   2019/9/19 16:17
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Long
+     * @param   cardBuyLogDTO
+     * @Desc:   desc
+     */
+    Integer saveOneCardBuyLogByDTOGetId(CardBuyLogDTO cardBuyLogDTO);
 }

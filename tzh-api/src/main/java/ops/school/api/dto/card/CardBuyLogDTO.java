@@ -33,6 +33,8 @@ public class CardBuyLogDTO extends BaseDTOCompute implements Serializable {
     /**修改时间*/
     private Date updateTime;
 
+    private String openId;
+
     public Long getId() {
         return this.id;
     }
@@ -113,6 +115,14 @@ public class CardBuyLogDTO extends BaseDTOCompute implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
     public CardBuyLogVO toVO() {
         CardBuyLogVO vo = new CardBuyLogVO();
         vo.setId(this.id);
@@ -140,5 +150,23 @@ public class CardBuyLogDTO extends BaseDTOCompute implements Serializable {
         model.setCreateTime(this.createTime);
         model.setUpdateTime(this.updateTime);
         return model;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CardBuyLogDTO{");
+        sb.append("id=").append(id);
+        sb.append(", schoolId=").append(schoolId);
+        sb.append(", userId=").append(userId);
+        sb.append(", cardId=").append(cardId);
+        sb.append(", money=").append(money);
+        sb.append(", wxTradeNo='").append(wxTradeNo).append('\'');
+        sb.append(", createId=").append(createId);
+        sb.append(", updateId=").append(updateId);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", updateTime=").append(updateTime);
+        sb.append(", openId='").append(openId).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

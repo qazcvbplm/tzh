@@ -3,6 +3,7 @@ package ops.school.api.service.card;
 import java.util.List;
 import java.util.Map;
 
+import ops.school.api.dto.card.CardBuyLogDTO;
 import ops.school.api.dto.card.CardUserDTO;
 import ops.school.api.entity.card.CardUser;
 import ops.school.api.vo.card.CardUserVO;
@@ -103,4 +104,24 @@ public interface CardUserService {
      * @Desc:   desc 通过id启用
      */
     ResponseObject startOneCardUserById(Long id);
+
+    /**
+     * @date:   2019/9/19 15:51
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   dto
+     * @Desc:   desc
+     */
+    ResponseObject payOneCardUserByDTO(CardUserDTO dto);
+
+    /**
+     * @date:   2019/9/19 16:56
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   cardBuyLogDTO
+     * @Desc:   desc
+     */
+    ResponseObject notifyAndAddCardUserByBuyLogDTO(CardBuyLogDTO cardBuyLogDTO);
 }
