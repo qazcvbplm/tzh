@@ -79,16 +79,16 @@ public class OrdersServiceTest {
     @Test
     public void keyOrderCompleteTest(){
         List<String> orderList = new ArrayList<>();
-        orderList.add("201909171149038394489931615");
-        orderList.add("201909171149371356568796785");
-        orderList.add("201909171151580221681265288");
-        orderList.add("201909171208128175899961796");
-        orderList.add("201909171215418237112321213");
-        orderList.add("201909171219486911119386998");
-        orderList.add("201909171223213309511382980");
-        orderList.add("201909171226374859555646571");
-        orderList.add("201909171258277409860776773");
-        orderList.add("201909171315445596956865554");
+//        orderList.add("201909171149038394489931615");
+//        orderList.add("201909171149371356568796785");
+//        orderList.add("201909171151580221681265288");
+//        orderList.add("201909171208128175899961796");
+//        orderList.add("201909171215418237112321213");
+//        orderList.add("201909171219486911119386998");
+//        orderList.add("201909171223213309511382980");
+//        orderList.add("201909171226374859555646571");
+//        orderList.add("201909171258277409860776773");
+//        orderList.add("201909171315445596956865554");
         for (String orderId : orderList) {
             this.doOrderComplete(orderId);
         }
