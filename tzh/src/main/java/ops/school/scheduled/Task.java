@@ -2,13 +2,9 @@ package ops.school.scheduled;
 
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import ops.school.api.constants.RedisConstants;
 import ops.school.api.constants.StatisticsConstants;
-import ops.school.api.dao.OrdersCompleteMapper;
 import ops.school.api.dto.RunOrdersTj;
-import ops.school.api.dto.TimeEveryDTO;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
 import ops.school.api.util.*;
@@ -22,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -300,13 +295,16 @@ public class Task {
     @Scheduled(cron = "0 */5 * * * ?")
     public void remindUntakenOrders() {
         // 查询所有待接手订单
-        List<Orders> ordersList;
+        List<Orders> ordersList = new ArrayList<>();
         if (SpringUtil.redisCache()) {
             ordersList = JSON.parseArray(stringRedisTemplate.boundHashOps("ALL_DJS").values().toString(), Orders.class);
         } else {
             ordersList = ordersService.findAllDjs();
         }
-        if (ordersList == null) {
+        if (ordersList != null || ordersList.size() < NumConstants.INT_NUM_1){
+            ordersList = ordersService.findAllDjs();
+        }
+        if (ordersList.size() < NumConstants.INT_NUM_1) {
             return;
         }
         //TODO
@@ -317,22 +315,28 @@ public class Task {
         List<Integer> shopIdList = PublicUtilS.getValueList(ordersList, "shopId");
         Collection<Shop> shopCollection = shopService.listByIds(shopIdList);
         Map<Integer, Shop> shopMap = PublicUtilS.listForMapValueE(shopCollection, "id");
+        List<Long> ordersIds = PublicUtilS.getValueList(ordersList,"id");
+        Collection<Orders> dbOrderList = null;
+        if (ordersIds.size() > NumConstants.INT_NUM_0){
+            dbOrderList = ordersService.listByIds(ordersIds);
+        }
+        Map<String,Orders> dbOrderMap = PublicUtilS.listForMapValueE(dbOrderList,"id");
         /**
          * 批量查询school信息
          */
         List<Integer> schoolIdList = PublicUtilS.getValueList(ordersList, "schoolId");
         Collection<School> schoolCollection = schoolService.listByIds(schoolIdList);
         Map<Integer, School> schoolMap = PublicUtilS.listForMapValueE(schoolCollection, "id");
-        for (Orders temp : ordersList) {
+        for (Orders tempOrder : ordersList) {
             Shop shop = null;
-            if (shopMap.get(temp.getShopId()) != null) {
-                shop = shopMap.get(temp.getShopId());
+            if (shopMap.get(tempOrder.getShopId()) != null) {
+                shop = shopMap.get(tempOrder.getShopId());
             } else {
                 continue;
             }
             School school = null;
-            if (schoolMap.get(temp.getSchoolId()) != null) {
-                school = schoolService.findById(temp.getSchoolId());
+            if (schoolMap.get(tempOrder.getSchoolId()) != null) {
+                school = schoolService.findById(tempOrder.getSchoolId());
             } else {
                 continue;
             }
@@ -341,24 +345,28 @@ public class Task {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String curTime = df.format(current);
             // 获取订单支付时间
-            long differTime = TimeUtilS.dateDiff(temp.getPayTime(), curTime);
-            if (differTime > timeOut) {
-                if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SHOP" + school.getPhone()) == null) {
-                    try {
-                        if (shop == null ){
-                            shop = new Shop();
-                            shop.setShopPhone("系统未查询到店家手机号");
-                        }
-                        if (shop.getShopPhone() == null){
-                            shop.setShopPhone("系统未查询到店家手机号");
-                        }
-                        Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getMessagePhone(), 372755, shop.getShopName() + "," + shop.getShopPhone(), null);
-                    } catch (Exception e) {
-                        LoggerUtil.log(e.getMessage());
-                    }
-                    stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SHOP" + school.getMessagePhone(), "", 5, TimeUnit.MINUTES);
-                }
+            long differTime = TimeUtilS.dateDiff(tempOrder.getPayTime(), curTime);
+            Orders dbOrder = dbOrderMap.get(tempOrder.getId());
+            boolean sendTrue = differTime > timeOut && dbOrder != null && "待接手".equals(dbOrder.getStatus());
+            if (!sendTrue) {
+                continue;
             }
+            if (stringRedisTemplate.opsForValue().get("SCHOOL_NOTIFY_SHOP" + school.getMessagePhone()) != null) {
+                continue;
+            }
+            try {
+                if (shop == null ){
+                    shop = new Shop();
+                    shop.setShopPhone("系统未查询到店家手机号");
+                }
+                if (shop.getShopPhone() == null){
+                    shop.setShopPhone("系统未查询到店家手机号");
+                }
+                Util.qqsms(1400169549, "0eb188f83ef4b2dc8976b5e76c70581e", school.getMessagePhone(), 372755, shop.getShopName() + "," + shop.getShopPhone(), null);
+            } catch (Exception e) {
+                LoggerUtil.log(e.getMessage());
+            }
+            stringRedisTemplate.opsForValue().set("SCHOOL_NOTIFY_SHOP" + school.getMessagePhone(), "", 5, TimeUnit.MINUTES);
         }//for
     }
 
