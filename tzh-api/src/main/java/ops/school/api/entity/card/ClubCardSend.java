@@ -1,5 +1,7 @@
 package ops.school.api.entity.card;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.dto.card.ClubCardSendDTO;
 
 import java.math.BigDecimal;
@@ -11,6 +13,7 @@ public class ClubCardSend implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**学校id*/
     private Long schoolId;

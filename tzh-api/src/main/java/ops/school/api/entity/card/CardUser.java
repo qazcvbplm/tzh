@@ -1,5 +1,7 @@
 package ops.school.api.entity.card;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import ops.school.api.dto.card.CardUserDTO;
 
 import java.math.BigDecimal;
@@ -11,11 +13,14 @@ public class CardUser implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**学校id*/
     private Long schoolId;
     /**用户id*/
     private Long userId;
+
+    private Long cardId;
     /**卡购买后每天使用次数*/
     private Integer cardDayTime;
     /**卡购买后每天最大的使用金额*/
@@ -131,6 +136,14 @@ public class CardUser implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public Long getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(Long cardId) {
+        this.cardId = cardId;
+    }
+
     public CardUserDTO toDTO() {
         CardUserDTO dto = new CardUserDTO();
         dto.setId(this.id);
@@ -145,6 +158,7 @@ public class CardUser implements Serializable {
         dto.setUpdateId(this.updateId);
         dto.setCreateTime(this.createTime);
         dto.setUpdateTime(this.updateTime);
+        dto.setCardId(this.cardId);
         return dto;
     }
 }

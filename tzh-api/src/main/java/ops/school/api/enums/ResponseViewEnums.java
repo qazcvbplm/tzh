@@ -25,6 +25,7 @@ public enum ResponseViewEnums implements RootEnums{
     FIND_FAILED("1210006","查询失败"),
     /**创建人不能为空*/
     CREATE_ID_CANT_NULL("1210007","创建人不能为空"),
+    UPDATE_ID_CAN_NOT_NULL("1210008","更新对象不能为空"),
 
 
     /**----------2-楼栋错误-----------*/
@@ -46,9 +47,10 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------4-微信用户错误-----------*/
     WX_USER_NO_EXIST("1240001","微信用户不存在，更新后操作"),
     WX_USER_BELL_NEED_ID("1240002","微信用户，余额，粮票的操作，必须有微信用户id"),
-    WX_USER_NEED_USER_ID("1240003","微信用户需要用户id参数"),
+    WX_USER_NEED_USER_ID("1240003","用户操作需要用户id参数"),
     WX_USER_FAILED_TO_WX("1240004","微信接口繁忙，请重试！"),
     WX_TUI_KUAN_ERROR("1240005","微信退款失败，请稍后重试或者请联系后台管理！"),
+    WX_USER_NO_EXIST2("1240006","微信用户不存在，更新后操作或者退出小程序并删除后重进"),
 
     /**----------5-订单错误-----------*/
     ORDER_DONT_HAVE_PRODUCT("1250001","订单中不存在商品，请点单后下单"),
@@ -119,6 +121,10 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------16-统计和提现错误错误-----------*/
     TX_DATA_HAD_NOT_COUNT("1216001","后台每日统计数据存疑，禁止当日提现，请联系后台"),
     TX_MONEY_LESS("1216002","可提现金额不足，请校验"),
+
+    /**----------17-统计和提现错误错误-----------*/
+    CARD_CAN_NOT_USED("1217001","数据变更，配送卡无法使用，请刷新或联系客服"),
+
 
 
     ;

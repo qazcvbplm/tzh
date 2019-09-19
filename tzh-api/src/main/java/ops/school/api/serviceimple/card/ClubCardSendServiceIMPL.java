@@ -25,12 +25,13 @@ import org.springframework.beans.BeanUtils;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service(value = "clubCardSendService")
 public class ClubCardSendServiceIMPL implements ClubCardSendService {
 
-    @Resource(name="clubCardSendMapper")
+    @Autowired
     private ClubCardSendMapper clubCardSendMapper;
 
     /**
@@ -84,10 +85,10 @@ public class ClubCardSendServiceIMPL implements ClubCardSendService {
     @Override
     public ResponseObject saveOneClubCardSendByDTO(@Valid ClubCardSendDTO saveDTO) {
         Assertions.notNull(saveDTO, PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(saveDTO.getWxUserId(),ResponseViewEnums.WX_USER_NEED_USER_ID);
+        Assertions.notNull(saveDTO.getOpUserId(),ResponseViewEnums.WX_USER_NEED_USER_ID);
         //设置日期格式
-        saveDTO.setCreateId(saveDTO.getWxUserId());
-        saveDTO.setUpdateId(saveDTO.getWxUserId());
+        saveDTO.setCreateId(saveDTO.getOpUserId());
+        saveDTO.setUpdateId(saveDTO.getOpUserId());
         ClubCardSendVO saveVO = saveDTO.toVO();
         Integer saveNum = clubCardSendMapper.insert(saveVO);
         if (saveNum != NumConstants.INT_NUM_1){
@@ -107,17 +108,15 @@ public class ClubCardSendServiceIMPL implements ClubCardSendService {
     @Override
     public ResponseObject updateOneClubCardSendByDTO(ClubCardSendDTO updateDTO) {
         Assertions.notNull(updateDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(updateDTO.getId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ClubCardSendVO clubCardSendVO = new ClubCardSendVO();
-        BeanUtils.copyProperties(updateDTO,clubCardSendVO);
+        Assertions.notNull(updateDTO.getId(),ResponseViewEnums.UPDATE_ID_CAN_NOT_NULL);
+        ClubCardSendVO clubCardSendVO = updateDTO.toVO();
         //设置日期格式
-        updateDTO.setCreateTime(new Date());
-        updateDTO.setUpdateTime(new Date());
+        clubCardSendVO.setUpdateTime(new Date());
         int updateNum = clubCardSendMapper.updateById(clubCardSendVO);
         if (updateNum < NumConstants.INTEGER_NUM_1){
             DisplayException.throwMessageWithEnum(PublicErrorEnums.PUBLIC_DO_FAILED);
         }
-        return new ResponseObject();
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
     /**
      * @date:
@@ -130,11 +129,15 @@ public class ClubCardSendServiceIMPL implements ClubCardSendService {
     @Override
     public ResponseObject deleteOneClubCardSendById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        int deleteNum = clubCardSendMapper.deleteById(id);
+        ClubCardSendVO clubCardSendVO = new ClubCardSendVO();
+        clubCardSendVO.setId(id);
+        clubCardSendVO.setUpdateTime(new Date());
+        clubCardSendVO.setIsDelete(ClubCardSendVO.IsDelete.HAS_DELETED.getValue());
+        int deleteNum = clubCardSendMapper.updateById(clubCardSendVO);
         if (deleteNum < NumConstants.INT_NUM_1){
             DisplayException.throwMessageWithEnum(PublicErrorEnums.PUBLIC_DO_FAILED);
         }
-        return new ResponseObject();
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
     /**
      * @date:
@@ -183,7 +186,7 @@ public class ClubCardSendServiceIMPL implements ClubCardSendService {
         if (stopNum < NumConstants.INT_NUM_1){
             DisplayException.throwMessageWithEnum(PublicErrorEnums.PUBLIC_DO_FAILED);
         }
-        return new ResponseObject();
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
     /**
@@ -201,7 +204,7 @@ public class ClubCardSendServiceIMPL implements ClubCardSendService {
         if (stopNum < NumConstants.INT_NUM_1){
             DisplayException.throwMessageWithEnum(PublicErrorEnums.PUBLIC_DO_FAILED);
         }
-        return new ResponseObject();
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
 }

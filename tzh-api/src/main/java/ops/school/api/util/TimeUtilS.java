@@ -465,7 +465,7 @@ public class TimeUtilS {
         return cal.getTime();
     }
 
-    public static Date getNextDayNextTime(Date date, int nextDay,int hour,int minutes,int seconds) {
+    public static Date getNextDayNextTimeNotUsed(Date date, int nextDay,int hour,int minutes,int seconds) {
         Calendar cal=new GregorianCalendar();
         cal.setTime(date);
         cal.set(getNowYear(),getNowMonth(),cal.get(Calendar.DATE)+nextDay,hour,minutes,seconds);
@@ -1104,7 +1104,9 @@ public class TimeUtilS {
     public static void main(String[] args) {
 
         System.out.println(getNo(8));
-        System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDayNextTime(new Date(),2,24,0,0 )));
+        System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDayNextTimeNotUsed(new Date(),1,10,0,0 )));
+
+        System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDay(new Date(),2)));
 
         try {
             Date a = get1970YearDateLong("25:00");

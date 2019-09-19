@@ -1,13 +1,23 @@
 package ops.school.api.serviceimple.card;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Date;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ops.school.api.constants.NumConstants;
+import ops.school.api.dao.WxUserMapper;
 import ops.school.api.dao.card.CardUserMapper;
+import ops.school.api.dao.card.ClubCardSendMapper;
+import ops.school.api.entity.WxUser;
 import ops.school.api.exception.DisplayException;
+import ops.school.api.service.WxUserService;
 import ops.school.api.service.card.CardUserService;
+import ops.school.api.service.card.ClubCardSendService;
+import ops.school.api.util.PublicUtilS;
+import ops.school.api.util.TimeUtilS;
+import ops.school.api.vo.card.ClubCardSendVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 
@@ -33,6 +43,12 @@ public class CardUserServiceIMPL implements CardUserService {
     @Autowired
     private CardUserMapper cardUserMapper;
 
+    @Autowired
+    private ClubCardSendMapper clubCardSendMapper;
+
+    @Autowired
+    private WxUserService wxUserService;
+
     /**
      * @date:
      * @author: Fang
@@ -52,6 +68,20 @@ public class CardUserServiceIMPL implements CardUserService {
         if (CollectionUtils.isEmpty(cardUserVOS)){
             tableData.setRecordsTotal(countNum);
             return tableData;
+        }
+        List<Long> cardIdList = PublicUtilS.getValueList(cardUserVOS,"id");
+        if (cardIdList == null || cardIdList.size() < NumConstants.INT_NUM_1){
+            tableData.setRecordsTotal(countNum);
+            tableData.setData(cardUserVOS);
+            return tableData;
+        }
+        Collection<ClubCardSendVO> clubCardSendVOS = clubCardSendMapper.selectBatchIds(cardIdList);
+        Map<Long,ClubCardSendVO> clubCardSendVOMap = PublicUtilS.listForMapValueE(clubCardSendVOS,"id");
+        for (CardUserVO cardUserVO : cardUserVOS) {
+            ClubCardSendVO clubCardSendVO = clubCardSendVOMap.get(cardUserVO.getId());
+            if (clubCardSendVO != null){
+                cardUserVO.setClubCardSendVO(clubCardSendVO);
+            }
         }
         tableData.setRecordsTotal(countNum);
         tableData.setData(cardUserVOS);
@@ -83,11 +113,25 @@ public class CardUserServiceIMPL implements CardUserService {
     @Override
     public ResponseObject saveOneCardUserByDTO(@Valid CardUserDTO saveDTO) {
         Assertions.notNull(saveDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        //设置日期格式
-        saveDTO.setCreateTime(new Date());
-        saveDTO.setUpdateTime(new Date());
+        Assertions.notNull(saveDTO.getCardId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO.getOpenId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(saveDTO.getSchoolId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        ClubCardSendVO clubCardSendVO = clubCardSendMapper.selectOneUsedCard(saveDTO.getCardId());
+        Assertions.notNull(clubCardSendVO,ResponseViewEnums.CARD_CAN_NOT_USED);
+        WxUser wxUser = wxUserService.findById(saveDTO.getOpenId());
+        Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST2);
         CardUserVO saveVO = new CardUserVO();
-        BeanUtils.copyProperties(saveDTO,saveVO);
+        saveVO.setSchoolId(saveDTO.getSchoolId());
+        saveVO.setUserId(wxUser.getId());
+        saveVO.setCardId(clubCardSendVO.getId());
+        saveVO.setCardDayTime(clubCardSendVO.getDayTime());
+        saveVO.setCardDayMoney(clubCardSendVO.getDayMoney());
+        saveVO.setCardType(clubCardSendVO.getType());
+        Date failureTime = TimeUtilS.getNextDay(new Date(),clubCardSendVO.getEffectiveDays());
+        saveVO.setCardFailureTime(failureTime);
+        saveVO.setIsDelete(ClubCardSendVO.IsDelete.NO_DELETED.getValue());
+        saveVO.setCreateId(wxUser.getId());
+        saveVO.setUpdateId(wxUser.getId());
         Integer saveNum = cardUserMapper.insert(saveVO);
         if (saveNum != NumConstants.INT_NUM_1){
             return new ResponseObject(false,ResponseViewEnums.FAILED);

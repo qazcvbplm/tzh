@@ -138,9 +138,18 @@
 </select>
 
 
+    <select id="selectOneUsedCard" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE id = #{cardId}
+        AND is_delete = 0
+        AND status = 1
+        AND send_end_time <![CDATA[ >= ]]> now()
+        AND send_begin_time <![CDATA[ <= ]]> now()
+    </select>
 
 
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0

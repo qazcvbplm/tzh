@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import ops.school.api.service.card.CardPayLogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -24,10 +25,11 @@ import ops.school.api.exception.Assertions;
 
 
 @Controller
-@RequestMapping("/api/cardPayLog")
+@RequestMapping("/api/card/pay")
 public class CardPayLogController {
-    @Resource(name="ardPayLogService")
-    private CardPayLogService ardPayLogService;
+
+    @Autowired
+    private CardPayLogService cardPayLogService;
 
 
     /**
@@ -42,7 +44,7 @@ public class CardPayLogController {
     @RequestMapping(value = "/list",method = RequestMethod.POST)
     public ResponseObject limitTableData(CardPayLogDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        LimitTableData<CardPayLogVO> tableData = ardPayLogService.limitTableDataByDTO(dto);
+        LimitTableData<CardPayLogVO> tableData = cardPayLogService.limitTableDataByDTO(dto);
         return new ResponseObject(true, ResponseViewEnums.SUCCESS)
                 .push("total",tableData.getRecordsTotal())
                 .push("list",tableData.getData());
@@ -59,7 +61,7 @@ public class CardPayLogController {
     @ResponseBody
     @RequestMapping(value = "/all",method = RequestMethod.POST)
     public List<CardPayLogVO> findAllCardPayLogVOs(){
-        List<CardPayLogVO> allCardPayLogVOs = ardPayLogService.findAllCardPayLogVOs();
+        List<CardPayLogVO> allCardPayLogVOs = cardPayLogService.findAllCardPayLogVOs();
         return allCardPayLogVOs;
     }
 
@@ -75,7 +77,7 @@ public class CardPayLogController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     public ResponseObject saveOneCardPayLogByDTO(CardPayLogDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = ardPayLogService.saveOneCardPayLogByDTO(dto);
+        ResponseObject view = cardPayLogService.saveOneCardPayLogByDTO(dto);
         return view;
     }
 
@@ -91,7 +93,7 @@ public class CardPayLogController {
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     public ResponseObject updateOneCardPayLogByDTO(CardPayLogDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = ardPayLogService.updateOneCardPayLogByDTO(dto);
+        ResponseObject view = cardPayLogService.updateOneCardPayLogByDTO(dto);
         return view;
     }
 
@@ -107,7 +109,7 @@ public class CardPayLogController {
     @RequestMapping(value = "/delete",method = RequestMethod.POST)
     public ResponseObject deleteOneCardPayLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = ardPayLogService.deleteOneCardPayLogById(id);
+        ResponseObject view = cardPayLogService.deleteOneCardPayLogById(id);
         return view;
     }
 
@@ -123,7 +125,7 @@ public class CardPayLogController {
     @RequestMapping(value = "/one",method = RequestMethod.POST)
     public CardPayLogVO findOneCardPayLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        CardPayLogVO resultVO = ardPayLogService.findOneCardPayLogById(id);
+        CardPayLogVO resultVO = cardPayLogService.findOneCardPayLogById(id);
         return resultVO;
     }
 
@@ -139,7 +141,7 @@ public class CardPayLogController {
     @RequestMapping(value = "/stop",method = RequestMethod.POST)
     public ResponseObject stopOneCardPayLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = ardPayLogService.stopOneCardPayLogById(id);
+        ResponseObject view = cardPayLogService.stopOneCardPayLogById(id);
         return view;
     }
 
@@ -155,7 +157,7 @@ public class CardPayLogController {
     @RequestMapping(value = "/start",method = RequestMethod.POST)
     public ResponseObject startOneCardPayLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = ardPayLogService.startOneCardPayLogById(id);
+        ResponseObject view = cardPayLogService.startOneCardPayLogById(id);
         return view;
     }
 

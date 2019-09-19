@@ -162,7 +162,7 @@ public class PrintTask {
                 Long listIndex = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
                 Long outTime = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).getExpire();
                 if (outTime != null && outTime.intValue() > 0) {
-                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDayNextTime(new Date(), 1, 10, 0, 0));
+                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDay(new Date(), 2));
                 }
                 continue;
             }
@@ -185,7 +185,7 @@ public class PrintTask {
                 Long listIndex = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).leftPush(JSON.toJSONString(printDataDTO));
                 Long outTime = stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).getExpire();
                 if (outTime != null && outTime.intValue() > 0) {
-                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDayNextTime(new Date(), 1, 10, 0, 0));
+                    stringRedisTemplate.boundListOps(RedisConstants.Shop_Failed_Print_OId_List).expireAt(TimeUtilS.getNextDay(new Date(), 2));
                 }
                 continue;
             }

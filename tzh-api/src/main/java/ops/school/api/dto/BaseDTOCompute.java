@@ -12,14 +12,16 @@ import java.util.List;
  */
 public class BaseDTOCompute {
 
-    private Integer page;
+    private Integer page = 0;
 
-    private Integer size;
+    private Integer size = 0;
 
     private List<Long> selectIds;
 
+    private Long opUserId;
+
     public Integer getPage() {
-        if (this.page == null || this.page <= 0){
+        if (this.page == null || this.page < 0){
             page = 1;
         }
         return (page - 1) * this.size;
@@ -30,6 +32,9 @@ public class BaseDTOCompute {
     }
 
     public Integer getSize() {
+        if (this.size == 0 || this.size == null){
+            return 100;
+        }
         return size * this.page;
     }
 
@@ -42,6 +47,15 @@ public class BaseDTOCompute {
     }
 
     public void setSelectIds(List<Long> selectIds) {
+
         this.selectIds = selectIds;
+    }
+
+    public Long getOpUserId() {
+        return opUserId;
+    }
+
+    public void setOpUserId(Long opUserId) {
+        this.opUserId = opUserId;
     }
 }

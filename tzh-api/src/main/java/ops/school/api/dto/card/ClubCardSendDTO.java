@@ -49,8 +49,6 @@ public class ClubCardSendDTO extends BaseDTOCompute implements Serializable {
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
-
-    private Long wxUserId;
     
     public Long getId() {
     return this.id;
@@ -194,14 +192,6 @@ public class ClubCardSendDTO extends BaseDTOCompute implements Serializable {
     
     public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
-    }
-
-    public Long getWxUserId() {
-        return wxUserId;
-    }
-
-    public void setWxUserId(Long wxUserId) {
-        this.wxUserId = wxUserId;
     }
 
     public ClubCardSendVO toVO() {

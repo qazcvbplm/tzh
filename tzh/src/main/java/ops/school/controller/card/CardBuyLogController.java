@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import ops.school.api.service.card.CardBuyLogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -24,10 +25,10 @@ import ops.school.api.exception.Assertions;
 
 
 @Controller
-@RequestMapping("/api/cardBuyLog")
+@RequestMapping("/ops/card/buy")
 public class CardBuyLogController {
 
-    @Resource(name="cardBuyLogService")
+    @Autowired
     private CardBuyLogService cardBuyLogService;
 
 

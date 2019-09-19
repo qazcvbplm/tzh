@@ -20,6 +20,8 @@ public class CardUserDTO extends BaseDTOCompute implements Serializable {
     private Long schoolId;
     /**用户id*/
     private Long userId;
+
+    private Long cardId;
     /**卡购买后每天使用次数*/
     private Integer cardDayTime;
     /**卡购买后每天最大的使用金额*/
@@ -38,6 +40,8 @@ public class CardUserDTO extends BaseDTOCompute implements Serializable {
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
+
+    private String openId;
     
     public Long getId() {
     return this.id;
@@ -135,6 +139,22 @@ public class CardUserDTO extends BaseDTOCompute implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public Long getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(Long cardId) {
+        this.cardId = cardId;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
     public CardUserVO toVO() {
         CardUserVO vo = new CardUserVO();
         vo.setId(this.id);
@@ -149,6 +169,7 @@ public class CardUserDTO extends BaseDTOCompute implements Serializable {
         vo.setUpdateId(this.updateId);
         vo.setCreateTime(this.createTime);
         vo.setUpdateTime(this.updateTime);
+        vo.setCardId(this.cardId);
         return vo;
     }
     public CardUser toModel() {
@@ -165,6 +186,7 @@ public class CardUserDTO extends BaseDTOCompute implements Serializable {
         model.setUpdateId(this.updateId);
         model.setCreateTime(this.createTime);
         model.setUpdateTime(this.updateTime);
+        model.setCardId(this.cardId);
         return model;
     }
 }

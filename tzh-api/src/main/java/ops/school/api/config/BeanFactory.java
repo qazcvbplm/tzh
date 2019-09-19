@@ -1,10 +1,11 @@
-package ops.school.config;
+package ops.school.api.config;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.core.NestedIOException;
 
 import java.io.IOException;
+
 
 public class BeanFactory extends SqlSessionFactoryBean {
  

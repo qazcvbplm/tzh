@@ -12,14 +12,15 @@ import ops.school.api.service.card.ClubCardSendService;
 import ops.school.api.util.LimitTableData;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.vo.card.ClubCardSendVO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/ops/card")
+@RequestMapping("/ops/card/club")
 public class ClubCardSendController{
 
-    @Resource(name="clubCardSendService")
+    @Autowired
     private ClubCardSendService clubCardSendService;
 
     /**
