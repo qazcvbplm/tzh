@@ -97,13 +97,13 @@ public class CardUserServiceIMPL implements CardUserService {
         Map<Long,ClubCardSendVO> clubCardSendVOMap = PublicUtilS.listForMapValueE(clubCardSendVOS,"id");
         for (CardUserVO cardUserVO : cardUserVOS) {
             ClubCardSendVO clubCardSendVO = clubCardSendVOMap.get(cardUserVO.getCardId());
-            if (clubCardSendVO != null){
-                cardUserVO.setClubCardSendVO(clubCardSendVO);
-            }
             //2-判断卡今日是否可用
             List<CardPayLogVO> payLogVOS = new ArrayList<>();
             Boolean canUseTrue = this.checkUserCardTodayCanUseTrue(clubCardSendVO,cardUserVO,payLogVOS,limitDTO.getSchoolId());
             cardUserVO.setCanUseTrue(canUseTrue);
+            if (clubCardSendVO != null){
+                cardUserVO.setClubCardSendVO(clubCardSendVO);
+            }
         }
         tableData.setRecordsTotal(countNum);
         tableData.setData(cardUserVOS);
@@ -379,7 +379,7 @@ public class CardUserServiceIMPL implements CardUserService {
     public Boolean checkUserCardTodayCanUseTrue(ClubCardSendVO clubCardSendVO, CardUserVO userCardVO, List<CardPayLogVO> payLogVOS,Long schoolId) {
         Assertions.notNull(clubCardSendVO);
         Assertions.notNull(userCardVO);
-        Assertions.notEmpty(payLogVOS);
+        Assertions.notNull(payLogVOS);
         Assertions.notNull(schoolId);
         //同一学校范围
         if(schoolId.intValue() != userCardVO.getSchoolId().intValue()){
