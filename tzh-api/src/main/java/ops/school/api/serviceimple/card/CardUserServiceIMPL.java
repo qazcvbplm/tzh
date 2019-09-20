@@ -97,12 +97,15 @@ public class CardUserServiceIMPL implements CardUserService {
         Map<Long,ClubCardSendVO> clubCardSendVOMap = PublicUtilS.listForMapValueE(clubCardSendVOS,"id");
         //查询使用日志
         List<Long> cardUserIdList = PublicUtilS.getValueList(cardUserVOS,"id");
-        List<CardPayLogVO> cardPayLogVOList = cardPayLogService.batchFindCardPayLogByCUIds(cardUserIdList);
+        List<CardPayLogVO> cardPayLogVOList = cardPayLogService.findCardPayLogByCUIdsAndTime(cardUserIdList,TimeUtilS.getDayBegin(),TimeUtilS.getDayEnd());
         Map<Long,List<CardPayLogVO>> payLogMap = PublicUtilS.listforEqualKeyListMap(cardPayLogVOList,"cardUserId");
         for (CardUserVO cardUserVO : cardUserVOS) {
             ClubCardSendVO clubCardSendVO = clubCardSendVOMap.get(cardUserVO.getCardId());
             //2-判断卡今日是否可用
             List<CardPayLogVO> payLogVOS = payLogMap.get(cardUserVO.getId());
+            if (payLogVOS == null){
+                payLogVOS = new ArrayList<>();
+            }
             Boolean canUseTrue = this.checkUserCardTodayCanUseTrue(clubCardSendVO,cardUserVO,payLogVOS,limitDTO.getSchoolId());
             cardUserVO.setCanUseTrue(canUseTrue);
             if (clubCardSendVO != null){
@@ -115,20 +118,6 @@ public class CardUserServiceIMPL implements CardUserService {
     }
 
     /**
-     * @date:
-     * @author: Fang
-     * @version:version
-     * @return: java.util.List<CardUserVO>
-     * @param
-     * @Desc:   desc 查询所有数据
-     */
-     @Override
-    public List<CardUserVO> findAllCardUserVOs() {
-        List<CardUserVO> CardUserVOS = cardUserMapper.selectList(new QueryWrapper<CardUserVO>());
-        return CardUserVOS;
-    }
-
-    /**
      * @date:   2019/9/19 15:51
      * @author: QinDaoFang
      * @version:version
@@ -136,8 +125,9 @@ public class CardUserServiceIMPL implements CardUserService {
      * @param   saveDTO
      * @Desc:   desc
      */
-    @Transactional(rollbackFor = Exception.class)
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseObject payOneCardUserByDTO(CardUserDTO saveDTO) {
         Assertions.notNull(saveDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(saveDTO.getCardId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
@@ -179,6 +169,20 @@ public class CardUserServiceIMPL implements CardUserService {
             DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_PAY_ERROR);
         }
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
+    }
+
+    /**
+     * @date:
+     * @author: Fang
+     * @version:version
+     * @return: java.util.List<CardUserVO>
+     * @param
+     * @Desc:   desc 查询所有数据
+     */
+     @Override
+    public List<CardUserVO> findAllCardUserVOs() {
+        List<CardUserVO> CardUserVOS = cardUserMapper.selectList(new QueryWrapper<CardUserVO>());
+        return CardUserVOS;
     }
 
     /**

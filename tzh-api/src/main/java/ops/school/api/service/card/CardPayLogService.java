@@ -1,5 +1,6 @@
 package ops.school.api.service.card;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -113,4 +114,14 @@ public interface CardPayLogService {
      * @Desc:   desc
      */
     List<CardPayLogVO> batchFindCardPayLogByCUIds(List<Long> cardUserIdList);
+
+    /**
+     * @date:   2019/9/20 12:27
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardPayLogVO>
+     * @param   cardUserIdList
+     * @Desc:   desc
+     */
+    List<CardPayLogVO> findCardPayLogByCUIdsAndTime(List<Long> cardUserIdList, Date start, Date end);
 }

@@ -1,5 +1,6 @@
 package ops.school.api.dao.card;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -70,4 +71,16 @@ public interface CardPayLogMapper extends BaseMapper<CardPayLogVO> {
      * @Desc:   desc
      */
     List<CardPayLogVO> batchFindCardPayLogByCUIds(@Param("list") List<Long> cardUserIdList);
+
+    /**
+     * @date:   2019/9/20 12:35
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardPayLogVO>
+     * @param   cardUserIdList
+     * @param   start
+     * @param   end
+     * @Desc:   desc
+     */
+    List<CardPayLogVO> findCardPayLogByCUIdsAndTime(@Param("list") List<Long> cardUserIdList, @Param("start") Date start, @Param("end") Date end);
 }

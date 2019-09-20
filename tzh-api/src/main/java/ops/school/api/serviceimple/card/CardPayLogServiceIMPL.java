@@ -8,6 +8,7 @@ import ops.school.api.constants.NumConstants;
 import ops.school.api.dao.card.CardPayLogMapper;
 import ops.school.api.exception.DisplayException;
 import ops.school.api.service.card.CardPayLogService;
+import ops.school.api.util.TimeUtilS;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 
@@ -210,5 +211,21 @@ public class CardPayLogServiceIMPL implements CardPayLogService {
     public List<CardPayLogVO> batchFindCardPayLogByCUIds(List<Long> cardUserIdList) {
         Assertions.notEmpty(cardUserIdList);
         return cardPayLogMapper.batchFindCardPayLogByCUIds(cardUserIdList);
+    }
+
+    /**
+     * @date:   2019/9/20 12:27
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardPayLogVO>
+     * @param   cardUserIdList
+     * @Desc:   desc
+     */
+    @Override
+    public List<CardPayLogVO> findCardPayLogByCUIdsAndTime(List<Long> cardUserIdList,Date start,Date end) {
+        Assertions.notEmpty(cardUserIdList);
+        Assertions.notNull(start);
+        Assertions.notNull(end);
+        return cardPayLogMapper.findCardPayLogByCUIdsAndTime(cardUserIdList,start,end);
     }
 }

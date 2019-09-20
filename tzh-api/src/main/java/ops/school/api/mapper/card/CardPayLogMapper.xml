@@ -118,6 +118,20 @@
         </foreach>
     </select>
 
+    <!--CreatBy Fang Time:2019/9/20 12:27 |  -->
+    <select id="findCardPayLogByCUIdsAndTime" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE
+        create_time <![CDATA[ >= ]]> #{start}
+        AND create_time <![CDATA[ <= ]]> #{end}
+        AND card_user_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
 
     <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
