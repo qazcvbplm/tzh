@@ -61,4 +61,13 @@ public interface CardPayLogMapper extends BaseMapper<CardPayLogVO> {
      */
     Integer startOneById(Long id);
 
+    /**
+     * @date:   2019/9/20 12:17
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardPayLogVO>
+     * @param   cardUserIdList
+     * @Desc:   desc
+     */
+    List<CardPayLogVO> batchFindCardPayLogByCUIds(@Param("list") List<Long> cardUserIdList);
 }

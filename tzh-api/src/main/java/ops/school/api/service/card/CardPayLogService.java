@@ -103,4 +103,14 @@ public interface CardPayLogService {
      * @Desc:   desc 通过id启用
      */
     ResponseObject startOneCardPayLogById(Long id);
+
+    /**
+     * @date:   2019/9/20 12:16
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardPayLogVO>
+     * @param   cardUserIdList
+     * @Desc:   desc
+     */
+    List<CardPayLogVO> batchFindCardPayLogByCUIds(List<Long> cardUserIdList);
 }

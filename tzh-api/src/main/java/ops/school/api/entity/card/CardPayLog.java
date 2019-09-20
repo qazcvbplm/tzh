@@ -17,6 +17,8 @@ public class CardPayLog implements Serializable {
     private Long id;
     /**学校id*/
     private Long schoolId;
+
+    private Long cardUserId;
     /**用户id*/
     private Long userId;
     /**卡id*/
@@ -124,10 +126,19 @@ public class CardPayLog implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public Long getCardUserId() {
+        return cardUserId;
+    }
+
+    public void setCardUserId(Long cardUserId) {
+        this.cardUserId = cardUserId;
+    }
+
     public CardPayLogDTO toDTO() {
         CardPayLogDTO dto = new CardPayLogDTO();
         dto.setId(this.id);
         dto.setSchoolId(this.schoolId);
+        dto.setCardUserId(this.cardUserId);
         dto.setUserId(this.userId);
         dto.setCardId(this.cardId);
         dto.setCardType(this.cardType);

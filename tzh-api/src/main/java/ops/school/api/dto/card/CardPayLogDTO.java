@@ -18,6 +18,8 @@ public class CardPayLogDTO  extends BaseDTOCompute implements Serializable {
     private Long id;
     /**学校id*/
     private Long schoolId;
+
+    private Long cardUserId;
     /**用户id*/
     private Long userId;
     /**卡id*/
@@ -125,10 +127,19 @@ public class CardPayLogDTO  extends BaseDTOCompute implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public Long getCardUserId() {
+        return cardUserId;
+    }
+
+    public void setCardUserId(Long cardUserId) {
+        this.cardUserId = cardUserId;
+    }
+
     public CardPayLogVO toVO() {
         CardPayLogVO vo = new CardPayLogVO();
         vo.setId(this.id);
         vo.setSchoolId(this.schoolId);
+        vo.setCardUserId(this.cardUserId);
         vo.setUserId(this.userId);
         vo.setCardId(this.cardId);
         vo.setCardType(this.cardType);
@@ -144,6 +155,7 @@ public class CardPayLogDTO  extends BaseDTOCompute implements Serializable {
         CardPayLog model = new CardPayLog();
         model.setId(this.id);
         model.setSchoolId(this.schoolId);
+        model.setCardUserId(this.getCardUserId());
         model.setUserId(this.userId);
         model.setCardId(this.cardId);
         model.setCardType(this.cardType);

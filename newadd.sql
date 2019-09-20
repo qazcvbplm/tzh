@@ -88,6 +88,7 @@ CREATE TABLE `card_user` (
 CREATE TABLE `card_pay_log` (
 	`id` BIGINT (20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
 	`school_id` BIGINT(20) NOT NULL COMMENT '学校id',
+	`card_user_id` BIGINT(20) NOT NULL COMMENT '用户配送卡主id',
 	`user_id` BIGINT(20) NOT NULL COMMENT '用户id',
 	`card_id` BIGINT(20) NOT NULL COMMENT '卡id',
 	`card_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '卡类型，1-配送费卡',

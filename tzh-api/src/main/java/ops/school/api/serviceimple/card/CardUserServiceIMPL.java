@@ -95,10 +95,14 @@ public class CardUserServiceIMPL implements CardUserService {
         }
         Collection<ClubCardSendVO> clubCardSendVOS = clubCardSendMapper.selectBatchIds(cardIdList);
         Map<Long,ClubCardSendVO> clubCardSendVOMap = PublicUtilS.listForMapValueE(clubCardSendVOS,"id");
+        //查询使用日志
+        List<Long> cardUserIdList = PublicUtilS.getValueList(cardUserVOS,"id");
+        List<CardPayLogVO> cardPayLogVOList = cardPayLogService.batchFindCardPayLogByCUIds(cardUserIdList);
+        Map<Long,List<CardPayLogVO>> payLogMap = PublicUtilS.listforEqualKeyListMap(cardPayLogVOList,"cardUserId");
         for (CardUserVO cardUserVO : cardUserVOS) {
             ClubCardSendVO clubCardSendVO = clubCardSendVOMap.get(cardUserVO.getCardId());
             //2-判断卡今日是否可用
-            List<CardPayLogVO> payLogVOS = new ArrayList<>();
+            List<CardPayLogVO> payLogVOS = payLogMap.get(cardUserVO.getId());
             Boolean canUseTrue = this.checkUserCardTodayCanUseTrue(clubCardSendVO,cardUserVO,payLogVOS,limitDTO.getSchoolId());
             cardUserVO.setCanUseTrue(canUseTrue);
             if (clubCardSendVO != null){

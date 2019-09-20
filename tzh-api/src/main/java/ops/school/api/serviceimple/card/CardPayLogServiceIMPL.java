@@ -198,4 +198,17 @@ public class CardPayLogServiceIMPL implements CardPayLogService {
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
+    /**
+     * @date:   2019/9/20 12:16
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardPayLogVO>
+     * @param   cardUserIdList
+     * @Desc:   desc
+     */
+    @Override
+    public List<CardPayLogVO> batchFindCardPayLogByCUIds(List<Long> cardUserIdList) {
+        Assertions.notEmpty(cardUserIdList);
+        return cardPayLogMapper.batchFindCardPayLogByCUIds(cardUserIdList);
+    }
 }
