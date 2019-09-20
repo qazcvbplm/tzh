@@ -6,12 +6,14 @@ import java.util.Map;
 import ops.school.api.dto.card.CardBuyLogDTO;
 import ops.school.api.dto.card.CardUserDTO;
 import ops.school.api.entity.card.CardUser;
+import ops.school.api.vo.card.CardPayLogVO;
 import ops.school.api.vo.card.CardUserVO;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.util.LimitTableData;
 import ops.school.api.enums.PublicErrorEnums;
 import ops.school.api.util.ResponseObject;
 import ops.school.api.exception.Assertions;
+import ops.school.api.vo.card.ClubCardSendVO;
 
 public interface CardUserService {
 
@@ -124,4 +126,18 @@ public interface CardUserService {
      * @Desc:   desc
      */
     ResponseObject notifyAndAddCardUserByBuyLogDTO(CardBuyLogDTO cardBuyLogDTO);
+
+
+    /**
+     * @date:   2019/9/20 10:44
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   clubCardSendVO
+     * @param   cardUserVO
+     * @param   payLogVOS
+     * @param   schoolId
+     * @Desc:   desc
+     */
+    Boolean checkUserCardTodayCanUseTrue(ClubCardSendVO clubCardSendVO, CardUserVO cardUserVO, List<CardPayLogVO> payLogVOS,Long schoolId);
 }

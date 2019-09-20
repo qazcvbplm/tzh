@@ -88,6 +88,15 @@ public class ClubCardSendVO extends ClubCardSend implements Serializable{
             return value.intValue();
         }
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ClubCardSendVO{");
+        String father = super.toString();
+        sb.append(father);
+        sb.append('}');
+        return sb.toString();
+    }
 }
 
 

@@ -1,10 +1,7 @@
 package ops.school.api.serviceimple.card;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
+import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ops.school.api.config.ServerConstants;
@@ -22,12 +19,15 @@ import ops.school.api.service.card.CardPayLogService;
 import ops.school.api.service.card.CardUserService;
 import ops.school.api.util.*;
 import ops.school.api.vo.card.CardBuyLogVO;
+import ops.school.api.vo.card.CardPayLogVO;
 import ops.school.api.vo.card.ClubCardSendVO;
 import ops.school.api.wxutil.WXpayUtil;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +61,9 @@ public class CardUserServiceIMPL implements CardUserService {
     @Autowired
     private CardBuyLogService cardBuyLogService;
 
+
+    private final Logger logger = LoggerFactory.getLogger(CardUserServiceIMPL.class);
+
     /**
      * @date:
      * @author: Fang
@@ -71,6 +74,8 @@ public class CardUserServiceIMPL implements CardUserService {
      */
     @Override
     public LimitTableData<CardUserVO> limitTableDataByDTO(CardUserDTO limitDTO) {
+        Assertions.notNull(limitDTO.getSchoolId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
+        //1-分页查询
         LimitTableData<CardUserVO> tableData = new LimitTableData();
         Integer countNum = cardUserMapper.countLimitByDTO(limitDTO);
         if (countNum < NumConstants.INTEGER_NUM_1){
@@ -81,7 +86,8 @@ public class CardUserServiceIMPL implements CardUserService {
             tableData.setRecordsTotal(countNum);
             return tableData;
         }
-        List<Long> cardIdList = PublicUtilS.getValueList(cardUserVOS,"id");
+        //-连表查询卡
+        List<Long> cardIdList = PublicUtilS.getValueList(cardUserVOS,"cardId");
         if (cardIdList == null || cardIdList.size() < NumConstants.INT_NUM_1){
             tableData.setRecordsTotal(countNum);
             tableData.setData(cardUserVOS);
@@ -90,10 +96,14 @@ public class CardUserServiceIMPL implements CardUserService {
         Collection<ClubCardSendVO> clubCardSendVOS = clubCardSendMapper.selectBatchIds(cardIdList);
         Map<Long,ClubCardSendVO> clubCardSendVOMap = PublicUtilS.listForMapValueE(clubCardSendVOS,"id");
         for (CardUserVO cardUserVO : cardUserVOS) {
-            ClubCardSendVO clubCardSendVO = clubCardSendVOMap.get(cardUserVO.getId());
+            ClubCardSendVO clubCardSendVO = clubCardSendVOMap.get(cardUserVO.getCardId());
             if (clubCardSendVO != null){
                 cardUserVO.setClubCardSendVO(clubCardSendVO);
             }
+            //2-判断卡今日是否可用
+            List<CardPayLogVO> payLogVOS = new ArrayList<>();
+            Boolean canUseTrue = this.checkUserCardTodayCanUseTrue(clubCardSendVO,cardUserVO,payLogVOS,limitDTO.getSchoolId());
+            cardUserVO.setCanUseTrue(canUseTrue);
         }
         tableData.setRecordsTotal(countNum);
         tableData.setData(cardUserVOS);
@@ -163,6 +173,49 @@ public class CardUserServiceIMPL implements CardUserService {
                 ServerConstants.BUY_CARD_SENDER_NOTIFY_URL);
         if (!"SUCCESS".equalsIgnoreCase(payMap.get("return_code"))){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_PAY_ERROR);
+        }
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
+    }
+
+    /**
+     * @date:   2019/9/19 16:57
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   cardBuyLogDTO
+     * @Desc:   desc
+     */
+    @Override
+    public ResponseObject notifyAndAddCardUserByBuyLogDTO(CardBuyLogDTO cardBuyLogDTO) {
+        Assertions.notNull(cardBuyLogDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(cardBuyLogDTO.getId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(cardBuyLogDTO.getWxTradeNo(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(cardBuyLogDTO.getOpenId(),ResponseViewEnums.WX_USER_NEED_USER_ID);
+        //1-先查询
+        CardBuyLogVO buyLogVO = cardBuyLogService.findOneCardBuyLogById(cardBuyLogDTO.getId());
+        Assertions.notNull(buyLogVO,"购买配送会员卡失败-来自微信回调-查询CardBuyLogVO空"+cardBuyLogDTO.toString());
+        ClubCardSendVO clubCardSendVO = clubCardSendMapper.selectOneUsedCard(buyLogVO.getCardId());
+        Assertions.notNull(clubCardSendVO,ResponseViewEnums.CARD_CAN_NOT_USED);
+        WxUser wxUser = wxUserService.findById(cardBuyLogDTO.getOpenId());
+        Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST2);
+        School school = schoolService.findById(buyLogVO.getSchoolId().intValue());
+        Assertions.notNull(wxUser,ResponseViewEnums.SCHOOL_HAD_CHANGE);
+        //3-业务处理
+        CardUserVO saveVO = new CardUserVO();
+        saveVO.setSchoolId(buyLogVO.getSchoolId());
+        saveVO.setUserId(wxUser.getId());
+        saveVO.setCardId(clubCardSendVO.getId());
+        saveVO.setCardDayTime(clubCardSendVO.getDayTime());
+        saveVO.setCardDayMoney(clubCardSendVO.getDayMoney());
+        saveVO.setCardType(clubCardSendVO.getType());
+        Date failureTime = TimeUtilS.getNextDay(new Date(),clubCardSendVO.getEffectiveDays());
+        saveVO.setCardFailureTime(failureTime);
+        saveVO.setIsDelete(ClubCardSendVO.IsDelete.NO_DELETED.getValue());
+        saveVO.setCreateId(wxUser.getId());
+        saveVO.setUpdateId(wxUser.getId());
+        Integer saveNum = cardUserMapper.insert(saveVO);
+        if (saveNum != NumConstants.INT_NUM_1){
+            return new ResponseObject(false,ResponseViewEnums.FAILED);
         }
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
@@ -311,46 +364,61 @@ public class CardUserServiceIMPL implements CardUserService {
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
     }
 
+
     /**
-     * @date:   2019/9/19 16:57
+     * @date:   2019/9/20 10:39
      * @author: QinDaoFang
      * @version:version
-     * @return: ops.school.api.util.ResponseObject
-     * @param   cardBuyLogDTO
+     * @return: java.lang.Boolean
+     * @param   clubCardSendVO
+     * @param   userCardVO
+     * @param   payLogVOS
      * @Desc:   desc
      */
     @Override
-    public ResponseObject notifyAndAddCardUserByBuyLogDTO(CardBuyLogDTO cardBuyLogDTO) {
-        Assertions.notNull(cardBuyLogDTO,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(cardBuyLogDTO.getId(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(cardBuyLogDTO.getWxTradeNo(),PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        Assertions.notNull(cardBuyLogDTO.getOpenId(),ResponseViewEnums.WX_USER_NEED_USER_ID);
-        //1-先查询
-        CardBuyLogVO buyLogVO = cardBuyLogService.findOneCardBuyLogById(cardBuyLogDTO.getId());
-        Assertions.notNull(buyLogVO,"购买配送会员卡失败-来自微信回调-查询CardBuyLogVO空"+cardBuyLogDTO.toString());
-        ClubCardSendVO clubCardSendVO = clubCardSendMapper.selectOneUsedCard(buyLogVO.getCardId());
-        Assertions.notNull(clubCardSendVO,ResponseViewEnums.CARD_CAN_NOT_USED);
-        WxUser wxUser = wxUserService.findById(cardBuyLogDTO.getOpenId());
-        Assertions.notNull(wxUser,ResponseViewEnums.WX_USER_NO_EXIST2);
-        School school = schoolService.findById(buyLogVO.getSchoolId().intValue());
-        Assertions.notNull(wxUser,ResponseViewEnums.SCHOOL_HAD_CHANGE);
-        //3-业务处理
-        CardUserVO saveVO = new CardUserVO();
-        saveVO.setSchoolId(buyLogVO.getSchoolId());
-        saveVO.setUserId(wxUser.getId());
-        saveVO.setCardId(clubCardSendVO.getId());
-        saveVO.setCardDayTime(clubCardSendVO.getDayTime());
-        saveVO.setCardDayMoney(clubCardSendVO.getDayMoney());
-        saveVO.setCardType(clubCardSendVO.getType());
-        Date failureTime = TimeUtilS.getNextDay(new Date(),clubCardSendVO.getEffectiveDays());
-        saveVO.setCardFailureTime(failureTime);
-        saveVO.setIsDelete(ClubCardSendVO.IsDelete.NO_DELETED.getValue());
-        saveVO.setCreateId(wxUser.getId());
-        saveVO.setUpdateId(wxUser.getId());
-        Integer saveNum = cardUserMapper.insert(saveVO);
-        if (saveNum != NumConstants.INT_NUM_1){
-            return new ResponseObject(false,ResponseViewEnums.FAILED);
+    public Boolean checkUserCardTodayCanUseTrue(ClubCardSendVO clubCardSendVO, CardUserVO userCardVO, List<CardPayLogVO> payLogVOS,Long schoolId) {
+        Assertions.notNull(clubCardSendVO);
+        Assertions.notNull(userCardVO);
+        Assertions.notEmpty(payLogVOS);
+        Assertions.notNull(schoolId);
+        //同一学校范围
+        if(schoolId.intValue() != userCardVO.getSchoolId().intValue()){
+            return false;
         }
-        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
+        //删除了
+        if (clubCardSendVO.getIsDelete().intValue() == ClubCardSendVO.IsDelete.HAS_DELETED.getIntValue() || userCardVO.getIsDelete().intValue() == CardUserVO.IsDelete.HAS_DELETED.getIntValue()){
+            return false;
+        }
+        //禁用
+        if (clubCardSendVO.getStatus().intValue() == ClubCardSendVO.Status.NO.getIntValue()){
+            return false;
+        }
+        //user
+        if (userCardVO.getCardFailureTime() == null || userCardVO.getCreateTime() == null || clubCardSendVO.getEffectiveDays() == null){
+            logger.error("判断用户配送卡日志-getCardFailureTime空-检查用户获取时时间插入-信息"+userCardVO.toString()+"clubCardSendVO"+clubCardSendVO.toString());
+            return false;
+        }
+        //时间比较
+        Date nowTime = new Date();
+        if(!(userCardVO.getCardFailureTime().compareTo(nowTime) >= 0)){
+            return false;
+        }
+        if (!(TimeUtilS.getNextDay(userCardVO.getCreateTime(),clubCardSendVO.getEffectiveDays()).compareTo(nowTime) >= 0)){
+            return false;
+        }
+        //使用次数和使用金额
+        Integer useTimeToday = 0;
+        BigDecimal useMoneyToday = new BigDecimal(0);
+        for (CardPayLogVO payLogVO : payLogVOS) {
+            useTimeToday++;
+            useMoneyToday = useMoneyToday.add(payLogVO.getUseMoney());
+        }
+        if (!(useTimeToday < clubCardSendVO.getDayTime())){
+            return false;
+        }
+        if (!(useMoneyToday.compareTo(clubCardSendVO.getDayMoney()) < 0)){
+            return false;
+        }
+        return true;
     }
 }

@@ -17,10 +17,21 @@ import java.io.Serializable;
 @TableName(value = "card_user")
 public class CardUserVO extends CardUser implements Serializable{
 
+    private static final long serialVersionUID = 1L;
+
     @TableField(exist = false)
     private ClubCardSendVO clubCardSendVO;
-      
-    private static final long serialVersionUID = 1L;
+
+    @TableField(exist = false)
+    private Boolean canUseTrue;
+
+    public Boolean getCanUseTrue() {
+        return canUseTrue;
+    }
+
+    public void setCanUseTrue(Boolean canUseTrue) {
+        this.canUseTrue = canUseTrue;
+    }
 
     public ClubCardSendVO getClubCardSendVO() {
         return clubCardSendVO;
@@ -75,6 +86,15 @@ public class CardUserVO extends CardUser implements Serializable{
         public int getIntValue() {
             return value.intValue();
         }
+    }
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CardUserVO{");
+        sb.append("clubCardSendVO=").append(clubCardSendVO);
+        String cardUser = super.toString();
+        sb.append(cardUser);
+        sb.append('}');
+        return sb.toString();
     }
 }
 

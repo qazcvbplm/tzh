@@ -216,4 +216,29 @@ public class ClubCardSend implements Serializable {
         dto.setUpdateTime(this.updateTime);
         return dto;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ClubCardSend{");
+        sb.append("id=").append(id);
+        sb.append(", schoolId=").append(schoolId);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", dayTime=").append(dayTime);
+        sb.append(", priceSale=").append(priceSale);
+        sb.append(", priceOriginal=").append(priceOriginal);
+        sb.append(", dayMoney=").append(dayMoney);
+        sb.append(", sendBeginTime=").append(sendBeginTime);
+        sb.append(", sendEndTime=").append(sendEndTime);
+        sb.append(", effectiveDays=").append(effectiveDays);
+        sb.append(", type=").append(type);
+        sb.append(", status=").append(status);
+        sb.append(", isDelete=").append(isDelete);
+        sb.append(", createId=").append(createId);
+        sb.append(", updateId=").append(updateId);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", updateTime=").append(updateTime);
+        sb.append('}');
+        return sb.toString();
+    }
 }

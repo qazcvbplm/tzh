@@ -161,4 +161,24 @@ public class CardUser implements Serializable {
         dto.setCardId(this.cardId);
         return dto;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CardUser{");
+        sb.append("id=").append(id);
+        sb.append(", schoolId=").append(schoolId);
+        sb.append(", userId=").append(userId);
+        sb.append(", cardId=").append(cardId);
+        sb.append(", cardDayTime=").append(cardDayTime);
+        sb.append(", cardDayMoney=").append(cardDayMoney);
+        sb.append(", cardType=").append(cardType);
+        sb.append(", cardFailureTime=").append(cardFailureTime);
+        sb.append(", isDelete=").append(isDelete);
+        sb.append(", createId=").append(createId);
+        sb.append(", updateId=").append(updateId);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", updateTime=").append(updateTime);
+        sb.append('}');
+        return sb.toString();
+    }
 }

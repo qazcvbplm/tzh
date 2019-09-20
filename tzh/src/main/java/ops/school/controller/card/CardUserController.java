@@ -52,6 +52,7 @@ public class CardUserController {
     @RequestMapping(value = "/list",method = RequestMethod.POST)
     public ResponseObject limitTableData(CardUserDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(dto.getSchoolId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
         LimitTableData<CardUserVO> tableData = cardUserService.limitTableDataByDTO(dto);
         return new ResponseObject(true, ResponseViewEnums.SUCCESS)
                 .push("total",tableData.getRecordsTotal())
