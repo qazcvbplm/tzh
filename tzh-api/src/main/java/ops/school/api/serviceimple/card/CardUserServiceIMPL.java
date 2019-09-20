@@ -478,7 +478,7 @@ public class CardUserServiceIMPL implements CardUserService {
         if (!(times < clubCardSendVO.getDayTime())){
             return false;
         }
-        if (!(money.compareTo(clubCardSendVO.getDayMoney()) < 0)){
+        if (!(money.compareTo(clubCardSendVO.getDayMoney()) <= 0)){
             return false;
         }
         return true;

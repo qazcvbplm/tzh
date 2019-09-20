@@ -40,7 +40,7 @@
         <result column="large_min_amount" property="largeMinAmount" jdbcType="DECIMAL" />
         <result column="extra_large_min_amount" property="extraLargeMinAmount" jdbcType="DECIMAL" />
 
-        <result column="yes_water_one" property="yesWaterOne" jdbcType="INTEGER" />
+        <result column="yes_open_card" property="yesOpenCard" jdbcType="INTEGER" />
         <result column="sender_tencent_group" property="senderTencentGroup" jdbcType="VARCHAR" />
 
     </resultMap>
@@ -81,6 +81,7 @@
         large_min_amount,
         extra_large_min_amount,
         sender_tencent_group,
+        yes_open_card,
         yes_water_one
     </sql>
 
@@ -255,6 +256,10 @@
             <if test="yesWaterOne != null">
                 yes_water_one = #{yesWaterOne},
             </if>
+            <if test="yesOpenCard != null">
+                yes_open_card = #{yesOpenCard},
+            </if>
+
             <if test="senderTencentGroup != null">
                 sender_tencent_group = #{senderTencentGroup},
             </if>

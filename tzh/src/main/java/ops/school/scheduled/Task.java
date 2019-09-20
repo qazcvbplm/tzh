@@ -152,7 +152,7 @@ public class Task {
 
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
-        Date date = TimeUtilS.getNextDay(new Date(), -5);
+        Date date = new Date();
         this.theDayilyStatistics(date);
     }
 
