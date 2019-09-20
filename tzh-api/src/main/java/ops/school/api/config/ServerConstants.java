@@ -13,6 +13,6 @@ public class ServerConstants {
 
     public final static String BUY_CARD_SENDER_NOTIFY_URL = URL+"/ops/card/user/notify";
 
-    public final static String BUY_CARD_SENDER_NOTIFY_URL_NO_HTTP = URL+"/ops/card/user/notify";
+    public final static String BUY_CARD_SENDER_NOTIFY_URL_NO_HTTP = "/ops/card/user/notify";
 
 }
