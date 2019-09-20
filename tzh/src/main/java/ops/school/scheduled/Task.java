@@ -11,8 +11,11 @@ import ops.school.api.dto.RunOrdersTj;
 import ops.school.api.dto.TimeEveryDTO;
 import ops.school.api.entity.*;
 import ops.school.api.service.*;
+import ops.school.api.service.card.CardBuyLogService;
+import ops.school.api.service.card.CardPayLogService;
 import ops.school.api.util.*;
 import ops.school.api.constants.NumConstants;
+import ops.school.api.vo.card.CardBuyLogVO;
 import ops.school.controller.SignController;
 import ops.school.service.TCouponService;
 import ops.school.service.TOrdersService;
@@ -64,6 +67,13 @@ public class Task {
 
     @Autowired
     private TxLogService txLogService;
+
+    @Autowired
+    private CardPayLogService cardPayLogService;
+
+    @Autowired
+    private CardBuyLogService cardBuyLogService;
+
     //10分钟
     private final long timeOut = 10;
 
@@ -198,6 +208,7 @@ public class Task {
                         .shoplog(shoptemp.getShopName(), shoptemp.getId(), day, result, "商铺日志", schooltemp.getId());
                 BigDecimal schoolGetTotal = new BigDecimal(0);
                 BigDecimal shopGetTotal = new BigDecimal(0);
+                BigDecimal cardShopAllSendMoney = new BigDecimal(0);
                 if (result.getSchoolGetTotal() != null){
                     schoolGetTotal = result.getSchoolGetTotal();
                 }
@@ -225,6 +236,7 @@ public class Task {
                 downSendMoney = downSendMoney.add(result.getDownSendMoney());
                 downSendCount = downSendCount + result.getDownSendCount();
                 shopDayLog.setShopDayTx(shopDayTxMoney);
+                shopDayLog.setSendCardUseOrBuyMoney(result.getCardSendMoney());
                 //保存店铺
                 dayLogTakeoutService.save(shopDayLog);
             }
@@ -279,6 +291,9 @@ public class Task {
             moneySave.setWxPayGet(shopEveryDayGetTotal);
             moneySave.setDownSendCount(downSendCount);
             moneySave.setDownSendMoney(downSendMoney);
+            //保存用户购卡信息
+            CardBuyLogVO cardBuyLogVO = cardBuyLogService.dayCountBuyMoneyByTime(schooltemp.getId(),TimeUtilS.getDayBegin(),TimeUtilS.getDayEnd());
+            moneySave.setSendCardUseOrBuyMoney(cardBuyLogVO.getMoney());
             //保存当日提现
             dayLogTakeoutService.save(moneySave);
             logger.error("定时数据统计-"+schooltemp.getName()+TimeUtilS.dateFormat(new Date()));

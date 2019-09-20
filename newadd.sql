@@ -124,4 +124,9 @@ ADD COLUMN `card_send_money`  decimal(10,2) NULL DEFAULT 0 COMMENT '用户此单
 ALTER TABLE `orders_complete`
 ADD COLUMN `send_card_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '每笔订单配送卡' ;
 
+ALTER TABLE `day_log_takeout`
+ADD COLUMN `send_card_use_or_buy_money`  decimal(10,2) NOT NULL DEFAULT 0 COMMENT '配送卡抵扣金额分店铺/学校负责得配送卡的金额' AFTER `down_send_money`;
+
+
+
 

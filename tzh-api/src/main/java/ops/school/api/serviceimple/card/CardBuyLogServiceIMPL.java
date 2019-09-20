@@ -219,4 +219,22 @@ public class CardBuyLogServiceIMPL implements CardBuyLogService {
         Integer addId = cardBuyLogMapper.saveOneCardBuyLogByDTOGetId(cardBuyLogDTO);
         return addId;
     }
+
+    /**
+     * @date:   2019/9/20 16:24
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.vo.card.CardBuyLogVO
+     * @param   schoolId
+     * @param   dayBegin
+     * @param   dayEnd
+     * @Desc:   desc
+     */
+    @Override
+    public CardBuyLogVO dayCountBuyMoneyByTime(Integer schoolId, Date dayBegin, Date dayEnd) {
+        Assertions.notNull(schoolId);
+        Assertions.notNull(dayBegin);
+        Assertions.notNull(dayEnd);
+        return cardBuyLogMapper.dayCountBuyMoneyByTime(schoolId,dayBegin,dayEnd);
+    }
 }

@@ -1,5 +1,6 @@
 package ops.school.api.service.card;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -113,4 +114,16 @@ public interface CardBuyLogService {
      * @Desc:   desc
      */
     Integer saveOneCardBuyLogByDTOGetId(CardBuyLogDTO cardBuyLogDTO);
+
+    /**
+     * @date:   2019/9/20 16:24
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.vo.card.CardBuyLogVO
+     * @param   id
+     * @param   dayBegin
+     * @param   dayEnd
+     * @Desc:   desc
+     */
+    CardBuyLogVO dayCountBuyMoneyByTime(Integer id, Date dayBegin, Date dayEnd);
 }

@@ -66,6 +66,8 @@ public class DayLogTakeout {
 
     private BigDecimal downSendMoney;
 
+    private BigDecimal sendCardUseOrBuyMoney;
+
     @TableField(exist = false)
     private Integer upSendCount;
 
@@ -81,6 +83,15 @@ public class DayLogTakeout {
 
     @TableField(exist = false)
     private DayLogTakeoutDTO everyDayCount;
+
+
+    public BigDecimal getSendCardUseOrBuyMoney() {
+        return sendCardUseOrBuyMoney;
+    }
+
+    public void setSendCardUseOrBuyMoney(BigDecimal sendCardUseOrBuyMoney) {
+        this.sendCardUseOrBuyMoney = sendCardUseOrBuyMoney;
+    }
 
     public Integer getUpSendCount() {
         return upSendCount;

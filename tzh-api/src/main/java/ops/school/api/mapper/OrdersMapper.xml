@@ -173,6 +173,7 @@
 	sum(o.coupon_used_amount) AS used_coupon,
 	sum(o.full_used_amount) AS used_full_cut,
 	sum(o.pay_food_coupon) AS used_food_coupon,
+	sum(o.card_send_money) AS card_send_money,
 	(
 		SELECT
 			sum(orders.discount_price)

@@ -123,10 +123,7 @@
     </foreach>
 </select>
 
-
-
-
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0
@@ -141,5 +138,19 @@
     WHERE id = #{id}
     AND is_delete = 0
 </update>
+
+    <!--CreatBy Fang Time:2019/9/20 16:25 |  -->
+    <select id="dayCountBuyMoneyByTime" resultMap="BaseResultMap">
+        SELECT
+        SUM(money) AS money
+        FROM <include refid="Table_Name"/>
+        WHERE
+        school_id = #{schoolId}
+        AND create_time <![CDATA[ >= ]]> #{dayBegin}
+        AND create_time <![CDATA[ <= ]]> #{dayEnd}
+        AND wx_trade_no != 0
+        AND wx_trade_no IS NOT NULL
+    </select>
+
 
 </mapper>
