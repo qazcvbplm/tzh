@@ -130,6 +130,11 @@ ADD COLUMN `send_card_use_or_buy_money`  decimal(10,2) NOT NULL DEFAULT 0 COMMEN
 ALTER TABLE `school`
 ADD COLUMN `yes_open_card`  int(4) NULL DEFAULT 0 COMMENT '是否开启学校配送卡模式' AFTER `extra_large_min_amount`;
 
+ALTER TABLE `shop`
+ADD COLUMN `yes_only`  int(2) NULL DEFAULT 0 COMMENT '店铺是否独家/只能在一个学校开' AFTER `open_description`;
+
+
+
 
 
 

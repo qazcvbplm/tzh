@@ -86,6 +86,10 @@ public class Shop {
 
     private Integer printType;
 
+    private Integer yesOnly;
+
+
+
     @TableField(exist = false)
     private BigDecimal minDiscount;
     @TableField(exist = false)
@@ -114,6 +118,14 @@ public class Shop {
 
     private String openDescription;
 
+
+    public Integer getYesOnly() {
+        return yesOnly;
+    }
+
+    public void setYesOnly(Integer yesOnly) {
+        this.yesOnly = yesOnly;
+    }
 
     @Transient
     public String getQueryType() {
