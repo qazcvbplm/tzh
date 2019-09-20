@@ -429,4 +429,58 @@ public class CardUserServiceIMPL implements CardUserService {
         }
         return true;
     }
+
+    /**
+     * @date:   2019/9/20 14:28
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   clubCardSendVO
+     * @param   userCardVO
+     * @param   times
+     * @param   money
+     * @param   schoolId
+     * @Desc:   desc
+     */
+    @Override
+    public Boolean checkUserCardTodayCanUseTrueByMoney(ClubCardSendVO clubCardSendVO, CardUserVO userCardVO, Integer times, BigDecimal money, Long schoolId) {
+        Assertions.notNull(clubCardSendVO);
+        Assertions.notNull(userCardVO);
+        Assertions.notNull(times);
+        Assertions.notNull(money);
+        Assertions.notNull(schoolId);
+        //同一学校范围
+        if(schoolId.intValue() != userCardVO.getSchoolId().intValue()){
+            return false;
+        }
+        //删除了
+        if (clubCardSendVO.getIsDelete().intValue() == ClubCardSendVO.IsDelete.HAS_DELETED.getIntValue() || userCardVO.getIsDelete().intValue() == CardUserVO.IsDelete.HAS_DELETED.getIntValue()){
+            return false;
+        }
+        //禁用
+        if (clubCardSendVO.getStatus().intValue() == ClubCardSendVO.Status.NO.getIntValue()){
+            return false;
+        }
+        //user
+        if (userCardVO.getCardFailureTime() == null || userCardVO.getCreateTime() == null || clubCardSendVO.getEffectiveDays() == null){
+            logger.error("判断用户配送卡日志-getCardFailureTime空-检查用户获取时时间插入-信息"+userCardVO.toString()+"clubCardSendVO"+clubCardSendVO.toString());
+            return false;
+        }
+        //时间比较
+        Date nowTime = new Date();
+        if(!(userCardVO.getCardFailureTime().compareTo(nowTime) >= 0)){
+            return false;
+        }
+        if (!(TimeUtilS.getNextDay(userCardVO.getCreateTime(),clubCardSendVO.getEffectiveDays()).compareTo(nowTime) >= 0)){
+            return false;
+        }
+        //使用次数和使用金额
+        if (!(times < clubCardSendVO.getDayTime())){
+            return false;
+        }
+        if (!(money.compareTo(clubCardSendVO.getDayMoney()) < 0)){
+            return false;
+        }
+        return true;
+    }
 }

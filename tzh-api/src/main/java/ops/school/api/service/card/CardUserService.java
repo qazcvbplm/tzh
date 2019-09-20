@@ -1,5 +1,6 @@
 package ops.school.api.service.card;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -140,4 +141,18 @@ public interface CardUserService {
      * @Desc:   desc
      */
     Boolean checkUserCardTodayCanUseTrue(ClubCardSendVO clubCardSendVO, CardUserVO cardUserVO, List<CardPayLogVO> payLogVOS,Long schoolId);
+
+    /**
+     * @date:   2019/9/20 14:28
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Boolean
+     * @param   clubCardSendVO
+     * @param   cardUserVO
+     * @param   times
+     * @param   sendPrice
+     * @param   valueOf
+     * @Desc:   desc
+     */
+    Boolean checkUserCardTodayCanUseTrueByMoney(ClubCardSendVO clubCardSendVO, CardUserVO cardUserVO, Integer times, BigDecimal sendPrice, Long valueOf);
 }

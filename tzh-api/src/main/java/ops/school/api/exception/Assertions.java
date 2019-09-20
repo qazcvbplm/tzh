@@ -20,7 +20,13 @@ public class Assertions {
 
     public static void isTrue(boolean expression, String message) {
         if (!expression) {
-            throw new IllegalArgumentException(message);
+            throw new DisplayException(message);
+        }
+    }
+
+    public static void isTrueAndFalseToError(boolean expression, RootEnums rootEnums) {
+        if (!expression) {
+            throw new DisplayException(rootEnums.getErrorMessage());
         }
     }
 

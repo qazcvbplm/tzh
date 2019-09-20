@@ -67,6 +67,9 @@
         <result column="down_send_count" property="downSendCount" jdbcType="INTEGER" />
         <result column="down_send_money" property="downSendMoney" jdbcType="DECIMAL" />
 
+        <result column="card_send_user_id" property="cardSendUserId" jdbcType="BIGINT" />
+        <result column="card_send_money" property="cardSendMoney" jdbcType="DECIMAL" />
+
         <association property="complete" javaType="ops.school.api.entity.OrdersComplete">
             <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
             <result column="app_get_school_rate" jdbcType="DECIMAL" property="appGetSchoolRate"/>

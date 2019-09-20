@@ -167,4 +167,23 @@ public class CardPayLogDTO  extends BaseDTOCompute implements Serializable {
         model.setUpdateTime(this.updateTime);
         return model;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CardPayLogDTO{");
+        sb.append("id=").append(id);
+        sb.append(", schoolId=").append(schoolId);
+        sb.append(", cardUserId=").append(cardUserId);
+        sb.append(", userId=").append(userId);
+        sb.append(", cardId=").append(cardId);
+        sb.append(", cardType=").append(cardType);
+        sb.append(", orderId='").append(orderId).append('\'');
+        sb.append(", useMoney=").append(useMoney);
+        sb.append(", createId=").append(createId);
+        sb.append(", updateId=").append(updateId);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", updateTime=").append(updateTime);
+        sb.append('}');
+        return sb.toString();
+    }
 }

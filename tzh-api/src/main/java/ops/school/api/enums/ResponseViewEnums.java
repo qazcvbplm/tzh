@@ -66,6 +66,7 @@ public enum ResponseViewEnums implements RootEnums{
     ORDER_PARAM_TIME_BEFORE("1250011","预定订单时间太早，请稍后重新下单"),
     ORDER_USER_BELL_NULL("1250012","用户数据有误，请前往“我的”界面重新授权绑定手机号"),
     ORDER_ADD_ORDER_NO_SHOP("1250013","亲！支付成功，下单失败，店铺有误，请联系学校负责人或者椰子后台客服服务"),
+    ORDER_NEED_USER_CARD_ID("1250014","订单缺失信息，需要配送卡信息"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),
@@ -125,6 +126,9 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------17-配送会员卡-----------*/
     CARD_CAN_NOT_USED("1217001","数据变更，配送卡无法使用，请刷新或联系客服"),
     CARD_BUY_ERROR("1217002","配送卡购买失败，请重试或联系客服"),
+    CARD_SEND_CANT_NULL("1217003","配送卡信息错误，请联系客服或者刷新小程序重试"),
+    CARD_SEND_CANT_USE_TODAY("1217004","配送卡今天不能使用，请校验"),
+    CARD_ORDERS_NEED_HAVE_CARD("1217004","外卖订单缺少配送卡信息，请校验"),
 
 
     /**----------18-微信支付错误-----------*/
