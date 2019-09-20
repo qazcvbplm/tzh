@@ -1,0 +1,42 @@
+#本地开发环境
+server:
+  port: 11000
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+spring:
+  application:
+    name: ops-dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/ops?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8&useSSL=false
+    type: com.alibaba.druid.pool.DruidDataSource
+    password: root
+    username: root
+  redis:
+    host: 47.101.221.55
+    password: toor
+    port: 6379
+  rabbitmq:
+    host: www.chuyinkeji.cn
+    port: 5672
+    username: root
+    password: tzh1234567890
+    publisher-confirms: true
+    publisher-returns: true
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual
+#本地日志
+#logging:
+#  file: logs/chuyin.log
+#  config: classpath:config/logback.xml
+#  path: logs/self-logs
+#开发线上日志
+logging:
+  file: logs/chuyin.log
+  level:
+    com:
+      util: debug
+  root: debug
