@@ -497,6 +497,34 @@ public class CardUserServiceIMPL implements CardUserService {
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
         Assertions.notNull(dto.getSchoolId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
         Assertions.notNull(dto.getUserId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
-        return cardUserMapper.findCardUserList(dto);
+        List<CardUserVO> cardUserVOS = cardUserMapper.findCardUserList(dto);
+        //-连表查询卡
+        List<Long> cardIdList = PublicUtilS.getValueList(cardUserVOS,"cardId");
+        if (cardIdList == null || cardIdList.size() < NumConstants.INT_NUM_1){
+            for (CardUserVO cardUserVO : cardUserVOS) {
+                cardUserVO.setCanUseTrue(false);
+            }
+            return cardUserVOS;
+        }
+        Collection<ClubCardSendVO> clubCardSendVOS = clubCardSendMapper.selectBatchIds(cardIdList);
+        Map<Long,ClubCardSendVO> clubCardSendVOMap = PublicUtilS.listForMapValueE(clubCardSendVOS,"id");
+        //查询使用日志
+        List<Long> cardUserIdList = PublicUtilS.getValueList(cardUserVOS,"id");
+        List<CardPayLogVO> cardPayLogVOList = cardPayLogService.findCardPayLogByCUIdsAndTime(cardUserIdList,TimeUtilS.getDayBegin(),TimeUtilS.getDayEnd());
+        Map<Long,List<CardPayLogVO>> payLogMap = PublicUtilS.listforEqualKeyListMap(cardPayLogVOList,"cardUserId");
+        for (CardUserVO cardUserVO : cardUserVOS) {
+            ClubCardSendVO clubCardSendVO = clubCardSendVOMap.get(cardUserVO.getCardId());
+            //2-判断卡今日是否可用
+            List<CardPayLogVO> payLogVOS = payLogMap.get(cardUserVO.getId());
+            if (payLogVOS == null){
+                payLogVOS = new ArrayList<>();
+            }
+            Boolean canUseTrue = this.checkUserCardTodayCanUseTrue(clubCardSendVO,cardUserVO,payLogVOS,dto.getSchoolId());
+            cardUserVO.setCanUseTrue(canUseTrue);
+            if (clubCardSendVO != null){
+                cardUserVO.setClubCardSendVO(clubCardSendVO);
+            }
+        }
+        return cardUserVOS;
     }
 }
