@@ -27,21 +27,6 @@ barcode:
   path: /home/barcode
 cert:
   path: /home/cert
-logging:
-  file: logs/chuyin.log
-#  level: trace
-  #config: classpath:config/logback.xml
-  #  level:
-  #    org.springframework.web: DEBUG        ##Spring框架中的日志级别
-  #    ops.school.api: DEBUG
-  #    ops.school: DEBUG
-
-  #path: logs/self-logs
-  level:
-    com:
-      util: debug
-  root: debug
-
 ops:
   redis:
     cache: true

@@ -6,7 +6,7 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 spring:
   application:
-    name: ops-dev
+    name: ops-test
   datasource:
     url: jdbc:mysql://localhost:3306/ops?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8&useSSL=false
     #url: jdbc:mysql://www.chuyinkeji.cn:62580/ops?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8&useSSL=false
@@ -29,3 +29,7 @@ spring:
         acknowledge-mode: manual
       simple:
         acknowledge-mode: manual
+logging:
+  file: logs/chuyin.log
+  config: classpath:config/logback.xml
+  path: logs/self-logs
