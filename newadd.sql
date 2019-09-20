@@ -127,6 +127,9 @@ ADD COLUMN `send_card_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '每�
 ALTER TABLE `day_log_takeout`
 ADD COLUMN `send_card_use_or_buy_money`  decimal(10,2) NOT NULL DEFAULT 0 COMMENT '配送卡抵扣金额分店铺/学校负责得配送卡的金额' AFTER `down_send_money`;
 
+ALTER TABLE `school`
+ADD COLUMN `yes_open_card`  int(4) NULL DEFAULT 0 COMMENT '是否开启学校配送卡模式' AFTER `extra_large_min_amount`;
+
 
 
 

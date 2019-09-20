@@ -30,7 +30,6 @@ public class OrdersComplete {
 
     private BigDecimal shopGetTotal;
 
-    @TableField(exist = false)
     private BigDecimal sendCardMoney;
 
 

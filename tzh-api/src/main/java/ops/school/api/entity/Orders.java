@@ -306,6 +306,10 @@ public class Orders extends BaseDTOMP implements Serializable {
 
     private BigDecimal afterDiscountPrice;
 
+    private BigDecimal cardSendMoney;
+
+    private Long cardSendUserId;
+
     @TableField(exist = false)
     private List<OrderProduct> op;
 
@@ -347,12 +351,6 @@ public class Orders extends BaseDTOMP implements Serializable {
 
     @TableField(exist = false)
     List<ProductOrderDTO> productOrderDTOS;
-
-    @TableField(exist = false)
-    private BigDecimal cardSendMoney;
-
-    @TableField(exist = false)
-    private Long cardSendUserId;
 
     private static final long serialVersionUID = 1L;
 

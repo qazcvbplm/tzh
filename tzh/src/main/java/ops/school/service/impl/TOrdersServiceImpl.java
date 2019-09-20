@@ -440,7 +440,7 @@ public class TOrdersServiceImpl implements TOrdersService {
                     }
                     compareMoney = compareMoney.add(payLogVO.getUseMoney());
                 }
-                Boolean canUseTrue = cardUserService.checkUserCardTodayCanUseTrueByMoney(clubCardSendVO,cardUserVO,cardTimes,sendPrice, Long.valueOf(orders.getSchoolId()));
+                Boolean canUseTrue = cardUserService.checkUserCardTodayCanUseTrueByMoney(clubCardSendVO,cardUserVO,cardTimes,sendPrice, Long.valueOf(school.getId()));
                 Assertions.isTrueAndFalseToError(canUseTrue,ResponseViewEnums.CARD_SEND_CANT_USE_TODAY);
                 if (sendPrice.compareTo(clubCardSendVO.getDayMoney()) >= 0 ){
                     sendUseCardMoney = clubCardSendVO.getDayMoney();
@@ -448,7 +448,9 @@ public class TOrdersServiceImpl implements TOrdersService {
                     sendUseCardMoney = sendPrice;
                 }
                 sendUseCardTrue = true;
-                cardPayLogDTO.setSchoolId(orders.getSchoolId().longValue());
+                cardPayLogDTO = new CardPayLogDTO();
+                cardPayLogDTO.setSchoolId(school.getId().longValue());
+                cardPayLogDTO.setCardUserId(cardUserVO.getId());
                 cardPayLogDTO.setUserId(wxUser.getId());
                 cardPayLogDTO.setCardId(clubCardSendVO.getId());
                 cardPayLogDTO.setCardType(clubCardSendVO.getType());
@@ -469,6 +471,8 @@ public class TOrdersServiceImpl implements TOrdersService {
             sendUseCardMoney = new BigDecimal(0);
             ordersSaveTemp.setCardSendUserId(Long.valueOf(0));
         }
+        //使用配送卡，减去支付金额
+        payPrice = payPrice.subtract(sendUseCardMoney);
         // 如果商品折扣未使用-->店铺满减
         if (!isDiscount) {
             // 查询商家所有满减规则（从最大满减额度开始）
@@ -502,7 +506,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 折后价格+餐盒费-->优惠券使用时的价格
         beforeCouponPrice = beforeCouponPrice.add(afterDiscountPrice).add(boxPrice);
         // 在没有优惠券的时候，支付价格为折后价格
-        payPrice = beforeCouponPrice;
+        payPrice = payPrice.add(beforeCouponPrice);
         //优惠券id是wx的wxCouponId
         WxUserCoupon wxUserCoupon = null;
         Coupon coupon = null;
@@ -1251,7 +1255,6 @@ public class TOrdersServiceImpl implements TOrdersService {
          */
         schoolGetTotal = schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(appGetTotal)
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
-        ordersComplete.setSchoolGetTotal(schoolGetTotal);
         // 订单Id
         ordersComplete.setOrderId(orders.getId());
         //配送卡优惠信息
@@ -1260,6 +1263,7 @@ public class TOrdersServiceImpl implements TOrdersService {
             schoolGetTotal = schoolGetTotal.subtract(cardSendMoney);
         }
         ordersComplete.setSendCardMoney(cardSendMoney);
+        ordersComplete.setSchoolGetTotal(schoolGetTotal);
         //保存订单完成信息
         orderCompleteService.save(ordersComplete);
         senderGetTotal = ordersComplete.getSenderGetTotal();

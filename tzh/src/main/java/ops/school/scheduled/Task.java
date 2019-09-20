@@ -157,7 +157,7 @@ public class Task {
 
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
-        Date date = new Date();
+        Date date = TimeUtilS.getNextDay(new Date(), -5);
         this.theDayilyStatistics(date);
     }
 
@@ -293,6 +293,9 @@ public class Task {
             moneySave.setDownSendMoney(downSendMoney);
             //保存用户购卡信息
             CardBuyLogVO cardBuyLogVO = cardBuyLogService.dayCountBuyMoneyByTime(schooltemp.getId(),TimeUtilS.getDayBegin(),TimeUtilS.getDayEnd());
+            if (cardBuyLogVO == null){
+                cardBuyLogVO = new CardBuyLogVO();
+            }
             moneySave.setSendCardUseOrBuyMoney(cardBuyLogVO.getMoney());
             //保存当日提现
             dayLogTakeoutService.save(moneySave);

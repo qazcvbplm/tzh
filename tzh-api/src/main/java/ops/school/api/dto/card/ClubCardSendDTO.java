@@ -7,6 +7,8 @@ import ops.school.api.dto.BaseDTOCompute;
 import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.ClubCardSend;
 import ops.school.api.vo.card.ClubCardSendVO;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 
 
@@ -30,8 +32,10 @@ public class ClubCardSendDTO extends BaseDTOCompute implements Serializable {
     /**卡购买后每天最大的使用金额*/
     private BigDecimal dayMoney;
     /**优惠券发放开始时间*/
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date sendBeginTime;
     /**优惠券发放结束时间*/
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date sendEndTime;
     /**卡购买后的有效天数*/
     private Integer effectiveDays;
@@ -46,6 +50,7 @@ public class ClubCardSendDTO extends BaseDTOCompute implements Serializable {
     /**修改人id*/
     private Long updateId;
     /**创建时间*/
+
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
