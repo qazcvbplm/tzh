@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 
-//@ContextConfiguration(locations = {"classpath:application.yml", "classpath:application-dev.yml","classpath:application-prod.yml","","classpath:application-test.yml","classpath:generator.xml"})
+//@ContextConfiguration(locations = {"classpath:application.yml", "classpath:application-dev.yml","classpath:application-prod.yml","","classpath:application-local.yml","classpath:generator.xml"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = App.class)
 public class ScheduledTaskTest{

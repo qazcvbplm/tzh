@@ -35,6 +35,7 @@ public class OrderInit implements CommandLineRunner {
     }
 
 
+
     @Override
     public void run(String... args) throws Exception {
         redisInit();

@@ -29,6 +29,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ops.school.api.dto.card.CardUserDTO;
@@ -42,6 +43,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class CardUserServiceIMPL implements CardUserService {
 
     private final static String payDesc = "椰子校园-配送卡购买";
+
+    @Value("${server.port}")
+    private String port;
+
+    @Value("${spring.profiles.active}")
+    private String active;
 
     @Autowired
     private CardUserMapper cardUserMapper;
@@ -164,11 +171,26 @@ public class CardUserServiceIMPL implements CardUserService {
                 saveDTO.getOpenId(),
                 ServerConstants.Local_Host_Url,
                 cardBuyLogDTO.getId().toString(),
-                ServerConstants.BUY_CARD_SENDER_NOTIFY_URL);
+                this.getNotifyUrl());
         if (!"SUCCESS".equalsIgnoreCase(payMap.get("return_code"))){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_PAY_ERROR);
         }
         return new ResponseObject(true,ResponseViewEnums.SUCCESS);
+    }
+
+    private String getNotifyUrl() {
+        if (port == null || active == null){
+            return ServerConstants.BUY_CARD_SENDER_NOTIFY_URL;
+        }
+        if ("11000".equals(port) && "prod".equals(active)){
+            return ServerConstants.BUY_CARD_SENDER_NOTIFY_URL;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(ServerConstants.SERVER_URL);
+        stringBuilder.append(":");
+        stringBuilder.append(port);
+        stringBuilder.append(ServerConstants.BUY_CARD_SENDER_NOTIFY_URL_NO_HTTP);
+        return stringBuilder.toString();
     }
 
     /**
