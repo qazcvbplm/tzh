@@ -422,7 +422,10 @@ public class TOrdersServiceImpl implements TOrdersService {
             //配送费计算配送卡
             Assertions.notNull(orders.getHaveCard(),ResponseViewEnums.CARD_ORDERS_NEED_HAVE_CARD);
             if (orders.getHaveCard() == NumConstants.INT_NUM_1){
-                if(orders.getUserCardId() == null || orders.getUserCardId() == 0){
+                if(orders.getUserCardId() == null ){
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_NEED_USER_CARD_ID);
+                }
+                if(orders.getUserCardId() == 0 ){
                     DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_NEED_USER_CARD_ID);
                 }
                 //配送费计算配送卡

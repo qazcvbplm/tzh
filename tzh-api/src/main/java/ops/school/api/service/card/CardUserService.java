@@ -155,4 +155,14 @@ public interface CardUserService {
      * @Desc:   desc
      */
     Boolean checkUserCardTodayCanUseTrueByMoney(ClubCardSendVO clubCardSendVO, CardUserVO cardUserVO, Integer times, BigDecimal sendPrice, Long valueOf);
+
+    /**
+     * @date:   2019/9/20 20:23
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardUserVO>
+     * @param   dto
+     * @Desc:   desc
+     */
+    List<CardUserVO> findCardUserList(CardUserDTO dto);
 }

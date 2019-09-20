@@ -483,4 +483,20 @@ public class CardUserServiceIMPL implements CardUserService {
         }
         return true;
     }
+
+    /**
+     * @date:   2019/9/20 20:23
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardUserVO>
+     * @param   dto
+     * @Desc:   desc
+     */
+    @Override
+    public List<CardUserVO> findCardUserList(CardUserDTO dto) {
+        Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(dto.getSchoolId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
+        Assertions.notNull(dto.getUserId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
+        return cardUserMapper.findCardUserList(dto);
+    }
 }

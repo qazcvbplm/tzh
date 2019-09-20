@@ -34,6 +34,7 @@
         <result column="shop_code_image" property="shopCodeImage"/>
         <result column="print_type" property="printType"/>
         <result column="open_description" jdbcType="VARCHAR" property="openDescription"/>
+        <result column="yes_only" property="yesOnly"/>
 
 
         <collection property="fullCut" ofType="ops.school.api.entity.FullCut"
@@ -79,11 +80,6 @@
 
     </resultMap>
 
-    <sql id="fd">
-  id,school_id,shop_name,shop_phone,shop_image,shop_category_id,send_model_flag,get_model_flag,score,start_price,box_price,send_price,send_time,top_title,shop_login_name,shop_login_pass_word,shop_address,rate,lat,lng,vip_discount_flag
-  ,send_price_add_by_count_flag,send_price_add,is_delete,sort,ts_model_flag,shop_code_image
-  </sql>
-
     <sql id="Base_Column_List" >
         shop.Id,
         shop.school_id,
@@ -120,6 +116,7 @@
         shop.all_tx_amount,
         shop.shop_code_image,
         shop.print_type,
+        shop.yes_only,
         shop.open_description
     </sql>
     <select id="count" resultType="int" parameterType="ops.school.api.entity.Shop">
@@ -173,6 +170,7 @@
         shop.all_tx_amount,
         shop.print_type,
         shop.open_description,
+        shop.yes_only,
         <!-- (select min(discount) from product where shop_id=shop.id and is_delete=0 and is_show=1 and discount!=1) as min_discount, -->
         if(shop.open_flag=1,
         (select count(*) from shop_open_time where shop_id = shop.id and DATE_FORMAT(now(),'%H:%i') between start_time
@@ -314,6 +312,11 @@
             <if test="sort != null">
                 sort = #{sort},
             </if>
+
+            <if test="yesOnly != null">
+                yes_only = #{yesOnly},
+            </if>
+
         </set>
         where Id = #{id,jdbcType=INTEGER}
     </update>

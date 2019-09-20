@@ -113,10 +113,18 @@
     </foreach>
 </select>
 
+    <!--CreatBy Fang Time:2019/9/20 20:24 |  -->
+    <select id="findCardUserList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE school_id = #{schoolId}
+        AND user_id = #{userId}
+        AND is_delete = 0
+        AND card_failure_time > now()
+    </select>
 
 
-
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0

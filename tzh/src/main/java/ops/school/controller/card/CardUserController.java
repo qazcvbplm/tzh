@@ -63,6 +63,25 @@ public class CardUserController {
      * @date:
      * @author: Fang
      * @version:version
+     * @return: cn.fang.result.LimitTableData<CardUserVO>
+     * @param   dto
+     * @Desc:   desc 分页查询
+     */
+    @ResponseBody
+    @RequestMapping(value = "/find",method = RequestMethod.POST)
+    public ResponseObject findCardUserList(CardUserDTO dto){
+        Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        Assertions.notNull(dto.getSchoolId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
+        Assertions.notNull(dto.getUserId(),ResponseViewEnums.SCHOOL_CANT_BE_NULL);
+        List<CardUserVO> tableData = cardUserService.findCardUserList(dto);
+        return new ResponseObject(true, ResponseViewEnums.SUCCESS)
+                .push("list",tableData);
+    }
+
+    /**
+     * @date:
+     * @author: Fang
+     * @version:version
      * @return: cn.fang.result.ResponseView
      * @param   dto
      * @Desc:   desc 通过DTO新增
