@@ -1,5 +1,6 @@
 package ops.school.api.dao.card;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -61,4 +62,25 @@ public interface CardBuyLogMapper extends BaseMapper<CardBuyLogVO> {
      */
     Integer startOneById(Long id);
 
+    /**
+     * @date:   2019/9/19 16:17
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.lang.Long
+     * @param   cardBuyLogDTO
+     * @Desc:   desc
+     */
+    Integer saveOneCardBuyLogByDTOGetId(CardBuyLogDTO cardBuyLogDTO);
+
+    /**
+     * @date:   2019/9/20 16:25
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.vo.card.CardBuyLogVO
+     * @param   schoolId
+     * @param   dayBegin
+     * @param   dayEnd
+     * @Desc:   desc
+     */
+    CardBuyLogVO dayCountBuyMoneyByTime(@Param("schoolId") Integer schoolId,@Param("dayBegin") Date dayBegin, @Param("dayEnd") Date dayEnd);
 }

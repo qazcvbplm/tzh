@@ -67,6 +67,9 @@
         <result column="down_send_count" property="downSendCount" jdbcType="INTEGER" />
         <result column="down_send_money" property="downSendMoney" jdbcType="DECIMAL" />
 
+        <result column="card_send_user_id" property="cardSendUserId" jdbcType="BIGINT" />
+        <result column="card_send_money" property="cardSendMoney" jdbcType="DECIMAL" />
+
         <association property="complete" javaType="ops.school.api.entity.OrdersComplete">
             <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
             <result column="app_get_school_rate" jdbcType="DECIMAL" property="appGetSchoolRate"/>
@@ -140,159 +143,13 @@
         resever_time,
         shop_accept_time,
         pay_food_coupon,
+        card_send_user_id,
+        card_send_money,
         after_discount_price
     </sql>
 
     <sql id="Table_Name">
         orders
-    </sql>
-
-    <sql id="Select_Limit_State">
-        1=1
-        <if test="id != null and id != '' ">
-            AND Id = #{id}
-        </if>
-        <if test="appId != null and appId != '' ">
-            AND app_id = #{appId}
-        </if>
-        <if test="schoolId != null and schoolId != '' ">
-            AND school_id = #{schoolId}
-        </if>
-        <if test="schoolTopDownPrice != null and schoolTopDownPrice != '' ">
-            AND school_top_down_price = #{schoolTopDownPrice}
-        </if>
-        <if test="shopId != null and shopId != '' ">
-            AND shop_id = #{shopId}
-        </if>
-        <if test="shopName != null and shopName != '' ">
-            AND shop_name = #{shopName}
-        </if>
-        <if test="shopImage != null and shopImage != '' ">
-            AND shop_image = #{shopImage}
-        </if>
-        <if test="shopAddress != null and shopAddress != '' ">
-            AND shop_address = #{shopAddress}
-        </if>
-        <if test="shopPhone != null and shopPhone != '' ">
-            AND shop_phone = #{shopPhone}
-        </if>
-        <if test="openId != null and openId != '' ">
-            AND open_id = #{openId}
-        </if>
-        <if test="addressName != null and addressName != '' ">
-            AND address_name = #{addressName}
-        </if>
-        <if test="addressPhone != null and addressPhone != '' ">
-            AND address_phone = #{addressPhone}
-        </if>
-        <if test="addressDetail != null and addressDetail != '' ">
-            AND address_detail = #{addressDetail}
-        </if>
-        <if test="floorId != null and floorId != '' ">
-            AND floor_id = #{floorId}
-        </if>
-        <if test="typ != null and typ != '' ">
-            AND typ = #{typ}
-        </if>
-        <if test="status != null and status != '' ">
-            AND status = #{status}
-        </if>
-        <if test="boxPrice != null and boxPrice != '' ">
-            AND box_price = #{boxPrice}
-        </if>
-        <if test="sendPrice != null and sendPrice != '' ">
-            AND send_price = #{sendPrice}
-        </if>
-        <if test="sendBasePrice != null and sendBasePrice != '' ">
-            AND send_base_price = #{sendBasePrice}
-        </if>
-        <if test="sendAddDistancePrice != null and sendAddDistancePrice != '' ">
-            AND send_add_distance_price = #{sendAddDistancePrice}
-        </if>
-        <if test="sendAddCountPrice != null and sendAddCountPrice != '' ">
-            AND send_add_count_price = #{sendAddCountPrice}
-        </if>
-        <if test="productPrice != null and productPrice != '' ">
-            AND product_price = #{productPrice}
-        </if>
-        <if test="discountType != null and discountType != '' ">
-            AND discount_type = #{discountType}
-        </if>
-        <if test="discountPrice != null and discountPrice != '' ">
-            AND discount_price = #{discountPrice}
-        </if>
-        <if test="couponId != null and couponId != '' ">
-            AND coupon_id = #{couponId}
-        </if>
-        <if test="couponFullAmount != null and couponFullAmount != '' ">
-            AND coupon_full_amount = #{couponFullAmount}
-        </if>
-        <if test="couponUsedAmount != null and couponUsedAmount != '' ">
-            AND coupon_used_amount = #{couponUsedAmount}
-        </if>
-        <if test="fullCutId != null and fullCutId != '' ">
-            AND full_cut_id = #{fullCutId}
-        </if>
-        <if test="fullAmount != null and fullAmount != '' ">
-            AND full_amount = #{fullAmount}
-        </if>
-        <if test="fullUsedAmount != null and fullUsedAmount != '' ">
-            AND full_used_amount = #{fullUsedAmount}
-        </if>
-        <if test="originalPrice != null and originalPrice != '' ">
-            AND original_price = #{originalPrice}
-        </if>
-        <if test="payPrice != null and payPrice != '' ">
-            AND pay_price = #{payPrice}
-        </if>
-        <if test="senderName != null and senderName != '' ">
-            AND sender_name = #{senderName}
-        </if>
-        <if test="senderPhone != null and senderPhone != '' ">
-            AND sender_phone = #{senderPhone}
-        </if>
-        <if test="senderId != null and senderId != '' ">
-            AND sender_id = #{senderId}
-        </if>
-        <if test="destination != null and destination != '' ">
-            AND destination = #{destination}
-        </if>
-        <if test="remark != null and remark != '' ">
-            AND remark = #{remark}
-        </if>
-        <if test="waterNumber != null and waterNumber != '' ">
-            AND water_number = #{waterNumber}
-        </if>
-        <if test="createTime != null and createTime != '' ">
-            AND create_time = #{createTime}
-        </if>
-        <if test="payment != null and payment != '' ">
-            AND payment = #{payment}
-        </if>
-        <if test="payTime != null and payTime != '' ">
-            AND pay_time = #{payTime}
-        </if>
-        <if test="payTimeLong != null and payTimeLong != '' ">
-            AND pay_time_long = #{payTimeLong}
-        </if>
-        <if test="sendGetFlag != null and sendGetFlag != '' ">
-            AND send_get_flag = #{sendGetFlag}
-        </if>
-        <if test="endTime != null and endTime != '' ">
-            AND end_time = #{endTime}
-        </if>
-        <if test="evaluateFlag != null and evaluateFlag != '' ">
-            AND evaluate_flag = #{evaluateFlag}
-        </if>
-        <if test="reseverTime != null and reseverTime != '' ">
-            AND resever_time = #{reseverTime}
-        </if>
-        <if test="shopAcceptTime != null and shopAcceptTime != '' ">
-            AND shop_accept_time = #{shopAcceptTime}
-        </if>
-        <if test="payFoodCoupon != null and payFoodCoupon != '' ">
-            AND pay_food_coupon = #{payFoodCoupon}
-        </if>
     </sql>
 
 
@@ -316,6 +173,7 @@
 	sum(o.coupon_used_amount) AS used_coupon,
 	sum(o.full_used_amount) AS used_full_cut,
 	sum(o.pay_food_coupon) AS used_food_coupon,
+	sum(o.card_send_money) AS card_send_money,
 	(
 		SELECT
 			sum(orders.discount_price)

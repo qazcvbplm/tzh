@@ -61,4 +61,13 @@ public interface CardUserMapper extends BaseMapper<CardUserVO> {
      */
     Integer startOneById(Long id);
 
+    /**
+     * @date:   2019/9/20 20:24
+     * @author: QinDaoFang
+     * @version:version
+     * @return: java.util.List<ops.school.api.vo.card.CardUserVO>
+     * @param   dto
+     * @Desc:   desc
+     */
+    List<CardUserVO> findCardUserList(CardUserDTO dto);
 }

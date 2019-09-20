@@ -61,4 +61,13 @@ public interface ClubCardSendMapper extends BaseMapper<ClubCardSendVO> {
      */
     Integer startOneById(Long id);
 
+    /**
+     * @date:   2019/9/19 13:50
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.vo.card.ClubCardSendVO
+     * @param   cardId
+     * @Desc:   desc
+     */
+    ClubCardSendVO selectOneUsedCard(Long cardId);
 }

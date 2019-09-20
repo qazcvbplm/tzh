@@ -65,7 +65,33 @@
     </if>
 </sql>
 
-<!--CreatBy Fang Time: |  分页查询统计-->
+    <!--CreatBy Fang Time:2019/9/19 16:17 |  -->
+    <insert id="saveOneCardBuyLogByDTOGetId" keyProperty="id" useGeneratedKeys="true" >
+        INSERT INTO <include refid="Table_Name"/>
+        (
+        school_id,
+        user_id,
+        card_id,
+        money,
+        create_id,
+        update_id,
+        create_time,
+        update_time
+        )
+        VALUES
+        (
+        #{schoolId},
+        #{userId},
+        #{cardId},
+        #{money},
+        #{createId},
+        #{updateId},
+        now(),
+        now()
+        )
+    </insert>
+
+    <!--CreatBy Fang Time: |  分页查询统计-->
 <select id="countLimitByDTO" resultType="java.lang.Integer">
     SELECT COUNT(1)
     FROM
@@ -97,10 +123,7 @@
     </foreach>
 </select>
 
-
-
-
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0
@@ -115,5 +138,19 @@
     WHERE id = #{id}
     AND is_delete = 0
 </update>
+
+    <!--CreatBy Fang Time:2019/9/20 16:25 |  -->
+    <select id="dayCountBuyMoneyByTime" resultMap="BaseResultMap">
+        SELECT
+        SUM(money) AS money
+        FROM <include refid="Table_Name"/>
+        WHERE
+        school_id = #{schoolId}
+        AND create_time <![CDATA[ >= ]]> #{dayBegin}
+        AND create_time <![CDATA[ <= ]]> #{dayEnd}
+        AND wx_trade_no != 0
+        AND wx_trade_no IS NOT NULL
+    </select>
+
 
 </mapper>

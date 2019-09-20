@@ -6,7 +6,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   profiles:
-    active: prod
+    active: test
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     driverClassName: com.mysql.jdbc.Driver
@@ -27,22 +27,6 @@ barcode:
   path: /home/barcode
 cert:
   path: /home/cert
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://212.129.149.27:8761/eureka/
-#  instance:
-#    leaseExpirationDurationInSeconds: 2
-#    leaseRenewalIntervalInSeconds: 1
-#feign:
-#  hystrix:
-#    enabled: true
-logging:
-  file: logs/chuyin.log
-  level:
-    com:
-      util: debug
-  root: debug
 ops:
   redis:
     cache: true
@@ -52,7 +36,6 @@ server:
     mime-types: image/png,image/jpeg,image/jpg,text/html,application/javascript,text/css,application/octet-stream,application/json
     min-response-size: 1024
 mybatis-plus:
-  mapper-locations: ops/school/api/mapper/*.xml
+  mapper-locations: ops/school/api/mapper/*.xml,ops/school/api/mapper/card/*.xml
   type-enums-package: ops/school/api/entity/enums
-
 

@@ -465,7 +465,27 @@ public class TimeUtilS {
         return cal.getTime();
     }
 
-    public static Date getNextDayNextTime(Date date, int nextDay,int hour,int minutes,int seconds) {
+    /**
+     * 得到一个时间延后或前移几天的时间
+     * @param nowdate：时间
+     * @param delay：前移或后延的天数
+     * @return
+     */
+    public static String getNextDay(String nowdate, String delay) {
+        try{
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String mdate = "";
+            Date d = strToDate(nowdate);
+            long myTime = (d.getTime() / 1000) + Integer.parseInt(delay) * 24 * 60 * 60;
+            d.setTime(myTime * 1000);
+            mdate = format.format(d);
+            return mdate;
+        }catch(Exception e){
+            return "";
+        }
+    }
+
+    public static Date getNextDayNextTimeNotUsed(Date date, int nextDay,int hour,int minutes,int seconds) {
         Calendar cal=new GregorianCalendar();
         cal.setTime(date);
         cal.set(getNowYear(),getNowMonth(),cal.get(Calendar.DATE)+nextDay,hour,minutes,seconds);
@@ -724,29 +744,6 @@ public class TimeUtilS {
         Date strtodate = formatter.parse(strDate, pos);
         return strtodate;
     }
-
-
-
-    /**
-     * 得到一个时间延后或前移几天的时间
-     * @param nowdate：时间
-     * @param delay：前移或后延的天数
-     * @return
-     */
-    public static String getNextDay(String nowdate, String delay) {
-        try{
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            String mdate = "";
-            Date d = strToDate(nowdate);
-            long myTime = (d.getTime() / 1000) + Integer.parseInt(delay) * 24 * 60 * 60;
-            d.setTime(myTime * 1000);
-            mdate = format.format(d);
-            return mdate;
-        }catch(Exception e){
-            return "";
-        }
-    }
-
 
     /**
      * 判断是否闰年
@@ -1104,7 +1101,9 @@ public class TimeUtilS {
     public static void main(String[] args) {
 
         System.out.println(getNo(8));
-        System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDayNextTime(new Date(),2,24,0,0 )));
+        System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDayNextTimeNotUsed(new Date(),1,10,0,0 )));
+
+        System.out.println(TimeUtilS.dateFormat(TimeUtilS.getNextDay(new Date(),2)));
 
         try {
             Date a = get1970YearDateLong("25:00");

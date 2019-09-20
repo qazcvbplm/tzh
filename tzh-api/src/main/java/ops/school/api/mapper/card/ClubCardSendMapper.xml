@@ -48,7 +48,7 @@
     </sql>
 
 <sql id="Select_Limit_State">
-    1=1
+    is_delete = 0
     <if test="id != null and id != '' ">
         AND id = #{id}
     </if>
@@ -110,7 +110,8 @@
     SELECT COUNT(1)
     FROM
     <include refid="Table_Name"/>
-
+    WHERE
+    <include refid="Select_Limit_State"/>
 </select>
 
 <!--CreatBy Fang Time: |  分页查询-->
@@ -137,9 +138,18 @@
 </select>
 
 
+    <select id="selectOneUsedCard" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE id = #{cardId}
+        AND is_delete = 0
+        AND status = 1
+        AND send_end_time <![CDATA[ >= ]]> now()
+        AND send_begin_time <![CDATA[ <= ]]> now()
+    </select>
 
 
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0

@@ -1,42 +1,50 @@
 package ops.school.controller.card;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
-import ops.school.api.dto.card.ClubCardSendDTO;
-import ops.school.api.enums.PublicErrorEnums;
-import ops.school.api.enums.ResponseViewEnums;
-import ops.school.api.exception.Assertions;
-import ops.school.api.service.card.ClubCardSendService;
-import ops.school.api.util.LimitTableData;
-import ops.school.api.util.ResponseObject;
-import ops.school.api.vo.card.ClubCardSendVO;
+import ops.school.api.service.card.CardBuyLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import ops.school.api.enums.ResponseViewEnums;
+import ops.school.api.util.LimitTableData;
+import ops.school.api.vo.card.CardBuyLogVO;
+import ops.school.api.dto.card.CardBuyLogDTO;
+import ops.school.api.entity.card.CardBuyLog;
+import ops.school.api.enums.PublicErrorEnums;
+import ops.school.api.util.ResponseObject;
+import ops.school.api.exception.Assertions;
+
+
 @Controller
-@RequestMapping("/ops/card/club")
-public class ClubCardSendController{
+@RequestMapping("/ops/card/buy")
+public class CardBuyLogController {
 
     @Autowired
-    private ClubCardSendService clubCardSendService;
+    private CardBuyLogService cardBuyLogService;
+
 
     /**
      * @date:
      * @author: Fang
      * @version:version
-     * @return: cn.fang.result.LimitTableData<ClubCardSendVO>
+     * @return: cn.fang.result.LimitTableData<CardBuyLogVO>
      * @param   dto
      * @Desc:   desc 分页查询
      */
     @ResponseBody
     @RequestMapping(value = "/list",method = RequestMethod.POST)
-    public ResponseObject limitTableData(ClubCardSendDTO dto){
-        Assertions.notNull(dto, PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        LimitTableData<ClubCardSendVO> tableData = clubCardSendService.limitTableDataByDTO(dto);
-        ResponseObject responseObject = new ResponseObject();
+    public ResponseObject limitTableData(CardBuyLogDTO dto){
+        Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
+        LimitTableData<CardBuyLogVO> tableData = cardBuyLogService.limitTableDataByDTO(dto);
         return new ResponseObject(true, ResponseViewEnums.SUCCESS)
                 .push("total",tableData.getRecordsTotal())
                 .push("list",tableData.getData());
@@ -46,30 +54,30 @@ public class ClubCardSendController{
      * @date:
      * @author: Fang
      * @version:version
-     * @return: java.util.List<ClubCardSendVO>
+     * @return: java.util.List<CardBuyLogVO>
      * @param
      * @Desc:   desc 查询所有数据
      */
     @ResponseBody
     @RequestMapping(value = "/all",method = RequestMethod.POST)
-    public List<ClubCardSendVO> findAllClubCardSendVOs(){
-        List<ClubCardSendVO> allClubCardSendVOs = clubCardSendService.findAllClubCardSendVOs();
-        return allClubCardSendVOs;
+    public List<CardBuyLogVO> findAllCardBuyLogVOs(){
+        List<CardBuyLogVO> allCardBuyLogVOs = cardBuyLogService.findAllCardBuyLogVOs();
+        return allCardBuyLogVOs;
     }
 
     /**
      * @date:
      * @author: Fang
      * @version:version
-     * @return: cn.fang.result.ResponseObject
+     * @return: cn.fang.result.ResponseView
      * @param   dto
      * @Desc:   desc 通过DTO新增
      */
     @ResponseBody
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    public ResponseObject saveOneClubCardSendByDTO(ClubCardSendDTO dto){
+    public ResponseObject saveOneCardBuyLogByDTO(CardBuyLogDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = clubCardSendService.saveOneClubCardSendByDTO(dto);
+        ResponseObject view = cardBuyLogService.saveOneCardBuyLogByDTO(dto);
         return view;
     }
 
@@ -77,15 +85,15 @@ public class ClubCardSendController{
      * @date:
      * @author: Fang
      * @version:version
-     * @return: cn.fang.result.ResponseObject
+     * @return: cn.fang.result.ResponseView
      * @param   dto
      * @Desc:   desc 通过DTO更新
      */
     @ResponseBody
     @RequestMapping(value = "/update",method = RequestMethod.POST)
-    public ResponseObject updateOneClubCardSendByDTO(ClubCardSendDTO dto){
+    public ResponseObject updateOneCardBuyLogByDTO(CardBuyLogDTO dto){
         Assertions.notNull(dto,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = clubCardSendService.updateOneClubCardSendByDTO(dto);
+        ResponseObject view = cardBuyLogService.updateOneCardBuyLogByDTO(dto);
         return view;
     }
 
@@ -93,15 +101,15 @@ public class ClubCardSendController{
      * @date:
      * @author: Fang
      * @version:version
-     * @return: cn.fang.result.ResponseObject
+     * @return: cn.fang.result.ResponseView
      * @param   id
      * @Desc:   desc 通过id删除
      */
     @ResponseBody
     @RequestMapping(value = "/delete",method = RequestMethod.POST)
-    public ResponseObject deleteOneClubCardSendById(Long id){
+    public ResponseObject deleteOneCardBuyLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = clubCardSendService.deleteOneClubCardSendById(id);
+        ResponseObject view = cardBuyLogService.deleteOneCardBuyLogById(id);
         return view;
     }
 
@@ -109,15 +117,15 @@ public class ClubCardSendController{
      * @date:
      * @author: Fang
      * @version:version
-     * @return: cn.fang.result.ResponseObject
+     * @return: cn.fang.result.ResponseView
      * @param   id
      * @Desc:   desc 通过id查询一个
      */
     @ResponseBody
     @RequestMapping(value = "/one",method = RequestMethod.POST)
-    public ClubCardSendVO findOneClubCardSendById(Long id){
+    public CardBuyLogVO findOneCardBuyLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ClubCardSendVO resultVO = clubCardSendService.findOneClubCardSendById(id);
+        CardBuyLogVO resultVO = cardBuyLogService.findOneCardBuyLogById(id);
         return resultVO;
     }
 
@@ -125,15 +133,15 @@ public class ClubCardSendController{
      * @date:
      * @author: Fang
      * @version:version
-     * @return: cn.fang.result.ResponseObject
+     * @return: cn.fang.result.ResponseView
      * @param   id
      * @Desc:   desc 通过id停用
      */
     @ResponseBody
     @RequestMapping(value = "/stop",method = RequestMethod.POST)
-    public ResponseObject stopOneClubCardSendById(Long id){
+    public ResponseObject stopOneCardBuyLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = clubCardSendService.stopOneClubCardSendById(id);
+        ResponseObject view = cardBuyLogService.stopOneCardBuyLogById(id);
         return view;
     }
 
@@ -141,15 +149,15 @@ public class ClubCardSendController{
      * @date:
      * @author: Fang
      * @version:version
-     * @return: cn.fang.result.ResponseObject
+     * @return: cn.fang.result.ResponseView
      * @param   id
      * @Desc:   desc 通过id启用
      */
     @ResponseBody
     @RequestMapping(value = "/start",method = RequestMethod.POST)
-    public ResponseObject startOneClubCardSendById(Long id){
+    public ResponseObject startOneCardBuyLogById(Long id){
         Assertions.notNull(id,PublicErrorEnums.PULBIC_EMPTY_PARAM);
-        ResponseObject view = clubCardSendService.startOneClubCardSendById(id);
+        ResponseObject view = cardBuyLogService.startOneCardBuyLogById(id);
         return view;
     }
 

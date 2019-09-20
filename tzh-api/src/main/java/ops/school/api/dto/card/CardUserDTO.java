@@ -3,12 +3,16 @@ package ops.school.api.dto.card;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import ops.school.api.dto.BaseDTOCompute;
+import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.CardUser;
-import org.springframework.beans.BeanUtils;
+import ops.school.api.vo.card.CardUserVO;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 
 
-public class CardUserDTO implements Serializable {
+public class CardUserDTO extends BaseDTOCompute implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
@@ -17,6 +21,8 @@ public class CardUserDTO implements Serializable {
     private Long schoolId;
     /**用户id*/
     private Long userId;
+
+    private Long cardId;
     /**卡购买后每天使用次数*/
     private Integer cardDayTime;
     /**卡购买后每天最大的使用金额*/
@@ -35,6 +41,8 @@ public class CardUserDTO implements Serializable {
     private Date createTime;
     /**修改时间*/
     private Date updateTime;
+
+    private String openId;
     
     public Long getId() {
     return this.id;
@@ -131,11 +139,55 @@ public class CardUserDTO implements Serializable {
     public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
     }
-    
-    public CardUser toModel() {
-    	CardUser model = new CardUser();
-		BeanUtils.copyProperties(this, model);
-		return model;
+
+    public Long getCardId() {
+        return cardId;
     }
 
+    public void setCardId(Long cardId) {
+        this.cardId = cardId;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
+    public CardUserVO toVO() {
+        CardUserVO vo = new CardUserVO();
+        vo.setId(this.id);
+        vo.setSchoolId(this.schoolId);
+        vo.setUserId(this.userId);
+        vo.setCardDayTime(this.cardDayTime);
+        vo.setCardDayMoney(this.cardDayMoney);
+        vo.setCardType(this.cardType);
+        vo.setCardFailureTime(this.cardFailureTime);
+        vo.setIsDelete(this.isDelete);
+        vo.setCreateId(this.createId);
+        vo.setUpdateId(this.updateId);
+        vo.setCreateTime(this.createTime);
+        vo.setUpdateTime(this.updateTime);
+        vo.setCardId(this.cardId);
+        return vo;
+    }
+    public CardUser toModel() {
+        CardUser model = new CardUser();
+        model.setId(this.id);
+        model.setSchoolId(this.schoolId);
+        model.setUserId(this.userId);
+        model.setCardDayTime(this.cardDayTime);
+        model.setCardDayMoney(this.cardDayMoney);
+        model.setCardType(this.cardType);
+        model.setCardFailureTime(this.cardFailureTime);
+        model.setIsDelete(this.isDelete);
+        model.setCreateId(this.createId);
+        model.setUpdateId(this.updateId);
+        model.setCreateTime(this.createTime);
+        model.setUpdateTime(this.updateTime);
+        model.setCardId(this.cardId);
+        return model;
+    }
 }

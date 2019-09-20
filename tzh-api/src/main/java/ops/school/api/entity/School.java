@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class School extends Base implements Serializable {
+public class School extends BaseDTOMP implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotBlank
@@ -83,6 +83,8 @@ public class School extends Base implements Serializable {
     private BigDecimal extraLargeMinAmount;
 
     private Integer yesWaterOne;
+
+    private Integer yesOpenCard;
 
     private String senderTencentGroup;
 
@@ -383,45 +385,55 @@ public class School extends Base implements Serializable {
     public void setEnableSender(Integer enableSender) {
         this.enableSender = enableSender;
     }
+    public Integer getYesOpenCard() {
+        return yesOpenCard;
+    }
+
+    public void setYesOpenCard(Integer yesOpenCard) {
+        this.yesOpenCard = yesOpenCard;
+    }
 
     @Override
     public String toString() {
-        return "School{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", messagePhone='" + messagePhone + '\'' +
-                ", loginName='" + loginName + '\'' +
-                ", rate=" + rate +
-                ", appId=" + appId +
-                ", money=" + money +
-                ", topDown=" + topDown +
-                ", sort=" + sort +
-                ", senderMoney=" + senderMoney +
-                ", sendMaxDistance=" + sendMaxDistance +
-                ", sendPerOut=" + sendPerOut +
-                ", sendPerMoney=" + sendPerMoney +
-                ", wxAppId='" + wxAppId + '\'' +
-                ", wxMessageTemplateId='" + wxMessageTemplateId + '\'' +
-                ", wxSecret='" + wxSecret + '\'' +
-                ", mchId='" + mchId + '\'' +
-                ", wxPayId='" + wxPayId + '\'' +
-                ", certPath='" + certPath + '\'' +
-                ", isDelete=" + isDelete +
-                ", createTime=" + createTime +
-                ", enableTakeout=" + enableTakeout +
-                ", enableCoupon=" + enableCoupon +
-                ", senderAllTx=" + senderAllTx +
-                ", userCharge=" + userCharge +
-                ", userBellAll=" + userBellAll +
-                ", userChargeSend=" + userChargeSend +
-                ", pageLayout=" + pageLayout +
-                ", smallMinAmount=" + smallMinAmount +
-                ", middleMinAmount=" + middleMinAmount +
-                ", largeMinAmount=" + largeMinAmount +
-                ", extraLargeMinAmount=" + extraLargeMinAmount +
-                ", yesWaterOne=" + yesWaterOne +
-                ", senderTencentGroup='" + senderTencentGroup + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("School{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", phone='").append(phone).append('\'');
+        sb.append(", messagePhone='").append(messagePhone).append('\'');
+        sb.append(", loginName='").append(loginName).append('\'');
+        sb.append(", loginPassWord='").append(loginPassWord).append('\'');
+        sb.append(", rate=").append(rate);
+        sb.append(", appId=").append(appId);
+        sb.append(", money=").append(money);
+        sb.append(", topDown=").append(topDown);
+        sb.append(", sort=").append(sort);
+        sb.append(", senderMoney=").append(senderMoney);
+        sb.append(", sendMaxDistance=").append(sendMaxDistance);
+        sb.append(", sendPerOut=").append(sendPerOut);
+        sb.append(", sendPerMoney=").append(sendPerMoney);
+        sb.append(", wxAppId='").append(wxAppId).append('\'');
+        sb.append(", wxMessageTemplateId='").append(wxMessageTemplateId).append('\'');
+        sb.append(", wxSecret='").append(wxSecret).append('\'');
+        sb.append(", mchId='").append(mchId).append('\'');
+        sb.append(", wxPayId='").append(wxPayId).append('\'');
+        sb.append(", certPath='").append(certPath).append('\'');
+        sb.append(", isDelete=").append(isDelete);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", enableTakeout=").append(enableTakeout);
+        sb.append(", enableCoupon=").append(enableCoupon);
+        sb.append(", senderAllTx=").append(senderAllTx);
+        sb.append(", userCharge=").append(userCharge);
+        sb.append(", userBellAll=").append(userBellAll);
+        sb.append(", userChargeSend=").append(userChargeSend);
+        sb.append(", pageLayout=").append(pageLayout);
+        sb.append(", smallMinAmount=").append(smallMinAmount);
+        sb.append(", middleMinAmount=").append(middleMinAmount);
+        sb.append(", largeMinAmount=").append(largeMinAmount);
+        sb.append(", extraLargeMinAmount=").append(extraLargeMinAmount);
+        sb.append(", yesWaterOne=").append(yesWaterOne);
+        sb.append(", yesOpenCard=").append(yesOpenCard);
+        sb.append(", senderTencentGroup='").append(senderTencentGroup).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

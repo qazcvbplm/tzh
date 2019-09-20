@@ -1,5 +1,9 @@
 package ops.school.api.entity.card;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.dto.card.CardBuyLogDTO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
@@ -9,6 +13,7 @@ public class CardBuyLog implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**学校id*/
     private Long schoolId;
@@ -109,4 +114,18 @@ public class CardBuyLog implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public CardBuyLogDTO toDTO() {
+        CardBuyLogDTO dto = new CardBuyLogDTO();
+        dto.setId(this.id);
+        dto.setSchoolId(this.schoolId);
+        dto.setUserId(this.userId);
+        dto.setCardId(this.cardId);
+        dto.setMoney(this.money);
+        dto.setWxTradeNo(this.wxTradeNo);
+        dto.setCreateId(this.createId);
+        dto.setUpdateId(this.updateId);
+        dto.setCreateTime(this.createTime);
+        dto.setUpdateTime(this.updateTime);
+        return dto;
+    }
 }

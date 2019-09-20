@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ops.school.api.entity.Base;
+import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.Evaluate;
 import ops.school.api.enums.ResponseViewEnums;
 import ops.school.api.exception.DisplayException;
@@ -86,7 +86,7 @@ public class EvaluateController {
 
     @ApiOperation(value = "按店铺查询", httpMethod = "POST")
     @PostMapping("findbyshopid")
-    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int shopId, Base base) {
+    public ResponseObject find(HttpServletRequest request, HttpServletResponse response, int shopId, BaseDTOMP base) {
         QueryWrapper<Evaluate> query = new QueryWrapper<Evaluate>().orderByDesc("create_time");
         query.lambda().eq(Evaluate::getShopId, shopId);
         List<Evaluate> list = evaluateService.page(PageUtil.getPage(base.getPage(), base.getSize()), query).getRecords();

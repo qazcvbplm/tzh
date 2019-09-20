@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="school_id" property="schoolId" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="card_id" property="cardId" jdbcType="INTEGER" />
     <result column="card_day_time" property="cardDayTime" jdbcType="INTEGER" />
     <result column="card_day_money" property="cardDayMoney" jdbcType="DECIMAL" />
     <result column="card_type" property="cardType" jdbcType="TINYINT" />
@@ -20,6 +21,7 @@
         id,
         school_id,
         user_id,
+        card_id,
         card_day_time,
         card_day_money,
         card_type,
@@ -46,6 +48,10 @@
     <if test="userId != null and userId != '' ">
         AND user_id = #{userId}
     </if>
+    <if test="cardId != null and cardId != '' ">
+        AND card_id = #{cardId}
+    </if>
+
     <if test="cardDayTime != null and cardDayTime != '' ">
         AND card_day_time = #{cardDayTime}
     </if>
@@ -107,10 +113,18 @@
     </foreach>
 </select>
 
+    <!--CreatBy Fang Time:2019/9/20 20:24 |  -->
+    <select id="findCardUserList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE school_id = #{schoolId}
+        AND user_id = #{userId}
+        AND is_delete = 0
+        AND card_failure_time > now()
+    </select>
 
 
-
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0

@@ -25,3 +25,9 @@ spring:
         acknowledge-mode: manual
       simple:
         acknowledge-mode: manual
+logging:
+  file: logs/chuyin.log
+  level:
+    com:
+      util: debug
+  root: debug

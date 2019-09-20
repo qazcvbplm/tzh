@@ -1,5 +1,9 @@
 package ops.school.api.entity.card;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.dto.card.CardUserDTO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
@@ -9,11 +13,14 @@ public class CardUser implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**学校id*/
     private Long schoolId;
     /**用户id*/
     private Long userId;
+
+    private Long cardId;
     /**卡购买后每天使用次数*/
     private Integer cardDayTime;
     /**卡购买后每天最大的使用金额*/
@@ -129,4 +136,49 @@ public class CardUser implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public Long getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(Long cardId) {
+        this.cardId = cardId;
+    }
+
+    public CardUserDTO toDTO() {
+        CardUserDTO dto = new CardUserDTO();
+        dto.setId(this.id);
+        dto.setSchoolId(this.schoolId);
+        dto.setUserId(this.userId);
+        dto.setCardDayTime(this.cardDayTime);
+        dto.setCardDayMoney(this.cardDayMoney);
+        dto.setCardType(this.cardType);
+        dto.setCardFailureTime(this.cardFailureTime);
+        dto.setIsDelete(this.isDelete);
+        dto.setCreateId(this.createId);
+        dto.setUpdateId(this.updateId);
+        dto.setCreateTime(this.createTime);
+        dto.setUpdateTime(this.updateTime);
+        dto.setCardId(this.cardId);
+        return dto;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CardUser{");
+        sb.append("id=").append(id);
+        sb.append(", schoolId=").append(schoolId);
+        sb.append(", userId=").append(userId);
+        sb.append(", cardId=").append(cardId);
+        sb.append(", cardDayTime=").append(cardDayTime);
+        sb.append(", cardDayMoney=").append(cardDayMoney);
+        sb.append(", cardType=").append(cardType);
+        sb.append(", cardFailureTime=").append(cardFailureTime);
+        sb.append(", isDelete=").append(isDelete);
+        sb.append(", createId=").append(createId);
+        sb.append(", updateId=").append(updateId);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", updateTime=").append(updateTime);
+        sb.append('}');
+        return sb.toString();
+    }
 }

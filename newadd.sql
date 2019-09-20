@@ -50,12 +50,11 @@ CREATE TABLE `club_card_send` (
 	`name` varchar(32) NOT NULL COMMENT '卡名',
     `description` varchar(64) DEFAULT "" COMMENT '卡描述',
     `day_time` int(5) NOT NULL DEFAULT '0' COMMENT '卡购买后每天使用次数',
+    `day_money` decimal(10,2) NOT NULL DEFAULT '0' COMMENT '卡购买后每天最大的使用金额',
     `price_sale` decimal(10,2) NOT NULL DEFAULT '0' COMMENT '卡购买价格，销售价',
     `price_original` decimal(10,2) NOT NULL DEFAULT '0' COMMENT '卡购买原价，展示用',
-
-    `day_money` decimal(10,2) NOT NULL DEFAULT '0' COMMENT '卡购买后每天最大的使用金额',
-    `send_begin_time` datetime NOT NULL COMMENT '优惠券发放开始时间',
-    `send_end_time` datetime NOT NULL COMMENT '优惠券发放结束时间',
+    `send_begin_time` datetime NOT NULL COMMENT '卡发放开始时间',
+    `send_end_time` datetime NOT NULL COMMENT '卡发放结束时间',
     `effective_days` int(5) NOT NULL DEFAULT '0' COMMENT '卡购买后的有效天数',
     `type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '卡类型，1-配送费卡',
     `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '卡的状态，0-冻结不可用，1-可用',
@@ -72,6 +71,7 @@ CREATE TABLE `card_user` (
 	`id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
 	`school_id` BIGINT(20) NOT NULL COMMENT '学校id',
 	`user_id` BIGINT(20) NOT NULL COMMENT '用户id',
+	`card_id` BIGINT(20) NOT NULL  COMMENT '卡id',
 	`card_day_time` int(5) NOT NULL DEFAULT '0' COMMENT '卡购买后每天使用次数',
     `card_day_money` decimal(10,2) NOT NULL DEFAULT '0' COMMENT '卡购买后每天最大的使用金额',
     `card_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '卡类型，1-配送费卡',
@@ -88,6 +88,7 @@ CREATE TABLE `card_user` (
 CREATE TABLE `card_pay_log` (
 	`id` BIGINT (20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
 	`school_id` BIGINT(20) NOT NULL COMMENT '学校id',
+	`card_user_id` BIGINT(20) NOT NULL COMMENT '用户配送卡主id',
 	`user_id` BIGINT(20) NOT NULL COMMENT '用户id',
 	`card_id` BIGINT(20) NOT NULL COMMENT '卡id',
 	`card_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '卡类型，1-配送费卡',
@@ -119,5 +120,21 @@ CREATE TABLE `card_buy_log` (
 ALTER TABLE `orders`
 ADD COLUMN `card_send_user_id`  bigint(20) NULL DEFAULT 0 COMMENT '用户购买的配送会员卡id' AFTER `after_discount_price`,
 ADD COLUMN `card_send_money`  decimal(10,2) NULL DEFAULT 0 COMMENT '用户此单减免配送费' AFTER `card_send_user_id`;
+
+ALTER TABLE `orders_complete`
+ADD COLUMN `send_card_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '每笔订单配送卡' ;
+
+ALTER TABLE `day_log_takeout`
+ADD COLUMN `send_card_use_or_buy_money`  decimal(10,2) NOT NULL DEFAULT 0 COMMENT '配送卡抵扣金额分店铺/学校负责得配送卡的金额' AFTER `down_send_money`;
+
+ALTER TABLE `school`
+MODIFY COLUMN `yes_open_card`  int(4) NULL DEFAULT 0 COMMENT '是否开启学校配送卡模式，0-关闭不使用配送卡，1-开启使用' AFTER `extra_large_min_amount`;
+
+ALTER TABLE `shop`
+ADD COLUMN `yes_only`  int(2) NULL DEFAULT 0 COMMENT '店铺是否独家/只能在一个学校开' AFTER `open_description`;
+
+
+
+
 
 

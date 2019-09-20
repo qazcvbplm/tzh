@@ -24,7 +24,7 @@ import java.util.Objects;
  * @author 
  */
 @Table(name="orders")
-public class Orders extends Base implements Serializable {
+public class Orders extends BaseDTOMP implements Serializable {
     /**
      * 订单
      */
@@ -306,6 +306,10 @@ public class Orders extends Base implements Serializable {
 
     private BigDecimal afterDiscountPrice;
 
+    private BigDecimal cardSendMoney;
+
+    private Long cardSendUserId;
+
     @TableField(exist = false)
     private List<OrderProduct> op;
 
@@ -339,11 +343,49 @@ public class Orders extends Base implements Serializable {
     @TableField(exist = false)
     private BigDecimal downSendMoney;
 
+    @TableField(exist = false)
+    private Integer haveCard;
+
+    @TableField(exist = false)
+    private Long userCardId;
 
     @TableField(exist = false)
     List<ProductOrderDTO> productOrderDTOS;
 
     private static final long serialVersionUID = 1L;
+
+
+    public Long getCardSendUserId() {
+        return cardSendUserId;
+    }
+
+    public void setCardSendUserId(Long cardSendUserId) {
+        this.cardSendUserId = cardSendUserId;
+    }
+
+    public BigDecimal getCardSendMoney() {
+        return cardSendMoney;
+    }
+
+    public void setCardSendMoney(BigDecimal cardSendMoney) {
+        this.cardSendMoney = cardSendMoney;
+    }
+
+    public Long getUserCardId() {
+        return userCardId;
+    }
+
+    public void setUserCardId(Long userCardId) {
+        this.userCardId = userCardId;
+    }
+
+    public Integer getHaveCard() {
+        return haveCard;
+    }
+
+    public void setHaveCard(Integer haveCard) {
+        this.haveCard = haveCard;
+    }
 
     public String getId() {
         return id;

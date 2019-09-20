@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import javax.validation.constraints.NotNull;
 
-public class SourceOrder extends Base {
+public class SourceOrder extends BaseDTOMP {
     @TableId(type = IdType.INPUT)
     private String id;
     @NotNull

@@ -4,6 +4,8 @@
 <resultMap id="BaseResultMap" type="ops.school.api.vo.card.CardPayLogVO" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="school_id" property="schoolId" jdbcType="BIGINT" />
+
+    <result column="card_user_id" property="cardUserId" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
     <result column="card_id" property="cardId" jdbcType="BIGINT" />
     <result column="card_type" property="cardType" jdbcType="TINYINT" />
@@ -18,6 +20,7 @@
     <sql id="Base_Column_List" >
         id,
         school_id,
+        card_user_id,
         user_id,
         card_id,
         card_type,
@@ -40,6 +43,9 @@
     </if>
     <if test="schoolId != null and schoolId != '' ">
         AND school_id = #{schoolId}
+    </if>
+    <if test="cardUserId != null and userId != '' ">
+        AND card_user_id = #{cardUserId}
     </if>
     <if test="userId != null and userId != '' ">
         AND user_id = #{userId}
@@ -102,10 +108,32 @@
     </foreach>
 </select>
 
+    <!--CreatBy Fang Time:2019/9/20 12:17 |  -->
+    <select id="batchFindCardPayLogByCUIds" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE card_user_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--CreatBy Fang Time:2019/9/20 12:27 |  -->
+    <select id="findCardPayLogByCUIdsAndTime" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM <include refid="Table_Name"/>
+        WHERE
+        create_time <![CDATA[ >= ]]> #{start}
+        AND create_time <![CDATA[ <= ]]> #{end}
+        AND card_user_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
 
 
-
-<!--CreatBy Fang Time: |  停用-->
+    <!--CreatBy Fang Time: |  停用-->
 <update id="stopOneById">
     UPDATE <include refid="Table_Name"/>
     SET status = 0

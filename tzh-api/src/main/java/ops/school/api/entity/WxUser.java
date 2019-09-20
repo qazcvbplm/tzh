@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
  * @author 
  */
 @Table(name="wx_user")
-public class WxUser extends Base implements Serializable {
+public class WxUser extends BaseDTOMP implements Serializable {
     /**
      * 微信用户唯一标识
      */

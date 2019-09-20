@@ -9,6 +9,7 @@ import ops.school.api.dao.OrdersMapper;
 import ops.school.api.dao.SchoolMapper;
 import ops.school.api.dao.WxUserBellMapper;
 import ops.school.api.dto.ShopTj;
+import ops.school.api.dto.card.CardPayLogDTO;
 import ops.school.api.dto.print.PrintDataDTO;
 import ops.school.api.dto.print.ShopPrintResultDTO;
 import ops.school.api.dto.project.OrderTempDTO;
@@ -21,8 +22,14 @@ import ops.school.api.exception.Assertions;
 import ops.school.api.exception.DisplayException;
 import ops.school.api.exception.YWException;
 import ops.school.api.service.*;
+import ops.school.api.service.card.CardPayLogService;
+import ops.school.api.service.card.CardUserService;
+import ops.school.api.service.card.ClubCardSendService;
 import ops.school.api.serviceimple.ShopPrintServiceIMPL;
 import ops.school.api.util.*;
+import ops.school.api.vo.card.CardPayLogVO;
+import ops.school.api.vo.card.CardUserVO;
+import ops.school.api.vo.card.ClubCardSendVO;
 import ops.school.api.wx.refund.RefundUtil;
 import ops.school.api.wxutil.AmountUtils;
 import ops.school.service.*;
@@ -112,6 +119,15 @@ public class TOrdersServiceImpl implements TOrdersService {
 
     @Autowired
     private ShopPrintService shopPringService;
+
+    @Autowired
+    private CardUserService cardUserService;
+
+    @Autowired
+    private ClubCardSendService clubCardSendService;
+
+    @Autowired
+    private CardPayLogService cardPayLogService;
 
     @Transactional
     @Override
@@ -254,6 +270,12 @@ public class TOrdersServiceImpl implements TOrdersService {
         Product product = null;
         //用于保存orderProduct
         List<OrderProduct> orderProductSaveList = new ArrayList<>();
+        //配送卡使用日志
+        CardPayLogDTO cardPayLogDTO = null;
+        // 配送费
+        BigDecimal sendUseCardMoney = BigDecimal.ZERO;
+        //判断是否保存配送卡使用日志
+        Boolean sendUseCardTrue = false;
         /**
          * 变量
          */
@@ -397,10 +419,63 @@ public class TOrdersServiceImpl implements TOrdersService {
             }
             // 最终配送费-->基础配送费+额外距离配送费+额外件数配送费
             sendPrice = sendPrice.add(shop.getSendPrice()).add(sendAddCountPrice).add(sendAddDistancePrice);
+            //配送费计算配送卡
+            Assertions.notNull(orders.getHaveCard(),ResponseViewEnums.CARD_ORDERS_NEED_HAVE_CARD);
+            if (orders.getHaveCard() == NumConstants.INT_NUM_1){
+                if(orders.getUserCardId() == null ){
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_NEED_USER_CARD_ID);
+                }
+                if(orders.getUserCardId() == 0 ){
+                    DisplayException.throwMessageWithEnum(ResponseViewEnums.ORDER_NEED_USER_CARD_ID);
+                }
+                //配送费计算配送卡
+                CardUserVO cardUserVO = cardUserService.findOneCardUserById(orders.getUserCardId());
+                Assertions.notNull(cardUserVO,ResponseViewEnums.CARD_SEND_CANT_NULL);
+                ClubCardSendVO clubCardSendVO = clubCardSendService.findOneClubCardSendById(cardUserVO.getCardId());
+                Assertions.notNull(clubCardSendVO,ResponseViewEnums.CARD_CAN_NOT_USED);
+                List<CardPayLogVO> payLogList = cardPayLogService.findCardPayLogByCUIdsAndTime(Arrays.asList(cardUserVO.getId()),TimeUtilS.getDayBegin(),TimeUtilS.getDayEnd());
+                Integer cardTimes = 0;
+                BigDecimal compareMoney = new BigDecimal(0);
+                compareMoney = compareMoney.add(sendPrice);
+                for (CardPayLogVO payLogVO : payLogList) {
+                    if (payLogVO != null){
+                        cardTimes++;
+                    }
+                    compareMoney = compareMoney.add(payLogVO.getUseMoney());
+                }
+                Boolean canUseTrue = cardUserService.checkUserCardTodayCanUseTrueByMoney(clubCardSendVO,cardUserVO,cardTimes,sendPrice, Long.valueOf(school.getId()));
+                Assertions.isTrueAndFalseToError(canUseTrue,ResponseViewEnums.CARD_SEND_CANT_USE_TODAY);
+                if (sendPrice.compareTo(clubCardSendVO.getDayMoney()) >= 0 ){
+                    sendUseCardMoney = clubCardSendVO.getDayMoney();
+                }else {
+                    sendUseCardMoney = sendPrice;
+                }
+                sendUseCardTrue = true;
+                cardPayLogDTO = new CardPayLogDTO();
+                cardPayLogDTO.setSchoolId(school.getId().longValue());
+                cardPayLogDTO.setCardUserId(cardUserVO.getId());
+                cardPayLogDTO.setUserId(wxUser.getId());
+                cardPayLogDTO.setCardId(clubCardSendVO.getId());
+                cardPayLogDTO.setCardType(clubCardSendVO.getType());
+                cardPayLogDTO.setOrderId(generatorOrderId);
+                cardPayLogDTO.setUseMoney(sendUseCardMoney);
+                cardPayLogDTO.setCreateId(wxUser.getId());
+                cardPayLogDTO.setUpdateId(wxUser.getId());
+
+                ordersSaveTemp.setCardSendUserId(cardUserVO.getId());
+            }else {
+                sendUseCardMoney = new BigDecimal(0);
+                ordersSaveTemp.setCardSendUserId(Long.valueOf(0));
+            }
+
         } else {
             // 其他的（堂食订单，自取订单）数值还是要置为0
             sendPrice = new BigDecimal(0);
+            sendUseCardMoney = new BigDecimal(0);
+            ordersSaveTemp.setCardSendUserId(Long.valueOf(0));
         }
+        //使用配送卡，减去支付金额
+        payPrice = payPrice.subtract(sendUseCardMoney);
         // 如果商品折扣未使用-->店铺满减
         if (!isDiscount) {
             // 查询商家所有满减规则（从最大满减额度开始）
@@ -434,7 +509,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         // 折后价格+餐盒费-->优惠券使用时的价格
         beforeCouponPrice = beforeCouponPrice.add(afterDiscountPrice).add(boxPrice);
         // 在没有优惠券的时候，支付价格为折后价格
-        payPrice = beforeCouponPrice;
+        payPrice = payPrice.add(beforeCouponPrice);
         //优惠券id是wx的wxCouponId
         WxUserCoupon wxUserCoupon = null;
         Coupon coupon = null;
@@ -565,6 +640,7 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersSaveTemp.setAfterDiscountPrice(afterDiscountPrice);
         ordersSaveTemp.setCreateTime(new Date());
         ordersSaveTemp.setOp(orderProductSaveList);
+        ordersSaveTemp.setCardSendMoney(sendUseCardMoney);
         /**
          * 支付金额计算逻辑
          */
@@ -590,6 +666,16 @@ public class TOrdersServiceImpl implements TOrdersService {
             if (!disProductStockSuccess) {
                 // 这里想的扣库存失败还是可以下单
                 logger.error("商品扣库存失败，商品信息：" + PublicUtilS.getCollectionToString(productDisStockList));
+            }
+        }
+        //下单完成后保存用户配送卡信息
+        if (sendUseCardTrue){
+            if (cardPayLogDTO == null){
+                logger.error("下单-保存用户-sendUseCardTrue是true-cardPayLogDTO是null");
+            }
+            ResponseObject saveO = cardPayLogService.saveOneCardPayLogByDTO(cardPayLogDTO);
+            if (!saveO.isCode()){
+                logger.error("下单-保存用户-sendUseCardTrue是true-cardPayLogDTO保存失败"+cardPayLogDTO.toString());
             }
         }
         //下单后领优惠券 新页面新接口
@@ -688,10 +774,6 @@ public class TOrdersServiceImpl implements TOrdersService {
         //2-没有开启就是带接手
             return updateD;
         }
-    }
-
-    private void thisOrderToRedisDJS(String orderId,Orders orders) {
-
     }
 
     private ResponseObject letOrderShopHadAccept(String orderId, Integer shopId) {
@@ -1066,6 +1148,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal schoolUnderTakeAmount = BigDecimal.ZERO;
         // 楼下返还金额
         BigDecimal downStairs = BigDecimal.ZERO;
+
+        BigDecimal cardSendMoney = BigDecimal.ZERO;
         // 是否有优惠券
         Boolean isCoupon = false;
         // 负责人抽成配送员百分比
@@ -1174,9 +1258,16 @@ public class TOrdersServiceImpl implements TOrdersService {
          */
         schoolGetTotal = schoolGetTotal.add(schoolGetSender.add(schoolGetshop).subtract(appGetTotal)
                 .subtract(orders.getPayFoodCoupon()).subtract(schoolUnderTakeAmount).add(downStairs));
-        ordersComplete.setSchoolGetTotal(schoolGetTotal);
         // 订单Id
         ordersComplete.setOrderId(orders.getId());
+        //配送卡优惠信息
+        if (orders.getCardSendUserId() != null && orders.getCardSendUserId().intValue() != 0){
+            cardSendMoney = orders.getCardSendMoney();
+            schoolGetTotal = schoolGetTotal.subtract(cardSendMoney);
+        }
+        ordersComplete.setSendCardMoney(cardSendMoney);
+        ordersComplete.setSchoolGetTotal(schoolGetTotal);
+        //保存订单完成信息
         orderCompleteService.save(ordersComplete);
         senderGetTotal = ordersComplete.getSenderGetTotal();
         /**

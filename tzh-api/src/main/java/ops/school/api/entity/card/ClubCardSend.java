@@ -1,5 +1,9 @@
 package ops.school.api.entity.card;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import ops.school.api.dto.card.ClubCardSendDTO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
@@ -9,6 +13,7 @@ public class ClubCardSend implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**学校id*/
     private Long schoolId;
@@ -189,4 +194,51 @@ public class ClubCardSend implements Serializable {
     this.updateTime = updateTime;
     }
 
+    public ClubCardSendDTO toDTO() {
+        ClubCardSendDTO dto = new ClubCardSendDTO();
+        dto.setId(this.id);
+        dto.setSchoolId(this.schoolId);
+        dto.setName(this.name);
+        dto.setDescription(this.description);
+        dto.setDayTime(this.dayTime);
+        dto.setPriceSale(this.priceSale);
+        dto.setPriceOriginal(this.priceOriginal);
+        dto.setDayMoney(this.dayMoney);
+        dto.setSendBeginTime(this.sendBeginTime);
+        dto.setSendEndTime(this.sendEndTime);
+        dto.setEffectiveDays(this.effectiveDays);
+        dto.setType(this.type);
+        dto.setStatus(this.status);
+        dto.setIsDelete(this.isDelete);
+        dto.setCreateId(this.createId);
+        dto.setUpdateId(this.updateId);
+        dto.setCreateTime(this.createTime);
+        dto.setUpdateTime(this.updateTime);
+        return dto;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ClubCardSend{");
+        sb.append("id=").append(id);
+        sb.append(", schoolId=").append(schoolId);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", dayTime=").append(dayTime);
+        sb.append(", priceSale=").append(priceSale);
+        sb.append(", priceOriginal=").append(priceOriginal);
+        sb.append(", dayMoney=").append(dayMoney);
+        sb.append(", sendBeginTime=").append(sendBeginTime);
+        sb.append(", sendEndTime=").append(sendEndTime);
+        sb.append(", effectiveDays=").append(effectiveDays);
+        sb.append(", type=").append(type);
+        sb.append(", status=").append(status);
+        sb.append(", isDelete=").append(isDelete);
+        sb.append(", createId=").append(createId);
+        sb.append(", updateId=").append(updateId);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", updateTime=").append(updateTime);
+        sb.append('}');
+        return sb.toString();
+    }
 }

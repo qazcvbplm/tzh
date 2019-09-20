@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import javax.validation.constraints.NotNull;
 
-public class Notice extends Base {
+public class Notice extends BaseDTOMP {
     @TableId(type = IdType.AUTO)
     private Integer id;
     @NotNull

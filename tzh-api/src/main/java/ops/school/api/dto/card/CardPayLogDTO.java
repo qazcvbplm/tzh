@@ -3,18 +3,24 @@ package ops.school.api.dto.card;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import ops.school.api.dto.BaseDTOCompute;
+import ops.school.api.entity.BaseDTOMP;
 import ops.school.api.entity.card.CardPayLog;
-import org.springframework.beans.BeanUtils;
+import ops.school.api.vo.card.CardPayLogVO;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 
 
-public class CardPayLogDTO implements Serializable {
+public class CardPayLogDTO  extends BaseDTOCompute implements Serializable {
     
     private static final long serialVersionUID = 1L;
     /**主键id*/
     private Long id;
     /**学校id*/
     private Long schoolId;
+
+    private Long cardUserId;
     /**用户id*/
     private Long userId;
     /**卡id*/
@@ -121,11 +127,64 @@ public class CardPayLogDTO implements Serializable {
     public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
     }
-    
-    public CardPayLog toModel() {
-    	CardPayLog model = new CardPayLog();
-		BeanUtils.copyProperties(this, model);
-		return model;
+
+    public Long getCardUserId() {
+        return cardUserId;
     }
 
+    public void setCardUserId(Long cardUserId) {
+        this.cardUserId = cardUserId;
+    }
+
+    public CardPayLogVO toVO() {
+        CardPayLogVO vo = new CardPayLogVO();
+        vo.setId(this.id);
+        vo.setSchoolId(this.schoolId);
+        vo.setCardUserId(this.cardUserId);
+        vo.setUserId(this.userId);
+        vo.setCardId(this.cardId);
+        vo.setCardType(this.cardType);
+        vo.setOrderId(this.orderId);
+        vo.setUseMoney(this.useMoney);
+        vo.setCreateId(this.createId);
+        vo.setUpdateId(this.updateId);
+        vo.setCreateTime(this.createTime);
+        vo.setUpdateTime(this.updateTime);
+        return vo;
+    }
+    public CardPayLog toModel() {
+        CardPayLog model = new CardPayLog();
+        model.setId(this.id);
+        model.setSchoolId(this.schoolId);
+        model.setCardUserId(this.getCardUserId());
+        model.setUserId(this.userId);
+        model.setCardId(this.cardId);
+        model.setCardType(this.cardType);
+        model.setOrderId(this.orderId);
+        model.setUseMoney(this.useMoney);
+        model.setCreateId(this.createId);
+        model.setUpdateId(this.updateId);
+        model.setCreateTime(this.createTime);
+        model.setUpdateTime(this.updateTime);
+        return model;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CardPayLogDTO{");
+        sb.append("id=").append(id);
+        sb.append(", schoolId=").append(schoolId);
+        sb.append(", cardUserId=").append(cardUserId);
+        sb.append(", userId=").append(userId);
+        sb.append(", cardId=").append(cardId);
+        sb.append(", cardType=").append(cardType);
+        sb.append(", orderId='").append(orderId).append('\'');
+        sb.append(", useMoney=").append(useMoney);
+        sb.append(", createId=").append(createId);
+        sb.append(", updateId=").append(updateId);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", updateTime=").append(updateTime);
+        sb.append('}');
+        return sb.toString();
+    }
 }

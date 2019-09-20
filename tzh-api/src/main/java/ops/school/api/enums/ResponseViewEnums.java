@@ -25,6 +25,7 @@ public enum ResponseViewEnums implements RootEnums{
     FIND_FAILED("1210006","查询失败"),
     /**创建人不能为空*/
     CREATE_ID_CANT_NULL("1210007","创建人不能为空"),
+    UPDATE_ID_CAN_NOT_NULL("1210008","更新对象不能为空"),
 
 
     /**----------2-楼栋错误-----------*/
@@ -46,9 +47,10 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------4-微信用户错误-----------*/
     WX_USER_NO_EXIST("1240001","微信用户不存在，更新后操作"),
     WX_USER_BELL_NEED_ID("1240002","微信用户，余额，粮票的操作，必须有微信用户id"),
-    WX_USER_NEED_USER_ID("1240003","微信用户需要用户id参数"),
+    WX_USER_NEED_USER_ID("1240003","用户操作需要用户id参数"),
     WX_USER_FAILED_TO_WX("1240004","微信接口繁忙，请重试！"),
     WX_TUI_KUAN_ERROR("1240005","微信退款失败，请稍后重试或者请联系后台管理！"),
+    WX_USER_NO_EXIST2("1240006","微信用户不存在，更新后操作或者退出小程序并删除后重进"),
 
     /**----------5-订单错误-----------*/
     ORDER_DONT_HAVE_PRODUCT("1250001","订单中不存在商品，请点单后下单"),
@@ -64,12 +66,13 @@ public enum ResponseViewEnums implements RootEnums{
     ORDER_PARAM_TIME_BEFORE("1250011","预定订单时间太早，请稍后重新下单"),
     ORDER_USER_BELL_NULL("1250012","用户数据有误，请前往“我的”界面重新授权绑定手机号"),
     ORDER_ADD_ORDER_NO_SHOP("1250013","亲！支付成功，下单失败，店铺有误，请联系学校负责人或者椰子后台客服服务"),
+    ORDER_NEED_USER_CARD_ID("1250014","订单缺失信息，需要配送卡信息"),
 
     /**----------6-商品信息错误-----------*/
     PRODUCT_HAD_CHANGE("1260001","商品信息发生变化，请联系后台管理"),
 
     /**----------7-学校信息错误-----------*/
-    SCHOOL_HAD_CHANGE("1270001","学校信息发生变化，请联系后台管理"),
+    SCHOOL_HAD_CHANGE("1270001","学校信息发生变化，请刷新或者联系后台管理"),
     SCHOOL_CANT_BE_NULL("1270002","需要选择学校"),
 
     /**----------8-店铺信息错误-----------*/
@@ -119,6 +122,18 @@ public enum ResponseViewEnums implements RootEnums{
     /**----------16-统计和提现错误错误-----------*/
     TX_DATA_HAD_NOT_COUNT("1216001","后台每日统计数据存疑，禁止当日提现，请联系后台"),
     TX_MONEY_LESS("1216002","可提现金额不足，请校验"),
+
+    /**----------17-配送会员卡-----------*/
+    CARD_CAN_NOT_USED("1217001","数据变更，配送卡无法使用，请刷新或联系客服"),
+    CARD_BUY_ERROR("1217002","配送卡购买失败，请重试或联系客服"),
+    CARD_SEND_CANT_NULL("1217003","配送卡信息错误，请联系客服或者刷新小程序重试"),
+    CARD_SEND_CANT_USE_TODAY("1217004","配送卡今天不能使用，请校验"),
+    CARD_ORDERS_NEED_HAVE_CARD("1217004","外卖订单缺少配送卡信息，请校验"),
+
+
+    /**----------18-微信支付错误-----------*/
+    WX_PAY_ERROR("1218001","微信支付失败，请重试"),
+
 
 
     ;
