@@ -1,6 +1,7 @@
 package ops.school.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.math.BigDecimal;
@@ -29,9 +30,20 @@ public class OrdersComplete {
 
     private BigDecimal shopGetTotal;
 
+    @TableField(exist = false)
+    private BigDecimal sendCardMoney;
+
 
     public OrdersComplete() {
         super();
+    }
+
+    public BigDecimal getSendCardMoney() {
+        return sendCardMoney;
+    }
+
+    public void setSendCardMoney(BigDecimal sendCardMoney) {
+        this.sendCardMoney = sendCardMoney;
     }
 
     public OrdersComplete(Orders order, School school, Shop shop, Sender sender) {

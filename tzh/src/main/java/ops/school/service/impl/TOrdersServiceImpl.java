@@ -1141,6 +1141,8 @@ public class TOrdersServiceImpl implements TOrdersService {
         BigDecimal schoolUnderTakeAmount = BigDecimal.ZERO;
         // 楼下返还金额
         BigDecimal downStairs = BigDecimal.ZERO;
+
+        BigDecimal cardSendMoney = BigDecimal.ZERO;
         // 是否有优惠券
         Boolean isCoupon = false;
         // 负责人抽成配送员百分比
@@ -1252,6 +1254,13 @@ public class TOrdersServiceImpl implements TOrdersService {
         ordersComplete.setSchoolGetTotal(schoolGetTotal);
         // 订单Id
         ordersComplete.setOrderId(orders.getId());
+        //配送卡优惠信息
+        if (orders.getCardSendUserId() != null && orders.getCardSendUserId().intValue() != 0){
+            cardSendMoney = orders.getCardSendMoney();
+            schoolGetTotal = schoolGetTotal.subtract(cardSendMoney);
+        }
+        ordersComplete.setSendCardMoney(cardSendMoney);
+        //保存订单完成信息
         orderCompleteService.save(ordersComplete);
         senderGetTotal = ordersComplete.getSenderGetTotal();
         /**

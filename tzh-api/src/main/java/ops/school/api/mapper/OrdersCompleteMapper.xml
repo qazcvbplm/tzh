@@ -13,12 +13,14 @@
         <result column="school_get_total" property="schoolGetTotal" jdbcType="DECIMAL" />
         <result column="sender_get_total" property="senderGetTotal" jdbcType="DECIMAL" />
         <result column="shop_get_total" property="shopGetTotal" jdbcType="DECIMAL" />
+        <result column="send_card_money" property="sendCardMoney" jdbcType="DECIMAL" />
     </resultMap>
 
 
     <sql id="Base_Column_List" >
         Id,
         order_id,
+        send_card_money,
         app_get_school_rate,
         school_get_shop_rate,
         school_get_sender_rate,

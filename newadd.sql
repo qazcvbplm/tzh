@@ -121,4 +121,7 @@ ALTER TABLE `orders`
 ADD COLUMN `card_send_user_id`  bigint(20) NULL DEFAULT 0 COMMENT '用户购买的配送会员卡id' AFTER `after_discount_price`,
 ADD COLUMN `card_send_money`  decimal(10,2) NULL DEFAULT 0 COMMENT '用户此单减免配送费' AFTER `card_send_user_id`;
 
+ALTER TABLE `orders_complete`
+ADD COLUMN `send_card_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '每笔订单配送卡' ;
+
 
