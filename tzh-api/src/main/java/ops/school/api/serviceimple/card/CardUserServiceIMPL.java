@@ -175,7 +175,7 @@ public class CardUserServiceIMPL implements CardUserService {
         if (!"SUCCESS".equalsIgnoreCase(payMap.get("return_code"))){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.WX_PAY_ERROR);
         }
-        return new ResponseObject(true,ResponseViewEnums.SUCCESS);
+        return new ResponseObject(true,ResponseViewEnums.SUCCESS).push("wxPayMap",payMap);
     }
 
     private String getNotifyUrl() {

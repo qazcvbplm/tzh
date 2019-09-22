@@ -38,7 +38,7 @@
     </sql>
 
 <sql id="Select_Limit_State">
-    1=1
+    is_delete = 0
     <if test="id != null and id != '' ">
         AND id = #{id}
     </if>
