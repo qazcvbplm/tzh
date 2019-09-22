@@ -128,8 +128,7 @@ public enum ResponseViewEnums implements RootEnums{
     CARD_BUY_ERROR("1217002","配送卡购买失败，请重试或联系客服"),
     CARD_SEND_CANT_NULL("1217003","配送卡信息错误，请联系客服或者刷新小程序重试"),
     CARD_SEND_CANT_USE_TODAY("1217004","配送卡今天不能使用，请校验"),
-    CARD_ORDERS_NEED_HAVE_CARD("1217004","外卖订单缺少配送卡信息，请校验"),
-
+    CARD_ORDERS_NEED_HAVE_CARD("1217004","小程序版本错误，请删除小程序再进入"),
 
     /**----------18-微信支付错误-----------*/
     WX_PAY_ERROR("1218001","微信支付失败，请重试"),
