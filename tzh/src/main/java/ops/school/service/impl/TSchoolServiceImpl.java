@@ -7,6 +7,8 @@ import ops.school.api.exception.YWException;
 import ops.school.api.service.LogsService;
 import ops.school.api.service.SchoolService;
 import ops.school.api.service.TxLogService;
+import ops.school.api.util.LoggerUtil;
+import ops.school.api.util.ResponseObject;
 import ops.school.api.wx.towallet.WeChatPayUtil;
 import ops.school.controller.RichTextController;
 import ops.school.service.TSchoolService;
@@ -61,5 +63,38 @@ public class TSchoolServiceImpl implements TSchoolService {
             throw new YWException("余额不足");
         }
 
+    }
+
+    /**
+     * @date:   2019/9/22 15:04
+     * @author: QinDaoFang
+     * @version:version
+     * @return: ops.school.api.util.ResponseObject
+     * @param   schoolId
+     * @param   amount
+     * @param   openId
+     * @Desc:   desc
+     */
+    @Override
+    public ResponseObject schoolLeaderDoTX(int schoolId, BigDecimal amount, String openId) {
+        School school = schoolService.findById(schoolId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("schoolId", schoolId);
+        map.put("amount", amount);
+        String payId = "tx" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        try {
+            TxLog log = new TxLog(schoolId, "代理提现", null, amount, "", schoolId, school.getAppId());
+            if (WeChatPayUtil.transfers(school.getWxAppId(), school.getMchId(),
+                    school.getWxPayId(), school.getCertPath(), payId, "127.0.0.1", amount, openId, log) == 1) {
+                txLogService.save(log);
+                stringRedisTemplate.delete("SCHOOL_ID_" + school.getId());
+                return new ResponseObject(true,"提现成功");
+            }
+        } catch (Exception e) {
+            logsService.save(new Logs(schoolId + "," + openId + ":" + amount + e.getMessage()));
+            LoggerUtil.logError("学校负责人提现错误-schoolLeaderDoTX-"+schoolId + "-" + openId + "-" + amount + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
+        return new ResponseObject(true,"提现失败,后台异常");
     }
 }

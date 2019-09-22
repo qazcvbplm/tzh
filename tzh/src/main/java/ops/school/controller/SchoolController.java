@@ -153,6 +153,9 @@ public class SchoolController {
         txSchoolWrapper.lambda().eq(DayLogTakeout::getSelfId,schoolId);
         txSchoolWrapper.lambda().like(DayLogTakeout::getDay, TimeUtilS.theYesterdayByCalendar(new Date()));
         List<DayLogTakeout> allTxSchoolList = dayLogTakeoutService.list(txSchoolWrapper);
+        if (allTxSchoolList.size() < NumConstants.INT_NUM_1){
+            DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_DATA_HAD_NOT_COUNT);
+        }
         DayLogTakeout dayLogTakeout = allTxSchoolList.get(0);
         if (dayLogTakeout == null){
             DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_DATA_HAD_NOT_COUNT);
@@ -160,13 +163,15 @@ public class SchoolController {
             DisplayException.throwMessageWithEnum(ResponseViewEnums.TX_MONEY_LESS);
         }
         String res = "";
+        ResponseObject responseObject = null;
+        //验证码
         if (cache != null && cache.equals(codes)) {
             stringRedisTemplate.delete(schoolId + school.getPhone());
-            res = tSchoolService.tx(schoolId, amount, openId);
+            responseObject = tSchoolService.schoolLeaderDoTX(schoolId, amount, openId);
         } else {
             return new ResponseObject(false, "验证码错误或者失效");
         }
-        return new ResponseObject(true, res);
+        return responseObject;
     }
 
     @ApiOperation(value = "获取验证码", httpMethod = "POST")

@@ -152,7 +152,7 @@ public class Task {
 
     @Scheduled(cron = "0 0 2 * * ?")
     public void jisuan() {
-        Date date = new Date();
+        Date date = TimeUtilS.getNextDay(new Date(),-5 );
         this.theDayilyStatistics(date);
     }
 
@@ -180,12 +180,14 @@ public class Task {
         txLog.le("create_time",TimeUtilS.getDayEnd(runTaskDay,-1));
         List<TxLog> txProxyList = txLogService.list(txLog);
         Map<Integer,List<TxLog>> txProxyListMap = PublicUtilS.listforEqualKeyListMap(txProxyList,"txerId");
+        QueryWrapper<TxLog> shopTxLog = new QueryWrapper<>();
         //统计店铺提现
-        txLog.eq("type","商家提现");
+        shopTxLog.eq("type","商家提现");
+        shopTxLog.eq("is_tx","1");
         // todo
-        txLog.ge("create_time",TimeUtilS.getDayBegin(runTaskDay,-1));
-        txLog.le("create_time",TimeUtilS.getDayEnd(runTaskDay,-1));
-        List<TxLog> txShoperList = txLogService.list(txLog);
+        shopTxLog.ge("create_time",TimeUtilS.getDayBegin(runTaskDay,-1));
+        shopTxLog.le("create_time",TimeUtilS.getDayEnd(runTaskDay,-1));
+        List<TxLog> txShoperList = txLogService.list(shopTxLog);
         Map<Integer,List<TxLog>> txShoperListMap = PublicUtilS.listforEqualKeyListMap(txShoperList,"txerId");
         for (School schooltemp : schools) {
             //当天学校总钱
@@ -272,7 +274,7 @@ public class Task {
             moneySave.setSchoolDayTx(tx);
             //学校所有店铺当日提现
             moneySave.setShopDayTx(shopsAllTxMoney);
-            toDaySchoolAllMoney = toDaySchoolAllMoney.subtract(tx).add(lastDaySchoolAllMoney);
+            toDaySchoolAllMoney = toDaySchoolAllMoney.subtract(tx).add(lastDaySchoolAllMoney).subtract(shopsAllTxMoney);
             //每日可提现加上跑腿所得
             BigDecimal runSchoolGet = new BigDecimal(0);
             if (runLog.getSelfGet() != null){
